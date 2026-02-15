@@ -102,7 +102,7 @@ public class StageManager : NetworkBehaviour
 
         if (myTeam != Team.Red)
         {
-            _mainCamera.transform.rotation = Quaternion.Euler(90f, 0, 180f);
+            _mainCamera.transform.Rotate(new Vector3(0, 0, 180f));
             Debug.Log("레드팀은 카메라 180도 회전");
         }
 

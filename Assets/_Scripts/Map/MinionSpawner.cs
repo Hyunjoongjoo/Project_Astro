@@ -19,6 +19,7 @@ public class MinionSpawner : MonoBehaviour
     [SerializeField] private List<Tower> _towers;
 
     private int _destroyedTowerCount = 0;
+    private Coroutine _minionSpawnCor;
 
     private void Start()
     {
@@ -35,16 +36,17 @@ public class MinionSpawner : MonoBehaviour
             }
         }
 
-        StartCoroutine(SpawnRoutine());
+        _minionSpawnCor = StartCoroutine(SpawnRoutine());
     }
 
     private IEnumerator SpawnRoutine()
     {
+         yield return new WaitUntil(() => GameManager.Instance.IsGameStarted); //게임 시작전 대기
+
         while (true)
         {
-            yield return new WaitUntil(() => GameManager.Instance.IsGameStarted); //게임 시작전 대기
-            yield return new WaitForSeconds(_spawnInterval);
             SpawnMinions();
+            yield return CoroutineManager.waitForSeconds(_spawnInterval);
         }
     }
 
