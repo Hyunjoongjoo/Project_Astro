@@ -1,5 +1,5 @@
 효과 ID,효과 그룹 ID,효과 종류,효과 수치,발동 조건,발동 조건 값,대상,설명 텍스트,기획용 비고
-id,effectGroupId,effectType,effectValue,triggerCondition,triggerValue,target,note,note
+id,effectGroupId,effectType,effectValue,triggerCondition,triggerValue,target,note,note2
 string,string,enum,string,enum,string,enum,string,string
 effect_item_attack001_01,effect_item_attack001,increase_attack_per,15,passive,0,self,des_effect_item_attack001_01,기획용 컬럼입니다. 게임에 사용되지 않습니다.
 effect_item_defence001_01,effect_item_defence001,decrease_damage_per,30,hp_below,40,self,des_effect_item_defence001_01,기획용 컬럼입니다. 게임에 사용되지 않습니다.

@@ -5,26 +5,29 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 
 //CSV 파일을 읽어서 C# 객체로 찍어내기
+
+//02.14 어드레서블 도입 이후 텍스트를 받아와서 리스트로 변경만 하는 역할로 변경
 public static class CsvParser
 {
     //Parse<T> 메서드
     //어떤 데이터 타입이든 처리, where new T()로 만들 수 있는 클래스만
-    public static List<T> Parse<T>(string csvFileName) where T : new()
+    //02.14 인자값 변경
+    public static List<T> Parse<T>(string csvContent) where T : new()
     {
         List<T> list = new List<T>();
 
-        //Resources에서 파일 읽어오기
-        TextAsset csvData = Resources.Load<TextAsset>(csvFileName);
+        //02.14 이제 안 읽어옴
+        ////Resources에서 파일 읽어오기
+        //TextAsset csvData = Resources.Load<TextAsset>(csvFileName);
 
 
-        if (csvData == null)
+        if (string.IsNullOrEmpty(csvContent))
         {
-            Debug.LogError($"[CsvParser] 파일 없다: {csvFileName}");
             return list;
         }
 
         //줄바꿈 처리
-        string[] lines = csvData.text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] lines = csvContent.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
         //헤더가 3줄이니까 4줄은 넘겨야 데이터가 존재
         if (lines.Length < 4)
@@ -82,7 +85,7 @@ public static class CsvParser
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError($"[CsvParser] 파싱 에러파트 파일:{csvFileName}, 줄:{i + 1}, 컬럼:{headers[j]}, 값:{value}\n에러:{e}");
+                        Debug.LogError($"[CsvParser] 파싱 에러, 줄:{i + 1}, 컬럼:{headers[j]}, 값:{value}\n에러:{e}");
                     }
                 }
             }
@@ -101,6 +104,7 @@ public static class CsvParser
     //타입 변환기
     //인자값 value는 string, type은 목표 타입
     //출력은 int bool 등 모든 타입이 될 수 있는 object
+    //02.14 테이블 규격에 맞춰 변경
     private static object ConvertValue(string value, Type type)
     {
         if (type == typeof(int))
@@ -111,15 +115,28 @@ public static class CsvParser
         {
             return float.TryParse(value, out float f) ? f : 0f;
         }
-        if (type == typeof(bool)) //기획서 상엔 t, f > (Jihoo) 데이터 테이블에서 0, 1로 저장된 것으로 확인
+        if (type == typeof(bool))
         {
-            // Jihoo
-            // 데이터 테이블 형식에 따라 "t"를 "1"로 변경
-            return value == "1";
+            //02.14 테이블 규격에 맞춰 변경
+            //공백 제거하고 소문자로 변환
+            string lowerVal = value.Trim().ToLower();
+            return lowerVal == "1" || lowerVal == "true" || lowerVal == "t";
         }
-        if (type.IsEnum) //Fire면 Type.Fire, 숫자를 적어도 Type 중 0번으로 변환.
+        if (type.IsEnum) //02.14 테이블 규격에 맞춰 변경
         {
-            return Enum.Parse(type, value);
+            try
+            {
+                //CSV 값에서 언더바, 공백 제거
+                string cleanValue = value.Replace("_", "").Trim();
+
+                //대소문자 무시하고 Enum 찾기
+                return Enum.Parse(type, cleanValue, true);
+            }
+            catch
+            {
+                Debug.LogWarning($"CSV 파싱 중, Enum 매칭 실패.   값: {value}");
+                return 0;
+            }
         }
         return value; // string
     }

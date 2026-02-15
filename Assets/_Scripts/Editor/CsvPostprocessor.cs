@@ -1,16 +1,11 @@
 using System.IO;
 using UnityEditor;
-using UnityEditor.AddressableAssets;
-using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
-
-//어드레서블 네임스페이스
-#if UNITY_ADDRESSABLES
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
-#endif
 
-public class CsvPostprocessor : MonoBehaviour
+
+public class CsvPostprocessor : AssetPostprocessor
 {
     //감시 폴더와 보관할 그룹명
     private const string CsvFolder = "Assets/_Data/Csv";

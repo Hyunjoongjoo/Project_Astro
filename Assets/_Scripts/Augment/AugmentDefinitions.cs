@@ -2,17 +2,6 @@ using System;
 
 //열거형, 공용 구조체, 인터페이스 등 모아둘 Definitions
 
-//임시 효과 타입
-public enum EffectType
-{
-    None = 0,
-    Attack = 1,     
-    Defense = 2,     
-    Hp = 3,          
-    MoveSpeed = 4,   
-    AttackSpeed = 5, 
-    Cooldown = 6     
-}
 
 //증강 타입
 public enum AugmentType
@@ -22,16 +11,6 @@ public enum AugmentType
     Skill = 2,  //스킬 강화
     Item = 3    //아이템 장착
 }
-
-//타겟 타입(CSV)
-public enum TargetType
-{
-    Self = 0,    //자신
-    Ally = 1,    //아군
-    Enemy = 2,   //적
-    AllAlly = 3  //아군 전체
-}
-
 
 //영웅의 기본 스탯 + 각 유저의 성장치를 합친 결과물
 //파이어베이스에서 캡슐화하여 받을 예정
