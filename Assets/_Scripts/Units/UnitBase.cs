@@ -5,18 +5,33 @@ using UnityEngine;
 public abstract class UnitBase : MonoBehaviour
 {
     [SerializeField] protected float _maxHealth;
-    [SerializeField] protected float _currentHealth;
     [SerializeField] protected float _deffense;
 
-    protected Team team;
+    protected float _currentHealth;
+    protected Team _team;
 
     // 미니언이 죽었을 때 경험치 증가
     // 서브 타워 파괴시 미니언 웨이브 강화
     // 메인 타워 파괴시 게임 종료 등 Die 시 다형성을 위한 유닛 타입
-    protected UnitType unitType;
+    protected UnitType _unitType;
 
     // 죽었을 때 이벤트를 알리며 자신의 타입을 알림
     public event Action<UnitBase> OnDeath;
+
+    protected virtual void Awake()
+    {
+        _currentHealth = _maxHealth;
+    }
+
+    public void TakeDamage(float amount)
+    {
+        _currentHealth -= amount;
+
+        if (_currentHealth < 1)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
+        {
+            Die();
+        }
+    }
 
     public virtual void Die()
     {
