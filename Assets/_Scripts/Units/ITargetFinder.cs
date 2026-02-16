@@ -5,8 +5,9 @@ using UnityEngine;
 
 public interface ITargetFinder
 {
-    public float SearchRange { get; set; }
-    public LayerMask TargetLayer { get; set; }
+    public float SearchRange { get; }
+    public LayerMask TargetLayer { get; }
+    public float SearchInterval { get; }
 
     public UnitBase FindTarget();
 }

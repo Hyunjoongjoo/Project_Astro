@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Fusion;
+using System;
 using UnityEngine;
 
 // 이동하는 유닛과 건물 모두에게 공통된 속성 정의
-public abstract class UnitBase : MonoBehaviour
+public abstract class UnitBase : NetworkBehaviour
 {
     [SerializeField] protected float _maxHealth;
     [SerializeField] protected float _deffense;
