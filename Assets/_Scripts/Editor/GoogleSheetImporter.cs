@@ -10,7 +10,8 @@ public class GoogleSheetImporter : EditorWindow
     //스프레드 시트 고유 ID 넣고
     private string _sheetId = "1OYp8Qpi3HPuoeZmpP4ssRck5V24W1sZCL6idIvUCerw";
     //경로설정
-    private const string SavePath = "Assets/_Data/Csv";
+    private const string CsvSavePath = "Assets/_Data/Csv";
+    private const string ClassSavePath = "Assets/_Scripts/TableData";
 
     //현재 테이블 이름으로 정보 가져오는 게 안돼서 GID로 직접 받을 예정
     ////테이블 목록이 적힌 관리용 시트
@@ -51,7 +52,7 @@ public class GoogleSheetImporter : EditorWindow
     private void DownloadAllSheets()
     {
         //저장폴더체크, 없으면 생성
-        if(!Directory.Exists(SavePath)) Directory.CreateDirectory(SavePath);
+        if(!Directory.Exists(CsvSavePath)) Directory.CreateDirectory(CsvSavePath);
 
         //코루틴 실행
         var routine = DownloadRoutine();
@@ -157,7 +158,7 @@ public class GoogleSheetImporter : EditorWindow
                 else
                 {
                     //경로 결합
-                    string filePath = Path.Combine(SavePath, $"{info.Name}.csv");
+                    string filePath = Path.Combine(CsvSavePath, $"{info.Name}.csv");
 
                     //실제 파일 생성 및 내용 쓰기
                     File.WriteAllText(filePath, www.downloadHandler.text);
@@ -172,5 +173,8 @@ public class GoogleSheetImporter : EditorWindow
         //파일이 밖에서 만들어졌기 때문에 유니티 에디터는 파일 생성을 인식 못한다고 함
         //그래서 강제 리프레쉬
         AssetDatabase.Refresh();
+
+        //TableClassGenerator 연결해서 스크립트 자동 생성
+        TableClassGenerator.GenerateAllClassesInFolder(CsvSavePath, ClassSavePath);
     }
 }
