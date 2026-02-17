@@ -1,6 +1,6 @@
 ﻿public enum Team
 {
-    Blue, Red
+    None, Blue, Red
 }
 
 public enum UnitType

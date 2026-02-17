@@ -189,7 +189,7 @@ public abstract class BaseAutoBattleAI : NetworkBehaviour
     protected Transform FindNearestTower()//가까운 타워 찾기
     {
         float minDistance = float.MaxValue;
-        Tower closest = null;
+        Structure closest = null;
 
         foreach (var tower in Tower.AliveTowers)
         {
@@ -198,7 +198,7 @@ public abstract class BaseAutoBattleAI : NetworkBehaviour
                 continue;
             }
 
-            if (tower.Team == team)
+            if (tower.team == team)
             {
                 continue;
             }

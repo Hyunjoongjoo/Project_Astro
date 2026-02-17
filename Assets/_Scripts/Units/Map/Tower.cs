@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -20,8 +21,6 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
     private float _nextScanTime;
     private float _nextAttackTime;
 
-    public Team Team => _team;
-
     public float AttackPower { get => _attackPower; }
     public float AttackSpeed { get => _attackSpeed; }
     public float AttackRange { get => _detectRange; }
@@ -29,10 +28,12 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
     public LayerMask TargetLayer { get => _targetLayer; }
     public float SearchInterval { get => _scanInterval; }
 
+    [Networked] public TickTimer AttackInterval { get; set; }
+
     protected override void Awake()
     {
         base.Awake();
-        if (_team == Team.Blue)
+        if (team == Team.Blue)
         {
             gameObject.layer = LayerMask.NameToLayer("BlueTeam");
             _targetLayer = 1 << LayerMask.NameToLayer("RedTeam");
@@ -57,6 +58,16 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         AliveTowers.Remove(this);
     }
 
+    public override void FixedUpdateNetwork()
+    {
+        if (AttackInterval.ExpiredOrNotRunning(Runner))
+        {
+
+        }
+        TickTimer.CreateFromSeconds(Runner, 1.5f);
+    }
+
+    // 네트워크라 이거 쓰면 안됨
     private void Update()
     {
         if (Time.time < _nextAttackTime)
@@ -134,7 +145,7 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
                 continue;
             }
 
-            if (ai.Team == _team)
+            if (ai.Team == team)
             {
                 continue;
             }

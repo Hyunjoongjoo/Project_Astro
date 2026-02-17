@@ -29,7 +29,7 @@ public class MinionSpawner : MonoBehaviour
         {
             if(tower != null)
             {
-                tower.OnTowerDestroyed += () =>
+                tower.OnDeath += (tower) =>
                 {
                     _destroyedTowerCount++;
                 };
@@ -38,6 +38,8 @@ public class MinionSpawner : MonoBehaviour
 
         _minionSpawnCor = StartCoroutine(SpawnRoutine());
     }
+
+    // 네트워크 동기화 땐 코루틴 쓰면 안됨! (동기화 깨질 수 있음)
 
     private IEnumerator SpawnRoutine()
     {
