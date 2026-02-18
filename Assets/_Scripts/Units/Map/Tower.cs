@@ -139,17 +139,6 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
                 continue;
             }
 
-            BaseAutoBattleAI ai = hit.GetComponent<BaseAutoBattleAI>();
-            if (ai == null)
-            {
-                continue;
-            }
-
-            if (ai.Team == team)
-            {
-                continue;
-            }
-
             float distance = Vector3.Distance(transform.position, hit.transform.position);
             if (distance < minDistance)
             {

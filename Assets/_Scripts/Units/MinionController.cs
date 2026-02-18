@@ -174,8 +174,8 @@ public class MinionController : MobilityUnit, IBasicAttack
             return;
         }
 
-        UnitController unit = target.GetComponent<UnitController>();
-        if (unit != null && !unit.IsDead)
+        UnitBase unit = target.GetComponent<UnitBase>();
+        if (unit != null)
         {
             unit.TakeDamage(AttackPower);
         }

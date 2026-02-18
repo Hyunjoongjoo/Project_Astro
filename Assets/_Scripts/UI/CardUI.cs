@@ -54,14 +54,14 @@ public class CardUI : MonoBehaviour, IBeginDragHandler,IDragHandler, IEndDragHan
 
         GameObject heroObj = Instantiate(prefab, spawnPos, Quaternion.identity);
 
-        BaseAutoBattleAI ai = heroObj.GetComponent<BaseAutoBattleAI>();
+        HeroController ai = heroObj.GetComponent<HeroController>();
         if (ai != null)
         {
             //임시 팀
             Team myTeam = Team.Blue; //나중에 교체
 
             //일단 null
-            ai.Setup(myTeam, null);
+            // ai.Setup(myTeam, null);
         }
 
         Debug.Log($"{_cardData.name} 소환 완료!");

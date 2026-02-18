@@ -698,118 +698,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 136332900}
   m_CullTransparentMesh: 1
---- !u!1 &143026191
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 143026192}
-  - component: {fileID: 143026193}
-  m_Layer: 0
-  m_Name: MinionSpawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &143026192
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 143026191}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.79, y: 0, z: -11.38}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1488995267}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &143026193
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 143026191}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9dde036937718dc4d93184ed86bca9a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MinionSpawner
-  _team: 0
-  _minionTag: Minion
-  _spawnPoints:
-  - {fileID: 286569281}
-  - {fileID: 2099991292}
-  _enemyBase: {fileID: 544860707}
-  _baseSpawnCount: 3
-  _bonusSpawnCount: 3
-  _spawnInterval: 15
-  _towers:
-  - {fileID: 1910674111}
-  - {fileID: 1992498372}
---- !u!1 &146631955
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 146631956}
-  - component: {fileID: 146631957}
-  m_Layer: 0
-  m_Name: MinionSpawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &146631956
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 146631955}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.79, y: 0, z: -11.38}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 254773289}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &146631957
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 146631955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9dde036937718dc4d93184ed86bca9a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MinionSpawner
-  _team: 1
-  _minionTag: Minion
-  _spawnPoints:
-  - {fileID: 1910674107}
-  - {fileID: 1992498368}
-  _enemyBase: {fileID: 1431818093}
-  _baseSpawnCount: 3
-  _bonusSpawnCount: 3
-  _spawnInterval: 15
-  _towers:
-  - {fileID: 286569285}
-  - {fileID: 2099991296}
 --- !u!1 &155707805
 GameObject:
   m_ObjectHideFlags: 0
@@ -1113,7 +1001,6 @@ Transform:
   - {fileID: 544860707}
   - {fileID: 1910674107}
   - {fileID: 1992498368}
-  - {fileID: 146631956}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &265504855
@@ -1165,6 +1052,7 @@ GameObject:
   - component: {fileID: 286569285}
   - component: {fileID: 286569283}
   - component: {fileID: 286569282}
+  - component: {fileID: 286569286}
   m_Layer: 30
   m_Name: sub_left
   m_TagString: Untagged
@@ -1279,17 +1167,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a122320be5e7874a9156352a6137389, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
-  _team: 0
-  _hp: 50
-  _damage: 10
+  _maxHealth: 0
+  _deffense: 0
+  team: 0
+  _CurrentHealth: 0
+  _CurrentState: 0
+  _attackPower: 0
+  _attackSpeed: 1
+  _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
+  _firePoint: {fileID: 1719435476}
   _detectRange: 5
   _targetLayer:
     serializedVersion: 2
     m_Bits: 0
   _scanInterval: 0.5
-  _attackInterval: 0.5
-  _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
-  _firePoint: {fileID: 1719435476}
+--- !u!114 &286569286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286569280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 1966679595
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 286569285}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &286707227
 GameObject:
   m_ObjectHideFlags: 0
@@ -2858,6 +2768,59 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 953484273}
   m_CullTransparentMesh: 1
+--- !u!1 &1001814887
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1001814889}
+  - component: {fileID: 1001814888}
+  m_Layer: 0
+  m_Name: MinionSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1001814888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1001814887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dde036937718dc4d93184ed86bca9a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MinionSpawner
+  _team: 0
+  _minionPrefab:
+    RawGuidValue: 00000000000000000000000000000000
+  _lanes: []
+  _waveInterval: 15
+  _minionsPerLane: 3
+  _spawnDelay: 0.3
+  _CurrentWave: 0
+  _IsActive: 0
+--- !u!4 &1001814889
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1001814887}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1086657593
 GameObject:
   m_ObjectHideFlags: 0
@@ -4170,7 +4133,6 @@ Transform:
   - {fileID: 1431818093}
   - {fileID: 286569281}
   - {fileID: 2099991292}
-  - {fileID: 143026192}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1497990086
@@ -5380,6 +5342,7 @@ GameObject:
   - component: {fileID: 1910674109}
   - component: {fileID: 1910674108}
   - component: {fileID: 1910674111}
+  - component: {fileID: 1910674112}
   m_Layer: 31
   m_Name: sub_right
   m_TagString: Untagged
@@ -5494,17 +5457,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a122320be5e7874a9156352a6137389, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
-  _team: 1
-  _hp: 50
-  _damage: 10
+  _maxHealth: 0
+  _deffense: 0
+  team: 0
+  _CurrentHealth: 0
+  _CurrentState: 0
+  _attackPower: 0
+  _attackSpeed: 1
+  _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
+  _firePoint: {fileID: 1390972883}
   _detectRange: 5
   _targetLayer:
     serializedVersion: 2
     m_Bits: 0
   _scanInterval: 0.5
-  _attackInterval: 0.5
-  _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
-  _firePoint: {fileID: 1390972883}
+--- !u!114 &1910674112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1910674106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 2433670754
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1910674111}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1001 &1939157236
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5620,6 +5605,7 @@ GameObject:
   - component: {fileID: 1992498370}
   - component: {fileID: 1992498369}
   - component: {fileID: 1992498372}
+  - component: {fileID: 1992498373}
   m_Layer: 31
   m_Name: sub_left
   m_TagString: Untagged
@@ -5734,17 +5720,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a122320be5e7874a9156352a6137389, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
-  _team: 1
-  _hp: 50
-  _damage: 10
+  _maxHealth: 0
+  _deffense: 0
+  team: 0
+  _CurrentHealth: 0
+  _CurrentState: 0
+  _attackPower: 0
+  _attackSpeed: 1
+  _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
+  _firePoint: {fileID: 640588923}
   _detectRange: 5
   _targetLayer:
     serializedVersion: 2
     m_Bits: 0
   _scanInterval: 0.5
-  _attackInterval: 0.5
-  _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
-  _firePoint: {fileID: 640588923}
+--- !u!114 &1992498373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992498367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 3698913291
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1992498372}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &2008401787
 GameObject:
   m_ObjectHideFlags: 0
@@ -5980,6 +5988,7 @@ GameObject:
   - component: {fileID: 2099991296}
   - component: {fileID: 2099991294}
   - component: {fileID: 2099991293}
+  - component: {fileID: 2099991297}
   m_Layer: 30
   m_Name: sub_right
   m_TagString: Untagged
@@ -6094,17 +6103,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a122320be5e7874a9156352a6137389, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
-  _team: 0
-  _hp: 50
-  _damage: 10
+  _maxHealth: 0
+  _deffense: 0
+  team: 0
+  _CurrentHealth: 0
+  _CurrentState: 0
+  _attackPower: 0
+  _attackSpeed: 1
+  _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
+  _firePoint: {fileID: 2021476522}
   _detectRange: 5
   _targetLayer:
     serializedVersion: 2
     m_Bits: 0
   _scanInterval: 0.5
-  _attackInterval: 0.5
-  _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
-  _firePoint: {fileID: 2021476522}
+--- !u!114 &2099991297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2099991291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 3772013669
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 2099991296}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -6120,3 +6151,4 @@ SceneRoots:
   - {fileID: 254773289}
   - {fileID: 1577995213}
   - {fileID: 825725157}
+  - {fileID: 1001814889}
