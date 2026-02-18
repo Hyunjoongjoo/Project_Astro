@@ -14,16 +14,18 @@ public enum StageState
 
 public class StageManager : NetworkBehaviour
 {
-    [Networked] public StageState CurrentState { get; set; }
-    [Networked] public float StateTimer { get; set; }
-    [Networked] public int CountdownValue { get; set; }
+    [Networked, HideInInspector] public StageState CurrentState { get; set; }
+    [Networked, HideInInspector] public float StateTimer { get; set; }
+    [Networked, HideInInspector] public int CountdownValue { get; set; }
 
     // 플레이어별 팀 정보 (PlayerRef를 키로 사용)
     [Networked, Capacity(2)]
     public NetworkDictionary<PlayerRef, Team> PlayerTeams => default;
 
-    [SerializeField] private StageIntroUI _introUI;
-    [SerializeField] private Camera _mainCamera;
+    [SerializeField] private NetworkObject _minionSpawnerPrefab;
+
+    private StageIntroUI _introUI;
+    private Camera _mainCamera;
 
     private const float PLAYER_INFO_DURATION = 4f;
     private const float COUNTDOWN_INTERVAL = 1f;
@@ -177,6 +179,7 @@ public class StageManager : NetworkBehaviour
     {
         _introUI.HideCountdown();
         GameManager.Instance.ChangeState(GameState.Play);
+        Runner.Spawn(_minionSpawnerPrefab);
         Debug.Log("게임 시작!");
     }
 }
