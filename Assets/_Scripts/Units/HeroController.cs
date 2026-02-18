@@ -1,7 +1,12 @@
 ﻿using UnityEngine;
 
-public class HeroController : UnitController
+public class HeroController : MobilityUnit, IBasicAttack
 {
+    [Header("공격 관련 스테이터스")]
+    [SerializeField] protected float _attackDamage = 10f;
+    [SerializeField] protected float _attackRange = 1.5f;
+    [SerializeField] protected float _attackCooldown = 1f;
+
     [Header("공격 타입")]
     [SerializeField] private AttackType _attackType;
 
@@ -9,20 +14,20 @@ public class HeroController : UnitController
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform _firePoint;
 
-    public override void Attack(Transform target)
+    public float AttackPower => _attackDamage;
+    public float AttackSpeed => _attackCooldown;
+    public float AttackRange => _attackRange;
+
+    public void BaseAttack(UnitBase target)
     {
-        if (IsDead || target == null)
+        if (target == null)
         {
             return;
         }
 
-        if (!CanAttack())
-        {
-            return;
-        }
-        float distance = Vector3.Distance(transform.position, target.position);
+        float distance = Vector3.Distance(transform.position, target.transform.position);
 
-        if (distance > _attackRange)
+        if (distance > AttackRange)
         {
             return;
         }
@@ -37,27 +42,14 @@ public class HeroController : UnitController
                 AttackRanged(target);
                 break;
         }
-
-        AttackCooldown();
     }
 
-    private void AttackMelee(Transform target)
+    private void AttackMelee(UnitBase target)
     {
-        Tower tower = target.GetComponent<Tower>();
-        if (tower != null)
-        {
-            tower.TakeDamage(_attackDamage);
-            return;
-        }
-
-        UnitController unit = target.GetComponent<UnitController>();
-        if (unit != null && !unit.IsDead)
-        {
-            unit.TakeDamage(_attackDamage);
-        }
+        target.TakeDamage(AttackPower);
     }
 
-    private void AttackRanged(Transform target)
+    private void AttackRanged(UnitBase target)
     {
         if (_projectilePrefab == null || _firePoint == null)
         {
@@ -66,6 +58,6 @@ public class HeroController : UnitController
 
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
-        projectile.GetComponent<Projectile>().Fire(target, _attackDamage);
+        projectile.GetComponent<Projectile>().Fire(target.transform, AttackPower);
     }
 }

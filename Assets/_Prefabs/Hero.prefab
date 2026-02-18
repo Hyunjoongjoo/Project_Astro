@@ -175,11 +175,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeroController
   _maxHealth: 80
-  _currentHealth: 80
-  _attackDamage: 10
-  _attackRange: 5
-  _attackCooldown: 1
-  _poolTag: 
+  _deffense: 0
+  team: 0
+  _moveSpeed: 0
   _attackType: 1
   _projectilePrefab: {fileID: 8628947152704392403, guid: eb6c3b0a4b68c7748993601aea1407aa, type: 3}
   _firePoint: {fileID: 3254258265416546076}
@@ -213,6 +211,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 5377544671602410325}
+  - {fileID: -1312837020189091309}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &8814415480333241405
 GameObject:
