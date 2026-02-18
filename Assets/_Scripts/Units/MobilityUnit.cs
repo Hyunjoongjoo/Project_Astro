@@ -24,6 +24,8 @@ public class MobilityUnit : UnitBase, ITargetFinder
     //팀과 공격타겟 설정등 셋업
     public virtual void Setup()
     {
+        agent.speed = _moveSpeed;
+
         if (team == Team.Blue)
         {
             gameObject.layer = LayerMask.NameToLayer("BlueTeam");

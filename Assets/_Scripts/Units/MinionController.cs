@@ -33,8 +33,9 @@ public class MinionController : MobilityUnit, IBasicAttack
     public float AttackSpeed => _attackSpeed;
     public float AttackRange => _attackRange;
 
-    public void Setup(UnitBase towerA, UnitBase towerB, UnitBase bridge)
+    public void Setup(Team myTeam, UnitBase towerA, UnitBase towerB, UnitBase bridge)
     {
+        team = myTeam;
         base.Setup();
         _towerA = towerA;
         _towerB = towerB;

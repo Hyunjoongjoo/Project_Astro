@@ -69,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ca1222fc7cc9e354e9c2ef3eb264a466, type: 2}
+  - {fileID: 2100000, guid: f74159fb2eeb7684db62b7a6ba546d2b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9657be50b40255a41a6e9f63d513fc39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bridge
-  _maxHealth: 0
+  _maxHealth: 100
   _deffense: 0
   team: 0
   _CurrentHealth: 0
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 2420249549
+  SortKey: 1994127434
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []

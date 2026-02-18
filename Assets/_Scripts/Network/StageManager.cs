@@ -22,7 +22,7 @@ public class StageManager : NetworkBehaviour
     [Networked, Capacity(2)]
     public NetworkDictionary<PlayerRef, Team> PlayerTeams => default;
 
-    [SerializeField] private NetworkObject _minionSpawnerPrefab;
+    [SerializeField] private NetworkPrefabRef _minionSpawnerPrefab;
 
     private StageIntroUI _introUI;
     private Camera _mainCamera;
@@ -102,12 +102,9 @@ public class StageManager : NetworkBehaviour
 
         Team myTeam = PlayerTeams.Get(Runner.LocalPlayer);
 
-        if (myTeam != Team.Red)
-        {
+        if (myTeam == Team.Red)
             _mainCamera.transform.Rotate(new Vector3(0, 0, 180f));
-            Debug.Log("레드팀은 카메라 180도 회전");
-        }
-
+ 
         // DB로 부터 받아온 플레이어 정보 중 표시할 것 선정
         ShowPlayerInfo();
     }
@@ -177,9 +174,11 @@ public class StageManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_StartGame()
     {
+        if (Object.HasStateAuthority)
+            Runner.Spawn(_minionSpawnerPrefab);
+
         _introUI.HideCountdown();
         GameManager.Instance.ChangeState(GameState.Play);
-        Runner.Spawn(_minionSpawnerPrefab);
         Debug.Log("게임 시작!");
     }
 }

@@ -47,8 +47,9 @@ GameObject:
   - component: {fileID: -6874581610270721540}
   - component: {fileID: 7786030501378965668}
   - component: {fileID: 5226437650269848162}
+  - component: {fileID: -2264104134157888630}
   m_Layer: 0
-  m_Name: Minion
+  m_Name: MinionRed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -103,7 +104,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 816e64c0c4e858b4281ee83131be0329, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -189,7 +190,7 @@ MonoBehaviour:
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 8596131259578450949}
-  _moveSpeed: 3
+  _moveSpeed: 15
   _searchRange: 4
   _targetLayer:
     serializedVersion: 2
@@ -228,10 +229,28 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 3521751882
+  SortKey: 424667727
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: -6874581610270721540}
+  - {fileID: -2264104134157888630}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &-2264104134157888630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6904354826114092882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0

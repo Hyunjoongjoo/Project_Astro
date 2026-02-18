@@ -4,8 +4,14 @@
 
 public class Structure : UnitBase
 {
+
     public override void Spawned()
     {
         base.Spawned();
+    }
+
+    public void SetTeam(Team myTeam)
+    {
+        team = myTeam;
     }
 }

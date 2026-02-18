@@ -45,10 +45,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dde036937718dc4d93184ed86bca9a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinionSpawner
-  _team: 0
-  _minionPrefab:
+  _blueMinionPrefab:
     RawGuidValue: fda1f12210245f845b7bb9a6b4353133
-  _lanes: []
+  _redMinionPrefab:
+    RawGuidValue: 404067b0ef7421643b81c17e7ecaeb74
+  _blueLanes:
+  - {fileID: 1573468754666278677, guid: 464b5c88acddb9d4aafbfa5e26d2815d, type: 3}
+  - {fileID: 5712291449058957168, guid: de67b6f4ef015ab4cb335acec2f97060, type: 3}
+  _redLanes:
+  - {fileID: 184022226703787276, guid: d5c623b20d3bd73489f9bc63cf874fb8, type: 3}
+  - {fileID: 7723320054443768061, guid: 4e465d1746ccdcd458fba972ef32a59f, type: 3}
   _waveInterval: 15
   _minionsPerLane: 3
   _spawnDelay: 0.3

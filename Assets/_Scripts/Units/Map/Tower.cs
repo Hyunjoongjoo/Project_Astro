@@ -33,16 +33,16 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
     public override void Spawned()
     {
         base.Spawned();
-        if (team == Team.Blue)
-        {
-            gameObject.layer = LayerMask.NameToLayer("BlueTeam");
-            _targetLayer = 1 << LayerMask.NameToLayer("RedTeam");
-        }
-        else
-        {
-            gameObject.layer = LayerMask.NameToLayer("RedTeam");
-            _targetLayer = 1 << LayerMask.NameToLayer("BlueTeam");
-        }
+        //if (team == Team.Blue)
+        //{
+        //    gameObject.layer = LayerMask.NameToLayer("BlueTeam");
+        //    _targetLayer = 1 << LayerMask.NameToLayer("RedTeam");
+        //}
+        //else
+        //{
+        //    gameObject.layer = LayerMask.NameToLayer("RedTeam");
+        //    _targetLayer = 1 << LayerMask.NameToLayer("BlueTeam");
+        //}
     }
 
     private void OnEnable()
