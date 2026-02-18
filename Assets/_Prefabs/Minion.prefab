@@ -44,7 +44,6 @@ GameObject:
   - component: {fileID: 6724172834192295644}
   - component: {fileID: 4080015249392216454}
   - component: {fileID: 8596131259578450949}
-  - component: {fileID: 6382368530059675601}
   - component: {fileID: -6874581610270721540}
   - component: {fileID: 7786030501378965668}
   - component: {fileID: 5226437650269848162}
@@ -172,27 +171,6 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &6382368530059675601
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6904354826114092882}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2735e784e0aabf4a84455516fa71d18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MinionAI
-  agent: {fileID: 8596131259578450949}
-  finalGoal: {fileID: 0}
-  detectRadius: 5
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 192
-  scanInterval: 0.5
-  team: 0
-  _enemyBase: {fileID: 0}
 --- !u!114 &-6874581610270721540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,14 +184,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinionController
   _maxHealth: 50
-  _currentHealth: 50
-  _attackDamage: 10
-  _attackRange: 5
-  _attackCooldown: 1
-  _poolTag: 
-  _attackType: 1
+  _deffense: 0
+  team: 0
+  _CurrentHealth: 0
+  _CurrentState: 0
+  agent: {fileID: 8596131259578450949}
+  _moveSpeed: 3
+  _searchRange: 4
+  _targetLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  _searchInterval: 0.3
+  _attackPower: 10
+  _attackSpeed: 1
+  _attackRange: 2
+  _attackType: 0
   _projectilePrefab: {fileID: 8628947152704392403, guid: eb6c3b0a4b68c7748993601aea1407aa, type: 3}
   _firePoint: {fileID: 7239607078526745090}
+  _towerA: {fileID: 0}
+  _towerB: {fileID: 0}
+  _bridge: {fileID: 0}
 --- !u!114 &7786030501378965668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -243,5 +233,5 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 6382368530059675601}
+  - {fileID: -6874581610270721540}
   ForceRemoteRenderTimeframe: 0

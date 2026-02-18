@@ -4,8 +4,8 @@
 
 public class Structure : UnitBase
 {
-    protected override void Awake()
+    public override void Spawned()
     {
-        base.Awake();
+        base.Spawned();
     }
 }

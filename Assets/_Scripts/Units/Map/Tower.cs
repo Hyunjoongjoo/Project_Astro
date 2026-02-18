@@ -30,9 +30,9 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
 
     [Networked] public TickTimer AttackInterval { get; set; }
 
-    protected override void Awake()
+    public override void Spawned()
     {
-        base.Awake();
+        base.Spawned();
         if (team == Team.Blue)
         {
             gameObject.layer = LayerMask.NameToLayer("BlueTeam");
