@@ -33,13 +33,18 @@ public class MinionController : MobilityUnit, IBasicAttack
     public float AttackSpeed => _attackSpeed;
     public float AttackRange => _attackRange;
 
-    public void Setup(Team myTeam, UnitBase towerA, UnitBase towerB, UnitBase bridge)
+    public void Setup(Team myTeam)
     {
         team = myTeam;
         base.Setup();
-        _towerA = towerA;
-        _towerB = towerB;
-        _bridge = bridge;
+
+        UnitBase[] targetStructure = team == Team.Blue ? 
+            ObjectContainer.Instance.redSideStructure :
+            ObjectContainer.Instance.blueSideStructure;
+
+        _towerA = targetStructure[0];
+        _towerB = targetStructure[1];
+        _bridge = targetStructure[2];
     }
 
     public override void Spawned()

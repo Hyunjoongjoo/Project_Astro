@@ -107,19 +107,16 @@ public class MinionSpawner : NetworkBehaviour
     {
         NetworkPrefabRef prefab;
         Transform spawnTransform;
-        UnitBase[] targetStructure;
 
         if (team == Team.Blue)
         {
             prefab = _blueMinionPrefab;
             spawnTransform = _blueLanes[laneIdx];
-            targetStructure = ObjectContainer.Instance.redSideStructure;
         }
         else
         {
             prefab = _redMinionPrefab;
             spawnTransform = _redLanes[laneIdx];
-            targetStructure = ObjectContainer.Instance.blueSideStructure;
         }
 
         if (spawnTransform == null)
@@ -141,7 +138,7 @@ public class MinionSpawner : NetworkBehaviour
                 // Spawned() 호출 전 Setup 호출하여 초기화
                 if (obj.TryGetComponent<MinionController>(out var minion))
                 {
-                    minion.Setup(team, targetStructure[0], targetStructure[1], targetStructure[2]);
+                    minion.Setup(team);
                 }
             }
         );

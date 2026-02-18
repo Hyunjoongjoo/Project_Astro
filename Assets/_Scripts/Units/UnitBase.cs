@@ -29,7 +29,7 @@ public abstract class UnitBase : NetworkBehaviour
     public override void Spawned()
     {
         // 팀 설정은 스폰되었을 때 공유 딕셔너리 등에서 주입
-        team = Team.Blue;
+        team = GameManager.Instance.PlayerTeam;
 
         if (Object.HasStateAuthority)
         {

@@ -102,6 +102,8 @@ public class StageManager : NetworkBehaviour
 
         Team myTeam = PlayerTeams.Get(Runner.LocalPlayer);
 
+        GameManager.Instance.SetTeam(myTeam);
+
         if (myTeam == Team.Red)
             _mainCamera.transform.Rotate(new Vector3(0, 0, 180f));
  
