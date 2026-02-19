@@ -17,6 +17,7 @@ public class GameManager : Singleton<GameManager>
     public void SetTeam(Team team)
     {
         PlayerTeam = team;
+        Debug.Log($"[GameManager] {PlayerTeam}으로 세팅 완료!");
     }
 
     public void ChangeState(GameState newState)

@@ -7,12 +7,12 @@ using TMPro;
 public class StageIntroUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _textIndicator;
-    [SerializeField] private Button _goLobbyBtn;
+    public Button goLobbyBtn;
 
     private void Awake()
     {
         _textIndicator.gameObject.SetActive(false);
-        _goLobbyBtn.gameObject.SetActive(false);
+        goLobbyBtn.gameObject.SetActive(false);
     }
 
     public void ShowPlayerInfo()
@@ -41,5 +41,11 @@ public class StageIntroUI : MonoBehaviour
     {
         gameObject.SetActive(false);
         Debug.Log("카운트 다운 패널 숨김");
+    }
+
+    public void ShowResultPanel(bool isVictory)
+    {
+        _textIndicator.text = isVictory ? "승리" : "패배";
+        goLobbyBtn.gameObject.SetActive(true);
     }
 }

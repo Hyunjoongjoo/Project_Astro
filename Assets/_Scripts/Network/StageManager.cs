@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum StageState
 {
@@ -44,6 +45,8 @@ public class StageManager : NetworkBehaviour
         // 즉, 이전에 이 StageManager를 스폰한 애가 마스터 클라이언트니까
         // 마스터 클라이언트만 이 조건을 통과함.
         // 마스터 클라이언트가 변수 변경 -> Networked 속성으로 모두에게 동기화
+        GameManager.Instance.ChangeState(GameState.Ready);
+
         if (Object.HasStateAuthority)
         {
             CurrentState = StageState.WaitingForPlayers;
@@ -98,9 +101,9 @@ public class StageManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_NotifyTeamAssignment()
     {
-        Debug.Log("팀 배정 완료!");
-
         Team myTeam = PlayerTeams.Get(Runner.LocalPlayer);
+
+        Debug.Log($"팀 배정 완료! 내 팀 {myTeam}");
 
         GameManager.Instance.SetTeam(myTeam);
 
@@ -209,16 +212,31 @@ public class StageManager : NetworkBehaviour
     private void RPC_GameOver(Team victory)
     {
         Debug.Log("게임오버 RPC 진입 성공");
+        _introUI.gameObject.SetActive(true);
+
+        _introUI.goLobbyBtn.onClick.AddListener(ShutDownAndSceneChange);
+
+        Debug.Log($"승리팀 : {victory}, 내 팀 : {PlayerTeams.Get(Runner.LocalPlayer)}");
+
         // 일단 패널 아무거나 띄움. 나중에 UI매니저에게
         if (PlayerTeams.Get(Runner.LocalPlayer) == victory)
         {
             Debug.Log("승리했습니다!!");
+            _introUI.ShowResultPanel(true);
         }
         else
         {
             Debug.Log("패배했습니다!!");
+            _introUI.ShowResultPanel(false);
         }
-        _introUI.gameObject.SetActive(true);
+        
         GameManager.Instance.ChangeState(GameState.Result);
+    }
+
+    public async void ShutDownAndSceneChange()
+    {
+        await Runner.Shutdown();
+
+        SceneManager.LoadScene("Lobby");
     }
 }

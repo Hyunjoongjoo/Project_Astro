@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
   SortKey: 1354014790
   ObjectInterest: 1
-  Flags: 262145
+  Flags: 1
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: -2723386092329298971}
@@ -71,11 +71,3 @@ MonoBehaviour:
     _items: []
   _minionSpawnerPrefab:
     RawGuidValue: 837058bd486a26c44b56c81b8bd87058
-  _blueBridgePrefab:
-    RawGuidValue: 1db5266c4b6a95a48840a0088a031436
-  _blueTowerPrefab:
-    RawGuidValue: ce244b7b0cdd7424f858393b3a26bfc1
-  _redBridgePrefab:
-    RawGuidValue: 7a03cf9eda3f79445831fc40e1b26fd2
-  _redTowerPrefab:
-    RawGuidValue: 85b012a78dcad9649a2aed2c9caec4e5
