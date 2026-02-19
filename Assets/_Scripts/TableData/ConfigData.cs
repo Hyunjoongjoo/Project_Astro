@@ -3,9 +3,9 @@
 [Serializable]
 public class ConfigData : ITableData
 {
-    public string id;
-    public string configValue;
-    public string note;
+    public String id;
+    public String configValue;
+    public String note;
 
     public string PrimaryID => id.ToString();
 }

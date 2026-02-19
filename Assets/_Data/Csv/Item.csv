@@ -1,6 +1,6 @@
 아이템 ID,아이템 이름,아이템 유형,아이콘 이미지,효과 그룹 ID,중복 가능 여부,기획용 비고
-id,name,type,iconImage,effectGroupId,isStackable,note
-string,string,enum,string,string,bool,string
+id,name,itemType,iconImage,effectGroupId,isStackable,note
+String,String,ItemType,String,String,Bool,String
 item_attack001,name_item_attack001,attack,icon_item_attack001,effect_item_attack001,TRUE,기획용 컬럼입니다. 게임에 사용되지 않습니다.
 item_defence001,name_defence001,defense,icon_item_defence001,effect_item_defence001,TRUE,기획용 컬럼입니다. 게임에 사용되지 않습니다.
 item_utility001,name_utility001,utility,icon_item_utility001,effect_item_utility001,TRUE,기획용 컬럼입니다. 게임에 사용되지 않습니다.

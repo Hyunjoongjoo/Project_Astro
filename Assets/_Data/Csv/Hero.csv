@@ -1,6 +1,6 @@
-영웅 테이블 기본키,영웅 이름,영웅 설명,유형,영웅의 역할,영웅의 일반 공격,영웅의 스킬,영웅의 능력치,계정 생성 시 지급되는 영웅 결정 요소,영웅 획득 시 필요 골드량,영웅 2D 아이콘 리소스,영웅 2D 이미지 리소스,영웅 3D 모델링 리소스,영웅 프리뷰 영상 리소스
-id,heroName,heroDesc,heroType,heroRole,autoAttack,skill,heroStatId,isDefault,goldRequirement,heroIcon,heroImg,heroModeling,heroPreviewVideo
-string,string,string,enum,enum,string,string,string,Bool,int,string,string,string,string
-Hero_Knight,Name_Hero_Knight,Desc_Hero_Knight,Robot,Tank,Skill_01,Skill_02,Stat_Hero_Knight,TRUE,10,Icon_Hero_Knight,Img_Hero_Knight,Model_Hero_Knight,Preview_Video_Hero_Knight
-Hero_Archer,Name_Hero_Archer,Desc_Hero_Archer,SpaceCraft,Ranged,Skill_03,Skill_04,Stat_Hero_Archer,TRUE,20,Icon_Hero_Archer,Img_Hero_Archer,Model_Hero_Archer,Preview_Video_Hero_Archer
-Hero_Priest,Name_Hero_Priest,Desc_Hero_Priest,Robot,Healer,Skill_05,Skill_06,Stat_Hero_Priest,FALSE,30,Icon_Hero_Priest,Img_Hero_Priest,Model_Hero_Priest,Preview_Video_Hero_Priest
+영웅 테이블 기본키,영웅 이름,영웅 설명,유형,영웅의 역할,영웅의 일반 공격,영웅의 스킬,영웅의 능력치,기본 지급 여부,영웅 획득 시 필요 골드량,영웅 2D 아이콘 리소스,영웅 2D 이미지 리소스,영웅 3D 모델링 리소스,영웅 프리뷰 영상 리소스,기획용 비고
+id,heroName,heroDesc,heroType,heroRole,autoAttack,skill,heroStatId,isDefault,goldRequirement,heroIcon,heroImg,heroModeling,heroPreviewVideo,note
+String,String,String,HeroType,HeroRole,String,String,String,Bool,Int,String,String,String,String,String
+Hero_Knight,Name_Hero_Knight,Desc_Hero_Knight,Robot,Tank,Skill_01,Skill_02,Stat_Hero_Knight,TRUE,10,Icon_Hero_Knight,Img_Hero_Knight,Model_Hero_Knight,Preview_Video_Hero_Knight,기획용 컬럼입니다. 게임에 사용되지 않습니다.
+Hero_Archer,Name_Hero_Archer,Desc_Hero_Archer,SpaceCraft,Ranged,Skill_03,Skill_04,Stat_Hero_Archer,TRUE,20,Icon_Hero_Archer,Img_Hero_Archer,Model_Hero_Archer,Preview_Video_Hero_Archer,기획용 컬럼입니다. 게임에 사용되지 않습니다.
+Hero_Priest,Name_Hero_Priest,Desc_Hero_Priest,Robot,Healer,Skill_05,Skill_06,Stat_Hero_Priest,FALSE,30,Icon_Hero_Priest,Img_Hero_Priest,Model_Hero_Priest,Preview_Video_Hero_Priest,기획용 컬럼입니다. 게임에 사용되지 않습니다.

@@ -1,6 +1,6 @@
 콘피그 ID,콘피그 값,기획용 비고
 id,configValue,note
-string,string,string
+String,String,String
 game_time_limit,240,하나의 대전이 시작되어 종료되기까지의 제한 시간 (초). 제한 시간 만료 시 게임 결과 시퀀스 진행
 minion_spawn_time,15,이전 미니언 웨이스 생성 이후 {N}초가 지나면 다시 미니언 웨이브 생성
 minion_spawn_count,3,한 라인에서 생성되는 미니언 개수
