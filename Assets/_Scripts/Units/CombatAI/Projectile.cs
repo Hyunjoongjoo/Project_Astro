@@ -35,8 +35,8 @@ public class Projectile : MonoBehaviour
         }
         else
         {
-            UnitController unit = target.GetComponent<UnitController>();
-            if (unit != null && !unit.IsDead)
+            UnitBase unit = target.GetComponent<UnitBase>();
+            if (unit != null)
             {
                 unit.TakeDamage(_damage);
             }

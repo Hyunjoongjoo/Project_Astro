@@ -9,17 +9,19 @@ using UnityEngine;
 
 public class HeroStatusHandler : MonoBehaviour
 {
-    //[SerializeField] private HeroData _baseHeroData; //원본DB <- CSV 파서 들여오면 그걸로 수정. (tableName = table_herostat)
+    [SerializeField] private string _heroId;
 
     //실시간 캐싱된 데이터값들
     private int _level;
     private int _exp;
     private bool _isUnlock;
     private HeroStatus _currentHeroStatus;
+    private HeroData _baseHeroData;
 
     // 프로퍼티
+    public string HeroId => _heroId;
     public HeroStatus CurrentHeroStatus => _currentHeroStatus;
-    //public string HeroID => _baseHeroData != null ? _baseHeroData.Hero_ID : string.Empty;
+    
     public int Level
     {
         get => _level;
@@ -59,11 +61,11 @@ public class HeroStatusHandler : MonoBehaviour
 
     private void Awake()
     {
-        //if (_baseHeroData != null)
-        //{
-        //    HeroManager.Instance.RegisterHeroHandler(_baseHeroData.Hero_ID, this);
-        //}
-        //else
+        if (!string.IsNullOrEmpty(_heroId))
+        {
+            HeroManager.Instance.RegisterHeroHandler(_heroId, this);
+        }
+        else
         {
             Debug.LogError($"[HeroStatusHandler] {gameObject.name}에 HeroData가 할당되지 않았습니다.");
         }
@@ -75,14 +77,21 @@ public class HeroStatusHandler : MonoBehaviour
         _exp = exp;
         _isUnlock = isUnlock;
 
-        RefreshData();
+        _baseHeroData = TableManager.Instance.HeroTable.Get(_heroId);
+
+        if (_baseHeroData != null)
+        {
+            RefreshData();
+        }
     }
 
     // 레벨에 따른 Status변화 
     private void RefreshData()
     {
-        //if (_baseHeroData == null || _baseHeroData.HeroStatus == null) return;
-        //_currentHeroStatus = new HeroStatus(_baseHeroData.HeroStatus);
+        if (_baseHeroData == null) return;
+
+        //_currentHeroStatus = new HeroStatus();    <-    CSV 베이스로 되어있는 해당 유닛의 기본 스텟 가져오기.
+
         ApplyLevelStatus(_currentHeroStatus, _level);
     }
 
@@ -100,6 +109,6 @@ public class HeroStatusHandler : MonoBehaviour
     // DB에 데이터 갱신 요청하는 메서드
     private void NotifyDataChanged()
     {
-        //OnHeroDataChanged?.Invoke(_baseHeroData.Hero_ID, _level, _exp, _isUnlock);
+        OnHeroDataChanged?.Invoke(_heroId, _level, _exp, _isUnlock);
     }
 }

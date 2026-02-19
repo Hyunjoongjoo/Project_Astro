@@ -133,7 +133,7 @@ public static class TableClassGenerator
                 return "bool";
             case "string":
             default:
-                return "string";
+                return csvType;
         }
     }
 

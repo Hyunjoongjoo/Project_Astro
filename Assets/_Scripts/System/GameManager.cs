@@ -12,6 +12,13 @@ public class GameManager : Singleton<GameManager>
     //다른데서 참조할 게임시작여부
     public bool IsGameStarted => _currentState == GameState.Play;
 
+    public Team PlayerTeam { get; private set; }
+
+    public void SetTeam(Team team)
+    {
+        PlayerTeam = team;
+    }
+
     public void ChangeState(GameState newState)
     {
         if(_currentState == newState) return;

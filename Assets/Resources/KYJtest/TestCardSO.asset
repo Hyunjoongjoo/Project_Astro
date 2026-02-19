@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: TestCardSO
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   heroImg: {fileID: 21300000, guid: 303f7617dbce23f4aa9cc50c0652267f, type: 3}
-  heroPrefab: {fileID: 4016167280289115820, guid: 5b30ba6ad9b35164c9e00648692c7b9d, type: 3}
+  heroPrefab:
+    RawGuidValue: ab5b7fb717621c345b4f562a2e7125b1

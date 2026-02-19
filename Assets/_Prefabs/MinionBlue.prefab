@@ -44,12 +44,12 @@ GameObject:
   - component: {fileID: 6724172834192295644}
   - component: {fileID: 4080015249392216454}
   - component: {fileID: 8596131259578450949}
-  - component: {fileID: 2883947181122249295}
+  - component: {fileID: -6874581610270721540}
   - component: {fileID: 7786030501378965668}
   - component: {fileID: 5226437650269848162}
-  - component: {fileID: -2549967687301474708}
+  - component: {fileID: -2264104134157888630}
   m_Layer: 0
-  m_Name: Hero
+  m_Name: MinionBlue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -104,7 +104,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4724079a2a75abb4e9c09a972ce0ef2e, type: 2}
+  - {fileID: 2100000, guid: f74159fb2eeb7684db62b7a6ba546d2b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -172,7 +172,7 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &2883947181122249295
+--- !u!114 &-6874581610270721540
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -181,27 +181,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 6904354826114092882}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8b2f4a5a7e52254ca4ac142269bc711, type: 3}
+  m_Script: {fileID: 11500000, guid: 4d380522b2ad33e4db63a2aa1f2bd383, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HeroController
-  _maxHealth: 80
+  m_EditorClassIdentifier: Assembly-CSharp::MinionController
+  _maxHealth: 50
   _deffense: 0
   team: 0
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 8596131259578450949}
-  _moveSpeed: 20
-  _searchRange: 5
+  _moveSpeed: 15
+  _searchRange: 4
   _targetLayer:
     serializedVersion: 2
     m_Bits: 0
   _searchInterval: 0.3
-  _attackPower: 15
+  _attackPower: 10
   _attackSpeed: 1
-  _attackRange: 3
+  _attackRange: 2
   _attackType: 0
-  _projectilePrefab: {fileID: 0}
-  _firePoint: {fileID: 0}
+  _projectilePrefab: {fileID: 8628947152704392403, guid: eb6c3b0a4b68c7748993601aea1407aa, type: 3}
+  _firePoint: {fileID: 7239607078526745090}
   _towerA: {fileID: 0}
   _towerB: {fileID: 0}
   _bridge: {fileID: 0}
@@ -229,15 +229,15 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 661268751
+  SortKey: 3521751882
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 2883947181122249295}
-  - {fileID: -2549967687301474708}
+  - {fileID: -6874581610270721540}
+  - {fileID: -2264104134157888630}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &-2549967687301474708
+--- !u!114 &-2264104134157888630
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
