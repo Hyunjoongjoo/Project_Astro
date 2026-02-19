@@ -26,11 +26,10 @@ public class UnitStat : MonoBehaviour //추후 NetWorkBehavior
     public float FinalMoveSpeed => BaseMoveSpeed + _addedMoveSpeed;
 
     //초기화
-    public void Init(DummyHeroData data)
+    public void Init(HeroGrowthData data)
     {
         BaseHealth = data.health;
         BaseAttack = data.attack;
-        BaseDefense = data.defense;
         BaseMoveSpeed = data.moveSpeed;
 
         CurrentHealth = BaseHealth;

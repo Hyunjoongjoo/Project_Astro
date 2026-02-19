@@ -60,7 +60,7 @@ public enum StatModType
 //스탯별 계산 공식
 public enum StatCalcMode
 {
-    Standard = 0,   //체력, 공격력, 치유력 =>  증가량 감소를 따로 계산
+    Standard = 0,   //체력, 공격력, 치유력 =>  증가량 감소량을 따로 계산
     SimpleSum = 1,  //실드, 탐지범위, 피해감소 =>  단순 값 더하기
     Individual = 2, //공속, 쿨감 =>  그냥 더하면 100% 감소가 되버릴 수 있어서 곱해서 줄여야 함
 }
