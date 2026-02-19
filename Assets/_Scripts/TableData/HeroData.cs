@@ -3,20 +3,21 @@
 [Serializable]
 public class HeroData : ITableData
 {
-    public string id;
-    public string heroName;
-    public string heroDesc;
-    public int heroType;
-    public int heroRole;
-    public string autoAttack;
-    public string skill;
-    public string heroStatId;
+    public String id;
+    public String heroName;
+    public String heroDesc;
+    public HeroType heroType;
+    public HeroRole heroRole;
+    public String autoAttack;
+    public String skill;
+    public String heroStatId;
     public bool isDefault;
     public int goldRequirement;
-    public string heroIcon;
-    public string heroImg;
-    public string heroModeling;
-    public string heroPreviewVideo;
+    public String heroIcon;
+    public String heroImg;
+    public String heroModeling;
+    public String heroPreviewVideo;
+    public String note;
 
     public string PrimaryID => id.ToString();
 }

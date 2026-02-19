@@ -66,7 +66,7 @@ public enum TriggerCondition
 }
 
 //효과 적용 대상
-public enum TargetType
+public enum Target
 {
     None,
     Self,
