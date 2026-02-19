@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 178213330925898664}
   - component: {fileID: 3927917408904204270}
   - component: {fileID: 4853758240674074159}
+  - component: {fileID: 6248845369454608215}
   m_Layer: 5
   m_Name: Lobby_Card
   m_TagString: Untagged
@@ -122,7 +123,34 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3927917408904204270}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6248845369454608215}
+        m_TargetAssemblyTypeName: LobbyHeroCardUI, Assembly-CSharp
+        m_MethodName: OnClickCard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &6248845369454608215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1467454931848645624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04c77591f18c5a341a104d629606b7d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LobbyHeroCardUI
+  _iconImg: {fileID: 1978954234197105934}
+  _nameTxt: {fileID: 6116082633495897170}
+  _detailPopupPrefab: {fileID: 7479665002333910777, guid: c35b523773e40f94d8340a7725b35660, type: 3}
 --- !u!1 &2961208074696845831
 GameObject:
   m_ObjectHideFlags: 0

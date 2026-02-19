@@ -70,6 +70,12 @@ public class UIManager : Singleton<UIManager>
     {
         if (prefab == null) return null;
 
+        //스택에 죽은 참조(파괴된 오브젝트)가 있다면 정리
+        while (_popupStack.Count > 0 && _popupStack.Peek() == null)
+        {
+            _popupStack.Pop();
+        }
+
         //토글로직, 같은버튼 한번더 누르면 닫기
         if (_popupStack.Count > 0)
         {
@@ -99,7 +105,10 @@ public class UIManager : Singleton<UIManager>
         if (_popupStack.Count > 0)
         {
             BaseUI ui = _popupStack.Pop();
-            ui.Close();
+            if (ui != null)
+            {
+                Destroy(ui.gameObject);
+            }
         }
     }
     #endregion
