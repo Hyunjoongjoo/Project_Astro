@@ -1,3 +1,6 @@
+//Table에 존재하는 Enum 정의
+//CSV, 엑셀 데이터랑 1:1 매핑용
+
 public enum ItemType
 {
     None,
