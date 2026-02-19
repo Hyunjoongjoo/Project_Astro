@@ -87,21 +87,25 @@ public class UserDataStore : MonoBehaviour
             };
             await userDocRef.Collection(COLLECTION_RECORD).Document(DOCUMENT_RECORD).SetAsync(Record);
 
-            // 3. 영웅 정보 생성 (일단 직접 기입)
-            string[] heroIdList = { "Hero_Knight", "Hero_Archer", "Hero_Priest" };
-            foreach (string heroId in heroIdList)
+            // 3. 영웅 정보 생성 (CSV파서를 통한 TableManager에서 Id값 가져옴)
+            var csvHeroDatas = TableManager.Instance.HeroTable.GetAll();
+            if (csvHeroDatas != null && csvHeroDatas.Count > 0)
             {
-                var heroData = new Dictionary<string, object>
+                foreach (var heroData in csvHeroDatas)
                 {
-                    { "isUnlock", false },
-                    { "level", 1 },
-                    { "exp", 0 }
-                };
+                    string heroId = heroData.PrimaryID;
 
-                // 서브 컬렉션에 영웅들 정보 생성
-                await userDocRef.Collection(COLLECTION_HERO).Document(heroId).SetAsync(heroData);
+                    var initHeroDbData = new Dictionary<string, object>
+                    {
+                        { "isUnlock", false },
+                        { "level", 1 },
+                        { "exp", 0 }
+                    };
+
+                    // 서브 컬렉션에 영웅들 정보 생성
+                    await userDocRef.Collection(COLLECTION_HERO).Document(heroId).SetAsync(initHeroDbData);
+                }
             }
-
             // 4. 지갑(재화) 정보 생성
             var Wallet = new Dictionary<string, object>
             {
@@ -109,7 +113,7 @@ public class UserDataStore : MonoBehaviour
             };
             await userDocRef.Collection(COLLECTION_WALLET).Document(DOCUMENT_WALLET).SetAsync(Wallet);
 
-            Debug.Log($"[Firestore] 유저 '{nickname}' 생성 및 기본 영웅 {heroIdList.Length}종 생성 완료");
+            Debug.Log($"[Firestore] 유저 '{nickname}' 생성 및 기본 영웅 {csvHeroDatas.Count}종 생성 완료");
         }
         catch (System.Exception e)
         {
