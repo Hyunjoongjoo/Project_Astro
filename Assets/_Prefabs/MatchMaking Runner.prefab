@@ -111,10 +111,34 @@ MonoBehaviour:
       m_Calls: []
   OnSceneLoadDone:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1619705219562072791}
+        m_TargetAssemblyTypeName: MatchMakingRunner, Assembly-CSharp
+        m_MethodName: OnSceneLoaded
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 3222780316176410853}
+          m_ObjectArgumentAssemblyTypeName: Fusion.NetworkRunner, Fusion.Runtime
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnSceneLoadStart:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1619705219562072791}
+        m_TargetAssemblyTypeName: MatchMakingRunner, Assembly-CSharp
+        m_MethodName: OnSceneLoadStart
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 3222780316176410853}
+          m_ObjectArgumentAssemblyTypeName: Fusion.NetworkRunner, Fusion.Runtime
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnReliableData:
     m_PersistentCalls:
       m_Calls: []

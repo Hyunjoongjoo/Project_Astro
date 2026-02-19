@@ -28,6 +28,7 @@ public class MatchMakingSystem : MonoBehaviour
         _isMatching = true;
 
         GameObject obj = Instantiate(_runnerPrefab);
+        DontDestroyOnLoad(obj);
         _networkRunner = obj.GetComponent<NetworkRunner>();
         obj.GetComponent<MatchMakingRunner>().Initialize(_cancelBtn, _networkRunner);
 

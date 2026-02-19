@@ -1,44 +1,48 @@
-﻿using System;
+﻿using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Tower : MonoBehaviour
+public class Tower : Structure, IBasicAttack, ITargetFinder
 {
-    [SerializeField] private Team _team;
-    [SerializeField] private float _hp;
-    public event Action OnTowerDestroyed;
-    private bool _isDestroyed = false;
-
     //26-02-13 주현중 수정 (임의로 범위,공격력 등등을 설정해서 진행)
-    public static List<Tower> AliveTowers = new List<Tower>();
+    public static List<Structure> AliveTowers = new List<Structure>();
 
-    [SerializeField] private float _damage;
-    [SerializeField] private float _detectRange;
-    [SerializeField] private LayerMask _targetLayer;
-    [SerializeField] private float _scanInterval = 0.5f;
-    [SerializeField] private float _attackInterval = 1f;
+    [SerializeField] private float _attackPower;
+    [SerializeField] private float _attackSpeed = 1f;
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform _firePoint;
 
-    private UnitController _currentTarget;
+    [SerializeField] private float _detectRange;
+    [SerializeField] private LayerMask _targetLayer;
+    [SerializeField] private float _scanInterval = 0.5f;
+
+    private UnitBase _currentTarget;
     private float _nextScanTime;
     private float _nextAttackTime;
 
-    public Team Team => _team;
+    public float AttackPower { get => _attackPower; }
+    public float AttackSpeed { get => _attackSpeed; }
+    public float AttackRange { get => _detectRange; }
+    public float SearchRange { get => _detectRange; }
+    public LayerMask TargetLayer { get => _targetLayer; }
+    public float SearchInterval { get => _scanInterval; }
 
-    private void Awake()
+    [Networked] public TickTimer AttackInterval { get; set; }
+
+    public override void Spawned()
     {
-        if (_team == Team.Blue)
-        {
-            gameObject.layer = LayerMask.NameToLayer("BlueTeam");
-            _targetLayer = 1 << LayerMask.NameToLayer("RedTeam");
-        }
-        else
-        {
-            gameObject.layer = LayerMask.NameToLayer("RedTeam");
-            _targetLayer = 1 << LayerMask.NameToLayer("BlueTeam");
-        }
+        base.Spawned();
+        //if (team == Team.Blue)
+        //{
+        //    gameObject.layer = LayerMask.NameToLayer("BlueTeam");
+        //    _targetLayer = 1 << LayerMask.NameToLayer("RedTeam");
+        //}
+        //else
+        //{
+        //    gameObject.layer = LayerMask.NameToLayer("RedTeam");
+        //    _targetLayer = 1 << LayerMask.NameToLayer("BlueTeam");
+        //}
     }
 
     private void OnEnable()
@@ -54,19 +58,24 @@ public class Tower : MonoBehaviour
         AliveTowers.Remove(this);
     }
 
+    public override void FixedUpdateNetwork()
+    {
+        if (AttackInterval.ExpiredOrNotRunning(Runner))
+        {
+
+        }
+        TickTimer.CreateFromSeconds(Runner, 1.5f);
+    }
+
+    // 네트워크라 이거 쓰면 안됨
     private void Update()
     {
-        if (_isDestroyed)
-        {
-            return;
-        }
-
         if (Time.time < _nextAttackTime)
         {
             return;
         }
 
-        UnitController target = FindTarget();
+        UnitBase target = FindTarget();
         if (target == null)
         {
             return;
@@ -74,10 +83,10 @@ public class Tower : MonoBehaviour
 
         FireProjectile(target);
 
-        _nextAttackTime = Time.time + _attackInterval;
+        _nextAttackTime = Time.time + _attackSpeed;
     }
 
-    private void FireProjectile(UnitController target)
+    private void FireProjectile(UnitBase target)
     {
         if (_projectilePrefab == null || _firePoint == null)
         {
@@ -93,20 +102,15 @@ public class Tower : MonoBehaviour
         Projectile proj = projectile.GetComponent<Projectile>();
         if (proj != null)
         {
-            proj.Fire(target.transform, _damage);
+            proj.Fire(target.transform, _attackPower);
         }
     }
 
-    private UnitController FindTarget()//가까운 적 거리 기준 찾기
+    public UnitBase FindTarget()//가까운 적 거리 기준 찾기
     {
         if (Time.time < _nextScanTime)
         {
             if (_currentTarget == null)
-            {
-                return null;
-            }
-
-            if (_currentTarget.IsDead)
             {
                 return null;
             }
@@ -125,23 +129,12 @@ public class Tower : MonoBehaviour
         }
 
         float minDistance = float.MaxValue;
-        UnitController closest = null;
+        UnitBase closest = null;
 
         foreach (var hit in hits)
         {
-            UnitController unit = hit.GetComponent<UnitController>();
-            if (unit == null || unit.IsDead)
-            {
-                continue;
-            }
-
-            BaseAutoBattleAI ai = hit.GetComponent<BaseAutoBattleAI>();
-            if (ai == null)
-            {
-                continue;
-            }
-
-            if (ai.Team == _team)
+            UnitBase unit = hit.GetComponent<UnitBase>();
+            if (unit == null)
             {
                 continue;
             }
@@ -155,30 +148,6 @@ public class Tower : MonoBehaviour
         }
         _currentTarget = closest;
         return _currentTarget;
-    }
-
-    public void TakeDamage(float amount)
-    {
-        if (_isDestroyed) return;
-
-        _hp -= amount;
-        if (_hp <= 0)
-        {
-            Die();
-        }
-    }
-
-    public void Die()
-    {
-        if (_isDestroyed)
-        {
-            return;
-        }
-
-        _isDestroyed = true;
-        AliveTowers.Remove(this);
-        OnTowerDestroyed?.Invoke();
-        gameObject.SetActive(false);
     }
 
 #if UNITY_EDITOR
