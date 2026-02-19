@@ -7,8 +7,8 @@ public class HeroDetailPopup : BaseUI
     [Header("메인 정보")]
     [SerializeField] private Image _heroPilotImg;
     [SerializeField] private TMP_Text _heroNameTxt;
-    [SerializeField] private TMP_Text _heroRoleTxt;
     [SerializeField] private TMP_Text _heroTypeTxt;
+    [SerializeField] private TMP_Text _heroRoleTxt;
     [SerializeField] private TMP_Text _descriptionTxt;
 
     [Header("하단 스와이프 패널")]
@@ -24,8 +24,8 @@ public class HeroDetailPopup : BaseUI
         //기본정보 매핑
         _heroNameTxt.text = data.heroName;
         _descriptionTxt.text = data.heroDesc;
-        //_heroTypeTxt.text = data.heroType;    이넘때문에 일단 주석 이넘부분 처리완료되면 수정예정
-        //_heroRoleTxt.text = data.heroRole;
+        _heroTypeTxt.text = data.heroType.ToString();
+        _heroRoleTxt.text = data.heroRole.ToString();
 
         //이미지는 어드레서블로  나중에 연결시킬예정 like 어드레서블 매니저
 

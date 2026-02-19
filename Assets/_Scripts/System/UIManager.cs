@@ -107,7 +107,7 @@ public class UIManager : Singleton<UIManager>
             BaseUI ui = _popupStack.Pop();
             if (ui != null)
             {
-                Destroy(ui.gameObject);
+                ui.Close();
             }
         }
     }
