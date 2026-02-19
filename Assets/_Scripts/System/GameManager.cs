@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public enum GameState { Ready,Play} //추후 상태 추가가능
+public enum GameState { Ready, Play, Result } //추후 상태 추가가능
 
 // 게임 매니저의 경우 아직 어떤 역할을 할지 구체적으로 정해지지 않음
 // 게임 전체 흐름을 관리할 것 같음. 어떤식으로 관리할지 설계해야 함.
@@ -17,6 +17,7 @@ public class GameManager : Singleton<GameManager>
     public void SetTeam(Team team)
     {
         PlayerTeam = team;
+        Debug.Log($"[GameManager] {PlayerTeam}으로 세팅 완료!");
     }
 
     public void ChangeState(GameState newState)
@@ -32,6 +33,9 @@ public class GameManager : Singleton<GameManager>
                 break;
             case GameState.Play:
                 //모든 로직 가동
+                break;
+            case GameState.Result:
+                // 결과 처리
                 break;
         }
     }
