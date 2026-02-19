@@ -14,6 +14,13 @@ public class GameManager : Singleton<GameManager>
 
     public Team PlayerTeam { get; private set; }
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+        Application.targetFrameRate = 60;
+    }
+
     public void SetTeam(Team team)
     {
         PlayerTeam = team;
