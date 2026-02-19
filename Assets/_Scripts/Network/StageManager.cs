@@ -170,6 +170,11 @@ public class StageManager : NetworkBehaviour
     private void StartGame()
     {
         CurrentState = StageState.Playing;
+        ObjectContainer OC = ObjectContainer.Instance;
+        OC.blueSideStructure[OC.BridgeIndex].OnDeath += BridgeDestroyed;
+        OC.redSideStructure[OC.BridgeIndex].OnDeath += BridgeDestroyed;
+        Debug.Log("브릿지 파괴에 메서드 구독 완료");
+
         RPC_StartGame();
     }
 
@@ -182,5 +187,38 @@ public class StageManager : NetworkBehaviour
         _introUI.HideCountdown();
         GameManager.Instance.ChangeState(GameState.Play);
         Debug.Log("게임 시작!");
+    }
+
+    private void BridgeDestroyed(UnitBase unit)
+    {
+        Debug.Log("브릿지 파괴 이벤트 메서드에 진입 완료");
+        CurrentState = StageState.GameOver;
+
+        ObjectContainer OC = ObjectContainer.Instance;
+        OC.blueSideStructure[OC.BridgeIndex].OnDeath -= BridgeDestroyed;
+        OC.redSideStructure[OC.BridgeIndex].OnDeath -= BridgeDestroyed;
+        Debug.Log("브릿지 파괴 메서드 구독 제거 완료");
+
+        // 브릿지가 파괴된 팀의 반대 팀이 승리 팀
+        Team victory = unit.team == Team.Blue ? Team.Red : Team.Blue;
+
+        RPC_GameOver(victory);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_GameOver(Team victory)
+    {
+        Debug.Log("게임오버 RPC 진입 성공");
+        // 일단 패널 아무거나 띄움. 나중에 UI매니저에게
+        if (PlayerTeams.Get(Runner.LocalPlayer) == victory)
+        {
+            Debug.Log("승리했습니다!!");
+        }
+        else
+        {
+            Debug.Log("패배했습니다!!");
+        }
+        _introUI.gameObject.SetActive(true);
+        GameManager.Instance.ChangeState(GameState.Result);
     }
 }
