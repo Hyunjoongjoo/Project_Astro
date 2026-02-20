@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 public class GoogleSheetImporter : EditorWindow
 {
+    //전처리문넣기 or 암호화
     //스프레드 시트 고유 ID 넣고
     private string _sheetId = "1OYp8Qpi3HPuoeZmpP4ssRck5V24W1sZCL6idIvUCerw";
     //경로설정
