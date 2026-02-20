@@ -27,6 +27,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     private TickTimer _attackTimer;
     private UnitFSM _fsm;
 
+    //임시로 불값으로 구현
     private bool _isDeploying;
     private Vector3 _deployTarget;
 
@@ -117,8 +118,10 @@ public class HeroController : MobilityUnit, IBasicAttack
         bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
         bool isDead = CurrentState == UnitState.Dead;
 
+        //FSM에 상태 전이 판단 위임
         _fsm.Update(isDead, hasTarget, inRange);
 
+        //FSM 결과에 따라 행동 처리
         switch (_fsm.State)
         {
             case UnitAIState.Detect:

@@ -87,8 +87,10 @@ public class MinionController : MobilityUnit, IBasicAttack
         bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
         bool isDead = CurrentState == UnitState.Dead;
 
+        //FSM에 상태 전이 판단 위임
         _fsm.Update(isDead: isDead, hasTarget: hasTarget, inRange: inRange);
 
+        //FSM 결과에 따라 행동 처리
         switch (_fsm.State)
         {
             case UnitAIState.Detect:
