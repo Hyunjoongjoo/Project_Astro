@@ -33,29 +33,50 @@ public class UIManager : Singleton<UIManager>
     {
         if (_uiRoot != null) return;
 
-        //Root UI 생성
-        GameObject rootObj = new GameObject("@UI_Root");
+        // 1. 기존 씬에 Canvas가 있는지 먼저 확인
+        Canvas existingCanvas = Object.FindFirstObjectByType<Canvas>();
+        GameObject rootObj;
+
+        if (existingCanvas != null)
+        {
+            // 씬에 이미 캔버스가 있다면 그걸 루트로 사용
+            rootObj = existingCanvas.gameObject;
+            rootObj.name = "@UI_Root";
+        }
+        else
+        {
+            // 없다면 새로 생성
+            rootObj = new GameObject("@UI_Root");
+            Canvas canvas = rootObj.GetOrAddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            rootObj.GetOrAddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            rootObj.GetOrAddComponent<GraphicRaycaster>();
+        }
+
         _uiRoot = rootObj.transform;
-        DontDestroyOnLoad(rootObj);
 
-        //캔버스 추가
-        Canvas canvas = rootObj.GetOrAddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        rootObj.GetOrAddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        rootObj.GetOrAddComponent<GraphicRaycaster>();
-
-        // 컨테이너 분리 (윈도우는 밑에, 팝업은 위에 쌓이도록)
-        _windowContainer = CreateContainer("Windows", _uiRoot);
-        _popupContainer = CreateContainer("Popups", _uiRoot);
+        // 2. 컨테이너 생성 (이미 있으면 찾고, 없으면 생성)
+        _windowContainer = FindOrCreateContainer("Windows", _uiRoot);
+        _popupContainer = FindOrCreateContainer("Popups", _uiRoot);
     }
-    private Transform CreateContainer(string name, Transform parent)
+    private Transform FindOrCreateContainer(string name, Transform parent)
     {
+        // 이미 자식으로 해당 컨테이너가 있는지 확인
+        Transform container = parent.Find(name);
+        if (container != null) return container;
+
+        // 없으면 생성
         GameObject obj = new GameObject(name);
         obj.transform.SetParent(parent);
         RectTransform rt = obj.AddComponent<RectTransform>();
+
+        // 화면에 꽉 차도록 앵커 설정
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;
         rt.sizeDelta = Vector2.zero;
+        rt.localScale = Vector3.one;
+        rt.localPosition = Vector3.zero;
+
         return obj.transform;
     }
 
