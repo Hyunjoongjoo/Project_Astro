@@ -21,7 +21,7 @@ public class LobbyHeroCardUI : MonoBehaviour
     public void OnClickCard()
     {
         // UIManager를 통해 팝업 생성 및 데이터 전달
-        var detailPopup = UIManager.Instance.ShowPopup<HeroDetailPopup>(_detailPopupPrefab);
+        var detailPopup = UIManager.Instance.ShowUI<HeroDetailPopup>(_detailPopupPrefab,true);
         if (detailPopup != null)
         {
             detailPopup.Setup(_data);
