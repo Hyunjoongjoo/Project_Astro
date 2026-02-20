@@ -1,0 +1,6 @@
+영웅 레벨 달성 보상 테이블 기본키,레벨 달성 보상이 지급될 영웅,보상 해금 레벨,해금 보상 ID,기획용 비고
+id,heroId,level,rewardId,note
+String,String,Int,String,String
+Lv03_Reward_Hero_Knight,Hero_Knight,3,Passive_Skill_Hero_Knight_01,기획용 컬럼입니다. 게임에 사용되지 않습니다.
+Lv06_Reward_Hero_Knight,Hero_Knight,6,Augment_Skill_Hero_Knight_01,기획용 컬럼입니다. 게임에 사용되지 않습니다.
+Lv09_Reward__Hero_Knight,Hero_Knight,9,Passive_Skill_Hero_Knight_02,기획용 컬럼입니다. 게임에 사용되지 않습니다.
