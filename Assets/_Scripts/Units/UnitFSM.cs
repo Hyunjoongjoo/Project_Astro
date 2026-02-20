@@ -12,7 +12,7 @@ public class UnitFSM
     }
 
     //상태 전이 판단, 실제 행동은 컨트롤러에서 처리
-    public void Update(bool isDead, bool hasTarget, bool inRange)
+    public void FSMUpdate(bool isDead, bool hasTarget, bool inRange)
     {
         if (isDead)
         {

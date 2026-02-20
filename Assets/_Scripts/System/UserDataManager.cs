@@ -99,4 +99,72 @@ public class UserDataManager : Singleton<UserDataManager>
             Debug.LogError($"[UserDataManager] Record Sync Failed: {e.Message}");
         }
     }
+
+    // 신규 영웅 생성 시(CSV 기준!) DB 대조하여 가감 (DB 로드 완료 이후 호출되어야함.)
+    public async Task SyncHeroDataAsync()
+    {
+        string uuid = _profileModel.uuid;
+
+        //CSV에 있는 모든 영웅 ID 가져오기 (최신 리스트)
+        var allCsvHeroes = TableManager.Instance.HeroTable.GetAll();
+        
+        HashSet<string> csvHeroIds = new HashSet<string>();
+        foreach (var csvHero in allCsvHeroes)
+        {
+            csvHeroIds.Add(csvHero.PrimaryID);
+        }
+
+        //유저가 현재 DB에 가지고 있는 영웅 리스트와 비교
+        HashSet<string> userHeroIds = new HashSet<string>();
+        foreach (var h in _heroesModel)
+        {
+            userHeroIds.Add(h.heroId);
+        }
+
+        List<Task> dbTasks = new List<Task>();
+
+        // CSV에 있는데 기존 DB에 없으면 추가
+        foreach (string cid in csvHeroIds)
+        {
+            if (!userHeroIds.Contains(cid))
+            {
+                Debug.Log($"[Sync] 누락된 영웅 발견: {cid}. DB에 추가합니다.");
+                dbTasks.Add(UserDataStore.Instance.AddNewHeroAsync(uuid, cid));
+
+                // 로컬 캐시 미리 추가
+                _heroesModel.Add(new HeroDbModel
+                {
+                    heroId = cid,
+                    level = 1,
+                    exp = 0,
+                    isUnlock = false
+                });
+            }
+        }
+
+        // CSV에 없는데 기존 DB에 있으면 삭제
+        for (int i = _heroesModel.Count - 1; i >= 0; i--)
+        {
+            string currentHeroId = _heroesModel[i].heroId;
+
+            if (!csvHeroIds.Contains(currentHeroId))
+            {
+                Debug.LogWarning($"[Sync] 제거된 영웅 발견: {currentHeroId}. DB에서 삭제합니다.");
+
+                dbTasks.Add(UserDataStore.Instance.DeleteHeroAsync(uuid, currentHeroId));
+
+                // 로컬 캐시에서 제거
+                _heroesModel.RemoveAt(i);
+            }
+        }
+
+        if (dbTasks.Count > 0)
+        {
+            await Task.WhenAll(dbTasks);
+            Debug.Log($"[Sync] 데이터 동기화 완료 (작업 수: {dbTasks.Count})");
+
+            // 4. HeroManager 런타임 스텟 재초기화
+            HeroManager.Instance.InitAllHeroStats(_heroesModel);
+        }
+    }
 }

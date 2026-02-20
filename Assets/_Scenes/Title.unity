@@ -282,9 +282,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   _dontDestroyOnLoad: 1
-  _windowRoot: {fileID: 0}
-  _popupRoot: {fileID: 0}
-  _backAction: {fileID: 0}
 --- !u!4 &24780332
 Transform:
   m_ObjectHideFlags: 0
@@ -3869,6 +3866,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1403576594}
   - component: {fileID: 1403576593}
+  - component: {fileID: 1403576595}
   m_Layer: 0
   m_Name: UserDataManager
   m_TagString: Untagged
@@ -3904,6 +3902,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1403576595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403576592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee7cc5fcd46382243b71255ea36ed2b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeroManager
+  _dontDestroyOnLoad: 1
 --- !u!1 &1425347252
 GameObject:
   m_ObjectHideFlags: 0
@@ -5712,6 +5723,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3b6c632393253f4598df8049f109b02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UserDataStore
+  _dontDestroyOnLoad: 1
 --- !u!114 &1782207123
 MonoBehaviour:
   m_ObjectHideFlags: 0

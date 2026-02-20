@@ -89,7 +89,7 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
         bool isDead = CurrentState == UnitState.Dead;
 
-        _fsm.Update(isDead, hasTarget, inRange);
+        _fsm.FSMUpdate(isDead, hasTarget, inRange);
 
         if (_fsm.State == UnitAIState.Dead)
         {

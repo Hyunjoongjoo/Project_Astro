@@ -8,7 +8,7 @@ public enum UnitType
     Bridge, Tower, Hero, Minion
 }
 
-public enum UnitState 
+public enum UnitState
 { 
     Idle, Move, Attack, Dead, Skill 
 }

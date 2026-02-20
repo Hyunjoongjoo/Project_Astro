@@ -27,9 +27,10 @@ public class HeroController : MobilityUnit, IBasicAttack
     private TickTimer _attackTimer;
     private UnitFSM _fsm;
 
-    //임시로 불값으로 구현
+    //배치
     private bool _isDeploying;
     private Vector3 _deployTarget;
+    private TickTimer _deployWaitTimer;
 
     public float AttackPower => _attackPower;
     public float AttackSpeed => _attackSpeed;
@@ -49,7 +50,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         _bridge = targetStructure[2];
     }
 
-    public void StartDeploy(Vector3 position)
+    public void StartDeploy(Vector3 position)//배치중
     {
         if (!Object.HasStateAuthority)
         {
@@ -57,10 +58,11 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         _deployTarget = position;
+        _deployWaitTimer = TickTimer.CreateFromSeconds(Runner, 3f);//임의로 3초
         _isDeploying = true;
     }
 
-    private void FinishDeploy()
+    private void FinishDeploy()//배치완료
     {
         _isDeploying = false;
     }
@@ -96,6 +98,12 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         if (_isDeploying)
         {
+            //배치중 일때는
+            if (!_deployWaitTimer.Expired(Runner))
+            {
+                return;
+            }
+
             CurrentState = UnitState.Move;
             MoveTo(_deployTarget);
 
@@ -103,10 +111,9 @@ public class HeroController : MobilityUnit, IBasicAttack
             {
                 FinishDeploy();
             }
-
             return;
         }
-
+        
         //주기적 탐색
         if (_searchTimer.ExpiredOrNotRunning(Runner))
         {
@@ -119,7 +126,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         bool isDead = CurrentState == UnitState.Dead;
 
         //FSM에 상태 전이 판단 위임
-        _fsm.Update(isDead, hasTarget, inRange);
+        _fsm.FSMUpdate(isDead, hasTarget, inRange);
 
         //FSM 결과에 따라 행동 처리
         switch (_fsm.State)
