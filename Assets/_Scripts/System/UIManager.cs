@@ -33,7 +33,7 @@ public class UIManager : Singleton<UIManager>
     {
         if (_uiRoot != null) return;
 
-        // 1. 기존 씬에 Canvas가 있는지 먼저 확인
+        //기존 씬에 Canvas가 있는지 먼저 확인
         Canvas existingCanvas = Object.FindFirstObjectByType<Canvas>();
         GameObject rootObj;
 
@@ -55,7 +55,7 @@ public class UIManager : Singleton<UIManager>
 
         _uiRoot = rootObj.transform;
 
-        // 2. 컨테이너 생성 (이미 있으면 찾고, 없으면 생성)
+        //컨테이너 생성 (이미 있으면 찾고, 없으면 생성)
         _windowContainer = FindOrCreateContainer("Windows", _uiRoot);
         _popupContainer = FindOrCreateContainer("Popups", _uiRoot);
     }
@@ -79,10 +79,20 @@ public class UIManager : Singleton<UIManager>
 
         return obj.transform;
     }
+    private void EnsureContainers()
+    {
+        // 씬이 바뀌어 참조가 깨졌거나 아직 초기화 전이라면 다시 잡음
+        if (_uiRoot == null || _windowContainer == null || _popupContainer == null)
+        {
+            InitRoot();
+        }
+    }
 
     #region 통합 UI 관리
     public T ShowUI<T>(GameObject prefab,bool isPopup = true) where T : BaseUI
     {
+        EnsureContainers(); //컨테이너랑 루트있는가 확인
+
         if (prefab == null) return null;
 
         // 중복 팝업 토글 체크
