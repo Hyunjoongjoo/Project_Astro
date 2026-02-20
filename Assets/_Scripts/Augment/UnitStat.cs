@@ -1,7 +1,8 @@
 using Fusion;
 using UnityEngine;
 
-//유닛의 최종 스탯 결과물 및 연산 로직 컴포넌트
+//현재 스탯을 계산하여 유닛에게 달아줄 관리자
+//
 public class UnitStat : MonoBehaviour //추후 NetWorkBehavior
 {
 

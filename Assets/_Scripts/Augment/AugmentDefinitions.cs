@@ -43,7 +43,8 @@ public class HeroGrowthData
 
 
 //기획서 상 그룹별 합산 후 곱연산 방식을 위한 enum
-//연산타입
+//연산타입별 우선순위 부여
+//리스트 정렬시켜서 깡스탯 먼저 계산하도록
 public enum StatModType
 {
     Flat = 100,         //고정값
