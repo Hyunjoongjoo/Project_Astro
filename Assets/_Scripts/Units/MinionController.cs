@@ -28,6 +28,7 @@ public class MinionController : MobilityUnit, IBasicAttack
 
     private TickTimer _searchTimer;
     private TickTimer _attackTimer;
+    private UnitFSM _fsm;
 
     public float AttackPower => _attackPower;
     public float AttackSpeed => _attackSpeed;
@@ -38,7 +39,7 @@ public class MinionController : MobilityUnit, IBasicAttack
         team = myTeam;
         base.Setup();
 
-        UnitBase[] targetStructure = team == Team.Blue ? 
+        UnitBase[] targetStructure = team == Team.Blue ?
             ObjectContainer.Instance.redSideStructure :
             ObjectContainer.Instance.blueSideStructure;
 
@@ -47,13 +48,20 @@ public class MinionController : MobilityUnit, IBasicAttack
         _bridge = targetStructure[2];
     }
 
+    public void SetAttackType(AttackType attackType)
+    {
+        _attackType = attackType;
+    }
+
     public override void Spawned()
     {
         base.Spawned();
 
         if (!Object.HasStateAuthority) return;
 
-        // 타이머를 즉시 만료 상태로 초기화 -> 첫 틱에 곧바로 탐색 실행
+        _fsm = new UnitFSM();
+
+        //타이머를 즉시 만료 상태로 초기화 -> 첫 틱에 곧바로 탐색 실행
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
 
@@ -69,14 +77,37 @@ public class MinionController : MobilityUnit, IBasicAttack
         if (CurrentState == UnitState.Dead) return;
 
         // 주기적 탐색
-        if (_searchTimer.ExpiredOrNotRunning(Runner))
+        if (_fsm.State == UnitAIState.Detect && _searchTimer.ExpiredOrNotRunning(Runner))
         {
             RefreshTarget();
             _searchTimer = TickTimer.CreateFromSeconds(Runner, SearchInterval);
         }
 
-        // 현재 목표에 따른 행동 처리
-        HandleBehaviour();
+        bool hasTarget = _currentTarget != null;
+        bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
+        bool isDead = CurrentState == UnitState.Dead;
+
+        //FSM에 상태 전이 판단 위임
+        _fsm.Update(isDead: isDead, hasTarget: hasTarget, inRange: inRange);
+
+        //FSM 결과에 따라 행동 처리
+        switch (_fsm.State)
+        {
+            case UnitAIState.Detect:
+                CurrentState = UnitState.Move;
+                OnDetectUpdate();
+                break;
+
+            case UnitAIState.Attack:
+                CurrentState = UnitState.Attack;
+                OnAttackUpdate();
+                break;
+
+            case UnitAIState.Dead:
+                CurrentState = UnitState.Dead;
+                StopMove();
+                break;
+        }
     }
 
     private void RefreshTarget()
@@ -121,9 +152,20 @@ public class MinionController : MobilityUnit, IBasicAttack
         // 두 타워가 모두 없으면 함교
         if (_towerA == null && _towerB == null) return _bridge;
 
-        // 타워가 하나만 있다면 그 놈이 타겟
-        if (_towerA == null) return _towerB;
-        if (_towerB == null) return _towerA;
+        // 타워가 하나만 남은 경우 타워나 함교 중 가까운 쪽
+        if (_towerA == null)
+        {
+            float distTower = Vector3.Distance(transform.position, _towerB.transform.position);
+            float distBridge = Vector3.Distance(transform.position, _bridge.transform.position);
+            return distBridge < distTower ? _bridge : _towerB;
+        }
+
+        if (_towerB == null)
+        {
+            float distTower = Vector3.Distance(transform.position, _towerA.transform.position);
+            float distBridge = Vector3.Distance(transform.position, _bridge.transform.position);
+            return distBridge < distTower ? _bridge : _towerA;
+        }
 
         // 두 타워가 모두 살아있다면 둘 중 가까운 넘
         float distA = Vector3.Distance(transform.position, _towerA.transform.position);
@@ -131,31 +173,48 @@ public class MinionController : MobilityUnit, IBasicAttack
         return distA <= distB ? _towerA : _towerB;
     }
 
-    private void HandleBehaviour()
+    //private void HandleBehaviour()
+    //{
+    //    // 유효한 목표가 없으면 대기 (함교까지 다 부쉈을 때)
+    //    if (_currentTarget == null)
+    //    {
+    //        CurrentState = UnitState.Idle;
+    //        StopMove();
+    //        return;
+    //    }
+
+    //    float distToTarget = Vector3.Distance(transform.position, _currentTarget.transform.position);
+
+    //    if (distToTarget > AttackRange)
+    //    {
+    //        // ── 이동 ──
+    //        CurrentState = UnitState.Move;
+    //        MoveTo(_currentTarget.transform.position);
+    //    }
+    //    else
+    //    {
+    //        // ── 공격 ──
+    //        StopMove();
+    //        CurrentState = UnitState.Attack;
+    //        TryAttack();
+    //    }
+    //}
+
+    private void OnDetectUpdate()
     {
-        // 유효한 목표가 없으면 대기 (함교까지 다 부쉈을 때)
         if (_currentTarget == null)
         {
-            CurrentState = UnitState.Idle;
             StopMove();
             return;
         }
 
-        float distToTarget = Vector3.Distance(transform.position, _currentTarget.transform.position);
+        MoveTo(_currentTarget.transform.position);
+    }
 
-        if (distToTarget > AttackRange)
-        {
-            // ── 이동 ──
-            CurrentState = UnitState.Move;
-            MoveTo(_currentTarget.transform.position);
-        }
-        else
-        {
-            // ── 공격 ──
-            StopMove();
-            CurrentState = UnitState.Attack;
-            TryAttack();
-        }
+    private void OnAttackUpdate()
+    {
+        StopMove();
+        TryAttack();
     }
 
     private void TryAttack()
@@ -164,28 +223,35 @@ public class MinionController : MobilityUnit, IBasicAttack
         if (_currentTarget == null) return;
 
         // IBasicAttack 인터페이스 기본 구현 호출 (target.TakeDamage(AttackPower))
-        ((IBasicAttack)this).BaseAttack(_currentTarget);
+        if (_attackType == AttackType.Melee)
+        {
+            ((IBasicAttack)this).BaseAttack(_currentTarget);
+        }
+        else
+        {
+            AttackRanged(_currentTarget.transform.position);
+        }
 
         // 다음 공격 가능 시간 설정 (AttackSpeed = 초당 공격 횟수)
         float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
         _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
     }
 
-    private void AttackMelee(Transform target)
-    {
-        Tower tower = target.GetComponent<Tower>();
-        if (tower != null)
-        {
-            tower.TakeDamage(AttackPower);
-            return;
-        }
+    //private void AttackMelee(Transform target)
+    //{
+    //    Tower tower = target.GetComponent<Tower>();
+    //    if (tower != null)
+    //    {
+    //        tower.TakeDamage(AttackPower);
+    //        return;
+    //    }
 
-        UnitBase unit = target.GetComponent<UnitBase>();
-        if (unit != null)
-        {
-            unit.TakeDamage(AttackPower);
-        }
-    }
+    //    UnitBase unit = target.GetComponent<UnitBase>();
+    //    if (unit != null)
+    //    {
+    //        unit.TakeDamage(AttackPower);
+    //    }
+    //}
 
     private void AttackRanged(Vector3 targetPos)
     {
@@ -194,9 +260,28 @@ public class MinionController : MobilityUnit, IBasicAttack
             return;
         }
 
+        if (_currentTarget == null)
+        {
+            return;
+        }
+
+        _currentTarget.TakeDamage(AttackPower);
+
+        RPC_FireProjectile(targetPos);
+    }
+
+    //투사체(현재는 이펙트만)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_FireProjectile(Vector3 targetPos)
+    {
+        if (_projectilePrefab == null || _firePoint == null)
+        {
+            return;
+        }
+
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
-        projectile.GetComponent<Projectile>().Fire(targetPos);
+        projectile.GetComponent<Projectile>()?.Fire(targetPos);
     }
 
     private void OnTargetDied(UnitBase deadUnit)
@@ -210,6 +295,7 @@ public class MinionController : MobilityUnit, IBasicAttack
 
     public override void Die()
     {
+        _fsm?.ForceDead();
         StopMove();
 
         // 목표 이벤트 구독 해제 후 부모 Die 호출 (Despawn)

@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
@@ -8,10 +8,13 @@ public class TableManager : Singleton<TableManager>
 {
     //테이블 목록
     //추가 시 제일 아래에 이어 작성
-    public TableBase<ItemData> ItemTable = new TableBase<ItemData>();
-    public TableBase<HeroData> HeroTable = new TableBase<HeroData>();
-    public TableBase<ItemEffectData> ItemEffectTable = new TableBase<ItemEffectData>();
     public TableBase<ConfigData> ConfigTable = new TableBase<ConfigData>();
+    public TableBase<HeroData> HeroTable = new TableBase<HeroData>();
+    public TableBase<HeroStatData> HeroStatTable = new TableBase<HeroStatData>();
+    public TableBase<HeroLevelData> HeroLevelTable = new TableBase<HeroLevelData>();
+    public TableBase<HeroLevelRewardData> HeroLevelRewardTable = new TableBase<HeroLevelRewardData>();
+    public TableBase<ItemData> ItemTable = new TableBase<ItemData>();
+    public TableBase<ItemEffectData> ItemEffectTable = new TableBase<ItemEffectData>();
     public TableBase<StringData> StringTable = new TableBase<StringData>();
 
 

@@ -21,6 +21,7 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
 
     private TickTimer _scanTimer;
     private TickTimer _attackTimer;
+    private UnitFSM _fsm;
 
     public float AttackPower { get => _attackPower; }
     public float AttackSpeed { get => _attackSpeed; }
@@ -39,6 +40,8 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         {
             return;
         }
+
+        _fsm = new UnitFSM();
 
         CurrentState = UnitState.Idle;
 
@@ -76,25 +79,51 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
             return;
         }
 
-        if (CurrentState == UnitState.Dead)
+        if (_fsm.State == UnitAIState.Detect && _scanTimer.ExpiredOrNotRunning(Runner))
         {
+            _currentTarget = FindTarget();
+            _scanTimer = TickTimer.CreateFromSeconds(Runner, _scanInterval);
+        }
+
+        bool hasTarget = _currentTarget != null;
+        bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
+        bool isDead = CurrentState == UnitState.Dead;
+
+        _fsm.Update(isDead, hasTarget, inRange);
+
+        if (_fsm.State == UnitAIState.Dead)
+        {
+            CurrentState = UnitState.Dead;
             return;
         }
 
-        UpdateDetect();
-        UpdateAttack();
-    }
-
-    private void UpdateDetect()
-    {
-        if (!_scanTimer.ExpiredOrNotRunning(Runner))
+        switch (_fsm.State)
         {
-            return;
-        }
+            case UnitAIState.Detect:
+                CurrentState = UnitState.Idle;
+                break;
 
-        _currentTarget = FindTarget();
-        _scanTimer = TickTimer.CreateFromSeconds(Runner, _scanInterval);
+            case UnitAIState.Attack:
+                CurrentState = UnitState.Attack;
+                UpdateAttack();
+                break;
+
+            case UnitAIState.Dead:
+                CurrentState = UnitState.Dead;
+                break;
+        }
     }
+
+    //private void UpdateDetect()
+    //{
+    //    if (!_scanTimer.ExpiredOrNotRunning(Runner))
+    //    {
+    //        return;
+    //    }
+
+    //    _currentTarget = FindTarget();
+    //    _scanTimer = TickTimer.CreateFromSeconds(Runner, _scanInterval);
+    //}
 
     private void UpdateAttack()
     {
@@ -125,8 +154,9 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
     }
 
+    //투사체(현재는 이펙트만)
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayAttackEffect(Vector3 hitPos)
+    private void RPC_PlayAttackEffect(Vector3 targetPos)
     {
         if (_projectilePrefab == null || _firePoint == null)
         {
@@ -134,7 +164,7 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         }
 
         var proj = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
-        proj.GetComponent<Projectile>()?.Fire(hitPos);
+        proj.GetComponent<Projectile>()?.Fire(targetPos);
     }
 
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기
@@ -157,7 +187,7 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
                 continue;
             }
 
-            //if (unit.team == this.team)//26-02-20 현재 팀설정에 문제가 있는듯함
+            //if (unit.team == this.team)
             //{
             //    continue;
             //}
@@ -170,6 +200,12 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
             }
         }
         return closest;
+    }
+
+    public override void Die()
+    {
+        _fsm?.ForceDead();
+        base.Die();
     }
 
 #if UNITY_EDITOR

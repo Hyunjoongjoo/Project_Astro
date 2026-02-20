@@ -11,7 +11,7 @@ public class UserDbModel
     [FirestoreProperty] public string nickName { get; set; }
     [FirestoreProperty] public int userLevel { get; set; }
     [FirestoreProperty] public int userExp { get; set; }
-    [FirestoreProperty] public Time CreateAt { get; set; }
+    [FirestoreProperty] public Timestamp createdAt { get; set; }
 }
 
 [FirestoreData]
@@ -40,7 +40,7 @@ public class WalletModel
 
 // Firestore 유저 데이터
 
-public class UserDataStore : MonoBehaviour
+public class UserDataStore : Singleton<UserDataStore>
 {
     private FirebaseFirestore _firestore;
     private const string COLLECTION_NAME = "users";
@@ -51,7 +51,6 @@ public class UserDataStore : MonoBehaviour
 
     private const string DOCUMENT_PROFILE = "DOC_Profile";
     private const string DOCUMENT_RECORD = "DOC_Record";
-    //private const string DOCUMENT_HERO = "DOC_Hero";
     private const string DOCUMENT_WALLET = "DOC_Wallet";
 
     public void Initialize()
