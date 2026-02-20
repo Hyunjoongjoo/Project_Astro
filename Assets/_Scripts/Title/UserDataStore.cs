@@ -60,6 +60,8 @@ public class UserDataStore : Singleton<UserDataStore>
         Debug.Log("[Firestore] Firestore initialized");
     }
 
+    #region DB Create / Delete
+
     // 새 유저 데이터 생성
     public async Task CreateUserDataAsync(string uuid, string nickname)
     {
@@ -119,6 +121,42 @@ public class UserDataStore : Singleton<UserDataStore>
             Debug.LogError($"[Firestore] 초기화 실패: {e.Message}");
         }
     }
+
+    // 기존 DB에 새 영웅 데이터 생성
+    public async Task AddNewHeroAsync(string uuid, string heroId)
+    {
+        var heroDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid)
+            .Collection(COLLECTION_HERO).Document(heroId);
+
+        var initHeroData = new Dictionary<string, object>
+        {
+            { "isUnlock", false },
+            { "level", 1 },
+            { "exp", 0 }
+        };
+
+        await heroDocRef.SetAsync(initHeroData);
+        Debug.Log($"[Firestore] 신규 영웅 {heroId} 추가 완료");
+    }
+
+    // 기존 DB에 사라진 영웅 데이터 삭제
+    public async Task DeleteHeroAsync(string uuid, string heroId)
+    {
+        try
+        {
+            await _firestore.Collection(COLLECTION_NAME).Document(uuid)
+                .Collection(COLLECTION_HERO).Document(heroId)
+                .DeleteAsync();
+
+            Debug.Log($"[Firestore] 영웅 {heroId} 삭제 성공");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[Firestore] 영웅 삭제 실패: {e.Message}");
+        }
+    }
+
+    #endregion
 
     #region DB Search
     // 유저 데이터 조회(uuid, 닉네임,경험치, 레벨, 생성 날짜 정보 사용)
