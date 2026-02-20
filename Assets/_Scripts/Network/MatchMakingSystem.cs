@@ -51,7 +51,7 @@ public class MatchMakingSystem : MonoBehaviour
         var args = new StartGameArgs()
         {
             GameMode = GameMode.Shared,
-            PlayerCount = 4
+            PlayerCount = 2
         };
 
         var result = await _networkRunner.StartGame(args);
