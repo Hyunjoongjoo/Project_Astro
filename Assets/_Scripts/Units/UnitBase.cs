@@ -6,17 +6,17 @@ using UnityEngine;
 public abstract class UnitBase : NetworkBehaviour
 {
     [Header("체력과 방어력 설정")]
-    [SerializeField] protected float _maxHealth;
-    [SerializeField] protected float _deffense;
+    [SerializeField] protected float maxHealth;
+    [SerializeField] protected float deffense;
 
-    protected float _currentHealth;
+    protected float currentHealth;
 
     // 미니언이 죽었을 때 경험치 증가
     // 서브 타워 파괴시 미니언 웨이브 강화
     // 메인 타워 파괴시 게임 종료 등 Die 시 다형성을 위한 유닛 타입
-    protected UnitType _unitType;
+    protected UnitType unitType;
 
-    protected NetworkObject _selfNetworkObj;
+    protected NetworkObject selfNetworkObj;
 
     public Team team;
 
@@ -30,8 +30,8 @@ public abstract class UnitBase : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
-            _selfNetworkObj = GetComponent<NetworkObject>();
-            _currentHealth = _maxHealth;
+            selfNetworkObj = GetComponent<NetworkObject>();
+            currentHealth = maxHealth;
         }
     }
 
@@ -41,9 +41,9 @@ public abstract class UnitBase : NetworkBehaviour
     {
         if (!Object.HasStateAuthority) return;
 
-        _currentHealth -= amount;
+        currentHealth -= amount;
 
-        if (_currentHealth < 1)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
+        if (currentHealth < 1)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
         {
             Die();
         }
@@ -53,6 +53,6 @@ public abstract class UnitBase : NetworkBehaviour
     {
         CurrentState = UnitState.Dead;
         OnDeath?.Invoke(this);
-        Runner.Despawn(_selfNetworkObj);
+        Runner.Despawn(selfNetworkObj);
     }
 }

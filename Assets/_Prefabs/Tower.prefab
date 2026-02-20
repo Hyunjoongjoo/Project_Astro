@@ -88,8 +88,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a122320be5e7874a9156352a6137389, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
-  _maxHealth: 100
-  _deffense: 0
+  maxHealth: 100
+  deffense: 0
   team: 0
   _CurrentHealth: 0
   _CurrentState: 0

@@ -38,13 +38,18 @@ public class MinionController : MobilityUnit, IBasicAttack
         team = myTeam;
         base.Setup();
 
-        UnitBase[] targetStructure = team == Team.Blue ? 
+        UnitBase[] targetStructure = team == Team.Blue ?
             ObjectContainer.Instance.redSideStructure :
             ObjectContainer.Instance.blueSideStructure;
 
         _towerA = targetStructure[0];
         _towerB = targetStructure[1];
         _bridge = targetStructure[2];
+    }
+
+    public void SetAttackType(AttackType attackType)
+    {
+        _attackType = attackType;
     }
 
     public override void Spawned()
@@ -121,9 +126,20 @@ public class MinionController : MobilityUnit, IBasicAttack
         // 두 타워가 모두 없으면 함교
         if (_towerA == null && _towerB == null) return _bridge;
 
-        // 타워가 하나만 있다면 그 놈이 타겟
-        if (_towerA == null) return _towerB;
-        if (_towerB == null) return _towerA;
+        // 타워가 하나만 남은 경우 타워나 함교 중 가까운 쪽
+        if (_towerA == null)
+        {
+            float distTower = Vector3.Distance(transform.position, _towerB.transform.position);
+            float distBridge = Vector3.Distance(transform.position, _bridge.transform.position);
+            return distBridge < distTower ? _bridge : _towerB;
+        }
+
+        if (_towerB == null)
+        {
+            float distTower = Vector3.Distance(transform.position, _towerA.transform.position);
+            float distBridge = Vector3.Distance(transform.position, _bridge.transform.position);
+            return distBridge < distTower ? _bridge : _towerA;
+        }
 
         // 두 타워가 모두 살아있다면 둘 중 가까운 넘
         float distA = Vector3.Distance(transform.position, _towerA.transform.position);
@@ -164,28 +180,35 @@ public class MinionController : MobilityUnit, IBasicAttack
         if (_currentTarget == null) return;
 
         // IBasicAttack 인터페이스 기본 구현 호출 (target.TakeDamage(AttackPower))
-        ((IBasicAttack)this).BaseAttack(_currentTarget);
+        if (_attackType == AttackType.Melee)
+        {
+            ((IBasicAttack)this).BaseAttack(_currentTarget);
+        }
+        else
+        {
+            AttackRanged(_currentTarget.transform.position);
+        }
 
         // 다음 공격 가능 시간 설정 (AttackSpeed = 초당 공격 횟수)
         float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
         _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
     }
 
-    private void AttackMelee(Transform target)
-    {
-        Tower tower = target.GetComponent<Tower>();
-        if (tower != null)
-        {
-            tower.TakeDamage(AttackPower);
-            return;
-        }
+    //private void AttackMelee(Transform target)
+    //{
+    //    Tower tower = target.GetComponent<Tower>();
+    //    if (tower != null)
+    //    {
+    //        tower.TakeDamage(AttackPower);
+    //        return;
+    //    }
 
-        UnitBase unit = target.GetComponent<UnitBase>();
-        if (unit != null)
-        {
-            unit.TakeDamage(AttackPower);
-        }
-    }
+    //    UnitBase unit = target.GetComponent<UnitBase>();
+    //    if (unit != null)
+    //    {
+    //        unit.TakeDamage(AttackPower);
+    //    }
+    //}
 
     private void AttackRanged(Vector3 targetPos)
     {
@@ -194,9 +217,27 @@ public class MinionController : MobilityUnit, IBasicAttack
             return;
         }
 
+        if (_currentTarget == null)
+        {
+            return;
+        }
+
+        _currentTarget.TakeDamage(AttackPower);
+
+        RPC_FireProjectile(targetPos);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_FireProjectile(Vector3 targetPos)
+    {
+        if (_projectilePrefab == null || _firePoint == null)
+        {
+            return;
+        }
+
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
-        projectile.GetComponent<Projectile>().Fire(targetPos);
+        projectile.GetComponent<Projectile>()?.Fire(targetPos);
     }
 
     private void OnTargetDied(UnitBase deadUnit)

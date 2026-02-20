@@ -127,8 +127,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9657be50b40255a41a6e9f63d513fc39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bridge
-  _maxHealth: 100
-  _deffense: 0
+  maxHealth: 150
+  deffense: 0
   team: 0
   _CurrentHealth: 0
   _CurrentState: 0

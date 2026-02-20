@@ -126,7 +126,7 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayAttackEffect(Vector3 hitPos)
+    private void RPC_PlayAttackEffect(Vector3 targetPos)
     {
         if (_projectilePrefab == null || _firePoint == null)
         {
@@ -134,7 +134,7 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         }
 
         var proj = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
-        proj.GetComponent<Projectile>()?.Fire(hitPos);
+        proj.GetComponent<Projectile>()?.Fire(targetPos);
     }
 
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기
