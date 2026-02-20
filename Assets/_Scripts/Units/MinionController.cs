@@ -88,7 +88,7 @@ public class MinionController : MobilityUnit, IBasicAttack
         bool isDead = CurrentState == UnitState.Dead;
 
         //FSM에 상태 전이 판단 위임
-        _fsm.Update(isDead: isDead, hasTarget: hasTarget, inRange: inRange);
+        _fsm.FSMUpdate(isDead: isDead, hasTarget: hasTarget, inRange: inRange);
 
         //FSM 결과에 따라 행동 처리
         switch (_fsm.State)
@@ -216,7 +216,7 @@ public class MinionController : MobilityUnit, IBasicAttack
         StopMove();
         TryAttack();
     }
-
+ 
     private void TryAttack()
     {
         if (!_attackTimer.ExpiredOrNotRunning(Runner)) return;

@@ -113,7 +113,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             }
             return;
         }
-
+        
         //주기적 탐색
         if (_searchTimer.ExpiredOrNotRunning(Runner))
         {
@@ -126,7 +126,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         bool isDead = CurrentState == UnitState.Dead;
 
         //FSM에 상태 전이 판단 위임
-        _fsm.Update(isDead, hasTarget, inRange);
+        _fsm.FSMUpdate(isDead, hasTarget, inRange);
 
         //FSM 결과에 따라 행동 처리
         switch (_fsm.State)
