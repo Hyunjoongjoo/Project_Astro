@@ -29,6 +29,7 @@ public class LoginView : MonoBehaviour
 
     public void SetInteractable(bool interactable)
     {
+        if (this == null || gameObject == null) return;
         _emailInput.interactable = interactable;
         _passwordInput.interactable = interactable;
         _loginButton.interactable = interactable;

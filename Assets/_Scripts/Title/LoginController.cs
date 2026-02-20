@@ -41,13 +41,14 @@ public class LoginController : MonoBehaviour
         {
             // 1단계: Firebase Auth 로그인
             var user = await _authService.LoginAsync(credentials.email, credentials.password);
-
+            Debug.Log("파이어베이스 Auth 로그인 ");
             // 2단계: Firestore에서 유저 데이터 조회
             var userData = await _userDataStore.GetUserDataAsync(user.UserId);
             var userHeroData = await _userDataStore.GetUserHeroDataAsync(user.UserId);
             var userRecordData = await _userDataStore.GetUserRecordDataAsync(user.UserId);
             var userWalletData = await _userDataStore.GetUserWalletDataAsync(user.UserId);
 
+            Debug.Log("파이어베이스 유저 데이터 조회");
             if (userData == null)
             {
                 // 유저 데이터가 없으면 닉네임 생성 유도
@@ -58,9 +59,14 @@ public class LoginController : MonoBehaviour
             // 3단계: 로그인 성공
             _loginView.ShowWelcomeMessage(userData.nickName);
             _onLoginSuccess?.Invoke(userData.nickName);
+            Debug.Log("로그인 성공");
 
             // 4단계: DB 데이터 캐싱
             UserDataManager.Instance.SetAllUserData(userData, userRecordData, userWalletData, userHeroData);
+            Debug.Log("DB 캐싱 성공");
+            
+            await UserDataManager.Instance.SyncHeroDataAsync();
+            Debug.Log("마이그레이션 성공");
         }
         catch (Exception ex)
         {
