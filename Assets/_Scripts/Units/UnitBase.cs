@@ -18,7 +18,7 @@ public abstract class UnitBase : NetworkBehaviour
 
     protected NetworkObject _selfNetworkObj;
 
-    [HideInInspector] public Team team;
+    public Team team;
 
     [Networked, HideInInspector] public float CurrentHealth { get; set; }
     [Networked, HideInInspector] public UnitState CurrentState { get; set; }
