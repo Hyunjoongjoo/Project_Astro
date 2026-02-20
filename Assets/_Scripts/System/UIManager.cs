@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.UI;
+
 
 /* 
 모든 UI 패널들은 BaseUI를 상속받으며 
@@ -10,103 +12,126 @@ UI 매니저를 통해서 관리되어야 한다.
 
 public class UIManager : Singleton<UIManager>
 {
-    // 싱글톤이라 인스펙터에서 직접 꽂으면 씬 전환시 참조를 잃어버리는 문제 있음
-    // 추 후 리팩토링 예정
-    [Header("UI 부모 설정")]
-    [SerializeField] private Transform _windowRoot;
-    [SerializeField] private Transform _popupRoot;
 
-    [Header("인풋 액션 연결")]
-    [SerializeField] private InputActionReference _backAction;  //UI cancel 액션 연결용
+    private Transform _uiRoot; // 모든 UI 들어가는 루트
 
     //현재 열려있는 팝업들 관리하는 스택 (뒤로가기 등에 활용)
     private Stack<BaseUI> _popupStack = new Stack<BaseUI>();
 
+    //팝업형이랑 그외에 UI가 들어갈 컨테이너들
+    private Transform _windowContainer;
+    private Transform _popupContainer;
+
     protected override void OnSingletonAwake()
     {
         base.OnSingletonAwake();
-        // 입력 이벤트 구독
-        if (_backAction != null)
-        {
-            _backAction.action.Enable();
-            _backAction.action.performed += OnBackInputPerformed;
-        }
+        InitRoot();
     }
 
-    private void OnDestroy()
+    //UI 루트 구성
+    private void InitRoot()
     {
-        // 메모리 누수 방지를 위한 이벤트 해제
-        if (_backAction != null)
-        {
-            _backAction.action.performed -= OnBackInputPerformed;
-        }
-    }
+        if (_uiRoot != null) return;
 
-    private void OnBackInputPerformed(InputAction.CallbackContext context)
-    {
-        if (_popupStack.Count > 0)
+        //기존 씬에 Canvas가 있는지 먼저 확인
+        Canvas existingCanvas = Object.FindFirstObjectByType<Canvas>();
+        GameObject rootObj;
+
+        if (existingCanvas != null)
         {
-            // 최상단 팝업 닫기
-            _popupStack.Peek().OnBackButtonPressed();
+            // 씬에 이미 캔버스가 있다면 그걸 루트로 사용
+            rootObj = existingCanvas.gameObject;
+            rootObj.name = "@UI_Root";
         }
         else
         {
-            // 팝업이 없을 때 로직 (예: 로비에서 게임 종료 팝업 띄우기)
+            // 없다면 새로 생성
+            rootObj = new GameObject("@UI_Root");
+            Canvas canvas = rootObj.GetOrAddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            rootObj.GetOrAddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            rootObj.GetOrAddComponent<GraphicRaycaster>();
+        }
+
+        _uiRoot = rootObj.transform;
+
+        //컨테이너 생성 (이미 있으면 찾고, 없으면 생성)
+        _windowContainer = FindOrCreateContainer("Windows", _uiRoot);
+        _popupContainer = FindOrCreateContainer("Popups", _uiRoot);
+    }
+    private Transform FindOrCreateContainer(string name, Transform parent)
+    {
+        // 이미 자식으로 해당 컨테이너가 있는지 확인
+        Transform container = parent.Find(name);
+        if (container != null) return container;
+
+        // 없으면 생성
+        GameObject obj = new GameObject(name);
+        obj.transform.SetParent(parent);
+        RectTransform rt = obj.AddComponent<RectTransform>();
+
+        // 화면에 꽉 차도록 앵커 설정
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.sizeDelta = Vector2.zero;
+        rt.localScale = Vector3.one;
+        rt.localPosition = Vector3.zero;
+
+        return obj.transform;
+    }
+    private void EnsureContainers()
+    {
+        // 씬이 바뀌어 참조가 깨졌거나 아직 초기화 전이라면 다시 잡음
+        if (_uiRoot == null || _windowContainer == null || _popupContainer == null)
+        {
+            InitRoot();
         }
     }
 
-    #region 윈도우 형 UI 관리
-
-    public void OpenWindow(GameObject windowPrefab)
+    #region 통합 UI 관리
+    public T ShowUI<T>(GameObject prefab,bool isPopup = true) where T : BaseUI
     {
-        //기존 윈도우 비활성화하는 로직 추가 가능
-        Instantiate(windowPrefab,_windowRoot);
-    }
+        EnsureContainers(); //컨테이너랑 루트있는가 확인
 
-    #endregion
-
-    #region 팝업 형 UI 관리
-    public T ShowPopup<T>(GameObject prefab) where T : BaseUI
-    {
         if (prefab == null) return null;
 
-        //스택에 죽은 참조(파괴된 오브젝트)가 있다면 정리
-        while (_popupStack.Count > 0 && _popupStack.Peek() == null)
+        // 중복 팝업 토글 체크
+        if (isPopup && _popupStack.Count > 0)
         {
-            _popupStack.Pop();
-        }
-
-        //토글로직, 같은버튼 한번더 누르면 닫기
-        if (_popupStack.Count > 0)
-        {
-            BaseUI topUI = _popupStack.Peek();
-            // 프리팹의 이름이나 클래스 타입을 비교 (여기서는 간단하게 클래스 타입으로 비교)
-            if (topUI is T)
+            if (_popupStack.Peek() is T)
             {
                 CloseTopPopup();
                 return null;
             }
         }
 
-        GameObject obj = Instantiate(prefab, _popupRoot);
+        // 팝업이면 팝업 컨테이너에, 일반 윈도우면 윈도우 컨테이너에 생성
+        Transform parent = isPopup ? _popupContainer : _windowContainer;
+        GameObject obj = Instantiate(prefab, parent);
         T ui = obj.GetComponent<T>();
 
         if (ui != null)
         {
             ui.Open();
-            _popupStack.Push(ui);
+            if (isPopup) _popupStack.Push(ui);
         }
 
         return ui;
+
+
     }
 
     public void CloseTopPopup()
     {
         if (_popupStack.Count > 0)
         {
-            BaseUI ui = _popupStack.Pop();
-            if (ui != null)
+            // 죽은 참조 정리
+            while (_popupStack.Count > 0 && _popupStack.Peek() == null)
+                _popupStack.Pop();
+
+            if (_popupStack.Count > 0)
             {
+                BaseUI ui = _popupStack.Pop();
                 ui.Close();
             }
         }

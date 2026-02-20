@@ -18,14 +18,11 @@ public abstract class BaseUI : MonoBehaviour
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     }
-    
-
+   
     //열릴 때
     public virtual void Open()
     {
         _isClosing = false;
-        _canvasGroup.interactable = true;
-        _canvasGroup.blocksRaycasts = true;
 
         _canvasGroup.DOKill();
         transform.DOKill();
@@ -44,9 +41,6 @@ public abstract class BaseUI : MonoBehaviour
         if (_isClosing) return;
         _isClosing = true;
 
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
-
         _canvasGroup.DOFade(0, _fadeDuration).SetEase(Ease.InCubic);
         transform.DOScale(0.9f, _scaleDuration).SetEase(Ease.InCubic).OnComplete(() =>
         {
@@ -60,9 +54,6 @@ public abstract class BaseUI : MonoBehaviour
     {
         if (_isClosing) return;
         _isClosing = true;
-
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
 
         _canvasGroup.DOFade(0, _fadeDuration).SetEase(Ease.InCubic);
         transform.DOScale(0.9f, _scaleDuration).SetEase(Ease.InCubic).OnComplete(() =>
