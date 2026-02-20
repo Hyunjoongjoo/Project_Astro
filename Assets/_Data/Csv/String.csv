@@ -1,6 +1,6 @@
 스트링 인덱스  ID,한국어 텍스트,기획용 비고
 id,textKor,note
-string,string,string
+String,String,String
 name_item_attack001,강화 철갑탄,
 name_defence001,요새화 프로토콜,
 name_utility001,이온 추진기,

@@ -121,8 +121,11 @@ public static class TableClassGenerator
     /// </summary>
     private static string ConvertCSharpType(string csvType)
     {
+        string originalType = csvType.Trim();
+        string lowerType = originalType.ToLower();
+
         //소문자로 변환하여 비교
-        switch (csvType.ToLower())
+        switch (lowerType)
         {
             case "int":
             case "enum":
@@ -132,8 +135,9 @@ public static class TableClassGenerator
             case "bool":
                 return "bool";
             case "string":
+                return "string";
             default:
-                return csvType;
+                return originalType;
         }
     }
 

@@ -1,6 +1,6 @@
 영웅 능력치 테이블 기본키,영웅 재소환 대기시간,1레벨 체력 수치,1레벨 상승 시 증가하는 체력 수치,1레벨 실드 수치,1레벨 상승 시 증가하는 실드 수치,1레벨 공격력 수치,1레벨 상승 시 증가하는 공격력 수치,1레벨 치유력 수치,1레벨 상승 시 증가하는 치유력 수치,영웅의 공격 속도,영웅의 장갑 형태,영웅의 이동 유형,영웅의 이동 속도,영웅의 탐지 범위,기획용 비고
 id,spawnCooldown,BaseHp,ipLvHp,baseShield,ipLvShield,baseAttackPower,ipLvAttackPower,baseHealingPower,ipLvHealingPower,attackSpeed,armorType,moveType,moveSpeed,detectionRange,note
-String,float,Int,Float,Int,Float,Int,Float,Int,Float,Float,ArmorType,MoveType,Float,Float,String
+String,Float,Int,Float,Int,Float,Int,Float,Int,Float,Float,ArmorType,MoveType,Float,Float,String
 Stat_Hero_Knight,30,100,10,50,5,20,2,0,0,1.5,Heavy,Large,2,1.5,기획용 컬럼입니다. 게임에 사용되지 않습니다.
 Stat_Hero_Archer,15,50,5,0,0,40,10,0,0,1,Light,Small,5,1,기획용 컬럼입니다. 게임에 사용되지 않습니다.
 Stat_Hero_Priest,22.5,75,7.5,0,0,10,10,30,3,1.2,Medium,Small,3,1.2,기획용 컬럼입니다. 게임에 사용되지 않습니다.

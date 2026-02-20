@@ -3,7 +3,7 @@
 [Serializable]
 public class HeroStatData : ITableData
 {
-    public String id;
+    public string id;
     public float spawnCooldown;
     public int BaseHp;
     public float ipLvHp;
@@ -18,7 +18,7 @@ public class HeroStatData : ITableData
     public MoveType moveType;
     public float moveSpeed;
     public float detectionRange;
-    public String note;
+    public string note;
 
     public string PrimaryID => id.ToString();
 }

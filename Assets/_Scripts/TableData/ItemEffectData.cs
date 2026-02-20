@@ -3,15 +3,15 @@
 [Serializable]
 public class ItemEffectData : ITableData
 {
-    public String id;
-    public String effectGroupId;
+    public string id;
+    public string effectGroupId;
     public EffectType effectType;
-    public String effectValue;
+    public string effectValue;
     public TriggerCondition triggerCondition;
-    public String triggerValue;
+    public string triggerValue;
     public Target target;
-    public String effectDesc;
-    public String note;
+    public string effectDesc;
+    public string note;
 
     public string PrimaryID => id.ToString();
 }
