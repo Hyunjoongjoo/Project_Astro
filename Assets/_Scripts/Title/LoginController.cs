@@ -61,6 +61,8 @@ public class LoginController : MonoBehaviour
 
             // 4단계: DB 데이터 캐싱
             UserDataManager.Instance.SetAllUserData(userData, userRecordData, userWalletData, userHeroData);
+            
+            await UserDataManager.Instance.SyncHeroDataAsync();
         }
         catch (Exception ex)
         {
