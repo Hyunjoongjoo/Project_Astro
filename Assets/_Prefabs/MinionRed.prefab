@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7239607078526745090}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,7 +48,7 @@ GameObject:
   - component: {fileID: 7786030501378965668}
   - component: {fileID: 5226437650269848162}
   - component: {fileID: -2264104134157888630}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MinionRed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -160,7 +160,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 6
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -190,7 +190,7 @@ MonoBehaviour:
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 8596131259578450949}
-  _moveSpeed: 15
+  _moveSpeed: 6
   _searchRange: 4
   _targetLayer:
     serializedVersion: 2
@@ -199,7 +199,7 @@ MonoBehaviour:
   _attackPower: 10
   _attackSpeed: 1
   _attackRange: 2
-  _attackType: 0
+  _attackType: 1
   _projectilePrefab: {fileID: 8628947152704392403, guid: eb6c3b0a4b68c7748993601aea1407aa, type: 3}
   _firePoint: {fileID: 7239607078526745090}
   _towerA: {fileID: 0}

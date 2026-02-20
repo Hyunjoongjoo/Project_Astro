@@ -184,7 +184,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
     }
 
-    private void AttackRanged(Transform target)
+    private void AttackRanged(Vector3 targetPos)
     {
         if (_projectilePrefab == null || _firePoint == null)
         {
@@ -193,7 +193,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
-        projectile.GetComponent<Projectile>().Fire(target, AttackPower);
+        projectile.GetComponent<Projectile>().Fire(targetPos);
     }
 
     private void OnTargetDied(UnitBase deadUnit)

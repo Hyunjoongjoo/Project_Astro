@@ -6,7 +6,6 @@ using static UnityEngine.GraphicsBuffer;
 
 public class Tower : Structure, IBasicAttack, ITargetFinder
 {
-    //26-02-13 주현중 수정 (임의로 범위,공격력 등등을 설정해서 진행)
     public static List<Structure> AliveTowers = new List<Structure>();
 
     [SerializeField] private float _attackPower;
@@ -40,6 +39,8 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         {
             return;
         }
+
+        CurrentState = UnitState.Idle;
 
         _scanTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
@@ -108,6 +109,8 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         }
         _currentTarget.TakeDamage(_attackPower);
 
+        RPC_PlayAttackEffect(_currentTarget.transform.position);
+
         float cooldown;
 
         if (AttackSpeed > 0f)
@@ -120,6 +123,18 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         }
 
         _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_PlayAttackEffect(Vector3 hitPos)
+    {
+        if (_projectilePrefab == null || _firePoint == null)
+        {
+            return;
+        }
+
+        var proj = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
+        proj.GetComponent<Projectile>()?.Fire(hitPos);
     }
 
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기
@@ -141,6 +156,11 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
             {
                 continue;
             }
+
+            //if (unit.team == this.team)//26-02-20 현재 팀설정에 문제가 있는듯함
+            //{
+            //    continue;
+            //}
 
             float distance = Vector3.Distance(transform.position, unit.transform.position);
             if (distance < minDistance)

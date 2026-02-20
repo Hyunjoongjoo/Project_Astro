@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7239607078526745090}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,7 +48,7 @@ GameObject:
   - component: {fileID: 7786030501378965668}
   - component: {fileID: 5226437650269848162}
   - component: {fileID: -2549967687301474708}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hero
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -160,7 +160,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 8
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -190,7 +190,7 @@ MonoBehaviour:
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 8596131259578450949}
-  _moveSpeed: 20
+  _moveSpeed: 8
   _searchRange: 5
   _targetLayer:
     serializedVersion: 2
@@ -199,7 +199,7 @@ MonoBehaviour:
   _attackPower: 15
   _attackSpeed: 1
   _attackRange: 3
-  _attackType: 0
+  _attackType: 1
   _projectilePrefab: {fileID: 0}
   _firePoint: {fileID: 0}
   _towerA: {fileID: 0}

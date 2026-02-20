@@ -100,7 +100,7 @@ MonoBehaviour:
   _detectRange: 5
   _targetLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 192
   _scanInterval: 0.5
 --- !u!23 &7371674430267400118
 MeshRenderer:

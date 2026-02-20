@@ -3,45 +3,14 @@ using DG.Tweening;
 
 public class Projectile : MonoBehaviour
 {
-    private float _damage;
-
-    public void Fire(Transform target, float damage)
+    public void Fire(Vector3 targetPos)
     {
-        _damage = damage;
-
-        if (target == null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Vector3 hitPos = target.position;
-
-        transform.DOMove(hitPos, 0.3f).SetEase(Ease.Linear).OnComplete(() => { Hit(target); });
+        Debug.Log("투사체 호출됨");
+        transform.DOMove(targetPos, 0.3f).SetEase(Ease.Linear).OnComplete(OnHit);
     }
 
-    private void Hit(Transform target)
+    private void OnHit()
     {
-        if (target == null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Tower tower = target.GetComponent<Tower>();
-        if (tower != null)
-        {
-            tower.TakeDamage(_damage);
-        }
-        else
-        {
-            UnitBase unit = target.GetComponent<UnitBase>();
-            if (unit != null)
-            {
-                unit.TakeDamage(_damage);
-            }
-        }
-
         Destroy(gameObject);
     }
 
