@@ -25,6 +25,10 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private TickTimer _searchTimer;
     private TickTimer _attackTimer;
+    private UnitFSM _fsm;
+
+    private bool _isDeploying;
+    private Vector3 _deployTarget;
 
     public float AttackPower => _attackPower;
     public float AttackSpeed => _attackSpeed;
@@ -44,17 +48,41 @@ public class HeroController : MobilityUnit, IBasicAttack
         _bridge = targetStructure[2];
     }
 
+    public void StartDeploy(Vector3 position)
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        _deployTarget = position;
+        _isDeploying = true;
+    }
+
+    private void FinishDeploy()
+    {
+        _isDeploying = false;
+    }
     public override void Spawned()
     {
         base.Spawned();
 
         if (!Object.HasStateAuthority) return;
 
+        _fsm = new UnitFSM();
+
         // 타이머를 즉시 만료 상태로 초기화 -> 첫 틱에 곧바로 탐색 실행
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
 
-        CurrentState = UnitState.Move;
+        if (_isDeploying)
+        {
+            CurrentState = UnitState.Move;
+        }
+        else
+        {
+            CurrentState = UnitState.Idle;
+        }
     }
 
     public override void FixedUpdateNetwork()
@@ -65,15 +93,53 @@ public class HeroController : MobilityUnit, IBasicAttack
         // 사망 상태면 행동 중단
         if (CurrentState == UnitState.Dead) return;
 
-        // 주기적 탐색
+        if (_isDeploying)
+        {
+            CurrentState = UnitState.Move;
+            MoveTo(_deployTarget);
+
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            {
+                FinishDeploy();
+            }
+
+            return;
+        }
+
+        //주기적 탐색
         if (_searchTimer.ExpiredOrNotRunning(Runner))
         {
             RefreshTarget();
             _searchTimer = TickTimer.CreateFromSeconds(Runner, SearchInterval);
         }
 
-        // 현재 목표에 따른 행동 처리
-        HandleBehaviour();
+        bool hasTarget = _currentTarget != null;
+        bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
+        bool isDead = CurrentState == UnitState.Dead;
+
+        _fsm.Update(isDead, hasTarget, inRange);
+
+        switch (_fsm.State)
+        {
+            case UnitAIState.Detect:
+                CurrentState = UnitState.Move;
+                if (_currentTarget != null)
+                {
+                    MoveTo(_currentTarget.transform.position);
+                }
+                break;
+
+            case UnitAIState.Attack:
+                CurrentState = UnitState.Attack;
+                StopMove();
+                TryAttack();
+                break;
+
+            case UnitAIState.Dead:
+                CurrentState = UnitState.Dead;
+                StopMove();
+                break;
+        }
     }
 
     private void RefreshTarget()
@@ -139,32 +205,32 @@ public class HeroController : MobilityUnit, IBasicAttack
         return distA <= distB ? _towerA : _towerB;
     }
 
-    private void HandleBehaviour()
-    {
-        // 유효한 목표가 없으면 대기 (함교까지 다 부쉈을 때)
-        if (_currentTarget == null)
-        {
-            CurrentState = UnitState.Idle;
-            StopMove();
-            return;
-        }
+    //private void HandleBehaviour()
+    //{
+    //    // 유효한 목표가 없으면 대기 (함교까지 다 부쉈을 때)
+    //    if (_currentTarget == null)
+    //    {
+    //        CurrentState = UnitState.Idle;
+    //        StopMove();
+    //        return;
+    //    }
 
-        float distToTarget = Vector3.Distance(transform.position, _currentTarget.transform.position);
+    //    float distToTarget = Vector3.Distance(transform.position, _currentTarget.transform.position);
 
-        if (distToTarget > AttackRange)
-        {
-            // ── 이동 ──
-            CurrentState = UnitState.Move;
-            MoveTo(_currentTarget.transform.position);
-        }
-        else
-        {
-            // ── 공격 ──
-            StopMove();
-            CurrentState = UnitState.Attack;
-            TryAttack();
-        }
-    }
+    //    if (distToTarget > AttackRange)
+    //    {
+    //        // ── 이동 ──
+    //        CurrentState = UnitState.Move;
+    //        MoveTo(_currentTarget.transform.position);
+    //    }
+    //    else
+    //    {
+    //        // ── 공격 ──
+    //        StopMove();
+    //        CurrentState = UnitState.Attack;
+    //        TryAttack();
+    //    }
+    //}
 
     private void TryAttack()
     {
@@ -227,11 +293,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        GameObject projectile = Instantiate(
-            _projectilePrefab,
-            _firePoint.position,
-            Quaternion.identity
-        );
+        GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
         projectile.GetComponent<Projectile>()?.Fire(targetPos);
     }
@@ -247,6 +309,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     public override void Die()
     {
+        _fsm?.ForceDead();
         StopMove();
 
         // 목표 이벤트 구독 해제 후 부모 Die 호출 (Despawn)

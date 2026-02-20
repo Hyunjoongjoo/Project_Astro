@@ -28,6 +28,7 @@ public class MinionController : MobilityUnit, IBasicAttack
 
     private TickTimer _searchTimer;
     private TickTimer _attackTimer;
+    private UnitFSM _fsm;
 
     public float AttackPower => _attackPower;
     public float AttackSpeed => _attackSpeed;
@@ -58,7 +59,9 @@ public class MinionController : MobilityUnit, IBasicAttack
 
         if (!Object.HasStateAuthority) return;
 
-        // 타이머를 즉시 만료 상태로 초기화 -> 첫 틱에 곧바로 탐색 실행
+        _fsm = new UnitFSM();
+
+        //타이머를 즉시 만료 상태로 초기화 -> 첫 틱에 곧바로 탐색 실행
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
 
@@ -74,14 +77,35 @@ public class MinionController : MobilityUnit, IBasicAttack
         if (CurrentState == UnitState.Dead) return;
 
         // 주기적 탐색
-        if (_searchTimer.ExpiredOrNotRunning(Runner))
+        if (_fsm.State == UnitAIState.Detect && _searchTimer.ExpiredOrNotRunning(Runner))
         {
             RefreshTarget();
             _searchTimer = TickTimer.CreateFromSeconds(Runner, SearchInterval);
         }
 
-        // 현재 목표에 따른 행동 처리
-        HandleBehaviour();
+        bool hasTarget = _currentTarget != null;
+        bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
+        bool isDead = CurrentState == UnitState.Dead;
+
+        _fsm.Update(isDead: isDead, hasTarget: hasTarget, inRange: inRange);
+
+        switch (_fsm.State)
+        {
+            case UnitAIState.Detect:
+                CurrentState = UnitState.Move;
+                OnDetectUpdate();
+                break;
+
+            case UnitAIState.Attack:
+                CurrentState = UnitState.Attack;
+                OnAttackUpdate();
+                break;
+
+            case UnitAIState.Dead:
+                CurrentState = UnitState.Dead;
+                StopMove();
+                break;
+        }
     }
 
     private void RefreshTarget()
@@ -147,31 +171,48 @@ public class MinionController : MobilityUnit, IBasicAttack
         return distA <= distB ? _towerA : _towerB;
     }
 
-    private void HandleBehaviour()
+    //private void HandleBehaviour()
+    //{
+    //    // 유효한 목표가 없으면 대기 (함교까지 다 부쉈을 때)
+    //    if (_currentTarget == null)
+    //    {
+    //        CurrentState = UnitState.Idle;
+    //        StopMove();
+    //        return;
+    //    }
+
+    //    float distToTarget = Vector3.Distance(transform.position, _currentTarget.transform.position);
+
+    //    if (distToTarget > AttackRange)
+    //    {
+    //        // ── 이동 ──
+    //        CurrentState = UnitState.Move;
+    //        MoveTo(_currentTarget.transform.position);
+    //    }
+    //    else
+    //    {
+    //        // ── 공격 ──
+    //        StopMove();
+    //        CurrentState = UnitState.Attack;
+    //        TryAttack();
+    //    }
+    //}
+
+    private void OnDetectUpdate()
     {
-        // 유효한 목표가 없으면 대기 (함교까지 다 부쉈을 때)
         if (_currentTarget == null)
         {
-            CurrentState = UnitState.Idle;
             StopMove();
             return;
         }
 
-        float distToTarget = Vector3.Distance(transform.position, _currentTarget.transform.position);
+        MoveTo(_currentTarget.transform.position);
+    }
 
-        if (distToTarget > AttackRange)
-        {
-            // ── 이동 ──
-            CurrentState = UnitState.Move;
-            MoveTo(_currentTarget.transform.position);
-        }
-        else
-        {
-            // ── 공격 ──
-            StopMove();
-            CurrentState = UnitState.Attack;
-            TryAttack();
-        }
+    private void OnAttackUpdate()
+    {
+        StopMove();
+        TryAttack();
     }
 
     private void TryAttack()
@@ -227,6 +268,7 @@ public class MinionController : MobilityUnit, IBasicAttack
         RPC_FireProjectile(targetPos);
     }
 
+    //투사체(현재는 이펙트만)
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_FireProjectile(Vector3 targetPos)
     {
@@ -251,6 +293,7 @@ public class MinionController : MobilityUnit, IBasicAttack
 
     public override void Die()
     {
+        _fsm?.ForceDead();
         StopMove();
 
         // 목표 이벤트 구독 해제 후 부모 Die 호출 (Despawn)

@@ -5,8 +5,7 @@ public class Projectile : MonoBehaviour
 {
     public void Fire(Vector3 targetPos)
     {
-        Debug.Log("투사체 호출됨");
-        transform.DOMove(targetPos, 0.3f).SetEase(Ease.Linear).OnComplete(OnHit);
+        transform.DOMove(targetPos, 0.18f).SetEase(Ease.Linear).OnComplete(OnHit);
     }
 
     private void OnHit()

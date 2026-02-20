@@ -20,7 +20,10 @@ public class HeroSpawner : NetworkBehaviour
         Runner.Spawn(prefab, spawnPos, Quaternion.identity,
             onBeforeSpawned: (Runner, obj) =>
             {
-                obj.GetComponent<HeroController>().Setup(team);
+                HeroController hero = obj.GetComponent<HeroController>();
+                hero.Setup(team);
+
+                hero.StartDeploy(spawnPos);
             });
 
         Debug.Log($"영웅 소환 완료!");
