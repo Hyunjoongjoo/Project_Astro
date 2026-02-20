@@ -1,6 +1,7 @@
-﻿using Fusion;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 
 public class Tower : Structure, IBasicAttack, ITargetFinder
@@ -18,8 +19,9 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
     [SerializeField] private float _scanInterval = 0.5f;
 
     private UnitBase _currentTarget;
-    private float _nextScanTime;
-    private float _nextAttackTime;
+
+    private TickTimer _scanTimer;
+    private TickTimer _attackTimer;
 
     public float AttackPower { get => _attackPower; }
     public float AttackSpeed { get => _attackSpeed; }
@@ -28,11 +30,19 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
     public LayerMask TargetLayer { get => _targetLayer; }
     public float SearchInterval { get => _scanInterval; }
 
-    [Networked] public TickTimer AttackInterval { get; set; }
+    //[Networked] public TickTimer AttackInterval { get; set; }
 
     public override void Spawned()
     {
         base.Spawned();
+
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        _scanTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         //if (team == Team.Blue)
         //{
         //    gameObject.layer = LayerMask.NameToLayer("BlueTeam");
@@ -60,71 +70,64 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
 
     public override void FixedUpdateNetwork()
     {
-        if (AttackInterval.ExpiredOrNotRunning(Runner))
+        if (!Object.HasStateAuthority)
         {
-
+            return;
         }
-        TickTimer.CreateFromSeconds(Runner, 1.5f);
+
+        if (CurrentState == UnitState.Dead)
+        {
+            return;
+        }
+
+        UpdateDetect();
+        UpdateAttack();
     }
 
-    // 네트워크라 이거 쓰면 안됨
-    private void Update()
+    private void UpdateDetect()
     {
-        if (Time.time < _nextAttackTime)
+        if (!_scanTimer.ExpiredOrNotRunning(Runner))
         {
             return;
         }
 
-        UnitBase target = FindTarget();
-        if (target == null)
-        {
-            return;
-        }
-
-        FireProjectile(target);
-
-        _nextAttackTime = Time.time + _attackSpeed;
+        _currentTarget = FindTarget();
+        _scanTimer = TickTimer.CreateFromSeconds(Runner, _scanInterval);
     }
 
-    private void FireProjectile(UnitBase target)
+    private void UpdateAttack()
     {
-        if (_projectilePrefab == null || _firePoint == null)
+        if (_currentTarget == null)
         {
             return;
         }
 
-        GameObject projectile = Instantiate(
-            _projectilePrefab,
-            _firePoint.position,
-            Quaternion.identity
-        );
-
-        Projectile proj = projectile.GetComponent<Projectile>();
-        if (proj != null)
+        if (!_attackTimer.ExpiredOrNotRunning(Runner))
         {
-            proj.Fire(target.transform, _attackPower);
+            return;
         }
+        _currentTarget.TakeDamage(_attackPower);
+
+        float cooldown;
+
+        if (AttackSpeed > 0f)
+        {
+            cooldown = 1f / AttackSpeed;
+        }
+        else
+        {
+            cooldown = 1f;
+        }
+
+        _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
     }
 
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기
     {
-        if (Time.time < _nextScanTime)
-        {
-            if (_currentTarget == null)
-            {
-                return null;
-            }
-
-            return _currentTarget;
-        }
-
-        _nextScanTime = Time.time + _scanInterval;
-
         Collider[] hits = Physics.OverlapSphere(transform.position, _detectRange, _targetLayer);
 
         if (hits.Length == 0)
         {
-            _currentTarget = null;
             return null;
         }
 
@@ -139,15 +142,14 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
                 continue;
             }
 
-            float distance = Vector3.Distance(transform.position, hit.transform.position);
+            float distance = Vector3.Distance(transform.position, unit.transform.position);
             if (distance < minDistance)
             {
                 minDistance = distance;
                 closest = unit;
             }
         }
-        _currentTarget = closest;
-        return _currentTarget;
+        return closest;
     }
 
 #if UNITY_EDITOR
