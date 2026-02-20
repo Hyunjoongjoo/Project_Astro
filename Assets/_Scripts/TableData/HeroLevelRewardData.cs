@@ -3,11 +3,11 @@
 [Serializable]
 public class HeroLevelRewardData : ITableData
 {
-    public String id;
-    public String heroId;
+    public string id;
+    public string heroId;
     public int level;
-    public String rewardId;
-    public String note;
+    public string rewardId;
+    public string note;
 
     public string PrimaryID => id.ToString();
 }
