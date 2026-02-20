@@ -35,6 +35,5 @@ public class LobbyHeroListWindow : BaseUI
                 cardUI.Setup(data);
             }
         }
-
     }
 }

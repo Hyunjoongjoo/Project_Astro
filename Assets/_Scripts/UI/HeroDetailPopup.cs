@@ -15,17 +15,21 @@ public class HeroDetailPopup : BaseUI
     [SerializeField] private SwipeUI _detailSwipeUI;
     [SerializeField] private GameObject[] _swipePages;
 
-    private HeroData _currentData;
+    [Header("스텟 페이지 설정")]
+    [SerializeField] private Transform _statContainer;
+    [SerializeField] private GameObject _statPanelPrefab;
 
-    public void Setup(HeroData data)
+    private HeroData _currentHeroData;
+
+    public void Setup(HeroData heroData)
     {
-        _currentData = data;
+        _currentHeroData = heroData;
 
         //기본정보 매핑
-        _heroNameTxt.text = data.heroName;
-        _descriptionTxt.text = data.heroDesc;
-        _heroTypeTxt.text = data.heroType.ToString();
-        _heroRoleTxt.text = data.heroRole.ToString();
+        _heroNameTxt.text = heroData.heroName;
+        _descriptionTxt.text = heroData.heroDesc;
+        _heroTypeTxt.text = heroData.heroType.ToString();
+        _heroRoleTxt.text = heroData.heroRole.ToString();
 
         //이미지는 어드레서블로  나중에 연결시킬예정 like 어드레서블 매니저
 
@@ -36,18 +40,46 @@ public class HeroDetailPopup : BaseUI
     private void RefreshDetailPages()
     {
         // 정보(스텟) 페이지 셋업
-        //SetupStatPage(_currentData.heroStatId);
+        SetupStatPage(_currentHeroData.heroStatId);
 
         // 프리뷰 영상 페이지 셋업
-        SetupVideoPage(_currentData.heroPreviewVideo);
+        SetupVideoPage(_currentHeroData.heroPreviewVideo);
 
         // 스킬 정보 셋업
-        SetupSkillPage(_currentData.skill);
+        SetupSkillPage(_currentHeroData.skill);
     }
 
     private void SetupStatPage(string statId)
     {
-        // 나중에 스텟 테이블 생기면 작업할 예정
+        // 기존에 생성된 스텟 항목들 제거
+        foreach (Transform child in _statContainer)
+            Destroy(child.gameObject);
+
+        Debug.Log($"요청하는 StatId: {statId}");
+        HeroStatData status = HeroManager.Instance.GetStatus(statId);
+
+        if (status == null)
+        {
+            Debug.LogError($"[HeroDetailPopup] {statId}에 해당하는 데이터를 HeroManager에서 찾을 수 없습니다! 딕셔너리를 확인하세요.");
+            return;
+        }
+
+        AddStatItem("체력", status.BaseHp.ToString());
+        AddStatItem("공격력", status.baseAttackPower.ToString());
+        AddStatItem("치유력", status.baseHealingPower.ToString());
+        AddStatItem("공격 속도", status.attackSpeed.ToString("F2"));
+        AddStatItem("이동 속도", status.moveSpeed.ToString("F1"));
+        AddStatItem("공격 범위", status.detectionRange.ToString("F1"));
+        AddStatItem("재소환 대기시간", $"{status.spawnCooldown}초");
+    }
+    private void AddStatItem(string name, string value)
+    {
+        GameObject obj = Instantiate(_statPanelPrefab, _statContainer);
+        var statItem = obj.GetComponent<StatPanelUI>();
+        if (statItem != null)
+        {
+            statItem.SetStat(name, value);
+        }
     }
 
     private void SetupVideoPage(string videoKey)
