@@ -74,20 +74,18 @@ public class Stat
             case StatCalcMode.Standard:
                 return CalculateStandard(); //체력, 공격력 등
 
-            case StatCalcMode.SimpleSum:
-                return CalculateSimpleSum(); //실드, 탐지범위
+            case StatCalcMode.Delay:
+                return CalculateDelay(); //실드, 탐지범위
 
-            case StatCalcMode.Individual:
-                return CalculateIndividual(); //공속, 쿨감
+            case StatCalcMode.Additive:
+                return CalculateAdditive(); //공속, 쿨감
         }
         return BaseValue;
     }
 
-    //공식 1~3
-    //각 계산식별 로직 적용해주기
-
-    //Standard, 체력, 공격력, 치유력, 이속
-    //증가% 합, 감소% 합 마지막에 곱셈
+    //Standard: 체력, 공격력, 치유력, 이속, 탐지범위
+    //증가% 합, 감소% 합 마지막에 곱셈 X
+    //02.20 변경: (기본값 * (1 + 증가%합) * (1 - 감소%합)) + 고정합
     private float CalculateStandard()
     {
         //깡스탯, 증가%, 감소%
@@ -103,65 +101,55 @@ public class Stat
             else if (mod.Type == StatModType.PercentAdd) sumInc += mod.Value;
             else if (mod.Type == StatModType.PercentMult) sumDec += mod.Value;
         }
-        
 
-        //공식: (기본값 + 깡스탯) * (1 + 증가%총합) * (1 - 감소%총합)
-        float finalBase = BaseValue + sumFlat;
-        float totalInc = 1f + sumInc;
-        float totalDec = 1f - sumDec;
-
-        float result = finalBase * totalInc * totalDec;
+        //02.20 변경, 캬 한줄컷
+        //퍼센트 곱연산 수행 후, 마지막 깡스탯 더함(깡스탯 자체가 사라질 가능성 있음)
+        float result = (BaseValue * (1f + sumInc) * (1f - sumDec)) + sumFlat;
 
         //소수점 내림
-        return Mathf.Max(Mathf.Floor(result), 1f);
+        return Mathf.Max(result, 0f);
     }
 
-    //단순 합연산
-    //실드, 탐지 범위, 받피감
-    private float CalculateSimpleSum()
+    //Delay: 공속, 리스폰
+    //02.20 변경: 기본값 * (1 - 단축버프%합 + 증가디버프%합)
+    private float CalculateDelay()
     {
-        float sumFlat = 0f;
-        float sumInc = 0f;
+        float sumInc = 0f;     //딜레이 단축 버프
+        float sumDec = 0f;      //딜레이 증가 디버프
 
         //종류별로 합산
         for (int i = 0; i < _modifiers.Count; i++)
         {
             StatModifier mod = _modifiers[i];
-            if (mod.Type == StatModType.Flat) sumFlat += mod.Value;
-            else if (mod.Type == StatModType.PercentAdd) sumInc += mod.Value;
+            if (mod.Type == StatModType.PercentAdd) sumInc += mod.Value;
+            else if (mod.Type == StatModType.PercentMult) sumDec += mod.Value;
         }
 
-        //공식: (기본값 + 깡스탯) * (1 + 증가%총합)
-        float result = (BaseValue + sumFlat) * (1f + sumInc);
-        return Mathf.Max(Mathf.Floor(result), 0f); //실드 0 이하로 안 내려가게
+
+        float result = BaseValue * (1f - sumInc + sumDec);
+
+        //0초 딜레이 방지를 위해 0.1초 강제(나중에 최소값 리팩토링)
+        //공속, 리스폰 두 최소값이 다를 경우 계산식 자체를 나눌 예정
+        return Mathf.Max(result, 0.1f);
     }
 
-    //개별 복리형, 100% 쿨감 등 밸런싱 버그 막기
-    //공속, 쿨감, 리스폰
-    private float CalculateIndividual()
+    //받피감, 스킬쿨감 계산식 추가
+    //순수 퍼센트 수치 합산(Base 0)
+    private float CalculateAdditive()
     {
-        float result = BaseValue;
-        
+        float sumFlat = 0f;
+
         //깡스탯 먼저
         for (int i = 0; i < _modifiers.Count; i++)
         {
-            if (_modifiers[i].Type == StatModType.Flat)
-                result += _modifiers[i].Value;
-        }
-
-        //남은 % 순서대로 곱하기
-        for (int i = 0; i < _modifiers.Count; i++)
-        {
             StatModifier mod = _modifiers[i];
-            if (mod.Type != StatModType.Flat)
-            {
-                //감소는 0.2가 들어오면 (1 - 0.2) = 0.8을 곱해줌
-                float multiplier = (mod.Type == StatModType.PercentMult) ? (1f - mod.Value) : (1f + mod.Value);
-                result *= multiplier;
-            }
+
+            //쿨감/받피감의 경우, "20% 쿨감 증강"은 Value = 0.2 인 Flat 타입으로 들어온다고 가정
+            //얘도 리팩토링 예상됨 테이블값 보고 정하기
+            if (mod.Type == StatModType.Flat) sumFlat += mod.Value;
         }
 
-        return result;
+        return BaseValue + sumFlat;
     }
 
 
