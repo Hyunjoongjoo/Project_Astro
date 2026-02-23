@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
 public class UserDataManager : Singleton<UserDataManager>
 {
+    //옵저버 패턴용 이벤트
+    public event Action<int> OnGoldChanged;
+
     private UserDbModel _profileModel;
     private RecordModel _recordModel;
     private WalletModel _walletModel;
@@ -35,6 +39,9 @@ public class UserDataManager : Singleton<UserDataManager>
         _walletModel.gold += amount;
 
         Debug.Log($"[Sync] DB와 로컬 골드 동기화 완료: {_walletModel.gold}");
+
+        // 골드 변경 알림 (구독자들에게 전파)
+        OnGoldChanged?.Invoke(_walletModel.gold);
     }
 
     public async Task UpdateHero(string heroId, int level, int exp, bool unlock)
