@@ -2,7 +2,7 @@
 {
     Deploy, //영웅컨트롤러쪽에서 직접 처리하는 상태
     //전투 AI 상태
-    Detect, Attack, Dead
+    Detect, Attack, Skill, Dead
 }
 public class UnitFSM
 {
@@ -12,6 +12,12 @@ public class UnitFSM
     {
         State = UnitAIState.Dead;
     }
+
+    public void EnterSkill()
+    {
+        State = UnitAIState.Skill;
+    }
+
 
     //상태 전이 판단, 실제 행동은 컨트롤러에서 처리
     public void DecideState(bool isDead, bool hasTarget, bool inRange)
@@ -36,6 +42,10 @@ public class UnitFSM
                 {
                     State = UnitAIState.Detect;
                 }
+                break;
+
+            case UnitAIState.Skill:
+                State = UnitAIState.Detect;
                 break;
         }
     }

@@ -16,7 +16,7 @@ public class HeroSpawner : NetworkBehaviour
         Instance = this;
     }
 
-    public bool CanDeployHero(Vector3 spawnPos, Team team)
+    public bool CanDeployHero(Vector3 spawnPos, Team team)//해당 위치에 영웅 배치가 가능한지 검사
     {
         if (!Object.HasStateAuthority)
         {
@@ -34,11 +34,12 @@ public class HeroSpawner : NetworkBehaviour
             return false;
         }
 
+        //최대 배치 거리 초과 시 차단
         float distance = Vector3.Distance(deployOrigin.position, spawnPos);
         return distance <= _maxDeployDistance;
     }
 
-    private Transform GetDeployOrigin(Team team)
+    private Transform GetDeployOrigin(Team team)//함교 위치를 반환
     {
         UnitBase[] myStructures = team == Team.Blue
             ? ObjectContainer.Instance.blueSideStructure
@@ -50,7 +51,7 @@ public class HeroSpawner : NetworkBehaviour
             : null;
     }
 
-    private float GetDeployDelay(float distance)
+    private float GetDeployDelay(float distance)//거리 기반 배치 지연시간
     {
         float time = Mathf.InverseLerp(_minDeployDistance, _maxDeployDistance, distance);
         return Mathf.Lerp(_minDeployTime, _maxDeployTime, time);
@@ -77,7 +78,7 @@ public class HeroSpawner : NetworkBehaviour
             {
                 HeroController hero = obj.GetComponent<HeroController>();
                 hero.Setup(team);
-
+                //배치 및 지연 처리는 컨트롤러가 수행
                 hero.BeginDeploy(spawnPos, deployDelay);
             });
 

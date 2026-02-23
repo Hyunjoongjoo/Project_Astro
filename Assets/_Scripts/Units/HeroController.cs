@@ -55,7 +55,9 @@ public class HeroController : MobilityUnit, IBasicAttack
         _enemyBridge = targetStructure[2];
     }
 
-    public void BeginDeploy(Vector3 targetPos, float deployDelay)//배치중
+    //스포너에서 전달받은 위치와 지연 시간을 기준으로 배치 시작
+    //배치완료전 까지는 전투,FSM로직 동작x
+    public void BeginDeploy(Vector3 targetPos, float deployDelay)
     {
         if (!Object.HasStateAuthority)
         {
@@ -71,6 +73,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         _isDeploying = false;
         _deployDelayTimer = default;
+        //배치 직후 바로 타겟 탐색 가능하도록 초기화
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
     }
 
@@ -82,8 +85,6 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         _fsm = new UnitFSM();
 
-        // 타이머를 즉시 만료 상태로 초기화 -> 첫 틱에 곧바로 탐색 실행
-        _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
 
@@ -154,7 +155,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         //}
     }
 
-    //FSM 결과에 따라 실제 유닛 행동을 적용 (AIState : 판단, UnitState : 애니메이션등 표현)
+    //FSM 결과에 따라 실제 유닛 행동을 적용 (AIState : 판단, UnitState : 애니메이션 등 표현)
     private void ApplyState(UnitAIState state)
     {
         switch (state)
@@ -165,6 +166,10 @@ public class HeroController : MobilityUnit, IBasicAttack
 
             case UnitAIState.Attack:
                 HandleAttack();
+                break;
+
+            case UnitAIState.Skill:
+                HandleSkill();
                 break;
 
             case UnitAIState.Dead:
@@ -205,6 +210,12 @@ public class HeroController : MobilityUnit, IBasicAttack
         HandleCombat();
     }
 
+    private void HandleSkill()
+    {
+        CurrentState = UnitState.Skill;
+        StopMove();
+    }
+
     private void HandleDead()
     {
         CurrentState = UnitState.Dead;
@@ -218,25 +229,38 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        //스킬 사용 가능하면 우선 시도
-        if (CanUseSkill())
+        //스킬 시작 조건 판단
+        if (CanUseSkill() && IsSkillTargetInRange())
         {
-            if (IsSkillTargetInRange())
-            {
-                UseSkill();
-                return;
-            }
-            else
-            {
-                //스킬 조건 충족을 위해 이동
-                MoveTo(_currentTarget.transform.position);
-                return;
-            }
+            StartSkill();//여기서 FSM 전환
+            return;
         }
 
         //스킬 사용 불가 → 기본 공격
         TryAttack();
     }
+
+    private void StartSkill()
+    {
+        _fsm.EnterSkill();// FSM 상태 전환
+        UseSkill();// 실제 효과
+    }
+
+    private void UseSkill()
+    {
+        if (_currentTarget == null)
+        {
+            return;
+        }
+
+        CurrentState = UnitState.Skill;//애니메이션 연출등등
+        StopMove();
+        //임시 구현 (지금은 데미지 2배 스킬이라고 가정)
+        _currentTarget.TakeDamage(_attackPower * 2f);
+
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
+    }
+
 
     private bool CanUseSkill()
     {
@@ -256,21 +280,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         );
 
         return dist <= _skillRange;
-    }
-
-    private void UseSkill()
-    {
-        if (_currentTarget == null)
-        {
-            return;
-        }
-
-        CurrentState = UnitState.Skill;//애니메이션 연출등등
-
-        //임시 구현 (지금은 데미지 2배 스킬이라고 가정)
-        _currentTarget.TakeDamage(_attackPower * 2f);
-
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
     }
 
     private void TryAttack()
