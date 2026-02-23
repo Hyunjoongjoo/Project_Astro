@@ -9,6 +9,10 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private float _attackSpeed = 1f;
     [SerializeField] private float _attackRange = 2f;
 
+    [Header("스킬 스테이터스")]
+    [SerializeField] private float _skillRange = 4f;
+    [SerializeField] private float _skillCooldown = 6f;
+
     [Header("공격 타입")]
     [SerializeField] private AttackType _attackType;
 
@@ -25,6 +29,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private TickTimer _searchTimer;
     private TickTimer _attackTimer;
+    private TickTimer _skillTimer;
     private UnitFSM _fsm;
 
     //배치
@@ -58,7 +63,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         _deployTarget = position;
-        _deployWaitTimer = TickTimer.CreateFromSeconds(Runner, 3f);//임의로 3초
+        _deployWaitTimer = TickTimer.CreateFromSeconds(Runner, 2.5f);//임의로 최대시간인 2.5초로 진행
         _isDeploying = true;
     }
 
@@ -77,6 +82,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         // 타이머를 즉시 만료 상태로 초기화 -> 첫 틱에 곧바로 탐색 실행
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
 
         if (_isDeploying)
         {
@@ -104,7 +110,6 @@ public class HeroController : MobilityUnit, IBasicAttack
                 return;
             }
 
-            CurrentState = UnitState.Move;
             MoveTo(_deployTarget);
 
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
@@ -113,9 +118,9 @@ public class HeroController : MobilityUnit, IBasicAttack
             }
             return;
         }
-        
-        //주기적 탐색
-        if (_searchTimer.ExpiredOrNotRunning(Runner))
+
+        //탐지 상태일 때만 타겟 재탐색 (공격 중에는 중단)
+        if (_fsm.State == UnitAIState.Detect && _searchTimer.ExpiredOrNotRunning(Runner))
         {
             RefreshTarget();
             _searchTimer = TickTimer.CreateFromSeconds(Runner, SearchInterval);
@@ -123,33 +128,171 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         bool hasTarget = _currentTarget != null;
         bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
-        bool isDead = CurrentState == UnitState.Dead;
+        bool isDead = CurrentState == UnitState.Dead;//FSM에도 사망 여부를 전달(의도치 않은 상태 전이 방지)
 
         //FSM에 상태 전이 판단 위임
-        _fsm.FSMUpdate(isDead, hasTarget, inRange);
+        _fsm.DecideState(isDead, hasTarget, inRange);
 
         //FSM 결과에 따라 행동 처리
-        switch (_fsm.State)
+        ApplyState(_fsm.State);
+        //switch (_fsm.State)
+        //{
+        //    case UnitAIState.Detect:
+        //        CurrentState = UnitState.Move;
+        //        if (_currentTarget != null)
+        //        {
+        //            MoveTo(_currentTarget.transform.position);
+        //        }
+        //        break;
+
+        //    case UnitAIState.Attack:
+        //        CurrentState = UnitState.Attack;
+        //        StopMove();
+        //        HandleCombat();
+        //        break;
+
+        //    case UnitAIState.Dead:
+        //        CurrentState = UnitState.Dead;
+        //        StopMove();
+        //        break;
+        //}
+    }
+
+    //FSM 결과에 따라 실제 유닛 행동을 적용 (AIState : 판단, UnitState : 애니메이션등 표현)
+    private void ApplyState(UnitAIState state)
+    {
+        switch (state)
         {
             case UnitAIState.Detect:
-                CurrentState = UnitState.Move;
-                if (_currentTarget != null)
-                {
-                    MoveTo(_currentTarget.transform.position);
-                }
+                HandleDetect();
                 break;
 
             case UnitAIState.Attack:
-                CurrentState = UnitState.Attack;
-                StopMove();
-                TryAttack();
+                HandleAttack();
                 break;
 
             case UnitAIState.Dead:
-                CurrentState = UnitState.Dead;
-                StopMove();
+                HandleDead();
                 break;
         }
+    }
+
+    private void HandleDetect()
+    {
+        // 전투 타겟이 없는 경우
+        if (_currentTarget == null)
+        {
+            //함교가 존재하면 계속 전진
+            if (_bridge != null)
+            {
+                CurrentState = UnitState.Move;
+                MoveTo(_bridge.transform.position);
+            }
+            else
+            {
+                CurrentState = UnitState.Idle;
+                StopMove();
+            }
+
+            return;
+        }
+
+        //타겟이 있는 경우 → 해당 타겟을 향해 이동
+        CurrentState = UnitState.Move;
+        MoveTo(_currentTarget.transform.position);
+    }
+
+    private void HandleAttack()
+    {
+        CurrentState = UnitState.Attack;
+        StopMove();
+        HandleCombat();
+    }
+
+    private void HandleDead()
+    {
+        CurrentState = UnitState.Dead;
+        StopMove();
+    }
+
+    private void HandleCombat()
+    {
+        if (_currentTarget == null)
+        {
+            return;
+        }
+
+        //스킬 사용 가능하면 우선 시도
+        if (CanUseSkill())
+        {
+            if (IsSkillTargetInRange())
+            {
+                UseSkill();
+                return;
+            }
+            else
+            {
+                //스킬 조건 충족을 위해 이동
+                MoveTo(_currentTarget.transform.position);
+                return;
+            }
+        }
+
+        //스킬 사용 불가 → 기본 공격
+        TryAttack();
+    }
+
+    private bool CanUseSkill()
+    {
+        return _skillTimer.ExpiredOrNotRunning(Runner);
+    }
+
+    private bool IsSkillTargetInRange()
+    {
+        if (_currentTarget == null)
+        {
+            return false;
+        }
+
+        float dist = Vector3.Distance(
+            transform.position,
+            _currentTarget.transform.position
+        );
+
+        return dist <= _skillRange;
+    }
+
+    private void UseSkill()
+    {
+        if (_currentTarget == null)
+        {
+            return;
+        }
+
+        //임시 구현 (지금은 데미지 2배 스킬이라고 가정)
+        _currentTarget.TakeDamage(_attackPower * 2f);
+
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
+    }
+
+    private void TryAttack()
+    {
+        if (!_attackTimer.ExpiredOrNotRunning(Runner)) return;
+        if (_currentTarget == null) return;
+
+        // IBasicAttack 인터페이스 기본 구현 호출 (target.TakeDamage(AttackPower))
+        if (_attackType == AttackType.Melee)
+        {
+            ((IBasicAttack)this).BaseAttack(_currentTarget);
+        }
+        else
+        {
+            AttackRanged(_currentTarget.transform.position);
+        }
+
+        // 다음 공격 가능 시간 설정 (AttackSpeed = 초당 공격 횟수)
+        float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
+        _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
     }
 
     private void RefreshTarget()
@@ -241,26 +384,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     //        TryAttack();
     //    }
     //}
-
-    private void TryAttack()
-    {
-        if (!_attackTimer.ExpiredOrNotRunning(Runner)) return;
-        if (_currentTarget == null) return;
-
-        // IBasicAttack 인터페이스 기본 구현 호출 (target.TakeDamage(AttackPower))
-        if (_attackType == AttackType.Melee)
-        {
-            ((IBasicAttack)this).BaseAttack(_currentTarget);
-        }
-        else
-        {
-            AttackRanged(_currentTarget.transform.position);
-        }
-
-        // 다음 공격 가능 시간 설정 (AttackSpeed = 초당 공격 횟수)
-        float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
-        _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
-    }
+    
 
     //private void AttackMelee(Transform target)
     //{
