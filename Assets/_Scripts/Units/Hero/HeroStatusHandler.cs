@@ -10,7 +10,8 @@ public class HeroStatusHandler
         string statusId = heroData.heroStatId;
 
         // 레벨 1 기준 베이스 데이터 복제
-        var statusSheetData = TableManager.Instance.HeroStatTable.Get(statusId);
+        //여현구 02.23 확장메서드(Clone) 구현에 따라 수정
+        var statusSheetData = TableManager.Instance.HeroStatTable.Get(statusId).Clone();
 
         if(statusSheetData == null) return null;
 
