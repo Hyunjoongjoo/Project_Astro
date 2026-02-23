@@ -85,29 +85,107 @@ public class MinionController : MobilityUnit, IBasicAttack
 
         bool hasTarget = _currentTarget != null;
         bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
-        bool isDead = CurrentState == UnitState.Dead;
+        bool isDead = CurrentState == UnitState.Dead;//FSM에도 사망 여부를 전달(의도치 않은 상태 전이 방지)
 
         //FSM에 상태 전이 판단 위임
-        _fsm.FSMUpdate(isDead: isDead, hasTarget: hasTarget, inRange: inRange);
+        _fsm.DecideState(isDead: isDead, hasTarget: hasTarget, inRange: inRange);
 
         //FSM 결과에 따라 행동 처리
-        switch (_fsm.State)
+        ApplyState(_fsm.State);
+        //switch (_fsm.State)
+        //{
+        //    case UnitAIState.Detect:
+        //        CurrentState = UnitState.Move;
+        //        OnDetectUpdate();
+        //        break;
+
+        //    case UnitAIState.Attack:
+        //        CurrentState = UnitState.Attack;
+        //        OnAttackUpdate();
+        //        break;
+
+        //    case UnitAIState.Dead:
+        //        CurrentState = UnitState.Dead;
+        //        StopMove();
+        //        break;
+        //}
+    }
+
+    // FSM 판단 결과를 실제 유닛 행동으로 적용
+    private void ApplyState(UnitAIState state)
+    {
+        switch (state)
         {
             case UnitAIState.Detect:
-                CurrentState = UnitState.Move;
-                OnDetectUpdate();
+                HandleDetect();
                 break;
 
             case UnitAIState.Attack:
-                CurrentState = UnitState.Attack;
-                OnAttackUpdate();
+                HandleAttack();
                 break;
 
             case UnitAIState.Dead:
-                CurrentState = UnitState.Dead;
-                StopMove();
+                HandleDead();
                 break;
         }
+    }
+
+    private void HandleDetect()
+    {
+        // 전투 타겟이 없는 경우
+        if (_currentTarget == null)
+        {
+            //함교가 존재하면 계속 전진
+            if (_bridge != null)
+            {
+                CurrentState = UnitState.Move;
+                MoveTo(_bridge.transform.position);
+            }
+            else
+            {
+                CurrentState = UnitState.Idle;
+                StopMove();
+            }
+
+            return;
+        }
+
+        //타겟이 있는 경우 → 해당 타겟을 향해 이동
+        CurrentState = UnitState.Move;
+        MoveTo(_currentTarget.transform.position);
+    }
+
+    private void HandleAttack()
+    {
+        CurrentState = UnitState.Attack;
+        StopMove();
+        TryAttack();
+    }
+
+    private void HandleDead()
+    {
+        CurrentState = UnitState.Dead;
+        StopMove();
+    }
+
+    private void TryAttack()
+    {
+        if (!_attackTimer.ExpiredOrNotRunning(Runner)) return;
+        if (_currentTarget == null) return;
+
+        // IBasicAttack 인터페이스 기본 구현 호출 (target.TakeDamage(AttackPower))
+        if (_attackType == AttackType.Melee)
+        {
+            ((IBasicAttack)this).BaseAttack(_currentTarget);
+        }
+        else
+        {
+            AttackRanged(_currentTarget.transform.position);
+        }
+
+        // 다음 공격 가능 시간 설정 (AttackSpeed = 초당 공격 횟수)
+        float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
+        _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
     }
 
     private void RefreshTarget()
@@ -200,43 +278,23 @@ public class MinionController : MobilityUnit, IBasicAttack
     //    }
     //}
 
-    private void OnDetectUpdate()
-    {
-        if (_currentTarget == null)
-        {
-            StopMove();
-            return;
-        }
+    //private void OnDetectUpdate()
+    //{
+    //    if (_currentTarget == null)
+    //    {
+    //        StopMove();
+    //        return;
+    //    }
 
-        MoveTo(_currentTarget.transform.position);
-    }
+    //    MoveTo(_currentTarget.transform.position);
+    //}
 
-    private void OnAttackUpdate()
-    {
-        StopMove();
-        TryAttack();
-    }
+    //private void OnAttackUpdate()
+    //{
+    //    StopMove();
+    //    TryAttack();
+    //}
  
-    private void TryAttack()
-    {
-        if (!_attackTimer.ExpiredOrNotRunning(Runner)) return;
-        if (_currentTarget == null) return;
-
-        // IBasicAttack 인터페이스 기본 구현 호출 (target.TakeDamage(AttackPower))
-        if (_attackType == AttackType.Melee)
-        {
-            ((IBasicAttack)this).BaseAttack(_currentTarget);
-        }
-        else
-        {
-            AttackRanged(_currentTarget.transform.position);
-        }
-
-        // 다음 공격 가능 시간 설정 (AttackSpeed = 초당 공격 횟수)
-        float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
-        _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
-    }
-
     //private void AttackMelee(Transform target)
     //{
     //    Tower tower = target.GetComponent<Tower>();
