@@ -3660,6 +3660,7 @@ GameObject:
   - component: {fileID: 9175007938799396470}
   - component: {fileID: 7212919620782308649}
   - component: {fileID: -1090826036922612233}
+  - component: {fileID: 7520878349283489512}
   - component: {fileID: 3480835021129358379}
   - component: {fileID: 771718635544394949}
   m_Layer: 5
@@ -3721,14 +3722,25 @@ MonoBehaviour:
   _heroLevelTxt: {fileID: 464417433172087653}
   _heroExpTxt: {fileID: 7659393462252266121}
   _heroExpBar: {fileID: 6636832228853863062}
-  _detailSwipeUI: {fileID: 4497097784937230209}
-  _swipePages: []
   _statContainer: {fileID: 2323891492917923050}
   _statPanelPrefab: {fileID: 3287407771323433971, guid: 32cf3c1672a8b4944aecf9ab640c783b, type: 3}
   _upgradeBtn: {fileID: 4900040001319930337}
   _upgradeBtnTxt: {fileID: 2115961883052846870}
   _buyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   _upgradeColor: {r: 0, g: 1, b: 0, a: 1}
+--- !u!114 &7520878349283489512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7479665002333910777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c9b44078d65de468f4765f4d916573, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeroDetailPresenter
+  _view: {fileID: -1090826036922612233}
 --- !u!114 &3480835021129358379
 MonoBehaviour:
   m_ObjectHideFlags: 0
