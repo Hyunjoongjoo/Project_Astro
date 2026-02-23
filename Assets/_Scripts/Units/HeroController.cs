@@ -25,14 +25,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
-    [Header("배치 설정")]
-    [SerializeField] private float _minDeployTime = 0.25f;
-    [SerializeField] private float _maxDeployTime = 2.5f;
-
-    //스테이지 기준 거리(임시)
-    [SerializeField] private float _minDeployDistance = 1f;
-    [SerializeField] private float _maxDeployDistance = 15f;
-
     private UnitBase _currentTarget;
 
     private TickTimer _searchTimer;
@@ -44,7 +36,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     private bool _isDeploying;
     private Vector3 _deployTarget;
     private TickTimer _deployDelayTimer;
-    private Transform _deployOrigin;
 
     public float AttackPower => _attackPower;
     public float AttackSpeed => _attackSpeed;
@@ -62,44 +53,25 @@ public class HeroController : MobilityUnit, IBasicAttack
         _enemyTowerA = targetStructure[0];
         _enemyTowerB = targetStructure[1];
         _enemyBridge = targetStructure[2];
-
-        UnitBase[] myStructures = team == Team.Blue ? 
-            ObjectContainer.Instance.blueSideStructure : 
-            ObjectContainer.Instance.redSideStructure;
-
-        _deployOrigin = myStructures[2].transform;
     }
 
-    public void StartDeploy(Vector3 position)//배치중
+    public void BeginDeploy(Vector3 targetPos, float deployDelay)//배치중
     {
         if (!Object.HasStateAuthority)
         {
             return;
         }
 
-        _deployTarget = position;
-
-        //함교 기준 거리 계산
-        float distance = Vector3.Distance(_deployOrigin.transform.position, _deployTarget);
-
-        //배치 시간 변환
-        float deployTime = GetDeployDelay(distance);
-
-        _deployDelayTimer = TickTimer.CreateFromSeconds(Runner, deployTime);
+        _deployTarget = targetPos;
+        _deployDelayTimer = TickTimer.CreateFromSeconds(Runner, deployDelay);
         _isDeploying = true;
-    }
-
-    private float GetDeployDelay(float distance)
-    {
-        float time = Mathf.InverseLerp(_minDeployDistance, _maxDeployDistance, distance);
-
-        return Mathf.Lerp(_minDeployTime, _maxDeployTime, time);
     }
 
     private void FinishDeploy()//배치완료
     {
         _isDeploying = false;
         _deployDelayTimer = default;
+        _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
     }
 
     public override void Spawned()
@@ -115,14 +87,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
 
-        if (_isDeploying)
-        {
-            CurrentState = UnitState.Move;
-        }
-        else
-        {
-            CurrentState = UnitState.Idle;
-        }
+        CurrentState = UnitState.Idle;
     }
 
     public override void FixedUpdateNetwork()
@@ -505,25 +470,6 @@ public class HeroController : MobilityUnit, IBasicAttack
             Gizmos.DrawLine(transform.position, _currentTarget.transform.position);
         }
 
-        //배치 디버그
-        if (_deployOrigin != null)
-        {
-            // 최소 배치 거리 (빠른 배치)
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(_deployOrigin.transform.position, _minDeployDistance);
-
-            // 최대 배치 거리 (느린 배치)
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(_deployOrigin.transform.position, _maxDeployDistance);
-
-            // 현재 배치 타겟 표시 (배치 중일 때)
-            if (_isDeploying)
-            {
-                Gizmos.color = Color.cyan;
-                Gizmos.DrawLine(_deployOrigin.transform.position, _deployTarget);
-                Gizmos.DrawSphere(_deployTarget, 0.2f);
-            }
-        }
     }
 #endif
 }
