@@ -40,7 +40,7 @@ public class HeroDetailPopup : BaseUI
     private void RefreshDetailPages()
     {
         // 정보(스텟) 페이지 셋업
-        SetupStatPage(_currentHeroData.heroStatId);
+        SetupStatPage(_currentHeroData.id);
 
         // 프리뷰 영상 페이지 셋업
         SetupVideoPage(_currentHeroData.heroPreviewVideo);
