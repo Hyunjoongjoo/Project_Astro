@@ -10,36 +10,22 @@ public class HeroStatusHandler
         string statusId = heroData.heroStatId;
 
         // 레벨 1 기준 베이스 데이터 복제
-        var statusSheetData = TableManager.Instance.HeroStatTable.Get(statusId);
+        //여현구 02.23  수정
+        //1. 확장메서드(Clone) 사용
+        //2. 불필요한 이중복사 중복코드 제거
+        var resultStatus = TableManager.Instance.HeroStatTable.Get(statusId).Clone();
 
-        if(statusSheetData == null) return null;
+       
+        if(resultStatus == null) return null;
 
-        HeroStatData resultStatus = new HeroStatData();
-
-        resultStatus.id = statusSheetData.id;
-        resultStatus.BaseHp = statusSheetData.BaseHp;
-        resultStatus.baseShield = statusSheetData.baseShield;
-        resultStatus.baseAttackPower = statusSheetData.baseAttackPower;
-        resultStatus.baseHealingPower = statusSheetData.baseHealingPower;
-        resultStatus.spawnCooldown = statusSheetData.spawnCooldown;
-        resultStatus.ipLvHp = statusSheetData.ipLvHp;
-        resultStatus.ipLvShield = statusSheetData.ipLvShield;
-        resultStatus.ipLvAttackPower = statusSheetData.ipLvAttackPower;
-        resultStatus.attackSpeed = statusSheetData.attackSpeed;
-        resultStatus.armorType = statusSheetData.armorType;
-        resultStatus.moveType = statusSheetData.moveType;
-        resultStatus.moveSpeed = statusSheetData.moveSpeed;
-        resultStatus.detectionRange = statusSheetData.detectionRange;
-        resultStatus.note = statusSheetData.note;
-                
         // 레벨업 스텟 계산하기
         if (level > 1)
         {
             int growthStep = level - 1;
-            resultStatus.BaseHp = (int)Math.Round(statusSheetData.BaseHp + (statusSheetData.ipLvHp * growthStep));
-            resultStatus.baseShield = (int)Math.Round(statusSheetData.baseShield + (statusSheetData.ipLvShield * growthStep));
-            resultStatus.baseAttackPower = (int)Math.Round(statusSheetData.baseAttackPower + (statusSheetData.ipLvAttackPower * growthStep));
-            resultStatus.baseHealingPower = (int)Math.Round(statusSheetData.baseHealingPower + (statusSheetData.ipLvHealingPower * growthStep));
+            resultStatus.BaseHp = (int)Math.Round(resultStatus.BaseHp + (resultStatus.ipLvHp * growthStep));
+            resultStatus.baseShield = (int)Math.Round(resultStatus.baseShield + (resultStatus.ipLvShield * growthStep));
+            resultStatus.baseAttackPower = (int)Math.Round(resultStatus.baseAttackPower + (resultStatus.ipLvAttackPower * growthStep));
+            resultStatus.baseHealingPower = (int)Math.Round(resultStatus.baseHealingPower + (resultStatus.ipLvHealingPower * growthStep));
         }
 
         return resultStatus;
