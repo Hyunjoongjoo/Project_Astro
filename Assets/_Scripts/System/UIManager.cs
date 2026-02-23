@@ -95,15 +95,15 @@ public class UIManager : Singleton<UIManager>
 
         if (prefab == null) return null;
 
-        // 중복 팝업 토글 체크
-        if (isPopup && _popupStack.Count > 0)
-        {
-            if (_popupStack.Peek() is T)
-            {
-                CloseTopPopup();
-                return null;
-            }
-        }
+        //// 중복 팝업 토글 체크
+        //if (isPopup && _popupStack.Count > 0)
+        //{
+        //    if (_popupStack.Peek() is T)
+        //    {
+        //        CloseTopPopup();
+        //        return null;
+        //    }
+        //}
 
         // 팝업이면 팝업 컨테이너에, 일반 윈도우면 윈도우 컨테이너에 생성
         Transform parent = isPopup ? _popupContainer : _windowContainer;
