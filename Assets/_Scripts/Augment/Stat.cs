@@ -75,10 +75,13 @@ public class Stat
                 return CalculateStandard(); //체력, 공격력 등
 
             case StatCalcMode.Delay:
-                return CalculateDelay(); //실드, 탐지범위
+                return CalculateDelay(); //공속 리스폰
+
+            case StatCalcMode.Speed:
+                return CalculateSpeed();
 
             case StatCalcMode.Additive:
-                return CalculateAdditive(); //공속, 쿨감
+                return CalculateAdditive(); //받피감 쿨감
         }
         return BaseValue;
     }
@@ -107,7 +110,7 @@ public class Stat
         float result = (BaseValue * (1f + sumInc) * (1f - sumDec)) + sumFlat;
 
         //소수점 내림
-        return Mathf.Max(result, 0f);
+        return Mathf.Floor(Mathf.Max(result, 0f) * 10f) / 10f;
     }
 
     //Delay: 공속, 리스폰
@@ -128,9 +131,29 @@ public class Stat
 
         float result = BaseValue * (1f - sumInc + sumDec);
 
-        //0초 딜레이 방지를 위해 0.1초 강제(나중에 최소값 리팩토링)
-        //공속, 리스폰 두 최소값이 다를 경우 계산식 자체를 나눌 예정
-        return Mathf.Max(result, 0.1f);
+        //셋째자리에서 내림처리, 0.1초 방어
+        float flooredResult = Mathf.Floor(result * 1000f) / 1000f;
+        return Mathf.Max(flooredResult, 0.1f);
+    }
+
+    //Speed, 이동속도, 탐지 범위
+    //기본값 * (1+버프%합 - 디버프%합)
+    private float CalculateSpeed()
+    {
+        float sumInc = 0f;
+        float sumDec = 0f;
+
+        for (int i = 0; i < _modifiers.Count; i++)
+        {
+            StatModifier mod = _modifiers[i];
+            if (mod.Type == StatModType.PercentAdd) sumInc += mod.Value;
+            else if (mod.Type == StatModType.PercentMult) sumDec += mod.Value;
+        }
+
+        float result = BaseValue * (1f + sumInc - sumDec);
+
+        //소수점 셋째자리에서 내림(탐지범위는 첫째자리인데 정밀도 높은 쪽으로 통일
+        return Mathf.Floor(Mathf.Max(result, 0f) * 1000f) / 1000f;
     }
 
     //받피감, 스킬쿨감 계산식 추가

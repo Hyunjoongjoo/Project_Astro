@@ -57,7 +57,8 @@ public enum StatModType
 public enum StatCalcMode
 {
     Standard,   //체력, 공격력, 치유력 등 =>                     (Base * %연산) + Flat
-    Delay,      //공속, 리스폰 등 => 값이 작을수록 좋음 =>        Base * (1 - 버프% + 디버프%) 
+    Delay,      //공속, 리스폰 등 => 값이 작을수록 좋음 =>        Base * (1 - 버프% + 디버프%)
+    Speed,      //이속, 담지범위 =>                               Base * (1 + 버프% - 디버프%)
     Additive    //받피감, 쿨감 => 순수 퍼센트 수치만 저장         0(Base) + 버프% - 디버프% 
 }
 
