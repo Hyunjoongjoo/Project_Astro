@@ -21,9 +21,17 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private Transform _firePoint;
 
     [Header("타워 레퍼런스")]
-    [SerializeField] private UnitBase _towerA;
-    [SerializeField] private UnitBase _towerB;
-    [SerializeField] private UnitBase _bridge;
+    [SerializeField] private UnitBase _enemyTowerA;
+    [SerializeField] private UnitBase _enemyTowerB;
+    [SerializeField] private UnitBase _enemyBridge;
+
+    [Header("배치 설정")]
+    [SerializeField] private float _minDeployTime = 0.25f;
+    [SerializeField] private float _maxDeployTime = 2.5f;
+
+    //스테이지 기준 거리(임시)
+    [SerializeField] private float _minDeployDistance = 1f;
+    [SerializeField] private float _maxDeployDistance = 15f;
 
     private UnitBase _currentTarget;
 
@@ -35,7 +43,8 @@ public class HeroController : MobilityUnit, IBasicAttack
     //배치
     private bool _isDeploying;
     private Vector3 _deployTarget;
-    private TickTimer _deployWaitTimer;
+    private TickTimer _deployDelayTimer;
+    private Transform _deployOrigin;
 
     public float AttackPower => _attackPower;
     public float AttackSpeed => _attackSpeed;
@@ -50,9 +59,15 @@ public class HeroController : MobilityUnit, IBasicAttack
             ObjectContainer.Instance.redSideStructure :
             ObjectContainer.Instance.blueSideStructure;
 
-        _towerA = targetStructure[0];
-        _towerB = targetStructure[1];
-        _bridge = targetStructure[2];
+        _enemyTowerA = targetStructure[0];
+        _enemyTowerB = targetStructure[1];
+        _enemyBridge = targetStructure[2];
+
+        UnitBase[] myStructures = team == Team.Blue ? 
+            ObjectContainer.Instance.blueSideStructure : 
+            ObjectContainer.Instance.redSideStructure;
+
+        _deployOrigin = myStructures[2].transform;
     }
 
     public void StartDeploy(Vector3 position)//배치중
@@ -63,14 +78,30 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         _deployTarget = position;
-        _deployWaitTimer = TickTimer.CreateFromSeconds(Runner, 2.5f);//임의로 최대시간인 2.5초로 진행
+
+        //함교 기준 거리 계산
+        float distance = Vector3.Distance(_deployOrigin.transform.position, _deployTarget);
+
+        //배치 시간 변환
+        float deployTime = GetDeployDelay(distance);
+
+        _deployDelayTimer = TickTimer.CreateFromSeconds(Runner, deployTime);
         _isDeploying = true;
+    }
+
+    private float GetDeployDelay(float distance)
+    {
+        float time = Mathf.InverseLerp(_minDeployDistance, _maxDeployDistance, distance);
+
+        return Mathf.Lerp(_minDeployTime, _maxDeployTime, time);
     }
 
     private void FinishDeploy()//배치완료
     {
         _isDeploying = false;
+        _deployDelayTimer = default;
     }
+
     public override void Spawned()
     {
         base.Spawned();
@@ -105,7 +136,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         if (_isDeploying)
         {
             //배치중 일때는
-            if (!_deployWaitTimer.Expired(Runner))
+            if (!_deployDelayTimer.Expired(Runner))
             {
                 return;
             }
@@ -183,10 +214,10 @@ public class HeroController : MobilityUnit, IBasicAttack
         if (_currentTarget == null)
         {
             //함교가 존재하면 계속 전진
-            if (_bridge != null)
+            if (_enemyBridge != null)
             {
                 CurrentState = UnitState.Move;
-                MoveTo(_bridge.transform.position);
+                MoveTo(_enemyBridge.transform.position);
             }
             else
             {
@@ -269,6 +300,8 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
+        CurrentState = UnitState.Skill;//애니메이션 연출등등
+
         //임시 구현 (지금은 데미지 2배 스킬이라고 가정)
         _currentTarget.TakeDamage(_attackPower * 2f);
 
@@ -332,30 +365,30 @@ public class HeroController : MobilityUnit, IBasicAttack
     private UnitBase GetClosestTower()
     {
         // 함교도 없으면 타겟 없음 (사실상 게임 종료)
-        if (_bridge == null) return null;
+        if (_enemyBridge == null) return null;
 
         // 두 타워가 모두 없으면 함교
-        if (_towerA == null && _towerB == null) return _bridge;
+        if (_enemyTowerA == null && _enemyTowerB == null) return _enemyBridge;
 
         // 타워가 하나만 남은 경우 타워나 함교 중 가까운 쪽
-        if (_towerA == null)
+        if (_enemyTowerA == null)
         {
-            float distTower = Vector3.Distance(transform.position, _towerB.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _bridge.transform.position);
-            return distBridge < distTower ? _bridge : _towerB;
+            float distTower = Vector3.Distance(transform.position, _enemyTowerB.transform.position);
+            float distBridge = Vector3.Distance(transform.position, _enemyBridge.transform.position);
+            return distBridge < distTower ? _enemyBridge : _enemyTowerB;
         }
 
-        if (_towerB == null)
+        if (_enemyTowerB == null)
         {
-            float distTower = Vector3.Distance(transform.position, _towerA.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _bridge.transform.position);
-            return distBridge < distTower ? _bridge : _towerA;
+            float distTower = Vector3.Distance(transform.position, _enemyTowerA.transform.position);
+            float distBridge = Vector3.Distance(transform.position, _enemyBridge.transform.position);
+            return distBridge < distTower ? _enemyBridge : _enemyTowerA;
         }
 
         // 두 타워가 모두 살아있다면 둘 중 가까운 넘
-        float distA = Vector3.Distance(transform.position, _towerA.transform.position);
-        float distB = Vector3.Distance(transform.position, _towerB.transform.position);
-        return distA <= distB ? _towerA : _towerB;
+        float distA = Vector3.Distance(transform.position, _enemyTowerA.transform.position);
+        float distB = Vector3.Distance(transform.position, _enemyTowerB.transform.position);
+        return distA <= distB ? _enemyTowerA : _enemyTowerB;
     }
 
     //private void HandleBehaviour()
@@ -470,6 +503,26 @@ public class HeroController : MobilityUnit, IBasicAttack
         {
             Gizmos.color = Color.magenta;
             Gizmos.DrawLine(transform.position, _currentTarget.transform.position);
+        }
+
+        //배치 디버그
+        if (_deployOrigin != null)
+        {
+            // 최소 배치 거리 (빠른 배치)
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(_deployOrigin.transform.position, _minDeployDistance);
+
+            // 최대 배치 거리 (느린 배치)
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(_deployOrigin.transform.position, _maxDeployDistance);
+
+            // 현재 배치 타겟 표시 (배치 중일 때)
+            if (_isDeploying)
+            {
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawLine(_deployOrigin.transform.position, _deployTarget);
+                Gizmos.DrawSphere(_deployTarget, 0.2f);
+            }
         }
     }
 #endif
