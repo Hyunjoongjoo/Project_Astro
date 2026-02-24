@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+public enum SceneState { Title, Lobby, Stage }
 public enum GameState { Ready, Play, Result } //추후 상태 추가가능
 
 // 게임 매니저의 경우 아직 어떤 역할을 할지 구체적으로 정해지지 않음
@@ -8,9 +9,12 @@ public enum GameState { Ready, Play, Result } //추후 상태 추가가능
 public class GameManager : Singleton<GameManager>
 {
     [SerializeField] private GameState _currentState = GameState.Ready;
+    [SerializeField] private SceneState _flowState = SceneState.Title;
 
     //다른데서 참조할 게임시작여부
     public bool IsGameStarted => _currentState == GameState.Play;
+    public SceneState FlowState => _flowState;
+
 
     public Team PlayerTeam { get; private set; }
 
@@ -45,6 +49,14 @@ public class GameManager : Singleton<GameManager>
                 // 결과 처리
                 break;
         }
+    }
+
+    public void SetSceneState(SceneState state)
+    {
+        _flowState = state;
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayBgm(state);
     }
 
     public void OnAugmentSelectionComplete() //초기 증강 선택 완료 버튼에서 호출할 메서드
