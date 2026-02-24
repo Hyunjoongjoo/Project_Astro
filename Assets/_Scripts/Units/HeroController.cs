@@ -123,7 +123,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             _searchTimer = TickTimer.CreateFromSeconds(Runner, SearchInterval);
         }
 
-        bool hasTarget = _currentTarget != null;
+        bool hasTarget = _currentTarget != null && !_currentTarget.IsDead;
         bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
         bool isDead = CurrentState == UnitState.Dead;//FSM에도 사망 여부를 전달(의도치 않은 상태 전이 방지)
 
@@ -317,6 +317,11 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private void SetTarget(UnitBase target)
     {
+        if (_currentTarget == target)
+        {
+            return;
+        }
+
         // 새 목표로 교체할 때 기존 사망 이벤트 구독 해제
         if (_currentTarget != null)
         {
