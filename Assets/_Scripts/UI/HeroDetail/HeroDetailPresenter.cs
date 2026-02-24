@@ -2,9 +2,13 @@
 
 public class HeroDetailPresenter : MonoBehaviour
 {
+    [Header("기본 설정")]
     [SerializeField] private HeroDetailView _view;
     [SerializeField] private GameObject _confirmPopupPrefab;
     [SerializeField] private GameObject _upgradeResultPrefab;
+
+    [Header("스텟 아이콘 SO")]
+    [SerializeField] private StatIconDataSO _statIcons;
 
     private HeroData _heroData;
     private HeroDbModel _userHeroData;
@@ -162,11 +166,12 @@ public class HeroDetailPresenter : MonoBehaviour
         HeroStatData status = HeroManager.Instance.GetStatus(_heroData.id);
         if (status == null) return;
 
-        _view.AddStatItem("체력", status.BaseHp.ToString());
-        _view.AddStatItem("공격력", status.baseAttackPower.ToString());
-        _view.AddStatItem("치유력", status.baseHealingPower.ToString());
-        _view.AddStatItem("공격 속도", status.attackSpeed.ToString("F2"));
-        _view.AddStatItem("이동 속도", status.moveSpeed.ToString("F1"));
+        _view.AddStatItem("체력", status.BaseHp.ToString(), _statIcons.GetIcon(StatType.Hp));
+        _view.AddStatItem("공격력", status.baseAttackPower.ToString(), _statIcons.GetIcon(StatType.AttackPower));
+        _view.AddStatItem("치유력", status.baseHealingPower.ToString(), _statIcons.GetIcon(StatType.HealingPower));
+        _view.AddStatItem("공격 속도", status.attackSpeed.ToString("F2"), _statIcons.GetIcon(StatType.AttackSpeed));
+        _view.AddStatItem("이동 속도", status.moveSpeed.ToString("F1"), _statIcons.GetIcon(StatType.MoveSpeed));
+        _view.AddStatItem("공격 범위", status.detectionRange.ToString("F1"), _statIcons.GetIcon(StatType.DetectionRange));
     }
 
     private void ShowUpgradeResult(HeroStatData oldStat)
