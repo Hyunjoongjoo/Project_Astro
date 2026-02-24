@@ -132,27 +132,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         //FSM 결과에 따라 행동 처리
         ApplyState(_fsm.State);
-        //switch (_fsm.State)
-        //{
-        //    case UnitAIState.Detect:
-        //        CurrentState = UnitState.Move;
-        //        if (_currentTarget != null)
-        //        {
-        //            MoveTo(_currentTarget.transform.position);
-        //        }
-        //        break;
 
-        //    case UnitAIState.Attack:
-        //        CurrentState = UnitState.Attack;
-        //        StopMove();
-        //        HandleCombat();
-        //        break;
-
-        //    case UnitAIState.Dead:
-        //        CurrentState = UnitState.Dead;
-        //        StopMove();
-        //        break;
-        //}
     }
 
     //FSM 결과에 따라 실제 유닛 행동을 적용 (AIState : 판단, UnitState : 애니메이션 등 표현)
@@ -269,6 +249,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         CurrentState = UnitState.Skill;//애니메이션 연출등등
         StopMove();
+        Debug.Log("스킬 발동");
         //임시 구현 (지금은 데미지 2배 스킬이라고 가정)
         _currentTarget.TakeDamage(_attackPower * 2f);
 
@@ -379,50 +360,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         return distA <= distB ? _enemyTowerA : _enemyTowerB;
     }
 
-    //private void HandleBehaviour()
-    //{
-    //    // 유효한 목표가 없으면 대기 (함교까지 다 부쉈을 때)
-    //    if (_currentTarget == null)
-    //    {
-    //        CurrentState = UnitState.Idle;
-    //        StopMove();
-    //        return;
-    //    }
-
-    //    float distToTarget = Vector3.Distance(transform.position, _currentTarget.transform.position);
-
-    //    if (distToTarget > AttackRange)
-    //    {
-    //        // ── 이동 ──
-    //        CurrentState = UnitState.Move;
-    //        MoveTo(_currentTarget.transform.position);
-    //    }
-    //    else
-    //    {
-    //        // ── 공격 ──
-    //        StopMove();
-    //        CurrentState = UnitState.Attack;
-    //        TryAttack();
-    //    }
-    //}
-    
-
-    //private void AttackMelee(Transform target)
-    //{
-    //    Tower tower = target.GetComponent<Tower>();
-    //    if (tower != null)
-    //    {
-    //        tower.TakeDamage(AttackPower);
-    //        return;
-    //    }
-
-    //    UnitBase unit = target.GetComponent<UnitBase>();
-    //    if (unit != null)
-    //    {
-    //        unit.TakeDamage(AttackPower);
-    //    }
-    //}
-
+ 
     private void AttackRanged(Vector3 targetPos)
     {
         if (_projectilePrefab == null || _firePoint == null)
