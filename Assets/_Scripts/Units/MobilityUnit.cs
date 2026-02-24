@@ -83,6 +83,16 @@ public class MobilityUnit : UnitBase, ITargetFinder
                 continue;
             }
 
+            if (unit == this)
+            {
+                continue;
+            }
+
+            if (unit.team == team)
+            {
+                continue;
+            }
+
             float dist = Vector3.Distance(transform.position, unit.transform.position);
             if (dist < minDistance)
             {
@@ -90,7 +100,6 @@ public class MobilityUnit : UnitBase, ITargetFinder
                 closest = unit;
             }
         }
-
         return closest;
     }
 

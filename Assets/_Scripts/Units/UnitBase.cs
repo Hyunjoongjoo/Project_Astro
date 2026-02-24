@@ -20,6 +20,8 @@ public abstract class UnitBase : NetworkBehaviour
 
     public Team team;
 
+    public bool IsDead { get; private set; }
+
     [Networked, HideInInspector] public float CurrentHealth { get; set; }
     [Networked, HideInInspector] public UnitState CurrentState { get; set; }
 
@@ -32,6 +34,7 @@ public abstract class UnitBase : NetworkBehaviour
         {
             selfNetworkObj = GetComponent<NetworkObject>();
             currentHealth = maxHealth;
+            IsDead = false;
         }
     }
 
@@ -40,6 +43,11 @@ public abstract class UnitBase : NetworkBehaviour
     public void TakeDamage(float amount)
     {
         if (!Object.HasStateAuthority) return;
+
+        if (IsDead)
+        {
+            return;
+        }
 
         currentHealth -= amount;
 
@@ -51,6 +59,13 @@ public abstract class UnitBase : NetworkBehaviour
 
     public virtual void Die()
     {
+        if (IsDead)
+        {
+            return;
+        }
+
+        IsDead = true;
+
         CurrentState = UnitState.Dead;
         OnDeath?.Invoke(this);
         Runner.Despawn(selfNetworkObj);
