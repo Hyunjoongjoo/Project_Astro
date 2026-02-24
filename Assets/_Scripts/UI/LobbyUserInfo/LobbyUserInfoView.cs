@@ -20,7 +20,7 @@ public class LobbyUserInfoView : MonoBehaviour
     public void SetGold(int gold) => _goldTxt.text = gold.ToString("N0");
 
     //레벨 정보 세팅
-    public void SetLevel(int level) => _levelTxt.text = $"Lv. {level}";
+    public void SetLevel(int level) => _levelTxt.text = $"{level}";
 
     // 경험치 게이지 및 텍스트 세팅
     public void SetExp(float current, float max)
