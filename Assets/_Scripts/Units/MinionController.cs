@@ -125,7 +125,6 @@ public class MinionController : MobilityUnit, IBasicAttack
                 break;
 
             case UnitAIState.Dead:
-                HandleDead();
                 break;
         }
     }
@@ -160,12 +159,6 @@ public class MinionController : MobilityUnit, IBasicAttack
         CurrentState = UnitState.Attack;
         StopMove();
         TryAttack();
-    }
-
-    private void HandleDead()
-    {
-        CurrentState = UnitState.Dead;
-        StopMove();
     }
 
     private void TryAttack()

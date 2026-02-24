@@ -173,7 +173,6 @@ public class HeroController : MobilityUnit, IBasicAttack
                 break;
 
             case UnitAIState.Dead:
-                HandleDead();
                 break;
         }
     }
@@ -207,18 +206,13 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         CurrentState = UnitState.Attack;
         StopMove();
+        RotateToTarget();
         HandleCombat();
     }
 
     private void HandleSkill()
     {
         CurrentState = UnitState.Skill;
-        StopMove();
-    }
-
-    private void HandleDead()
-    {
-        CurrentState = UnitState.Dead;
         StopMove();
     }
 
@@ -238,6 +232,26 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         //스킬 사용 불가 → 기본 공격
         TryAttack();
+    }
+
+    private void RotateToTarget()
+    {
+        if (_currentTarget == null)
+        {
+            return;
+        }
+
+        Vector3 dir = _currentTarget.transform.position - transform.position;
+        dir.y = 0f; //수평 회전
+
+        if (dir.sqrMagnitude < 0.001f)
+        {
+            return;
+        }
+
+        Quaternion targetRotation = Quaternion.LookRotation(dir);
+
+        transform.rotation = targetRotation;
     }
 
     private void StartSkill()

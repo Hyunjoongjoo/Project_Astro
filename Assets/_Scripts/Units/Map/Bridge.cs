@@ -26,6 +26,114 @@ public class Bridge : Structure, IBasicAttack, ITargetFinder
     public LayerMask TargetLayer { get => _targetLayer; }
     public float SearchInterval { get => _scanInterval; }
 
+    public override void Spawned()
+    {
+        base.Spawned();
+
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        _fsm = new UnitFSM();
+
+        CurrentState = UnitState.Idle;
+
+        _scanTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        if (_fsm.State == UnitAIState.Detect && _scanTimer.ExpiredOrNotRunning(Runner))
+        {
+            _currentTarget = FindTarget();
+            _scanTimer = TickTimer.CreateFromSeconds(Runner, _scanInterval);
+        }
+
+        bool hasTarget = _currentTarget != null;
+        bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
+        bool isDead = CurrentState == UnitState.Dead;
+
+        _fsm.DecideState(isDead, hasTarget, inRange);
+        ApplyState(_fsm.State);
+    }
+
+    private void ApplyState(UnitAIState state)
+    {
+        switch (state)
+        {
+            case UnitAIState.Detect:
+                HandleDetect();
+                break;
+
+            case UnitAIState.Attack:
+                HandleAttack();
+                break;
+
+            case UnitAIState.Dead:
+                break;
+        }
+    }
+
+    private void HandleDetect()
+    {
+        CurrentState = UnitState.Idle;
+    }
+
+    private void HandleAttack()
+    {
+        CurrentState = UnitState.Attack;
+        UpdateAttack();
+    }
+
+    private void UpdateAttack()
+    {
+        if (_currentTarget == null)
+        {
+            return;
+        }
+
+        if (!_attackTimer.ExpiredOrNotRunning(Runner))
+        {
+            return;
+        }
+        _currentTarget.TakeDamage(_attackPower);
+
+        RPC_PlayAttackEffect(_currentTarget.transform.position);
+
+        float cooldown;
+
+        if (AttackSpeed > 0f)
+        {
+            cooldown = 1f / AttackSpeed;
+        }
+        else
+        {
+            cooldown = 1f;
+        }
+
+        _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
+    }
+
+    //투사체(현재는 이펙트만)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_PlayAttackEffect(Vector3 targetPos)
+    {
+        if (_projectilePrefab == null || _firePoint == null)
+        {
+            return;
+        }
+
+        var projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
+        projectile.GetComponent<Projectile>()?.Fire(targetPos);
+    }
+
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, _detectRange, _targetLayer);
@@ -60,6 +168,13 @@ public class Bridge : Structure, IBasicAttack, ITargetFinder
         }
         return closest;
     }
+
+    public override void Die()
+    {
+        _fsm?.ForceDead();
+        base.Die();
+    }
+
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()//탐지 범위 시각화
     {
