@@ -68,12 +68,12 @@ public class HeroDetailView : BaseUI
         foreach (Transform child in _statContainer) Destroy(child.gameObject);
     }
 
-    public void AddStatItem(string name, string value)
+    public void AddStatItem(string name, string value, Sprite icon)
     {
         GameObject obj = Instantiate(_statPanelPrefab, _statContainer);
         if (obj.TryGetComponent(out StatPanelUI statItem))
         {
-            statItem.SetStat(name, value);
+            statItem.SetStat(name, value, icon);
         }
     }
 
