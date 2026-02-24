@@ -15,12 +15,12 @@ public class ConfirmPopup : BaseUI
         _yesBtn.onClick.RemoveAllListeners();
         _yesBtn.onClick.AddListener(() => { 
             onYes?.Invoke();
-            Close();
+            OnBackButtonPressed();
         });
 
         _noBtn.onClick.RemoveAllListeners();
         _noBtn.onClick.AddListener(() => {
-            Close(); // 그냥 닫기
+            OnBackButtonPressed(); // 그냥 닫기
         });
     }
 }
