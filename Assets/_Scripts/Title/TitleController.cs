@@ -16,6 +16,7 @@ public class TitleController : MonoBehaviour
     void Awake()
     {
         InitializeFirebase();
+        GameManager.Instance.SetSceneState(SceneState.Title);
     }
 
     private void InitializeFirebase()
