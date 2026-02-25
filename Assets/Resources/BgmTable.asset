@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: BgmTable
   m_EditorClassIdentifier: Assembly-CSharp::BgmTable
   _entries:
-  - state: 0
+  - state: 1
     clip: {fileID: 0}
