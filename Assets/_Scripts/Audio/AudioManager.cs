@@ -10,9 +10,11 @@ public sealed class AudioManager : Singleton<AudioManager>
     [Header("Sources")]
     [SerializeField] private AudioSource _bgmA;
     [SerializeField] private AudioSource _bgmB;
+    [SerializeField] private AudioSource _sfxSource;
 
-    [Header("BGM Table")]
+    [Header("Sound Table")]
     [SerializeField] private BgmTable _bgmTable;
+    [SerializeField] private SFXTable _sfxTable;
 
     [Header("BGM Crossfade")]
     [SerializeField, Min(0f)] private float _bgmFadeSeconds = 1.5f;
@@ -108,6 +110,18 @@ public sealed class AudioManager : Singleton<AudioManager>
         _fadeCo = null;
     }
 
+    #endregion
+
+    #region SFX
+    public void PlaySfx(SfxList sfx)
+    {
+        if (_sfxTable == null || _sfxSource == null) return;
+
+        if (_sfxTable.TryGetClip(sfx, out var clip) && clip != null)
+        {
+            _sfxSource.PlayOneShot(clip);
+        }
+    }
     #endregion
 
     #region Volume
