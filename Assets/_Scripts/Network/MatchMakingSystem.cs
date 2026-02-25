@@ -19,6 +19,8 @@ public class MatchMakingSystem : MonoBehaviour
 
     private int _height;
 
+    public const string MATCH_TYPE = "matchType";
+
     private void Awake()
     {
         _cancelBtn.interactable = false;
@@ -54,7 +56,7 @@ public class MatchMakingSystem : MonoBehaviour
     {
         var sessionProps = new Dictionary<string, SessionProperty>
         {
-            ["matchType"] = (int)matchType
+            [MATCH_TYPE] = (int)matchType
         };
 
         var args = new StartGameArgs()

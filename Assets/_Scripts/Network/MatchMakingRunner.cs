@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined
+public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 {
     private Button _cancelBtn;
     private NetworkRunner _networkRunner;
@@ -27,15 +27,43 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined
     {
         Debug.Log($"플레이어 입장: {player.PlayerId}");
 
-        if (_networkRunner.IsSharedModeMasterClient && _networkRunner.ActivePlayers.Count() == 2)
+        if (_networkRunner.IsSharedModeMasterClient)
         {
-            Debug.Log("플레이어 2명 입장! 매칭 완료");
+            if (_networkRunner.SessionInfo.Properties.TryGetValue(MatchMakingSystem.MATCH_TYPE, out var value))
+            {
+                MatchType type = (MatchType)(int)value;
+                switch (type) 
+                {
+                    case MatchType.OneVsOne:
+                        CheckMatchStatus(2);
+                        break;
+                    case MatchType.TwoVsTwo:
+                        CheckMatchStatus(4);
+                        break;
+                    default:
+                        Debug.LogError("매치 타입이 잘못되었습니다.");
+                        break;
+                }
+            }
+        }
+    }
+
+    public void CheckMatchStatus(int count)
+    {
+        if (_networkRunner.ActivePlayers.Count() == count)
+        {
+            Debug.Log($"플레이어 {count}명 입장! 매칭 완료");
 
             int index = UnityEngine.SceneManagement.SceneUtility.
                 GetBuildIndexByScenePath("Assets/_Scenes/Stage.unity");
 
             _networkRunner.LoadScene(SceneRef.FromIndex(index));
         }
+    }
+
+    public void PlayerLeft(PlayerRef player)
+    {
+        Debug.Log("플레이어가 떠남.");
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
