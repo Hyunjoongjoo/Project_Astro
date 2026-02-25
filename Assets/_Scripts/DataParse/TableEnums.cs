@@ -33,7 +33,9 @@ public enum EffectType
     None,
     IncreaseAttackPower,   
     IncreaseAttackSpeed, 
-    IncreaseAttackRange,   
+    IncreaseAttackRange,
+    IncreaseSkillRange,
+    IncreaseDetectionRange, //탐지 범위
     DecreaseCooldown,      
 
     IncreaseMoveSpeed,
@@ -45,12 +47,12 @@ public enum EffectType
     IncreaseMaxHp,
     DecreaseMaxHp,
 
-    InstantHeal,
+    InstantHeal,            //유닛스탯제외(즉시회복)
     IncreaseHealPower,
-    IncreaseShieldAmount,
+    IncreaseShieldAmount,   //유닛스탯제외2(실드증가) => 기본스탯에 실드없어서 매핑 제외
 
     DecreaseRespawnTime,
-    ImmuneCcCount
+    ImmuneCcCount           //유닛스탯제외3(CC면역횟수)
 }
 
 //조건 타입 정의
