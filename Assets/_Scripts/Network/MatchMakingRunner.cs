@@ -8,6 +8,9 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
     private Button _cancelBtn;
     private NetworkRunner _networkRunner;
 
+    private MatchType _curMatchType;
+    private int _requiredPlayerCount;
+
     public void Initialize(Button btn, NetworkRunner runner)
     {
         _cancelBtn = btn;
@@ -18,6 +21,12 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
     public void OnConnectedToServer(NetworkRunner runner)
     {
         Debug.Log("OnConnectedToServer 실행됨.");
+        if (_networkRunner.SessionInfo.Properties.TryGetValue(MatchMakingSystem.MATCH_TYPE, out var value))
+        {
+            _curMatchType = (MatchType)(int)value;
+            _requiredPlayerCount = _curMatchType == MatchType.OneVsOne ? 2 : 4;
+        }
+
         _cancelBtn.interactable = true;
     }
 
@@ -29,22 +38,7 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
         if (_networkRunner.IsSharedModeMasterClient)
         {
-            if (_networkRunner.SessionInfo.Properties.TryGetValue(MatchMakingSystem.MATCH_TYPE, out var value))
-            {
-                MatchType type = (MatchType)(int)value;
-                switch (type) 
-                {
-                    case MatchType.OneVsOne:
-                        CheckMatchStatus(2);
-                        break;
-                    case MatchType.TwoVsTwo:
-                        CheckMatchStatus(4);
-                        break;
-                    default:
-                        Debug.LogError("매치 타입이 잘못되었습니다.");
-                        break;
-                }
-            }
+            CheckMatchStatus(_requiredPlayerCount);
         }
     }
 
