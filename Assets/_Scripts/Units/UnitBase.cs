@@ -57,6 +57,29 @@ public abstract class UnitBase : NetworkBehaviour
         }
     }
 
+    
+    public virtual float GetAttackDistanceTo(UnitBase target)
+    {
+        if (target == null)//타겟이 없는 경우 항상 사거리 밖으로 판정되도록 처리
+        {
+            return float.MaxValue;
+        }
+
+        //자신과 타겟의 콜라이더를 기준으로 실제 전투 거리 계산
+        Collider myCollider = GetComponentInChildren<Collider>();
+        Collider targetCollider = target.GetComponentInChildren<Collider>();
+
+        if (myCollider == null || targetCollider == null)//콜라이더가 없는 경우 중심점 거리 계산으로
+        {
+            return Vector3.Distance(transform.position, target.transform.position);
+        }
+
+        Vector3 myPoint = myCollider.ClosestPoint(target.transform.position);
+        Vector3 targetPoint = targetCollider.ClosestPoint(transform.position);
+
+        return Vector3.Distance(myPoint, targetPoint);
+    }
+
     public virtual void Die()
     {
         if (IsDead)

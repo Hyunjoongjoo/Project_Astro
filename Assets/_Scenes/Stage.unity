@@ -2728,6 +2728,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   _dontDestroyOnLoad: 1
   _currentState: 0
+  _flowState: 0
 --- !u!4 &825725157
 Transform:
   m_ObjectHideFlags: 0

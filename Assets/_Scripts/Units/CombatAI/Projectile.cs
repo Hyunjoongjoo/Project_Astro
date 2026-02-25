@@ -13,8 +13,8 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void OnDisable()//풀링으로 교체시
-    {
-        DOTween.Kill(transform);
-    }
+    //private void OnDisable()//풀링으로 교체시
+    //{
+    //    DOTween.Kill(transform);
+    //}
 }

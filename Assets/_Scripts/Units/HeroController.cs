@@ -10,7 +10,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private float _attackRange = 2f;
 
     [Header("스킬 스테이터스")]
-    [SerializeField] private float _skillRange = 4f;
+    //[SerializeField] private float _skillRange = 4f;
     [SerializeField] private float _skillCooldown = 6f;
 
     [Header("공격 타입")]
@@ -25,6 +25,9 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
+    [SerializeField] private MonoBehaviour _skillComponent;
+
+
     private UnitBase _currentTarget;
 
     private TickTimer _searchTimer;
@@ -37,9 +40,20 @@ public class HeroController : MobilityUnit, IBasicAttack
     private Vector3 _deployTarget;
     private TickTimer _deployDelayTimer;
 
+    private IHeroSkill _skill; //영웅별로 서로 다른 스킬을 처리하기 위한 스킬 인터페이스
+    private UnitBase _skillTarget;
+
     public float AttackPower => _attackPower;
     public float AttackSpeed => _attackSpeed;
     public float AttackRange => _attackRange;
+    public UnitBase CurrentTarget => _currentTarget;
+    public UnitBase SkillTarget => _skillTarget;
+
+    private void Awake()
+    {
+        // 인스펙터에서 할당된 스킬 컴포넌트를 IHeroSkill 인터페이스로 캐스팅하여 사용
+        _skill = _skillComponent as IHeroSkill;
+    }
 
     public void Setup(Team myTeam)
     {
@@ -99,6 +113,8 @@ public class HeroController : MobilityUnit, IBasicAttack
         // 사망 상태면 행동 중단
         if (CurrentState == UnitState.Dead) return;
 
+        _fsm.TickSkill(Runner);
+
         if (_isDeploying)
         {
             //배치중 일때는
@@ -116,7 +132,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        //탐지 상태일 때만 타겟 재탐색 (공격 중에는 중단)
+        //탐지 상태일 때만 타겟 재탐색
         if (_fsm.State == UnitAIState.Detect && _searchTimer.ExpiredOrNotRunning(Runner))
         {
             RefreshTarget();
@@ -124,7 +140,19 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         bool hasTarget = _currentTarget != null && !_currentTarget.IsDead;
-        bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
+        bool inRange = false;
+        if (hasTarget)
+        {
+            //이동 중인지 여부 (네비 기준)
+            bool isApproaching = agent.hasPath && !agent.pathPending;
+
+            //실제 전투 거리 판정은 콜라이더 기준
+            float combatDistance = GetAttackDistanceTo(_currentTarget);
+            bool isCombatInRange = combatDistance <= _attackRange;
+
+            inRange = isApproaching && isCombatInRange;
+        }
+
         bool isDead = CurrentState == UnitState.Dead;//FSM에도 사망 여부를 전달(의도치 않은 상태 전이 방지)
 
         //FSM에 상태 전이 판단 위임
@@ -177,7 +205,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        //타겟이 있는 경우 → 해당 타겟을 향해 이동
+        //타겟이 있는 경우 해당 타겟을 향해 이동
         CurrentState = UnitState.Move;
         MoveTo(_currentTarget.transform.position);
     }
@@ -198,19 +226,19 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private void HandleCombat()
     {
-        if (_currentTarget == null)
+        if (_currentTarget == null || _currentTarget.IsDead)
         {
             return;
         }
 
         //스킬 시작 조건 판단
-        if (CanUseSkill() && IsSkillTargetInRange())
+        if (_fsm.State == UnitAIState.Attack && _skill != null && CanUseSkill() && _skill.CanUse(this))
         {
             StartSkill();//여기서 FSM 전환
             return;
         }
 
-        //스킬 사용 불가 → 기본 공격
+        //스킬 사용 불가시에 기본 공격
         TryAttack();
     }
 
@@ -236,24 +264,27 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private void StartSkill()
     {
-        _fsm.EnterSkill();// FSM 상태 전환
+        _skillTarget = _currentTarget;
+        _fsm.EnterSkill(Runner, 0.15f);// FSM 상태 전환
+
         UseSkill();// 실제 효과
     }
 
     private void UseSkill()
     {
-        if (_currentTarget == null)
+        if (_skillTarget == null || _skillTarget.IsDead)
         {
+            _skillTarget = null;
             return;
         }
 
         CurrentState = UnitState.Skill;//애니메이션 연출등등
         StopMove();
-        Debug.Log("스킬 발동");
-        //임시 구현 (지금은 데미지 2배 스킬이라고 가정)
-        _currentTarget.TakeDamage(_attackPower * 2f);
-
+        
+        _skill.Execute(this);
         _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
+
+        _skillTarget = null;
     }
 
 
@@ -262,20 +293,20 @@ public class HeroController : MobilityUnit, IBasicAttack
         return _skillTimer.ExpiredOrNotRunning(Runner);
     }
 
-    private bool IsSkillTargetInRange()
-    {
-        if (_currentTarget == null)
-        {
-            return false;
-        }
+    //private bool IsSkillTargetInRange()
+    //{
+    //    if (_currentTarget == null)
+    //    {
+    //        return false;
+    //    }
 
-        float dist = Vector3.Distance(
-            transform.position,
-            _currentTarget.transform.position
-        );
+    //    float dist = Vector3.Distance(
+    //        transform.position,
+    //        _currentTarget.transform.position
+    //    );
 
-        return dist <= _skillRange;
-    }
+    //    return dist <= _skillRange;
+    //}
 
     private void TryAttack()
     {
@@ -394,6 +425,23 @@ public class HeroController : MobilityUnit, IBasicAttack
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
         projectile.GetComponent<Projectile>()?.Fire(targetPos);
+    }
+
+    //[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    //public void RPC_PlaySkillEffect(Vector3 position, float radius)
+    //{
+    //    if (_skillEffectPrefab == null)
+    //    {
+    //        return;
+    //    }
+
+    //    GameObject fx = Instantiate(_skillEffectPrefab, position, Quaternion.identity);
+    //    fx.GetComponent<AssaultSkill>()?.Play(radius);
+    //}
+
+    public void ForceStopMoveForSkill()//외부에서 스탑무브를 사용가능하도록
+    {
+        StopMove();
     }
 
     private void OnTargetDied(UnitBase deadUnit)

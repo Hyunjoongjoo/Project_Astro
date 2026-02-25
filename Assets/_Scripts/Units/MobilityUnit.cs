@@ -26,21 +26,44 @@ public class MobilityUnit : UnitBase, ITargetFinder
     {
         agent.speed = _moveSpeed;
 
+        int myLayer;
+        int enemyLayer;
+
         if (team == Team.Blue)
         {
-            gameObject.layer = LayerMask.NameToLayer("BlueTeam");
-            _targetLayer = 1 << LayerMask.NameToLayer("RedTeam");
+            myLayer = LayerMask.NameToLayer("BlueTeam");
+            enemyLayer = LayerMask.NameToLayer("RedTeam");
         }
         else if (team == Team.Red)
         {
-            gameObject.layer = LayerMask.NameToLayer("RedTeam");
-            _targetLayer = 1 << LayerMask.NameToLayer("BlueTeam");
+            myLayer = LayerMask.NameToLayer("RedTeam");
+            enemyLayer = LayerMask.NameToLayer("BlueTeam");
         }
         else
         {
             Debug.Log("중립 오브젝트입니다.");
+            return;
+        }
+
+        //팀레이어 적용
+        SetLayer(gameObject, myLayer);
+        //탐지 단계에서는 적 팀 레이어만 대상으로
+        _targetLayer = 1 << enemyLayer;
+    }
+
+    private void SetLayer(GameObject root, int layer)//UnitBase가 붙은 오브젝트만 대상으로 레이어를 설정
+    {
+        if (root.GetComponent<UnitBase>() != null)
+        {
+            root.layer = layer;
+        }
+
+        foreach (Transform child in root.transform)
+        {
+            SetLayer(child.gameObject, layer);
         }
     }
+
 
     protected virtual void MoveTo(Vector3 destination)
     {
@@ -93,6 +116,12 @@ public class MobilityUnit : UnitBase, ITargetFinder
                 continue;
             }
 
+            if (unit.IsDead)
+            {
+                continue;
+            }
+            
+            //탐지 단계에서는 대략적인 거리 비교
             float dist = Vector3.Distance(transform.position, unit.transform.position);
             if (dist < minDistance)
             {
