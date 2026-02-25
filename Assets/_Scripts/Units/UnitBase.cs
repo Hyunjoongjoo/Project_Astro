@@ -69,5 +69,9 @@ public abstract class UnitBase : NetworkBehaviour
         CurrentState = UnitState.Dead;
         OnDeath?.Invoke(this);
         Runner.Despawn(selfNetworkObj);
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySfx(SfxList.DestroySound);
+        }
     }
 }
