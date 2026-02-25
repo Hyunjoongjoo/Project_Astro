@@ -18,7 +18,7 @@ public sealed class AudioManager : Singleton<AudioManager>
     [SerializeField, Min(0f)] private float _bgmFadeSeconds = 1.5f;
 
     private Coroutine _fadeCo;
-
+   
     protected override void OnSingletonAwake()
     {
         PrepareBgm(_bgmA);
@@ -123,7 +123,17 @@ public sealed class AudioManager : Singleton<AudioManager>
     {
         if (_mixer == null) return;
 
-        float db = NormalizedToDb(normalized01);
+        string muteKey = bus switch
+        {
+            AudioBus.BGM => AudioParam.BGM_MUTE_KEY,
+            AudioBus.SFX => AudioParam.SFX_MUTE_KEY,
+            _ => AudioParam.MASTER_MUTE_KEY
+        };
+
+        bool isMuted = PlayerPrefs.GetInt(muteKey, 0) == 1;
+        float finalVol = isMuted ? 0.0001f : normalized01;
+
+        float db = NormalizedToDb(finalVol);
 
         string param = bus switch
         {

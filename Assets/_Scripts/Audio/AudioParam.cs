@@ -11,4 +11,9 @@ public static class AudioParam
     public const string MASTER_KEY = "audio.master";
     public const string BGM_KEY    = "audio.bgm";
     public const string SFX_KEY    = "audio.sfx";
+
+    // Mute Keys
+    public const string MASTER_MUTE_KEY = "audio.master_mute";
+    public const string BGM_MUTE_KEY = "audio.bgm_mute";
+    public const string SFX_MUTE_KEY = "audio.sfx_mute";
 }

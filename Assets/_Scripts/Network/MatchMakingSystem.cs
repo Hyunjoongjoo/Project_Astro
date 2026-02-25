@@ -1,8 +1,12 @@
-﻿using Fusion;
+﻿using DG.Tweening;
+using Fusion;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
-using System.Threading.Tasks;
+
+public enum MatchType { OneVsOne, TwoVsTwo }
 
 public class MatchMakingSystem : MonoBehaviour
 {
@@ -15,13 +19,15 @@ public class MatchMakingSystem : MonoBehaviour
 
     private int _height;
 
+    public const string MATCH_TYPE = "matchType";
+
     private void Awake()
     {
         _cancelBtn.interactable = false;
         _height = Screen.height;
     }
 
-    public async void OnClickMatchMaking()
+    public async void OnClickMatchMaking(int matchType)
     {
         if (_isMatching) return; // 중복 클릭 방지
 
@@ -33,7 +39,7 @@ public class MatchMakingSystem : MonoBehaviour
         obj.GetComponent<MatchMakingRunner>().Initialize(_cancelBtn, _networkRunner);
 
         _matchMakingPanel.transform.DOMoveY(0, 0.8f).SetEase(Ease.OutCubic);
-        await OnConnected();
+        await OnConnected((MatchType)matchType);
     }
 
     public async void OnClickCancelMatching()
@@ -46,12 +52,18 @@ public class MatchMakingSystem : MonoBehaviour
         _matchMakingPanel.transform.DOMoveY(_height + 1, 0.8f).SetEase(Ease.OutCubic);
     }
 
-    public async Task OnConnected()
+    public async Task OnConnected(MatchType matchType)
     {
+        var sessionProps = new Dictionary<string, SessionProperty>
+        {
+            [MATCH_TYPE] = (int)matchType
+        };
+
         var args = new StartGameArgs()
         {
             GameMode = GameMode.Shared,
-            PlayerCount = 2
+            PlayerCount = matchType == MatchType.OneVsOne ? 2 : 4,
+            SessionProperties = sessionProps
         };
 
         var result = await _networkRunner.StartGame(args);

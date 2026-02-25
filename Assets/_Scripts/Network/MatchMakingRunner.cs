@@ -3,10 +3,13 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined
+public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 {
     private Button _cancelBtn;
     private NetworkRunner _networkRunner;
+
+    private MatchType _curMatchType;
+    private int _requiredPlayerCount;
 
     public void Initialize(Button btn, NetworkRunner runner)
     {
@@ -18,6 +21,12 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined
     public void OnConnectedToServer(NetworkRunner runner)
     {
         Debug.Log("OnConnectedToServer 실행됨.");
+        if (_networkRunner.SessionInfo.Properties.TryGetValue(MatchMakingSystem.MATCH_TYPE, out var value))
+        {
+            _curMatchType = (MatchType)(int)value;
+            _requiredPlayerCount = _curMatchType == MatchType.OneVsOne ? 2 : 4;
+        }
+
         _cancelBtn.interactable = true;
     }
 
@@ -27,15 +36,28 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined
     {
         Debug.Log($"플레이어 입장: {player.PlayerId}");
 
-        if (_networkRunner.IsSharedModeMasterClient && _networkRunner.ActivePlayers.Count() == 2)
+        if (_networkRunner.IsSharedModeMasterClient)
         {
-            Debug.Log("플레이어 2명 입장! 매칭 완료");
+            CheckMatchStatus(_requiredPlayerCount);
+        }
+    }
+
+    public void CheckMatchStatus(int count)
+    {
+        if (_networkRunner.ActivePlayers.Count() == count)
+        {
+            Debug.Log($"플레이어 {count}명 입장! 매칭 완료");
 
             int index = UnityEngine.SceneManagement.SceneUtility.
                 GetBuildIndexByScenePath("Assets/_Scenes/Stage.unity");
 
             _networkRunner.LoadScene(SceneRef.FromIndex(index));
         }
+    }
+
+    public void PlayerLeft(PlayerRef player)
+    {
+        Debug.Log("플레이어가 떠남.");
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
@@ -50,7 +72,12 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined
         if (runner.IsSharedModeMasterClient)
         {
             var stageManagerPrefab = Resources.Load<NetworkObject>("StageManager");
-            runner.Spawn(stageManagerPrefab, Vector3.zero, Quaternion.identity);
+            runner.Spawn(stageManagerPrefab, Vector3.zero, Quaternion.identity,
+                onBeforeSpawned: (Runner, obj) => 
+                {
+                    StageManager stageManager = obj.GetComponent<StageManager>();
+                    stageManager.Initialize(_curMatchType, _requiredPlayerCount);
+                });
 
             Debug.Log("마스터 클라이언트 StageManager 생성 완료");
         }
