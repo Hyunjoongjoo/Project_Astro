@@ -72,7 +72,12 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
         if (runner.IsSharedModeMasterClient)
         {
             var stageManagerPrefab = Resources.Load<NetworkObject>("StageManager");
-            runner.Spawn(stageManagerPrefab, Vector3.zero, Quaternion.identity);
+            runner.Spawn(stageManagerPrefab, Vector3.zero, Quaternion.identity,
+                onBeforeSpawned: (Runner, obj) => 
+                {
+                    StageManager stageManager = obj.GetComponent<StageManager>();
+                    stageManager.Initialize(_curMatchType, _requiredPlayerCount);
+                });
 
             Debug.Log("마스터 클라이언트 StageManager 생성 완료");
         }
