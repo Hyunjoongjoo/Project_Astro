@@ -4122,6 +4122,7 @@ MonoBehaviour:
   _view: {fileID: -1090826036922612233}
   _confirmPopupPrefab: {fileID: 8634472420008628492, guid: 49fdff230dea7dd46b96826cbf2e1507, type: 3}
   _upgradeResultPrefab: {fileID: 6578181167580409867, guid: 03f230d748ee8f44c8f7fd72ea3ad90d, type: 3}
+  _statIcons: {fileID: 11400000, guid: ac28feee89734864e9c4fc4181605bb8, type: 2}
 --- !u!114 &3480835021129358379
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -83,7 +83,7 @@ public class MinionController : MobilityUnit, IBasicAttack
             _searchTimer = TickTimer.CreateFromSeconds(Runner, SearchInterval);
         }
 
-        bool hasTarget = _currentTarget != null;
+        bool hasTarget = _currentTarget != null && !_currentTarget.IsDead;
         bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
         bool isDead = CurrentState == UnitState.Dead;//FSM에도 사망 여부를 전달(의도치 않은 상태 전이 방지)
 
@@ -92,23 +92,6 @@ public class MinionController : MobilityUnit, IBasicAttack
 
         //FSM 결과에 따라 행동 처리
         ApplyState(_fsm.State);
-        //switch (_fsm.State)
-        //{
-        //    case UnitAIState.Detect:
-        //        CurrentState = UnitState.Move;
-        //        OnDetectUpdate();
-        //        break;
-
-        //    case UnitAIState.Attack:
-        //        CurrentState = UnitState.Attack;
-        //        OnAttackUpdate();
-        //        break;
-
-        //    case UnitAIState.Dead:
-        //        CurrentState = UnitState.Dead;
-        //        StopMove();
-        //        break;
-        //}
     }
 
     // FSM 판단 결과를 실제 유닛 행동으로 적용
@@ -125,7 +108,6 @@ public class MinionController : MobilityUnit, IBasicAttack
                 break;
 
             case UnitAIState.Dead:
-                HandleDead();
                 break;
         }
     }
@@ -160,12 +142,6 @@ public class MinionController : MobilityUnit, IBasicAttack
         CurrentState = UnitState.Attack;
         StopMove();
         TryAttack();
-    }
-
-    private void HandleDead()
-    {
-        CurrentState = UnitState.Dead;
-        StopMove();
     }
 
     private void TryAttack()
@@ -208,6 +184,11 @@ public class MinionController : MobilityUnit, IBasicAttack
 
     private void SetTarget(UnitBase target)
     {
+        if (_currentTarget == target)
+        {
+            return;
+        }
+
         // 새 목표로 교체할 때 기존 사망 이벤트 구독 해제
         if (_currentTarget != null)
         {
@@ -250,66 +231,6 @@ public class MinionController : MobilityUnit, IBasicAttack
         float distB = Vector3.Distance(transform.position, _towerB.transform.position);
         return distA <= distB ? _towerA : _towerB;
     }
-
-    //private void HandleBehaviour()
-    //{
-    //    // 유효한 목표가 없으면 대기 (함교까지 다 부쉈을 때)
-    //    if (_currentTarget == null)
-    //    {
-    //        CurrentState = UnitState.Idle;
-    //        StopMove();
-    //        return;
-    //    }
-
-    //    float distToTarget = Vector3.Distance(transform.position, _currentTarget.transform.position);
-
-    //    if (distToTarget > AttackRange)
-    //    {
-    //        // ── 이동 ──
-    //        CurrentState = UnitState.Move;
-    //        MoveTo(_currentTarget.transform.position);
-    //    }
-    //    else
-    //    {
-    //        // ── 공격 ──
-    //        StopMove();
-    //        CurrentState = UnitState.Attack;
-    //        TryAttack();
-    //    }
-    //}
-
-    //private void OnDetectUpdate()
-    //{
-    //    if (_currentTarget == null)
-    //    {
-    //        StopMove();
-    //        return;
-    //    }
-
-    //    MoveTo(_currentTarget.transform.position);
-    //}
-
-    //private void OnAttackUpdate()
-    //{
-    //    StopMove();
-    //    TryAttack();
-    //}
- 
-    //private void AttackMelee(Transform target)
-    //{
-    //    Tower tower = target.GetComponent<Tower>();
-    //    if (tower != null)
-    //    {
-    //        tower.TakeDamage(AttackPower);
-    //        return;
-    //    }
-
-    //    UnitBase unit = target.GetComponent<UnitBase>();
-    //    if (unit != null)
-    //    {
-    //        unit.TakeDamage(AttackPower);
-    //    }
-    //}
 
     private void AttackRanged(Vector3 targetPos)
     {

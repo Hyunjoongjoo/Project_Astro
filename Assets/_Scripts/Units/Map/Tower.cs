@@ -79,6 +79,11 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
             return;
         }
 
+        if (CurrentState == UnitState.Dead)
+        {
+            return;
+        }
+
         if (_fsm.State == UnitAIState.Detect && _scanTimer.ExpiredOrNotRunning(Runner))
         {
             _currentTarget = FindTarget();
@@ -90,26 +95,22 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         bool isDead = CurrentState == UnitState.Dead;
 
         _fsm.DecideState(isDead, hasTarget, inRange);
+        ApplyState(_fsm.State);
+    }
 
-        if (_fsm.State == UnitAIState.Dead)
-        {
-            CurrentState = UnitState.Dead;
-            return;
-        }
-
-        switch (_fsm.State)
+    private void ApplyState(UnitAIState state)
+    {
+        switch (state)
         {
             case UnitAIState.Detect:
-                CurrentState = UnitState.Idle;
+                HandleDetect();
                 break;
 
             case UnitAIState.Attack:
-                CurrentState = UnitState.Attack;
-                UpdateAttack();
+                HandleAttack();
                 break;
 
             case UnitAIState.Dead:
-                CurrentState = UnitState.Dead;
                 break;
         }
     }
@@ -124,6 +125,17 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
     //    _currentTarget = FindTarget();
     //    _scanTimer = TickTimer.CreateFromSeconds(Runner, _scanInterval);
     //}
+
+    private void HandleDetect()
+    {
+        CurrentState = UnitState.Idle;
+    }
+
+    private void HandleAttack()
+    {
+        CurrentState = UnitState.Attack;
+        UpdateAttack();
+    }
 
     private void UpdateAttack()
     {
@@ -163,8 +175,8 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
             return;
         }
 
-        var proj = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
-        proj.GetComponent<Projectile>()?.Fire(targetPos);
+        var projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
+        projectile.GetComponent<Projectile>()?.Fire(targetPos);
     }
 
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기
