@@ -33749,6 +33749,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014afde5c13b1b843884adb81ba0e2a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageIntroUI
+  _introPanel: {fileID: 764561870}
   _textIndicator: {fileID: 162553943}
   _gameTimer: {fileID: 299840329}
   _augmentGauge: {fileID: 1220292401}

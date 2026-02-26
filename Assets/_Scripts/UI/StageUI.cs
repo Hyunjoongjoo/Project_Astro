@@ -6,6 +6,7 @@ using TMPro;
 // Stage 씬 인게임 시퀀스에 쓰이는 UI들을 제어하는 클래스
 public class StageUI : MonoBehaviour
 {
+    [SerializeField] private GameObject _introPanel;
     [SerializeField] private TextMeshProUGUI _textIndicator;
     [SerializeField] private TextMeshProUGUI _gameTimer;
     [SerializeField] private Slider _augmentGauge;
@@ -41,7 +42,7 @@ public class StageUI : MonoBehaviour
 
     public void HideCountdown()
     {
-        gameObject.SetActive(false);
+        _introPanel.SetActive(false);
         Debug.Log("카운트 다운 패널 숨김");
     }
 
