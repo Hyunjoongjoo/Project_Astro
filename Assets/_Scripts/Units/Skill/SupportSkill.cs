@@ -1,6 +1,7 @@
-﻿using Fusion;
+﻿using DG.Tweening;
+using Fusion;
 using UnityEngine;
-using DG.Tweening;
+using static UnityEngine.GraphicsBuffer;
 
 public class SupportSkill : NetworkBehaviour, IHeroSkill
 {
@@ -58,6 +59,11 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
             }
 
             if (unit.UnitType != UnitType.Hero)
+            {
+                continue;
+            }
+
+            if (unit == caster)
             {
                 continue;
             }
