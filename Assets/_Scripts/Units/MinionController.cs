@@ -141,6 +141,7 @@ public class MinionController : MobilityUnit, IBasicAttack
     {
         CurrentState = UnitState.Attack;
         StopMove();
+        RotateToTarget();
         TryAttack();
     }
 
@@ -162,6 +163,26 @@ public class MinionController : MobilityUnit, IBasicAttack
         // 다음 공격 가능 시간 설정 (AttackSpeed = 초당 공격 횟수)
         float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
         _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
+    }
+
+    private void RotateToTarget()
+    {
+        if (_currentTarget == null)
+        {
+            return;
+        }
+
+        Vector3 dir = _currentTarget.transform.position - transform.position;
+        dir.y = 0f; //수평 회전
+
+        if (dir.sqrMagnitude < 0.001f)
+        {
+            return;
+        }
+
+        Quaternion targetRotation = Quaternion.LookRotation(dir);
+
+        transform.rotation = targetRotation;
     }
 
     private void RefreshTarget()

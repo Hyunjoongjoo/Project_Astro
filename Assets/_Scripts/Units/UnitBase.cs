@@ -40,7 +40,7 @@ public abstract class UnitBase : NetworkBehaviour
 
     public override void FixedUpdateNetwork() { }
 
-    public void TakeDamage(float amount)
+    public virtual void TakeDamage(float amount)
     {
         if (!Object.HasStateAuthority) return;
 

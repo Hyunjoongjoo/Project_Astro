@@ -583,6 +583,7 @@ GameObject:
   - component: {fileID: 288590522490992711}
   - component: {fileID: 6970888073266845989}
   - component: {fileID: -3351744654108456150}
+  - component: {fileID: 7704040667658692594}
   m_Layer: 6
   m_Name: Hero4
   m_TagString: Untagged
@@ -711,15 +712,15 @@ MonoBehaviour:
   _searchInterval: 0.3
   _attackPower: 15
   _attackSpeed: 1
-  _attackRange: 4
-  _skillRange: 4
-  _skillCooldown: 6
+  _attackRange: 5
+  _skillCooldown: 5
   _attackType: 1
   _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
   _firePoint: {fileID: 4892445714994426902}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
+  _skillComponent: {fileID: 0}
 --- !u!114 &288590522490992711
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -750,6 +751,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 9043486588942551580}
+  - {fileID: 7704040667658692594}
   ForceRemoteRenderTimeframe: 0
 --- !u!136 &-3351744654108456150
 CapsuleCollider:
@@ -774,6 +776,23 @@ CapsuleCollider:
   m_Height: 4.2381673
   m_Direction: 1
   m_Center: {x: 0, y: -0.00000083446497, z: 0.0000007152557}
+--- !u!114 &7704040667658692594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3852116074081476708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
 --- !u!1 &4017051268299437664
 GameObject:
   m_ObjectHideFlags: 0

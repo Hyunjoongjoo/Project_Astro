@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.UI.Image;
 
 public class HeroController : MobilityUnit, IBasicAttack
 {
@@ -42,6 +43,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private IHeroSkill _skill; //영웅별로 서로 다른 스킬을 처리하기 위한 스킬 인터페이스
     private UnitBase _skillTarget;
+    private float _damageReductionRate = 0f;
 
     public float AttackPower => _attackPower;
     public float AttackSpeed => _attackSpeed;
@@ -96,6 +98,8 @@ public class HeroController : MobilityUnit, IBasicAttack
         base.Spawned();
 
         if (!Object.HasStateAuthority) return;
+
+        _damageReductionRate = 0f;
 
         _fsm = new UnitFSM();
 
@@ -293,21 +297,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         return _skillTimer.ExpiredOrNotRunning(Runner);
     }
 
-    //private bool IsSkillTargetInRange()
-    //{
-    //    if (_currentTarget == null)
-    //    {
-    //        return false;
-    //    }
-
-    //    float dist = Vector3.Distance(
-    //        transform.position,
-    //        _currentTarget.transform.position
-    //    );
-
-    //    return dist <= _skillRange;
-    //}
-
     private void TryAttack()
     {
         if (!_attackTimer.ExpiredOrNotRunning(Runner)) return;
@@ -414,6 +403,34 @@ public class HeroController : MobilityUnit, IBasicAttack
         RPC_FireProjectile(targetPos);
     }
 
+    public override void TakeDamage(float amount)
+    {
+        float original = amount;
+
+        if (_damageReductionRate > 0f)
+        {
+            amount *= (1f - _damageReductionRate);
+        }
+
+#if UNITY_EDITOR
+        Debug.Log(
+            $"[Damage] {name} | original={original}, reduced={amount}, rate={_damageReductionRate}"
+        );
+#endif
+
+        base.TakeDamage(amount);
+    }
+
+    public void SetDamageReduction(float rate)
+    {
+        _damageReductionRate = Mathf.Clamp01(rate);
+    }
+
+    public void ClearDamageReduction()
+    {
+        _damageReductionRate = 0f;
+    }
+
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_FireProjectile(Vector3 targetPos)
     {
@@ -427,19 +444,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         projectile.GetComponent<Projectile>()?.Fire(targetPos);
     }
 
-    //[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    //public void RPC_PlaySkillEffect(Vector3 position, float radius)
-    //{
-    //    if (_skillEffectPrefab == null)
-    //    {
-    //        return;
-    //    }
-
-    //    GameObject fx = Instantiate(_skillEffectPrefab, position, Quaternion.identity);
-    //    fx.GetComponent<AssaultSkill>()?.Play(radius);
-    //}
-
-    public void ForceStopMoveForSkill()//외부에서 스탑무브를 사용가능하도록
+    public void ForceStopMoveForSkill()//외부에서 StopMove를 사용가능하도록
     {
         StopMove();
     }
@@ -457,6 +462,8 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         _fsm?.ForceDead();
         StopMove();
+
+        ClearDamageReduction();
 
         // 목표 이벤트 구독 해제 후 부모 Die 호출 (Despawn)
         if (_currentTarget != null)

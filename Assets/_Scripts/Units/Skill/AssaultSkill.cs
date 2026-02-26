@@ -69,9 +69,6 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
 
             float damage = caster.AttackPower * _damageMultiplier;
             unit.TakeDamage(damage);
-#if UNITY_EDITOR
-            Debug.Log($"[강습!] {caster.name} -> {unit.name}, dmg={damage}");
-#endif
         }
 
         //이펙트
