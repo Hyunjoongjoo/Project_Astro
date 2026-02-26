@@ -73,7 +73,11 @@ public class HeroSpawner : NetworkBehaviour
         float distance = Vector3.Distance(origin.position, spawnPos);
         float deployDelay = GetDeployDelay(distance);
 
-        Runner.Spawn(prefab, spawnPos, Quaternion.identity,
+        //영웅 초기 방향 결정
+        Vector3 forwardDir = team == Team.Blue ? Vector3.forward : Vector3.back;
+        Quaternion spawnRot = Quaternion.LookRotation(forwardDir);
+
+        Runner.Spawn(prefab, spawnPos, spawnRot,
             onBeforeSpawned: (Runner, obj) =>
             {
                 HeroController hero = obj.GetComponent<HeroController>();

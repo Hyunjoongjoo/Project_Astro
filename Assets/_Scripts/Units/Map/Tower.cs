@@ -36,6 +36,8 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
     {
         base.Spawned();
 
+        unitType = UnitType.Tower;
+
         if (!Object.HasStateAuthority)
         {
             return;

@@ -442,10 +442,12 @@ GameObject:
   - component: {fileID: 7299576946842487594}
   - component: {fileID: 1134780754710619926}
   - component: {fileID: 707048002635603553}
+  - component: {fileID: 4569985432753418785}
   - component: {fileID: 9158771151194973300}
   - component: {fileID: -7269745521372557208}
+  - component: {fileID: -2192352356554374425}
   m_Layer: 6
-  m_Name: Hero2
+  m_Name: Tank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -534,7 +536,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 5.542556
-  m_Speed: 8
+  m_Speed: 6
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -558,13 +560,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8b2f4a5a7e52254ca4ac142269bc711, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeroController
-  maxHealth: 80
+  maxHealth: 100
   deffense: 0
   team: 0
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 7299576946842487594}
-  _moveSpeed: 8
+  _moveSpeed: 6
   _searchRange: 5
   _targetLayer:
     serializedVersion: 2
@@ -573,9 +575,11 @@ MonoBehaviour:
   _attackPower: 15
   _attackSpeed: 1
   _attackRange: 4
-  _skillRange: 4
-  _skillCooldown: 6
+  _initSkillCooldown: 4
+  _skillCooldown: 8
+  _skillComponent: {fileID: 4569985432753418785}
   _attackType: 1
+  _heroSize: 1
   _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
   _firePoint: {fileID: 128638915413792048}
   _enemyTowerA: {fileID: 0}
@@ -593,6 +597,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e06afd8dba25da47828c557178535da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitStat
+--- !u!114 &4569985432753418785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324447883655620717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee3b1320d30cd445b022376d94d2fef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DefenseSkill
+  _duration: 5
+  _damageReductionRate: 0.3
+  _effectPrefab: {fileID: 3479278419723618712, guid: b4b0419d3c6ad2d4a8b5133bfe5693d3, type: 3}
 --- !u!114 &9158771151194973300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -611,6 +630,8 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1134780754710619926}
+  - {fileID: 4569985432753418785}
+  - {fileID: -2192352356554374425}
   ForceRemoteRenderTimeframe: 0
 --- !u!136 &-7269745521372557208
 CapsuleCollider:
@@ -635,6 +656,23 @@ CapsuleCollider:
   m_Height: 2.8066292
   m_Direction: 1
   m_Center: {x: 0, y: -0.0000007152557, z: -0.0000069141383}
+--- !u!114 &-2192352356554374425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324447883655620717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
 --- !u!1 &1541514002332503806
 GameObject:
   m_ObjectHideFlags: 0

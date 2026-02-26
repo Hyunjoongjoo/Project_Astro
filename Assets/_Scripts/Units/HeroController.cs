@@ -2,6 +2,10 @@
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum HeroSize
+{
+    Small, Large
+}
 public class HeroController : MobilityUnit, IBasicAttack
 {
     [Header("공격 스테이터스")]
@@ -11,10 +15,13 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     [Header("스킬 스테이터스")]
     //[SerializeField] private float _skillRange = 4f;
+    [SerializeField] private float _initSkillCooldown;//첫 쿨타임
     [SerializeField] private float _skillCooldown = 6f;
+    [SerializeField] private MonoBehaviour _skillComponent;
 
-    [Header("공격 타입")]
+    [Header("타입")]
     [SerializeField] private AttackType _attackType;
+    [SerializeField] private HeroSize _heroSize;
 
     [Header("원거리")]
     [SerializeField] private GameObject _projectilePrefab;
@@ -25,7 +32,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
-    [SerializeField] private MonoBehaviour _skillComponent;
 
 
     private UnitBase _currentTarget;
@@ -41,13 +47,19 @@ public class HeroController : MobilityUnit, IBasicAttack
     private TickTimer _deployDelayTimer;
 
     private IHeroSkill _skill; //영웅별로 서로 다른 스킬을 처리하기 위한 스킬 인터페이스
-    private UnitBase _skillTarget;
+    private float _damageReductionRate = 0f;
 
     public float AttackPower => _attackPower;
     public float AttackSpeed => _attackSpeed;
     public float AttackRange => _attackRange;
     public UnitBase CurrentTarget => _currentTarget;
-    public UnitBase SkillTarget => _skillTarget;
+    public LayerMask AllyLayer
+    {
+        get
+        {
+            return team == Team.Blue ? LayerMask.GetMask("BlueTeam") : LayerMask.GetMask("RedTeam");
+        }
+    }
 
     private void Awake()
     {
@@ -88,6 +100,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         _isDeploying = false;
         _deployDelayTimer = default;
         //배치 직후 바로 타겟 탐색 가능하도록 초기화
+        agent.ResetPath();
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
     }
 
@@ -95,12 +108,35 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         base.Spawned();
 
-        if (!Object.HasStateAuthority) return;
+        unitType = UnitType.Hero;
+
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        if (agent != null)
+        {
+            agent.enabled = false;
+
+            // 스폰 위치가 네비 밖이거나 겹쳐있을 경우 보정
+            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+            {
+                transform.position = hit.position;
+            }
+
+            //나중에 영웅 크기 적용할것이라면...
+            
+            agent.enabled = true;
+            agent.ResetPath();
+        }
+
+        _damageReductionRate = 0f;
 
         _fsm = new UnitFSM();
 
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, _initSkillCooldown);
 
         CurrentState = UnitState.Idle;
     }
@@ -193,48 +229,41 @@ public class HeroController : MobilityUnit, IBasicAttack
             //함교가 존재하면 계속 전진
             if (_enemyBridge != null)
             {
-                CurrentState = UnitState.Move;
                 MoveTo(_enemyBridge.transform.position);
+                CurrentState = UnitState.Move;
             }
             else
             {
-                CurrentState = UnitState.Idle;
                 StopMove();
+                CurrentState = UnitState.Idle;
             }
 
             return;
         }
 
         //타겟이 있는 경우 해당 타겟을 향해 이동
-        CurrentState = UnitState.Move;
         MoveTo(_currentTarget.transform.position);
+        CurrentState = UnitState.Move;
     }
 
     private void HandleAttack()
     {
-        CurrentState = UnitState.Attack;
         StopMove();
         RotateToTarget();
+        CurrentState = UnitState.Attack;
         HandleCombat();
     }
 
     private void HandleSkill()
     {
-        CurrentState = UnitState.Skill;
         StopMove();
+        CurrentState = UnitState.Skill;
     }
 
     private void HandleCombat()
     {
-        if (_currentTarget == null || _currentTarget.IsDead)
+        if (TryUseSkill())
         {
-            return;
-        }
-
-        //스킬 시작 조건 판단
-        if (_fsm.State == UnitAIState.Attack && _skill != null && CanUseSkill() && _skill.CanUse(this))
-        {
-            StartSkill();//여기서 FSM 전환
             return;
         }
 
@@ -262,56 +291,39 @@ public class HeroController : MobilityUnit, IBasicAttack
         transform.rotation = targetRotation;
     }
 
-    private void StartSkill()
+    private bool TryUseSkill()
     {
-        _skillTarget = _currentTarget;
-        _fsm.EnterSkill(Runner, 0.15f);// FSM 상태 전환
+        if (_skill == null)
+            return false;
 
-        UseSkill();// 실제 효과
-    }
+        if (!_skillTimer.ExpiredOrNotRunning(Runner))
+            return false;
 
-    private void UseSkill()
-    {
-        if (_skillTarget == null || _skillTarget.IsDead)
+        if (!_skill.CanUse(this))
+            return false;
+
+        _fsm.EnterSkill(Runner, 0.15f);
+
+        bool success = _skill.Execute(this);
+        if (success)
         {
-            _skillTarget = null;
-            return;
+            _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
         }
 
-        CurrentState = UnitState.Skill;//애니메이션 연출등등
-        StopMove();
-        
-        _skill.Execute(this);
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
-
-        _skillTarget = null;
+        return success;
     }
-
-
-    private bool CanUseSkill()
-    {
-        return _skillTimer.ExpiredOrNotRunning(Runner);
-    }
-
-    //private bool IsSkillTargetInRange()
-    //{
-    //    if (_currentTarget == null)
-    //    {
-    //        return false;
-    //    }
-
-    //    float dist = Vector3.Distance(
-    //        transform.position,
-    //        _currentTarget.transform.position
-    //    );
-
-    //    return dist <= _skillRange;
-    //}
 
     private void TryAttack()
     {
-        if (!_attackTimer.ExpiredOrNotRunning(Runner)) return;
-        if (_currentTarget == null) return;
+        if (!_attackTimer.ExpiredOrNotRunning(Runner))
+        {
+            return;
+        }
+
+        if (_currentTarget == null)
+        {
+            return;
+        }
 
         // IBasicAttack 인터페이스 기본 구현 호출 (target.TakeDamage(AttackPower))
         if (_attackType == AttackType.Melee)
@@ -414,6 +426,46 @@ public class HeroController : MobilityUnit, IBasicAttack
         RPC_FireProjectile(targetPos);
     }
 
+    public override void TakeDamage(float amount)
+    {
+        if (_damageReductionRate > 0f)
+        {
+            amount *= (1f - _damageReductionRate);
+        }
+
+        base.TakeDamage(amount);
+    }
+
+    public void SetDamageReduction(float rate)
+    {
+        _damageReductionRate = Mathf.Clamp01(rate);
+    }
+
+    public void ClearDamageReduction()
+    {
+        _damageReductionRate = 0f;
+    }
+
+    public void HealUnit(UnitBase target, float healRatio)
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        if (target == null || target.IsDead)
+        {
+            return;
+        }
+
+        float healAmount = target.MaxHealth * Mathf.Clamp01(healRatio);
+
+        target.CurrentHealth = Mathf.Min(
+            target.CurrentHealth + healAmount,
+            target.MaxHealth
+        );
+    }
+
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_FireProjectile(Vector3 targetPos)
     {
@@ -427,19 +479,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         projectile.GetComponent<Projectile>()?.Fire(targetPos);
     }
 
-    //[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    //public void RPC_PlaySkillEffect(Vector3 position, float radius)
-    //{
-    //    if (_skillEffectPrefab == null)
-    //    {
-    //        return;
-    //    }
-
-    //    GameObject fx = Instantiate(_skillEffectPrefab, position, Quaternion.identity);
-    //    fx.GetComponent<AssaultSkill>()?.Play(radius);
-    //}
-
-    public void ForceStopMoveForSkill()//외부에서 스탑무브를 사용가능하도록
+    public void ForceStopMoveForSkill()//외부에서 StopMove를 사용가능하도록
     {
         StopMove();
     }
@@ -457,6 +497,8 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         _fsm?.ForceDead();
         StopMove();
+
+        ClearDamageReduction();
 
         // 목표 이벤트 구독 해제 후 부모 Die 호출 (Despawn)
         if (_currentTarget != null)
