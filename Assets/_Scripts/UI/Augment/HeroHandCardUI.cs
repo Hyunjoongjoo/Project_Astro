@@ -12,6 +12,7 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void Setup(AugmentData data)
     {
+        if (_iconImg == null) _iconImg = GetComponent<Image>();
         _data = data;
         _iconImg.sprite = data.icon;
         _mainCam = Camera.main;
