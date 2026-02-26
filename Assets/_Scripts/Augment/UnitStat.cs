@@ -109,4 +109,16 @@ public class UnitStat : MonoBehaviour
         }
     }
 
+    
+    //현재 최종 스탯 값 반환 메서드 (전투 데미지 계산, 스킬 쿨타임 로직 등에서 호출하기 위함)
+    public float GetStatValue(EffectType type)
+    {
+        if (_statMap.TryGetValue(type, out Stat stat))
+        {
+            //내부적으로 _isDirty 플래그를 체크하여 필요할 때만 재계산된 값을 반환
+            return stat.Value;
+        }
+        return 0f; //매핑되지 않은 스탯을 물어보면 0 반환
+        Debug.LogWarning("매핑 안 된 스탯임");
+    }
 }
