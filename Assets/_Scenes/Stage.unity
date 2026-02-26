@@ -9475,7 +9475,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc25583f41193f4a9e558c0d50f8ff2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardUI
-  _cardData: {fileID: 11400000, guid: a10b8df9e55537a42b6c688fe766e588, type: 2}
+  _cardData: {fileID: 11400000, guid: 2487ab5d605cac44da03f1fe969f2046, type: 2}
   _cardImg: {fileID: 1931262295}
 --- !u!114 &373121664
 MonoBehaviour:
@@ -10835,7 +10835,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc25583f41193f4a9e558c0d50f8ff2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardUI
-  _cardData: {fileID: 11400000, guid: 280d55599b26b614986de60c4a35df20, type: 2}
+  _cardData: {fileID: 11400000, guid: ce285f2be6356ec479332baca8440672, type: 2}
   _cardImg: {fileID: 1098804710}
 --- !u!114 &539131707
 MonoBehaviour:
@@ -59418,7 +59418,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc25583f41193f4a9e558c0d50f8ff2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardUI
-  _cardData: {fileID: 11400000, guid: 203d2494c00d5f846bd01bddeaab89d5, type: 2}
+  _cardData: {fileID: 11400000, guid: 604de1ea33d53b54dbfb5ab21ac024e8, type: 2}
   _cardImg: {fileID: 43688393}
 --- !u!114 &2038634439
 MonoBehaviour:
