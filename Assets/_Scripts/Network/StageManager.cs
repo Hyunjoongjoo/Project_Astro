@@ -9,6 +9,7 @@ public enum StageState
     AssigningTeams,       // 팀 배정 중
     ShowingPlayerInfo,    // 플레이어 정보 표시
     Countdown,            // 카운트다운
+    AugmentSelection,     // 증강 선택 단계
     Playing,              // 게임 진행 중
     GameOver              // 게임 종료
 }
@@ -22,6 +23,10 @@ public class StageManager : NetworkBehaviour
     // 플레이어별 팀 정보 (PlayerRef를 키로 사용)
     [Networked, Capacity(4)]
     public NetworkDictionary<PlayerRef, Team> PlayerTeams => default;
+
+    //플레이어별 증강 선택 완료 여부 추적용
+    [Networked, Capacity(4)]
+    private NetworkDictionary<PlayerRef, NetworkBool> _playerAugmentReady => default;
 
     [Networked, Capacity(2)]
     public NetworkDictionary<Team, int> AugmentExp => default;
@@ -190,16 +195,52 @@ public class StageManager : NetworkBehaviour
             }
             else
             {
-                // 게임 시작!
-                StartGame();
+                // 증강 선택 단계
+                EnterAugmentSelection();
             }
         }
+    }
+    private void EnterAugmentSelection()
+    {
+        if (Object.HasStateAuthority)
+        {
+            CurrentState = StageState.AugmentSelection;
+            // 모든 클라이언트에게 증강 UI를 띄우라고 알림
+            RPC_RequestAugmentSelection();
+        }
+    }
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_RequestAugmentSelection()
+    {
+        _stageUI.HideCountdown(); // 카운트다운 텍스트 숨기기
+
+        // 3장의 랜덤 카드를 뽑아 UI를 띄움
+        var options = AugmentManager.Instance.GetRandomAugments(AugmentType.Hero, 3);
+        AugmentManager.Instance.ShowAugmentWindow(options);
+
+        Debug.Log("[Stage] 증강 선택 시작!");
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_UpdateCountdown(int value)
     {
         _stageUI.UpdateCountdown(value);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_ReportAugmentComplete(PlayerRef player)
+    {
+        if (!_playerAugmentReady.ContainsKey(player))
+        {
+            _playerAugmentReady.Add(player, true);
+        }
+
+        // 모든 플레이어가 선택을 완료했는지 확인
+        if (_playerAugmentReady.Count == Runner.ActivePlayers.Count())
+        {
+            Debug.Log("모든 플레이어 증강 선택 완료. 게임을 시작합니다.");
+            StartGame();
+        }
     }
 
     private void StartGame()

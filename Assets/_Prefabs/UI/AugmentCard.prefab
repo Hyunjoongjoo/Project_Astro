@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2283405981279440640}
   - component: {fileID: 6553150027251201400}
+  - component: {fileID: 7748897822503748131}
   - component: {fileID: 6036715149321125062}
   - component: {fileID: 1448131494327005669}
   m_Layer: 5
@@ -50,6 +51,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 292972939330173462}
   m_CullTransparentMesh: 1
+--- !u!114 &7748897822503748131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 292972939330173462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587d505858fb79647baeff068a48453e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AugmentCardUI
+  _iconImg: {fileID: 1180228959813342069}
+  _nameTxt: {fileID: 6347664883886796998}
+  _descTxt: {fileID: 1780087356490952661}
+  _selectBtn: {fileID: 1448131494327005669}
 --- !u!114 &6036715149321125062
 MonoBehaviour:
   m_ObjectHideFlags: 0

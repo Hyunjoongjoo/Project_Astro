@@ -40,7 +40,6 @@ public class GameManager : Singleton<GameManager>
         switch (_currentState)
         {
             case GameState.Ready:
-                //증강 선택 UI같은거 띄우기
                 break;
             case GameState.Play:
                 //모든 로직 가동

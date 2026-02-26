@@ -291,7 +291,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         transform.rotation = targetRotation;
     }
 
-    private bool TryUseSkill()
+    private bool TryUseSkill()//스킬 쿨타임/조건 체크 후 스킬 실행 시도
     {
         if (_skill == null)
             return false;
@@ -408,7 +408,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         return distA <= distB ? _enemyTowerA : _enemyTowerB;
     }
 
- 
+    //Projectile 연출 및 기본 공격 데미지 적용
     private void AttackRanged(Vector3 targetPos)
     {
         if (_projectilePrefab == null || _firePoint == null)
@@ -421,9 +421,25 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        _currentTarget.TakeDamage(AttackPower);
+        ApplyBasicAttackDamage(_currentTarget);
 
         RPC_FireProjectile(targetPos);
+    }
+
+    //모든 기본 공격은 이 메서드를 통해 TakeDamage로 진입
+    private void ApplyBasicAttackDamage(UnitBase target)
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        if (target == null || target.IsDead)
+        {
+            return;
+        }
+
+        target.TakeDamage(_attackPower);
     }
 
     public override void TakeDamage(float amount)
@@ -466,6 +482,26 @@ public class HeroController : MobilityUnit, IBasicAttack
         );
     }
 
+    //포격형 전용 데미지 진입점
+    public void ApplyBarrageSkillDamage(UnitBase target, float damageRatio)
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        if (target == null || target.IsDead)
+        {
+            return;
+        }
+
+        float baseDamage = _attackPower;
+        float finalDamage = baseDamage * damageRatio;
+
+        target.TakeDamage(finalDamage);
+    }
+
+    //기본 공격 / 포격형 스킬 공통 투사체 연출
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_FireProjectile(Vector3 targetPos)
     {
