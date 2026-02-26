@@ -210,7 +210,7 @@ public class StageManager : NetworkBehaviour
         {
             Runner.Spawn(_minionSpawnerPrefab);
             CurrentState = StageState.Playing;
-            CountdownValue = GAME_DURATION + 1;
+            CountdownValue = GAME_DURATION;
             StateTimer = COUNTDOWN_INTERVAL;
         }
 
@@ -237,9 +237,10 @@ public class StageManager : NetworkBehaviour
             }
             else
             {
-                // 인게임 타이머 4분이 다 됨.
+                // 인게임 타이머 4분이 다 됨. 
                 // 시간 종료 시 승패 규칙에 따라 승패 RPC
-                // RPC_GameOver(Team.Blue);
+                // TODO : 일단 무승부로 처리. 추후 승패 판정 로직 추가
+                RPC_GameOver(Team.None);
             }
         }
     }
@@ -247,7 +248,7 @@ public class StageManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_UpdateStageTimer(int remainingSeconds)
     {
-        // _introUI.UpdateStageTimer(remainingSeconds); // UI 갱신
+        _stageUI.UpdateStageTimer(remainingSeconds); // UI 갱신
     }
 
     // =============== 여기부터 함교 파괴 감지 ~ 게임 종료 후 로비로 복귀까지 ===============

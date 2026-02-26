@@ -7,6 +7,7 @@ using TMPro;
 public class StageUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _textIndicator;
+    [SerializeField] private TextMeshProUGUI _gameTimer;
     public Button goLobbyBtn;
 
     private void Awake()
@@ -41,6 +42,13 @@ public class StageUI : MonoBehaviour
     {
         gameObject.SetActive(false);
         Debug.Log("카운트 다운 패널 숨김");
+    }
+
+    public void UpdateStageTimer(int timeSeconds)
+    {
+        int minute = timeSeconds / 60;
+        int second = timeSeconds % 60;
+        _gameTimer.text = $"{minute} : {second:D2}";
     }
 
     public void ShowResultPanel(bool isVictory)
