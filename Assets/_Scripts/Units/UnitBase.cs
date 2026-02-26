@@ -93,6 +93,9 @@ public abstract class UnitBase : NetworkBehaviour
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlaySfx(SfxList.DestroySound);
 
+        if (Object.HasStateAuthority == true)
+            ObjectContainer.Instance.IncreaseAugmentGauge(team, unitType);
+
         Runner.Despawn(selfNetworkObj);
     }
 }

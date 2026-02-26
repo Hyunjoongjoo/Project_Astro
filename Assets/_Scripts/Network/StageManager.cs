@@ -23,6 +23,9 @@ public class StageManager : NetworkBehaviour
     [Networked, Capacity(4)]
     public NetworkDictionary<PlayerRef, Team> PlayerTeams => default;
 
+    [Networked, Capacity(2)]
+    public NetworkDictionary<Team, int> AugmentExp => default;
+
     [SerializeField] private NetworkPrefabRef _minionSpawnerPrefab;
 
     ObjectContainer _objectContainer;
@@ -54,6 +57,7 @@ public class StageManager : NetworkBehaviour
     {
         GameManager.Instance.ChangeState(GameState.Ready);
         _objectContainer = ObjectContainer.Instance;
+        _objectContainer.OnIncreasedAugmentGauge += UpdateAugmentGauge;
 
         // 권한 확인. PhotonView.IsMine과 비슷한 쓰임
         // 즉, 이전에 이 StageManager를 스폰한 애가 마스터 클라이언트니까
@@ -117,6 +121,10 @@ public class StageManager : NetworkBehaviour
 
         for (int i = half; i < players.Count; i++)
             PlayerTeams.Add(players[i], Team.Red);
+
+        // 팀 자원인 증강 게이지도 추가함.
+        AugmentExp.Add(Team.Blue, 0);
+        AugmentExp.Add(Team.Red, 0);
 
         // RPC로 모든 클라이언트에 팀 배정 알림
         RPC_NotifyTeamAssignment();
@@ -257,6 +265,15 @@ public class StageManager : NetworkBehaviour
         _stageUI.UpdateStageTimer(remainingSeconds); // UI 갱신
     }
 
+    private void UpdateAugmentGauge(Team team, int amount)
+    {
+        if ( AugmentExp.TryGet(team, out int curExp) )
+            AugmentExp.Set(team, curExp + amount);
+
+        else
+            Debug.LogError("증강 게이지 증가 실패");
+    }
+
     // =============== 여기부터 함교 파괴 감지 ~ 게임 종료 후 로비로 복귀까지 ===============
     private void BridgeDestroyed(UnitBase unit)
     {
@@ -265,7 +282,8 @@ public class StageManager : NetworkBehaviour
 
         _objectContainer.blueSideStructure[_objectContainer.BridgeIndex].OnDeath -= BridgeDestroyed;
         _objectContainer.redSideStructure[_objectContainer.BridgeIndex].OnDeath -= BridgeDestroyed;
-        Debug.Log("브릿지 파괴 메서드 구독 제거 완료");
+        _objectContainer.OnIncreasedAugmentGauge -= UpdateAugmentGauge;
+        Debug.Log("각종 이벤트 구독 제거 완료");
 
         // 브릿지가 파괴된 팀의 반대 팀이 승리 팀
         Team victory = unit.team == Team.Blue ? Team.Red : Team.Blue;
