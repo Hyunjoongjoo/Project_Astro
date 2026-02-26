@@ -270,7 +270,7 @@ public class StageManager : NetworkBehaviour
         if ( AugmentExp.TryGet(team, out int curExp) )
         {
             int value = AugmentExp.Set(team, curExp + amount);
-            RPC_UpdateAugmentGauge(value);
+            RPC_UpdateAugmentGauge(team, value);
         }
 
         else
@@ -282,7 +282,7 @@ public class StageManager : NetworkBehaviour
         if (AugmentExp.TryGet(team, out int curExp))
         {
             int value = AugmentExp.Set(team, curExp - amount);
-            RPC_UpdateAugmentGauge(value);
+            RPC_UpdateAugmentGauge(team, value);
         }
 
         else
@@ -290,9 +290,11 @@ public class StageManager : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_UpdateAugmentGauge(int value)
+    private void RPC_UpdateAugmentGauge(Team team, int value)
     {
-        _stageUI.UpdateAugmentGauge(value); // UI 갱신
+        Team myTeam = PlayerTeams.Get(Runner.LocalPlayer);
+        if (myTeam == team)
+            _stageUI.UpdateAugmentGauge(value); // UI 갱신
     }
 
     // =============== 여기부터 함교 파괴 감지 ~ 게임 종료 후 로비로 복귀까지 ===============
