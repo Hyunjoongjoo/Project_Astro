@@ -8,6 +8,7 @@ public class StageUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _textIndicator;
     [SerializeField] private TextMeshProUGUI _gameTimer;
+    [SerializeField] private Slider _augmentGauge;
     public Button goLobbyBtn;
 
     private void Awake()
@@ -49,6 +50,11 @@ public class StageUI : MonoBehaviour
         int minute = timeSeconds / 60;
         int second = timeSeconds % 60;
         _gameTimer.text = $"{minute} : {second:D2}";
+    }
+
+    public void UpdateAugmentGauge(int value)
+    {
+        _augmentGauge.value = value;
     }
 
     public void ShowResultPanel(bool isVictory)

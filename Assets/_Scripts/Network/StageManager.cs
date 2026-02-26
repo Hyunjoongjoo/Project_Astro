@@ -23,6 +23,9 @@ public class StageManager : NetworkBehaviour
     [Networked, Capacity(4)]
     public NetworkDictionary<PlayerRef, Team> PlayerTeams => default;
 
+    [Networked, Capacity(2)]
+    public NetworkDictionary<Team, int> AugmentExp => default;
+
     [SerializeField] private NetworkPrefabRef _minionSpawnerPrefab;
 
     ObjectContainer _objectContainer;
@@ -41,7 +44,7 @@ public class StageManager : NetworkBehaviour
         _mainCamera = Camera.main;
         _stageUI = FindFirstObjectByType<StageUI>();
         if (_stageUI == null)
-            Debug.Log("인트로 UI 찾지 못함");
+            Debug.Log("스테이지 UI 찾지 못함");
     }
 
     public void Initialize(MatchType matchType, int requiredPlayerCount)
@@ -54,6 +57,7 @@ public class StageManager : NetworkBehaviour
     {
         GameManager.Instance.ChangeState(GameState.Ready);
         _objectContainer = ObjectContainer.Instance;
+        _objectContainer.OnIncreasedAugmentGauge += IncreaseAugmentGauge;
 
         // 권한 확인. PhotonView.IsMine과 비슷한 쓰임
         // 즉, 이전에 이 StageManager를 스폰한 애가 마스터 클라이언트니까
@@ -117,6 +121,10 @@ public class StageManager : NetworkBehaviour
 
         for (int i = half; i < players.Count; i++)
             PlayerTeams.Add(players[i], Team.Red);
+
+        // 팀 자원인 증강 게이지도 추가함.
+        AugmentExp.Add(Team.Blue, 0);
+        AugmentExp.Add(Team.Red, 0);
 
         // RPC로 모든 클라이언트에 팀 배정 알림
         RPC_NotifyTeamAssignment();
@@ -208,15 +216,21 @@ public class StageManager : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
-            Runner.Spawn(_minionSpawnerPrefab);
-            CurrentState = StageState.Playing;
-            CountdownValue = GAME_DURATION;
-            StateTimer = COUNTDOWN_INTERVAL;
+            // 게임 시작 직전 초기화할 것들 (마스터가 대표로)
+            InitializeBeforeStartGame();
         }
 
         _stageUI.HideCountdown();
         GameManager.Instance.ChangeState(GameState.Play);
         Debug.Log("게임 시작!");
+    }
+
+    private void InitializeBeforeStartGame()
+    {
+        Runner.Spawn(_minionSpawnerPrefab);
+        CurrentState = StageState.Playing;
+        CountdownValue = GAME_DURATION;
+        StateTimer = COUNTDOWN_INTERVAL;
     }
 
     // =============== 여기부터 게임 시작 후 타이머 가동 ===============
@@ -251,6 +265,36 @@ public class StageManager : NetworkBehaviour
         _stageUI.UpdateStageTimer(remainingSeconds); // UI 갱신
     }
 
+    private void IncreaseAugmentGauge(Team team, int amount)
+    {
+        if ( AugmentExp.TryGet(team, out int curExp) )
+        {
+            int value = AugmentExp.Set(team, curExp + amount);
+            RPC_UpdateAugmentGauge(value);
+        }
+
+        else
+            Debug.LogError("증강 게이지 증가 실패");
+    }
+
+    private void DecreaseAugmentGauge(Team team, int amount)
+    {
+        if (AugmentExp.TryGet(team, out int curExp))
+        {
+            int value = AugmentExp.Set(team, curExp - amount);
+            RPC_UpdateAugmentGauge(value);
+        }
+
+        else
+            Debug.LogError("증강 게이지 감소 실패");
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_UpdateAugmentGauge(int value)
+    {
+        _stageUI.UpdateAugmentGauge(value); // UI 갱신
+    }
+
     // =============== 여기부터 함교 파괴 감지 ~ 게임 종료 후 로비로 복귀까지 ===============
     private void BridgeDestroyed(UnitBase unit)
     {
@@ -259,7 +303,8 @@ public class StageManager : NetworkBehaviour
 
         _objectContainer.blueSideStructure[_objectContainer.BridgeIndex].OnDeath -= BridgeDestroyed;
         _objectContainer.redSideStructure[_objectContainer.BridgeIndex].OnDeath -= BridgeDestroyed;
-        Debug.Log("브릿지 파괴 메서드 구독 제거 완료");
+        _objectContainer.OnIncreasedAugmentGauge -= IncreaseAugmentGauge;
+        Debug.Log("각종 이벤트 구독 제거 완료");
 
         // 브릿지가 파괴된 팀의 반대 팀이 승리 팀
         Team victory = unit.team == Team.Blue ? Team.Red : Team.Blue;
