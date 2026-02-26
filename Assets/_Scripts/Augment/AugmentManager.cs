@@ -66,7 +66,11 @@ public class AugmentManager : Singleton<AugmentManager>
         UIManager.Instance.CloseTopPopup();
 
         // 선택 완료 후 게임 상태 전환
-        GameManager.Instance.OnAugmentSelectionComplete();
+        var stageManager = Object.FindFirstObjectByType<StageManager>();
+        if (stageManager != null)
+        {
+            stageManager.RPC_ReportAugmentComplete(stageManager.Runner.LocalPlayer);
+        }
     }
 
     //하단 UI패널에 영웅 카드 추가
