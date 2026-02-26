@@ -41,7 +41,7 @@ public class StageManager : NetworkBehaviour
         _mainCamera = Camera.main;
         _stageUI = FindFirstObjectByType<StageUI>();
         if (_stageUI == null)
-            Debug.Log("인트로 UI 찾지 못함");
+            Debug.Log("스테이지 UI 찾지 못함");
     }
 
     public void Initialize(MatchType matchType, int requiredPlayerCount)
@@ -208,15 +208,21 @@ public class StageManager : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
-            Runner.Spawn(_minionSpawnerPrefab);
-            CurrentState = StageState.Playing;
-            CountdownValue = GAME_DURATION;
-            StateTimer = COUNTDOWN_INTERVAL;
+            // 게임 시작 직전 초기화할 것들 (마스터가 대표로)
+            InitializeBeforeStartGame();
         }
 
         _stageUI.HideCountdown();
         GameManager.Instance.ChangeState(GameState.Play);
         Debug.Log("게임 시작!");
+    }
+
+    private void InitializeBeforeStartGame()
+    {
+        Runner.Spawn(_minionSpawnerPrefab);
+        CurrentState = StageState.Playing;
+        CountdownValue = GAME_DURATION;
+        StateTimer = COUNTDOWN_INTERVAL;
     }
 
     // =============== 여기부터 게임 시작 후 타이머 가동 ===============

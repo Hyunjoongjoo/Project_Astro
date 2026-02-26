@@ -8,6 +8,7 @@ public class StageUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _textIndicator;
     [SerializeField] private TextMeshProUGUI _gameTimer;
+    [SerializeField] private Slider _augmentGauge;
     public Button goLobbyBtn;
 
     private void Awake()

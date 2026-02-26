@@ -82,19 +82,16 @@ public abstract class UnitBase : NetworkBehaviour
 
     public virtual void Die()
     {
-        if (IsDead)
-        {
-            return;
-        }
+        if (IsDead) return;
 
         IsDead = true;
 
         CurrentState = UnitState.Dead;
         OnDeath?.Invoke(this);
-        Runner.Despawn(selfNetworkObj);
+
         if (AudioManager.Instance != null)
-        {
             AudioManager.Instance.PlaySfx(SfxList.DestroySound);
-        }
+
+        Runner.Despawn(selfNetworkObj);
     }
 }
