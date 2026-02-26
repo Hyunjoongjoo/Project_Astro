@@ -501,6 +501,7 @@ GameObject:
   - component: {fileID: 8779724000700933737}
   - component: {fileID: 1286710755949793987}
   - component: {fileID: 5106166068817242912}
+  - component: {fileID: 8345162342218717666}
   - component: {fileID: 2564167791635826302}
   - component: {fileID: -6791266335917339417}
   - component: {fileID: -5489522264367414398}
@@ -621,6 +622,7 @@ MonoBehaviour:
   maxHealth: 100
   deffense: 0
   team: 0
+  _IsDead: 0
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 8779724000700933737}
@@ -640,7 +642,7 @@ MonoBehaviour:
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
-  _skillComponent: {fileID: 0}
+  _skillComponent: {fileID: 8345162342218717666}
 --- !u!114 &5106166068817242912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -653,6 +655,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e06afd8dba25da47828c557178535da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitStat
+--- !u!114 &8345162342218717666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2207229902267668355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5caafbcf88fd95c489fac2a4a8c32240, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SupportSkill
+  _healRatio: 0.5
+  _healRange: 5
+  _healEffectPrefab: {fileID: 3479278419723618712, guid: 6135948fdbd8dbc498c368cf6640858f, type: 3}
+  _effectLifeTime: 0.6
 --- !u!114 &2564167791635826302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -671,6 +689,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1286710755949793987}
+  - {fileID: 8345162342218717666}
   - {fileID: -5489522264367414398}
   ForceRemoteRenderTimeframe: 0
 --- !u!136 &-6791266335917339417

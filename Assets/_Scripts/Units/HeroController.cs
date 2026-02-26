@@ -1,7 +1,7 @@
 ﻿using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
-using static UnityEngine.UI.Image;
+
 
 public class HeroController : MobilityUnit, IBasicAttack
 {
@@ -50,6 +50,13 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float AttackRange => _attackRange;
     public UnitBase CurrentTarget => _currentTarget;
     public UnitBase SkillTarget => _skillTarget;
+    public LayerMask AllyLayer
+    {
+        get
+        {
+            return team == Team.Blue ? LayerMask.GetMask("BlueUnit") : LayerMask.GetMask("RedUnit");
+        }
+    }
 
     private void Awake()
     {
@@ -412,12 +419,6 @@ public class HeroController : MobilityUnit, IBasicAttack
             amount *= (1f - _damageReductionRate);
         }
 
-#if UNITY_EDITOR
-        Debug.Log(
-            $"[Damage] {name} | original={original}, reduced={amount}, rate={_damageReductionRate}"
-        );
-#endif
-
         base.TakeDamage(amount);
     }
 
@@ -429,6 +430,26 @@ public class HeroController : MobilityUnit, IBasicAttack
     public void ClearDamageReduction()
     {
         _damageReductionRate = 0f;
+    }
+
+    public void HealUnit(UnitBase target, float healRatio)
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        if (target == null || target.IsDead)
+        {
+            return;
+        }
+
+        float healAmount = target.MaxHealth * Mathf.Clamp01(healRatio);
+
+        target.CurrentHealth = Mathf.Min(
+            target.CurrentHealth + healAmount,
+            target.MaxHealth
+        );
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

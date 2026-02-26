@@ -9,7 +9,7 @@ public abstract class UnitBase : NetworkBehaviour
     [SerializeField] protected float maxHealth;
     [SerializeField] protected float deffense;
 
-    protected float currentHealth;
+    //protected float currentHealth;
 
     // 미니언이 죽었을 때 경험치 증가
     // 서브 타워 파괴시 미니언 웨이브 강화
@@ -20,8 +20,9 @@ public abstract class UnitBase : NetworkBehaviour
 
     public Team team;
 
-    public bool IsDead { get; private set; }
-
+    public float MaxHealth => maxHealth;
+    public UnitType UnitType => unitType;
+    [Networked, HideInInspector] public bool IsDead { get; private set; }
     [Networked, HideInInspector] public float CurrentHealth { get; set; }
     [Networked, HideInInspector] public UnitState CurrentState { get; set; }
 
@@ -33,7 +34,7 @@ public abstract class UnitBase : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             selfNetworkObj = GetComponent<NetworkObject>();
-            currentHealth = maxHealth;
+            CurrentHealth = maxHealth;
             IsDead = false;
         }
     }
@@ -49,9 +50,9 @@ public abstract class UnitBase : NetworkBehaviour
             return;
         }
 
-        currentHealth -= amount;
+        CurrentHealth -= amount;
 
-        if (currentHealth < 1)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
+        if (CurrentHealth < 1)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
         {
             Die();
         }
