@@ -4,7 +4,7 @@ using DG.Tweening;
 using TMPro;
 
 // Stage 씬 인게임 시퀀스에 쓰이는 UI들을 제어하는 클래스
-public class StageIntroUI : MonoBehaviour
+public class StageUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _textIndicator;
     public Button goLobbyBtn;
