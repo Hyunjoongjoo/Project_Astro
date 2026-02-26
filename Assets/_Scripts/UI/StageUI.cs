@@ -52,6 +52,11 @@ public class StageUI : MonoBehaviour
         _gameTimer.text = $"{minute} : {second:D2}";
     }
 
+    public void UpdateAugmentGauge(int value)
+    {
+        _augmentGauge.value = value;
+    }
+
     public void ShowResultPanel(bool isVictory)
     {
         _textIndicator.text = isVictory ? "승리" : "패배";

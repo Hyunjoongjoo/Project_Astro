@@ -57,7 +57,7 @@ public class StageManager : NetworkBehaviour
     {
         GameManager.Instance.ChangeState(GameState.Ready);
         _objectContainer = ObjectContainer.Instance;
-        _objectContainer.OnIncreasedAugmentGauge += UpdateAugmentGauge;
+        _objectContainer.OnIncreasedAugmentGauge += IncreaseAugmentGauge;
 
         // 권한 확인. PhotonView.IsMine과 비슷한 쓰임
         // 즉, 이전에 이 StageManager를 스폰한 애가 마스터 클라이언트니까
@@ -265,13 +265,34 @@ public class StageManager : NetworkBehaviour
         _stageUI.UpdateStageTimer(remainingSeconds); // UI 갱신
     }
 
-    private void UpdateAugmentGauge(Team team, int amount)
+    private void IncreaseAugmentGauge(Team team, int amount)
     {
         if ( AugmentExp.TryGet(team, out int curExp) )
-            AugmentExp.Set(team, curExp + amount);
+        {
+            int value = AugmentExp.Set(team, curExp + amount);
+            RPC_UpdateAugmentGauge(value);
+        }
 
         else
             Debug.LogError("증강 게이지 증가 실패");
+    }
+
+    private void DecreaseAugmentGauge(Team team, int amount)
+    {
+        if (AugmentExp.TryGet(team, out int curExp))
+        {
+            int value = AugmentExp.Set(team, curExp - amount);
+            RPC_UpdateAugmentGauge(value);
+        }
+
+        else
+            Debug.LogError("증강 게이지 감소 실패");
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_UpdateAugmentGauge(int value)
+    {
+        _stageUI.UpdateAugmentGauge(value); // UI 갱신
     }
 
     // =============== 여기부터 함교 파괴 감지 ~ 게임 종료 후 로비로 복귀까지 ===============
@@ -282,7 +303,7 @@ public class StageManager : NetworkBehaviour
 
         _objectContainer.blueSideStructure[_objectContainer.BridgeIndex].OnDeath -= BridgeDestroyed;
         _objectContainer.redSideStructure[_objectContainer.BridgeIndex].OnDeath -= BridgeDestroyed;
-        _objectContainer.OnIncreasedAugmentGauge -= UpdateAugmentGauge;
+        _objectContainer.OnIncreasedAugmentGauge -= IncreaseAugmentGauge;
         Debug.Log("각종 이벤트 구독 제거 완료");
 
         // 브릿지가 파괴된 팀의 반대 팀이 승리 팀
