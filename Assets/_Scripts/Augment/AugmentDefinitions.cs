@@ -1,17 +1,17 @@
-using System;
+﻿using System;
 
 //CSV 데이터는 TableEnums 에 정의
 
 //여긴 인게임 연산 로직, 데이터 전송 받을 객체만 정의
 
 //증강 타입
-public enum AugmentType
-{
-    None = 0,
-    Unlock = 1, //기체 해금
-    Skill = 2,  //스킬 강화
-    Item = 3    //아이템 장착
-}
+//public enum AugmentType
+//{
+//    None = 0,
+//    Unlock = 1, //기체 해금
+//    Skill = 2,  //스킬 강화
+//    Item = 3    //아이템 장착
+//}
 
 //임시
 //영웅의 기본 스탯 + 각 유저의 성장치를 합친 결과물

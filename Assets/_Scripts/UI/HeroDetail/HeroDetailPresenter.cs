@@ -41,7 +41,7 @@ public class HeroDetailPresenter : MonoBehaviour
         _userHeroData = UserDataManager.Instance.HeroesModel.Find(h => h.heroId == _heroData.id);
         if (_userHeroData == null) return;
 
-        //리프레시할 때마다 버튼 이벤트를 새로 연결합니다.
+        //리프레시할 때마다 버튼 이벤트를 새로 연결
         _view.UpgradeBtn.onClick.RemoveAllListeners();
         _view.UpgradeBtn.onClick.AddListener(HandleUpgradeAction);
 
@@ -81,14 +81,14 @@ public class HeroDetailPresenter : MonoBehaviour
 
     private async void HandleUpgradeAction()
     {
-        // 프리팹 자체가 null인지 먼저 체크 (인스펙터 할당 문제 확인용)
+        // 프리팹 자체가 null인지 먼저 체크
         if (_confirmPopupPrefab == null)
         {
             Debug.LogError("Presenter에 _confirmPopupPrefab이 할당되지 않았습니다!");
             return;
         }
 
-        // 클릭 시점에 최신 데이터를 다시 확인 (NullReference 방지)
+        // 클릭 시점에 최신 데이터를 다시 확인
         _userHeroData = UserDataManager.Instance.HeroesModel.Find(h => h.heroId == _heroData.id);
         if (_userHeroData == null) return;
 
