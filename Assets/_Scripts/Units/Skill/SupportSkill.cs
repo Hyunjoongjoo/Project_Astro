@@ -17,31 +17,34 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
         return FindHealTarget(caster) != null;
     }
 
-    public void Execute(HeroController caster)
+    public bool Execute(HeroController caster)
     {
         if (!caster.Object.HasStateAuthority)
         {
-            return;
+            return false;
         }
 
         UnitBase target = FindHealTarget(caster);
         if (target == null)
         {
-            return;
+            return false;
         }
+
+        float before = target.CurrentHealth;
 
         caster.HealUnit(target, _healRatio);
 
+        float after = target.CurrentHealth;
+        float healed = after - before;
+
         RPC_PlayHealEffect(target.Object.Id);
+
+        return true;
     }
 
     private UnitBase FindHealTarget(HeroController caster)
     {
-        Collider[] hits = Physics.OverlapSphere(
-            caster.transform.position,
-            _healRange,
-            caster.AllyLayer
-        );
+        Collider[] hits = Physics.OverlapSphere(caster.transform.position, _healRange, caster.AllyLayer);
 
         UnitBase best = null;
         float bestDist = float.MaxValue;
@@ -54,7 +57,7 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
                 continue;
             }
 
-            if (unit.UnitType != UnitType.Hero && unit.UnitType != UnitType.Minion)
+            if (unit.UnitType != UnitType.Hero)
             {
                 continue;
             }
@@ -102,7 +105,7 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
         );
 
         effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(1f, 0.2f).SetEase(Ease.OutBack);
+        effects.transform.DOScale(2f, 0.2f).SetEase(Ease.OutBack);
 
         Destroy(effects, _effectLifeTime);
     }

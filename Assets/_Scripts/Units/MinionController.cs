@@ -57,6 +57,8 @@ public class MinionController : MobilityUnit, IBasicAttack
     {
         base.Spawned();
 
+        unitType = UnitType.Minion;
+
         if (!Object.HasStateAuthority) return;
 
         _fsm = new UnitFSM();

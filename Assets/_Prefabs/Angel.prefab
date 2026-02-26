@@ -506,7 +506,7 @@ GameObject:
   - component: {fileID: -6791266335917339417}
   - component: {fileID: -5489522264367414398}
   m_Layer: 6
-  m_Name: Hero3
+  m_Name: Angel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -595,7 +595,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 6.4798117
-  m_Speed: 8
+  m_Speed: 6.5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -622,12 +622,11 @@ MonoBehaviour:
   maxHealth: 100
   deffense: 0
   team: 0
-  _IsDead: 0
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 8779724000700933737}
   _moveSpeed: 6.5
-  _searchRange: 5
+  _searchRange: 7
   _targetLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -635,14 +634,15 @@ MonoBehaviour:
   _attackPower: 10
   _attackSpeed: 0.8
   _attackRange: 4
-  _skillCooldown: 8
+  _initSkillCooldown: 5
+  _skillCooldown: 10
+  _skillComponent: {fileID: 8345162342218717666}
   _attackType: 1
   _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
   _firePoint: {fileID: 4179351352739521411}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
-  _skillComponent: {fileID: 8345162342218717666}
 --- !u!114 &5106166068817242912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -668,7 +668,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SupportSkill
   _healRatio: 0.5
-  _healRange: 5
+  _healRange: 7
   _healEffectPrefab: {fileID: 3479278419723618712, guid: 6135948fdbd8dbc498c368cf6640858f, type: 3}
   _effectLifeTime: 0.6
 --- !u!114 &2564167791635826302

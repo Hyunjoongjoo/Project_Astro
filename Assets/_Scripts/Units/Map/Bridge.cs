@@ -30,6 +30,8 @@ public class Bridge : Structure, IBasicAttack, ITargetFinder
     {
         base.Spawned();
 
+        unitType = UnitType.Bridge;
+
         if (!Object.HasStateAuthority)
         {
             return;

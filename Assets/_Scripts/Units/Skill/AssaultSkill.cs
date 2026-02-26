@@ -29,17 +29,17 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
         return dist <= caster.SearchRange;//강습에 맞게 스킬 자체는 탐지범위에 걸리면 시전하도록
     }
 
-    public void Execute(HeroController caster)
+    public bool Execute(HeroController caster)
     {
         if (!caster.Object.HasStateAuthority)
         {
-            return;
+            return false;
         }
 
-        UnitBase target = caster.SkillTarget;
-        if (target == null)
+        UnitBase target = GetAssaultBaseTarget(caster);
+        if (target == null || target.IsDead)
         {
-            return;
+            return false;
         }
 
         //워프 위치 계산 (타겟 정중앙)
@@ -57,12 +57,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
         foreach (var hit in hits)
         {
             UnitBase unit = hit.GetComponent<UnitBase>();
-            if (unit == null)
-            {
-                continue;
-            }
-
-            if (unit.IsDead)
+            if (unit == null || unit.IsDead)
             {
                 continue;
             }
@@ -73,12 +68,25 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
 
         //이펙트
         RPC_PlayEffect(warpPos);
+
+        return true;
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_PlayEffect(Vector3 position)
     {
         PlayEffect(position);
+    }
+
+    private UnitBase GetAssaultBaseTarget(HeroController caster)
+    {
+        //현재 전투 타겟 우선
+        if (caster.CurrentTarget != null && !caster.CurrentTarget.IsDead)
+        {
+            return caster.CurrentTarget;
+        }
+
+        return null;
     }
 
     private void PlayEffect(Vector3 position)

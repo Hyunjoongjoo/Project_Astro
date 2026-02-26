@@ -370,7 +370,7 @@ GameObject:
   - component: {fileID: 479350263834020189}
   - component: {fileID: -3041197003229238917}
   m_Layer: 6
-  m_Name: Hero1
+  m_Name: Corsair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -490,7 +490,7 @@ MonoBehaviour:
   _CurrentState: 0
   agent: {fileID: 1555341712732983471}
   _moveSpeed: 8
-  _searchRange: 5
+  _searchRange: 6
   _targetLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -498,14 +498,15 @@ MonoBehaviour:
   _attackPower: 15
   _attackSpeed: 1.5
   _attackRange: 2
-  _skillCooldown: 5
+  _initSkillCooldown: 2
+  _skillCooldown: 4
+  _skillComponent: {fileID: 5510236954846484131}
   _attackType: 1
   _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
   _firePoint: {fileID: 533690703149539074}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
-  _skillComponent: {fileID: 5510236954846484131}
 --- !u!114 &250558184794622207
 MonoBehaviour:
   m_ObjectHideFlags: 0

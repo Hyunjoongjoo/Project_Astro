@@ -22,7 +22,7 @@ public abstract class UnitBase : NetworkBehaviour
 
     public float MaxHealth => maxHealth;
     public UnitType UnitType => unitType;
-    [Networked, HideInInspector] public bool IsDead { get; private set; }
+    public bool IsDead { get; private set; }
     [Networked, HideInInspector] public float CurrentHealth { get; set; }
     [Networked, HideInInspector] public UnitState CurrentState { get; set; }
 

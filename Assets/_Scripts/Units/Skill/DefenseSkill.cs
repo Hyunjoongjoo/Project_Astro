@@ -20,22 +20,24 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
         return !_isActive;
     }
 
-    public void Execute(HeroController caster)
+    public bool Execute(HeroController caster)
     {
         if (!caster.Object.HasStateAuthority)
         {
-            return;
+            return false;
         }
 
         if (_isActive)
         {
-            return;
+            return false;
         }
 
         _caster = caster;
 
         ActivateDefense();
         RPC_PlayEffect(caster.Object.Id);
+
+        return true;
     }
 
     public override void FixedUpdateNetwork()
