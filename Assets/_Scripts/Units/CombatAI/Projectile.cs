@@ -9,6 +9,9 @@ public class Projectile : MonoBehaviour
     {
         ApplyTeamColor(team);
 
+        Vector3 dir = (targetPos - transform.position).normalized;
+        transform.up = dir;
+
         transform.DOMove(targetPos, 0.18f).SetEase(Ease.Linear).OnComplete(OnHit);
 
         if (AudioManager.Instance != null)

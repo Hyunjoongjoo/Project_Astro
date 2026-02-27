@@ -536,7 +536,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AssaultSkill
   _radius: 3
   _damageMultiplier: 1
-  _effectPrefab: {fileID: 3479278419723618712, guid: 57ad495f540b7f041a731fb9173f13cf, type: 3}
+  _effectPrefab: {fileID: 6393617126741755569, guid: 19138c6e05c43fe46a292e5d6d939efa, type: 3}
   _effectScaleTime: 0.25
 --- !u!114 &1679591168465454536
 MonoBehaviour:
