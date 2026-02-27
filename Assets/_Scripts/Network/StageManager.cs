@@ -174,6 +174,7 @@ public class StageManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_HidePlayerInfo()
     {
+        // TODO: 플레이어 인포 숨기고 카운트다운이 아닌 증강 선택을 함.
         _stageUI.HidePlayerInfo();
         _stageUI.ShowCountdown(3);
     }
