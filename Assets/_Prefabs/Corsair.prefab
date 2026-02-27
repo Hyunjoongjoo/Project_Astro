@@ -502,11 +502,13 @@ MonoBehaviour:
   _skillCooldown: 4
   _skillComponent: {fileID: 5510236954846484131}
   _attackType: 1
+  _heroSize: 0
   _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
   _firePoint: {fileID: 533690703149539074}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
+  _summonCooldown: 6
 --- !u!114 &250558184794622207
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -32,6 +32,8 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
+    [Header("영웅 소환 쿨다운")]
+    [SerializeField] private float _summonCooldown;
 
 
     private UnitBase _currentTarget;
@@ -53,6 +55,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float AttackSpeed => _attackSpeed;
     public float AttackRange => _attackRange;
     public UnitBase CurrentTarget => _currentTarget;
+    public float SummonCooldown => _summonCooldown;
     public LayerMask AllyLayer
     {
         get

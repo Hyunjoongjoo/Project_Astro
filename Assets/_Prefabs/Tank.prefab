@@ -585,6 +585,7 @@ MonoBehaviour:
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
+  _summonCooldown: 13
 --- !u!114 &707048002635603553
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -11,9 +11,16 @@ public class HeroSpawner : NetworkBehaviour
     [SerializeField] private float _minDeployDistance = 1f;
     [SerializeField] private float _maxDeployDistance = 15f;
 
+    [Networked, HideInInspector] private TickTimer _summonTimer { get; set; }
+
     public override void Spawned()
     {
         Instance = this;
+    }
+
+    public bool CanSummon()
+    {
+        return _summonTimer.ExpiredOrNotRunning(Runner);
     }
 
     public bool CanDeployHero(Vector3 spawnPos, Team team)//해당 위치에 영웅 배치가 가능한지 검사
@@ -57,12 +64,28 @@ public class HeroSpawner : NetworkBehaviour
         return Mathf.Lerp(_minDeployTime, _maxDeployTime, time);
     }
 
+    private void StartSummonCooldown(float cooldown)
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        _summonTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_SpawnUnit(NetworkPrefabRef prefab, Vector3 spawnPos, Team team)
     {
-
         if (prefab == default)
+        {
             return;
+        }
+
+        if (!CanSummon())
+        {
+            return;
+        }
 
         if (!CanDeployHero(spawnPos, team))
         {
@@ -84,6 +107,7 @@ public class HeroSpawner : NetworkBehaviour
                 hero.Setup(team);
                 //배치 및 지연 처리는 컨트롤러가 수행
                 hero.BeginDeploy(spawnPos, deployDelay);
+                StartSummonCooldown(hero.SummonCooldown);
             });
 
         Debug.Log($"영웅 소환 완료!");
