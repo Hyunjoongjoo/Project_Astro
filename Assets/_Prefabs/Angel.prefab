@@ -595,7 +595,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 6.4798117
-  m_Speed: 6.5
+  m_Speed: 6
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -625,14 +625,14 @@ MonoBehaviour:
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 8779724000700933737}
-  _moveSpeed: 6.5
+  _moveSpeed: 6
   _searchRange: 7
   _targetLayer:
     serializedVersion: 2
     m_Bits: 0
   _searchInterval: 0.3
   _attackPower: 10
-  _attackSpeed: 0.8
+  _attackSpeed: 1
   _attackRange: 3
   _skillRange: 3
   _initSkillCooldown: 5

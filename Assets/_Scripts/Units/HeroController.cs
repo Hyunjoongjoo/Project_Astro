@@ -14,9 +14,9 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private float _attackRange = 2f;
 
     [Header("스킬 스테이터스")]
-    [SerializeField] private float _skillRange = 4f;
+    [SerializeField] private float _skillRange;
     [SerializeField] private float _initSkillCooldown;//첫 쿨타임
-    [SerializeField] private float _skillCooldown = 6f;
+    [SerializeField] private float _skillCooldown;
     [SerializeField] private MonoBehaviour _skillComponent;
 
     [Header("타입")]
