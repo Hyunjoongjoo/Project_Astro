@@ -5,14 +5,14 @@ using UnityEngine.UI;
 
 public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private Image _iconImg;
+    [SerializeField] private Image _iconImg;
+    [SerializeField] private LayerMask _groundLayer;
     private AugmentData _data;
     private Vector3 _originPos;
     private Camera _mainCam;
 
     public void Setup(AugmentData data)
     {
-        if (_iconImg == null) _iconImg = GetComponent<Image>();
         _data = data;
         _iconImg.sprite = data.icon;
         _mainCam = Camera.main;
@@ -36,13 +36,23 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         Ray ray = _mainCam.ScreenPointToRay(eventData.position);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100f))
+
+        Debug.DrawRay(ray.origin, ray.direction * 100f, Color.red, 2f);  //에디터에서 확인용 
+
+        if (Physics.Raycast(ray, out hit, 100f, _groundLayer))
         {
+            Debug.Log($"소환 지점 발견: {hit.point}");
+            Debug.Log($"맞은 오브젝트: {hit.collider.name}");
+
             HeroSpawner.Instance.RPC_SpawnUnit(
                 GetUnitPrefab(),
                 hit.point,
                 GameManager.Instance.PlayerTeam
-                );
+            );
+        }
+        else
+        {
+            Debug.LogWarning("소환실패");
         }
         transform.position = _originPos;
     }
