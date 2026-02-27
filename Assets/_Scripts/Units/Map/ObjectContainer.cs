@@ -33,7 +33,6 @@ public class ObjectContainer : Singleton<ObjectContainer>
         Team targetTeam = diedUnitTeam == Team.Blue ? Team.Red : Team.Blue;
         int amount = type == UnitType.Hero ? heroAugmentExp : minionAugmentExp;
 
-        if (diedUnitTeam == Team.Blue)
-            OnIncreasedAugmentGauge?.Invoke(targetTeam, amount); 
+        OnIncreasedAugmentGauge?.Invoke(targetTeam, amount); 
     }
 }

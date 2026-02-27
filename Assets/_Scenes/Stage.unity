@@ -59107,8 +59107,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectContainer
   _dontDestroyOnLoad: 0
-  minionAugmentExp: 0
-  heroAugmentExp: 0
+  minionAugmentExp: 6
+  heroAugmentExp: 10
   blueSideStructure:
   - {fileID: 1318979820}
   - {fileID: 347813271}
