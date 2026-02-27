@@ -1,9 +1,6 @@
 ﻿using Fusion;
 using UnityEngine;
-public enum AugmentType
-{
-    Hero,Item,Skill
-}
+
 [System.Serializable]
 public class AugmentData
 {
