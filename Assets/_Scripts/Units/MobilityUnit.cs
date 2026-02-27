@@ -9,23 +9,23 @@ public class MobilityUnit : UnitBase, ITargetFinder
     [SerializeField] protected NavMeshAgent agent;
 
     [Header("이동 관련 스테이터스")]
-    [SerializeField] protected float _moveSpeed;
+    [SerializeField] protected float moveSpeed;
     [SerializeField] protected UnitSize unitSize;
 
     [Header("탐지 관련 스테이터스")]
-    [SerializeField] protected float _searchRange;
-    [SerializeField] protected LayerMask _targetLayer;
-    [SerializeField] protected float _searchInterval = 0.3f;
+    [SerializeField] protected float searchRange;
+    [SerializeField] protected LayerMask targetLayer;
+    [SerializeField] protected float searchInterval = 0.3f;
 
-    public float MoveSpeed => _moveSpeed;
-    public float SearchRange => _searchRange;
-    public LayerMask TargetLayer => _targetLayer;
-    public float SearchInterval => _searchInterval;
+    public float MoveSpeed => moveSpeed;
+    public float SearchRange => searchRange;
+    public LayerMask TargetLayer => targetLayer;
+    public float SearchInterval => searchInterval;
 
     //팀과 공격타겟 설정등 셋업
     public virtual void Setup()
     {
-        agent.speed = _moveSpeed;
+        agent.speed = moveSpeed;
 
         ConfigureAreaMask();
 
@@ -51,7 +51,7 @@ public class MobilityUnit : UnitBase, ITargetFinder
         //팀레이어 적용
         SetLayer(gameObject, myLayer);
         //탐지 단계에서는 적 팀 레이어만 대상으로
-        _targetLayer = 1 << enemyLayer;
+        targetLayer = 1 << enemyLayer;
     }
 
     private void SetLayer(GameObject root, int layer)//UnitBase가 붙은 오브젝트만 대상으로 레이어를 설정
@@ -69,7 +69,10 @@ public class MobilityUnit : UnitBase, ITargetFinder
 
     private void ConfigureAreaMask()
     {
-        if (agent == null) return;
+        if (agent == null)
+        {
+            return;
+        }
 
         int meteorArea = NavMesh.GetAreaFromName("MeteorZone");
 
@@ -160,7 +163,7 @@ public class MobilityUnit : UnitBase, ITargetFinder
     protected virtual void OnDrawGizmosSelected()//탐지 범위 시각화
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, _searchRange);
+        Gizmos.DrawWireSphere(transform.position, searchRange);
     }
 #endif
 }

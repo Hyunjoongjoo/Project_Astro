@@ -566,13 +566,13 @@ MonoBehaviour:
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 7299576946842487594}
-  _moveSpeed: 7
+  moveSpeed: 7
   unitSize: 2
-  _searchRange: 5
-  _targetLayer:
+  searchRange: 5
+  targetLayer:
     serializedVersion: 2
     m_Bits: 0
-  _searchInterval: 0.3
+  searchInterval: 0.3
   _attackPower: 10
   _attackSpeed: 1.5
   _attackRange: 2

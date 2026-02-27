@@ -190,13 +190,13 @@ MonoBehaviour:
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 8596131259578450949}
-  _moveSpeed: 6
+  moveSpeed: 6
   unitSize: 1
-  _searchRange: 4
-  _targetLayer:
+  searchRange: 4
+  targetLayer:
     serializedVersion: 2
     m_Bits: 0
-  _searchInterval: 0.3
+  searchInterval: 0.3
   _attackPower: 10
   _attackSpeed: 1
   _attackRange: 3
