@@ -136,6 +136,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeroHandCardUI
   _iconImg: {fileID: 5183859060218411406}
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &1857677499821193337
 MonoBehaviour:
   m_ObjectHideFlags: 0
