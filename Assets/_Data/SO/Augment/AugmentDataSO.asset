@@ -20,7 +20,7 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 2d13039d5ad7ef84198d41909fb3ae1b, type: 3}
     targetId: Hero_Knight
     heroPrefab:
-      RawGuidValue: 00000000000000000000000000000000
+      RawGuidValue: 44e070ac9eccb1a4f9838f1cb2cb4b46
   - id: Hero_Archer
     type: 0
     name: "\uAD81\uC218\uC778\uB4EF"
@@ -28,7 +28,7 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: d2158142f3d96b248be324fc2f90e7c9, type: 3}
     targetId: Hero_Archer
     heroPrefab:
-      RawGuidValue: 00000000000000000000000000000000
+      RawGuidValue: 1c6d38f465d89a149ac6941541862ec0
   - id: Hero_Priest
     type: 0
     name: "\uD790\uB7EC\uC778\uB4EF"
@@ -36,4 +36,4 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 84b20f48c8a41ea45ba3dfc32dce6047, type: 3}
     targetId: Hero_Priest
     heroPrefab:
-      RawGuidValue: 00000000000000000000000000000000
+      RawGuidValue: d09a2cf10307a4c40a977b56313018db

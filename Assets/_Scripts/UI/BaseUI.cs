@@ -13,6 +13,8 @@ public abstract class BaseUI : MonoBehaviour
     [SerializeField] protected float _scaleDuration = 0.25f;
     protected CanvasGroup _canvasGroup;
     private bool _isClosing = false;
+    // 현재 UI가 열려 있는지 (토글용 확인 플래그)
+    public bool IsOpened => gameObject.activeSelf && !_isClosing;
 
     protected virtual void Awake()
     {
@@ -66,5 +68,20 @@ public abstract class BaseUI : MonoBehaviour
     public virtual void OnBackButtonPressed()
     {
         UIManager.Instance.CloseTopPopup();
+    }
+
+    // 토글 로직
+    public virtual void Toggle()
+    {
+        if (IsOpened)
+        {
+            //열려 있으면 닫기
+            DeActivate();
+        }
+        else
+        {
+            // 닫혀 있으면 열기
+            Open();
+        }
     }
 }
