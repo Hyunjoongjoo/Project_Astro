@@ -52,7 +52,7 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
         else
         {
-            Debug.LogWarning("바닥을 찾지 못해 소환에 실패했습니다.");
+            Debug.LogWarning("소환실패");
         }
         transform.position = _originPos;
     }
