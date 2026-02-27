@@ -6,16 +6,17 @@ using TMPro;
 // Stage 씬 인게임 시퀀스에 쓰이는 UI들을 제어하는 클래스
 public class StageUI : MonoBehaviour
 {
-    [SerializeField] private GameObject _introPanel;
-    [SerializeField] private TextMeshProUGUI _textIndicator;
+    [SerializeField] private GameObject _vsPanel;
+    [SerializeField] private GameObject _resultPanel;
+    [SerializeField] private TextMeshProUGUI _countdownIndicator;
     [SerializeField] private TextMeshProUGUI _gameTimer;
     [SerializeField] private Slider _augmentGauge;
     public Button goLobbyBtn;
 
     private void Awake()
     {
-        _textIndicator.gameObject.SetActive(false);
-        goLobbyBtn.gameObject.SetActive(false);
+        _countdownIndicator.gameObject.SetActive(false);
+        _resultPanel.gameObject.SetActive(false);
     }
 
     public void ShowPlayerInfo()
@@ -30,19 +31,19 @@ public class StageUI : MonoBehaviour
 
     public void ShowCountdown(int count)
     {
-        _textIndicator.gameObject.SetActive(true);
+        _countdownIndicator.gameObject.SetActive(true);
         Debug.Log("카운트 다운 패널 보여줌");
     }
 
     public void UpdateCountdown(int count)
     {
-        _textIndicator.text = count.ToString();
+        _countdownIndicator.text = count.ToString();
         Debug.Log("카운트 다운 갱신 (3 -> 2 -> 1 -> Start 등");
     }
 
     public void HideCountdown()
     {
-        _introPanel.SetActive(false);
+        _vsPanel.SetActive(false);
         Debug.Log("카운트 다운 패널 숨김");
     }
 
@@ -60,7 +61,7 @@ public class StageUI : MonoBehaviour
 
     public void ShowResultPanel(bool isVictory)
     {
-        _textIndicator.text = isVictory ? "승리" : "패배";
+        _countdownIndicator.text = isVictory ? "승리" : "패배";
         goLobbyBtn.gameObject.SetActive(true);
     }
 }
