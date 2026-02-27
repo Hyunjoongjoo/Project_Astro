@@ -40,8 +40,6 @@ public class GameManager : Singleton<GameManager>
         switch (_currentState)
         {
             case GameState.Ready:
-                var options = AugmentManager.Instance.GetRandomAugments(AugmentType.Hero, 3);
-                AugmentManager.Instance.ShowAugmentWindow(options);
                 break;
             case GameState.Play:
                 //모든 로직 가동
