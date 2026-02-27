@@ -18,7 +18,6 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     [Header("타입")]
     [SerializeField] private AttackType _attackType;
-    [SerializeField] private UnitSize _unitSize;
 
     [Header("원거리")]
     [SerializeField] private GameObject _projectilePrefab;
@@ -53,7 +52,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float AttackRange => _attackRange;
     public UnitBase CurrentTarget => _currentTarget;
     public float SummonCooldown => _summonCooldown;
-    public UnitSize UnitSize => _unitSize;
     public LayerMask AllyLayer
     {
         get

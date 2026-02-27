@@ -706,6 +706,7 @@ MonoBehaviour:
   _CurrentState: 0
   agent: {fileID: 3123802997670338100}
   _moveSpeed: 6
+  unitSize: 0
   _searchRange: 9
   _targetLayer:
     serializedVersion: 2
@@ -716,7 +717,6 @@ MonoBehaviour:
   _attackRange: 5
   _skillComponent: {fileID: -2787799764655628976}
   _attackType: 1
-  _unitSize: 0
   _projectilePrefab: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
   _firePoint: {fileID: 4892445714994426902}
   _enemyTowerA: {fileID: 0}

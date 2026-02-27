@@ -191,6 +191,7 @@ MonoBehaviour:
   _CurrentState: 0
   agent: {fileID: 8596131259578450949}
   _moveSpeed: 6
+  unitSize: 1
   _searchRange: 4
   _targetLayer:
     serializedVersion: 2

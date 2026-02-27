@@ -1,6 +1,6 @@
-using Unity.VisualScripting;
+﻿using Unity.VisualScripting;
 using UnityEngine;
-using static Fusion.Editor.FusionHubWindow;
+
 
 
 //런타임 카드 객체

@@ -12,7 +12,7 @@ public class MinionController : MobilityUnit, IBasicAttack
     [SerializeField] private float _attackSpeed = 1f;
     [SerializeField] private float _attackRange = 2f;
 
-    [Header("공격 타입")]
+    [Header("타입")]
     [SerializeField] private AttackType _attackType;
 
     [Header("원거리")]
