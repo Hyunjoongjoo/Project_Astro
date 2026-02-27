@@ -117,7 +117,7 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
 
         if (_projectileFxPrefab != null)
         {
-            RPC_FireProjectile(_caster.Object.Id, _target.Object.Id);
+            RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team);
         }
     }
 
@@ -133,7 +133,7 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
 
     //투사체 연출
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_FireProjectile(NetworkId casterId, NetworkId targetId)
+    private void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team)
     {
         if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
         {
@@ -157,7 +157,7 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
         Projectile projectile = projectileObj.GetComponent<Projectile>();
         if (projectile != null)
         {
-            projectile.Fire(end);
+            projectile.Fire(end, team);
         }
     }
 }

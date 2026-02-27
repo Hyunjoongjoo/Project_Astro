@@ -283,7 +283,7 @@ public class MinionController : MobilityUnit, IBasicAttack
 
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
-        projectile.GetComponent<Projectile>()?.Fire(targetPos);
+        projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
     }
 
     private void OnTargetDied(UnitBase deadUnit)

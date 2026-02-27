@@ -2,9 +2,9 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public enum HeroSize
+public enum UnitSize
 {
-    Small, Large
+    Small, Medium, Large
 }
 public class HeroController : MobilityUnit, IBasicAttack
 {
@@ -21,7 +21,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     [Header("타입")]
     [SerializeField] private AttackType _attackType;
-    [SerializeField] private HeroSize _heroSize;
+    [SerializeField] private UnitSize _unitSize;
 
     [Header("원거리")]
     [SerializeField] private GameObject _projectilePrefab;
@@ -57,6 +57,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     public UnitBase CurrentTarget => _currentTarget;
     public float SkillRange => _skillRange;
     public float SummonCooldown => _summonCooldown;
+    public UnitSize UnitSize => _unitSize;
     public LayerMask AllyLayer
     {
         get
@@ -516,7 +517,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
-        projectile.GetComponent<Projectile>()?.Fire(targetPos);
+        projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
     }
 
     public void ForceStopMoveForSkill()//외부에서 StopMove를 사용가능하도록
