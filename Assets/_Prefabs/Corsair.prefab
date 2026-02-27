@@ -498,9 +498,6 @@ MonoBehaviour:
   _attackPower: 15
   _attackSpeed: 1
   _attackRange: 3
-  _skillRange: 4
-  _initSkillCooldown: 2
-  _skillCooldown: 4
   _skillComponent: {fileID: 5510236954846484131}
   _attackType: 1
   _unitSize: 0
@@ -534,10 +531,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19492d2d6ff5ba146b7506991db6a319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AssaultSkill
-  _radius: 3
-  _damageMultiplier: 1
-  _effectPrefab: {fileID: 6393617126741755569, guid: 19138c6e05c43fe46a292e5d6d939efa, type: 3}
-  _effectScaleTime: 0.25
+  _data: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
 --- !u!114 &1679591168465454536
 MonoBehaviour:
   m_ObjectHideFlags: 0

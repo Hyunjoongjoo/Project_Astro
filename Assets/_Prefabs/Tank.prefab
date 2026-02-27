@@ -575,9 +575,6 @@ MonoBehaviour:
   _attackPower: 10
   _attackSpeed: 1.5
   _attackRange: 2
-  _skillRange: 0
-  _initSkillCooldown: 4
-  _skillCooldown: 8
   _skillComponent: {fileID: 4569985432753418785}
   _attackType: 1
   _unitSize: 0
@@ -611,9 +608,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ee3b1320d30cd445b022376d94d2fef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DefenseSkill
-  _duration: 5
-  _damageReductionRate: 0.3
-  _effectPrefab: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}
+  _data: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
 --- !u!114 &9158771151194973300
 MonoBehaviour:
   m_ObjectHideFlags: 0

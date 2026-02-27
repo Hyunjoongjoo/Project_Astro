@@ -4,16 +4,9 @@ using DG.Tweening;
 
 public class AssaultSkill : NetworkBehaviour, IHeroSkill
 {
-    [Header("범위 설정")]
-    [SerializeField] private float _radius = 3f;
+    [SerializeField] private AssaultSkillSO _data;
 
-    [Header("데미지 설정")]
-    [SerializeField] private float _damageMultiplier = 1f;
-
-    [Header("이펙트")]
-    [SerializeField] private GameObject _effectPrefab;
-    [SerializeField] private float _effectScaleTime = 0.25f;
-
+    public SkillDataSO Data => _data;
     //public bool BlockAttackDuringSkill => true;
     //public bool BlockMoveDuringSkill => true;
 
@@ -26,7 +19,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
 
         float dist = caster.GetAttackDistanceTo(caster.CurrentTarget);
 
-        return dist <= caster.SkillRange;//기획서에 맞게 스킬범위를 새로 지정
+        return dist <= _data.skillRange;//기획서에 맞게 스킬범위를 새로 지정
     }
 
     public bool Execute(HeroController caster)
@@ -52,7 +45,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
 
         LayerMask targetMask = caster.TargetLayer;
 
-        Collider[] hits = Physics.OverlapSphere(warpPos, _radius, targetMask);
+        Collider[] hits = Physics.OverlapSphere(warpPos, _data.radius, targetMask);
 
         foreach (var hit in hits)
         {
@@ -62,7 +55,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
                 continue;
             }
 
-            float damage = caster.AttackPower * _damageMultiplier;
+            float damage = caster.AttackPower * _data.damageMultiplier;
             unit.TakeDamage(damage);
         }
 
@@ -96,13 +89,13 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
 
     private void PlayEffect(Transform casterTransform)
     {
-        if (_effectPrefab == null)
+        if (_data.effectPrefab == null)
         {
             return;
         }
 
         GameObject effects = Instantiate(
-         _effectPrefab,
+         _data.effectPrefab,
          casterTransform.position,
          Quaternion.identity,
          casterTransform
@@ -117,7 +110,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
         }
 
         effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(_radius * 2f * 6.5f, _effectScaleTime).SetEase(Ease.OutQuad);
+        effects.transform.DOScale(_data.radius * 2f * 6.5f, _data.effectLifeTime).SetEase(Ease.OutQuad);
 
         float lifeTime = ps != null
             ? ps.main.duration + ps.main.startLifetime.constantMax
@@ -131,7 +124,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, _radius);
+        Gizmos.DrawWireSphere(transform.position, _data.radius);
     }
 #endif
 }
