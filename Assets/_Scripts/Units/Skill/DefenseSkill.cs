@@ -6,7 +6,7 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
 {
     [Header("방어 설정")]
     [SerializeField] private float _duration = 5f;//지속시간
-    [SerializeField] private float _damageReductionRate = 0.5f; // 50%
+    [SerializeField] private float _damageReductionRate = 0.3f; // 30%
 
     [Header("이펙트")]
     [SerializeField] private GameObject _effectPrefab;
