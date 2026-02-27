@@ -574,7 +574,8 @@ MonoBehaviour:
   _searchInterval: 0.3
   _attackPower: 15
   _attackSpeed: 1
-  _attackRange: 4
+  _attackRange: 2
+  _skillRange: 0
   _initSkillCooldown: 4
   _skillCooldown: 8
   _skillComponent: {fileID: 4569985432753418785}

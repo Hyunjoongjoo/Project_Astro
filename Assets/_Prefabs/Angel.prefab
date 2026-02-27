@@ -633,7 +633,8 @@ MonoBehaviour:
   _searchInterval: 0.3
   _attackPower: 10
   _attackSpeed: 0.8
-  _attackRange: 4
+  _attackRange: 3
+  _skillRange: 3
   _initSkillCooldown: 5
   _skillCooldown: 10
   _skillComponent: {fileID: 8345162342218717666}
@@ -669,8 +670,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5caafbcf88fd95c489fac2a4a8c32240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SupportSkill
-  _healRatio: 0.5
-  _healRange: 7
+  _healAmount: 100
   _healEffectPrefab: {fileID: 3479278419723618712, guid: 6135948fdbd8dbc498c368cf6640858f, type: 3}
   _effectLifeTime: 0.6
 --- !u!114 &2564167791635826302

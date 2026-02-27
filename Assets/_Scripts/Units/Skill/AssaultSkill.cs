@@ -26,7 +26,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
 
         float dist = caster.GetAttackDistanceTo(caster.CurrentTarget);
 
-        return dist <= caster.SearchRange;//강습에 맞게 스킬 자체는 탐지범위에 걸리면 시전하도록
+        return dist <= caster.SkillRange;//기획서에 맞게 스킬범위를 새로 지정
     }
 
     public bool Execute(HeroController caster)

@@ -6,8 +6,7 @@ using static UnityEngine.GraphicsBuffer;
 public class SupportSkill : NetworkBehaviour, IHeroSkill
 {
     [Header("힐 설정")]
-    [SerializeField] private float _healRatio = 0.5f;   // 50%
-    [SerializeField] private float _healRange = 5f;
+    [SerializeField] private float _healAmount = 100f; //기획서 회복량에 따라 100으로 변경
 
     [Header("이펙트")]
     [SerializeField] private GameObject _healEffectPrefab;
@@ -33,7 +32,7 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
 
         float before = target.CurrentHealth;
 
-        caster.HealUnit(target, _healRatio);
+        caster.HealUnit(target, _healAmount);
 
         float after = target.CurrentHealth;
         float healed = after - before;
@@ -45,7 +44,7 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
 
     private UnitBase FindHealTarget(HeroController caster)
     {
-        Collider[] hits = Physics.OverlapSphere(caster.transform.position, _healRange, caster.AllyLayer);
+        Collider[] hits = Physics.OverlapSphere(caster.transform.position, caster.SkillRange, caster.AllyLayer);
 
         UnitBase best = null;
         float bestDist = float.MaxValue;

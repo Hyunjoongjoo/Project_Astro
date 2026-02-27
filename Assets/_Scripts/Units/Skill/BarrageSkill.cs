@@ -43,7 +43,9 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
             return false;
         }
 
-        return true;
+        float dist = caster.GetAttackDistanceTo(target);
+
+        return dist <= caster.SkillRange;
     }
 
     public bool Execute(HeroController caster)
