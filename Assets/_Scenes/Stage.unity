@@ -35602,6 +35602,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StageIntroUI
   _vsPanel: {fileID: 1756171693}
   _resultPanel: {fileID: 1283840288}
+  _victoryPanel: {fileID: 421395279}
+  _defeatPanel: {fileID: 1777294911}
   _countdownIndicator: {fileID: 1193730004}
   _gameTimer: {fileID: 299840329}
   _augmentGauge: {fileID: 1220292401}
@@ -48260,7 +48262,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1283840289
 RectTransform:
   m_ObjectHideFlags: 0
@@ -57911,7 +57913,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1777294912
 RectTransform:
   m_ObjectHideFlags: 0
