@@ -1,5 +1,6 @@
 ﻿public interface IHeroSkill
 {
+    SkillDataSO Data { get; }
     bool CanUse(HeroController caster);//스킬 사용 가능한지 여부
     bool Execute(HeroController caster);//실제 스킬 효과 실행
 

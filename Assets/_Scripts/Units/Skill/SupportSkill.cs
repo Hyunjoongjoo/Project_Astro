@@ -1,16 +1,13 @@
 ﻿using DG.Tweening;
 using Fusion;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
+
 
 public class SupportSkill : NetworkBehaviour, IHeroSkill
 {
-    [Header("힐 설정")]
-    [SerializeField] private float _healAmount = 100f; //기획서 회복량에 따라 100으로 변경
+    [SerializeField] private SupportSkillSO _data;
 
-    [Header("이펙트")]
-    [SerializeField] private GameObject _healEffectPrefab;
-    [SerializeField] private float _effectLifeTime = 0.6f;
+    public SkillDataSO Data => _data;
 
     public bool CanUse(HeroController caster)
     {
@@ -32,7 +29,7 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
 
         float before = target.CurrentHealth;
 
-        caster.HealUnit(target, _healAmount);
+        caster.HealUnit(target, _data.healAmount);
 
         float after = target.CurrentHealth;
         float healed = after - before;
@@ -44,7 +41,7 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
 
     private UnitBase FindHealTarget(HeroController caster)
     {
-        Collider[] hits = Physics.OverlapSphere(caster.transform.position, caster.SkillRange, caster.AllyLayer);
+        Collider[] hits = Physics.OverlapSphere(caster.transform.position, _data.skillRange, caster.AllyLayer);
 
         UnitBase best = null;
         float bestDist = float.MaxValue;
@@ -92,7 +89,7 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_PlayHealEffect(NetworkId targetId)
     {
-        if (_healEffectPrefab == null)
+        if (_data.effectPrefab == null)
         {
             return;
         }
@@ -103,7 +100,7 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
         }
 
         GameObject effects = Instantiate(
-            _healEffectPrefab,
+            _data.effectPrefab,
             targetObj.transform.position,
             Quaternion.identity,
             targetObj.transform //자식으로 부착
@@ -112,6 +109,6 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
         effects.transform.localScale = Vector3.zero;
         effects.transform.DOScale(2f, 0.2f).SetEase(Ease.OutBack);
 
-        Destroy(effects, _effectLifeTime);
+        Destroy(effects, _data.effectLifeTime);
     }
 }

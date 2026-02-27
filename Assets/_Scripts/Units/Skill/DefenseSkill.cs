@@ -4,16 +4,13 @@ using System.Collections.Generic;
 
 public class DefenseSkill : NetworkBehaviour, IHeroSkill
 {
-    [Header("방어 설정")]
-    [SerializeField] private float _duration = 5f;//지속시간
-    [SerializeField] private float _damageReductionRate = 0.3f; // 30%
-
-    [Header("이펙트")]
-    [SerializeField] private GameObject _effectPrefab;
+    [SerializeField] private DefenseSkillSO _data;
 
     private TickTimer _timer;
     private bool _isActive;
     private HeroController _caster;
+
+    public SkillDataSO Data => _data;
 
     public bool CanUse(HeroController caster)
     {
@@ -61,9 +58,9 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
     private void ActivateDefense()
     {
         _isActive = true;
-        _timer = TickTimer.CreateFromSeconds(Runner, _duration);
+        _timer = TickTimer.CreateFromSeconds(Runner, _data.duration);
 
-        _caster.SetDamageReduction(_damageReductionRate);
+        _caster.SetDamageReduction(_data.damageReductionRate);
     }
 
     private void DeactivateDefense()
@@ -80,7 +77,7 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_PlayEffect(NetworkId casterId)
     {
-        if (_effectPrefab == null)
+        if (_data.effectPrefab == null)
         {
             return;
         }
@@ -93,7 +90,7 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
         Transform casterTransform = casterObject.transform;
 
         GameObject effects = Instantiate(
-            _effectPrefab,
+            _data.effectPrefab,
             casterTransform.position,
             casterTransform.rotation,
             casterTransform//부모 지정
@@ -104,6 +101,6 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
         effects.transform.localRotation = Quaternion.identity;
         effects.transform.localScale = Vector3.one * 17f;
 
-        Destroy(effects, _duration);
+        Destroy(effects, _data.duration);
     }
 }

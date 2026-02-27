@@ -14,9 +14,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private float _attackRange = 2f;
 
     [Header("스킬 스테이터스")]
-    [SerializeField] private float _skillRange;
-    [SerializeField] private float _initSkillCooldown;//첫 쿨타임
-    [SerializeField] private float _skillCooldown;
     [SerializeField] private MonoBehaviour _skillComponent;
 
     [Header("타입")]
@@ -55,7 +52,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float AttackSpeed => _attackSpeed;
     public float AttackRange => _attackRange;
     public UnitBase CurrentTarget => _currentTarget;
-    public float SkillRange => _skillRange;
     public float SummonCooldown => _summonCooldown;
     public UnitSize UnitSize => _unitSize;
     public LayerMask AllyLayer
@@ -141,7 +137,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         _fsm = new UnitFSM();
 
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, _initSkillCooldown);
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skill.Data.initCooldown);
 
         CurrentState = UnitState.Idle;
     }
@@ -312,7 +308,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         bool success = _skill.Execute(this);
         if (success)
         {
-            _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
+            _skillTimer = TickTimer.CreateFromSeconds(Runner, _skill.Data.cooldown);
         }
 
         return success;
