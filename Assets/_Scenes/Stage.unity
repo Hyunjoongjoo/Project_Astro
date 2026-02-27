@@ -3095,9 +3095,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75a03fa9e9e5eec4a8a7cf6201e2073e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AugmentManager
-  _dontDestroyOnLoad: 1
+  _dontDestroyOnLoad: 0
   _masterSO: {fileID: 11400000, guid: 2eb710d974001b34cbbee6410a54a84a, type: 2}
   _augmentWindowPrefab: {fileID: 4106133892853824477, guid: 1f36554bda3c65842b069e4845963db7, type: 3}
+  _toggleBtn: {fileID: 1180466687}
   _heroCardSlotPrefab: {fileID: 8006802584929967089, guid: 1e71b10ac1aafed47b1e5f4250316636, type: 3}
   _slotContainer: {fileID: 136332901}
 --- !u!4 &225820718
@@ -10422,14 +10423,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.20261288, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4ee91d319886c4e4b8a4155b88bc8e7f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f924bbcbb5ede4af497aee3e342feaad, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -22629,7 +22630,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 084b6c14e738fa3459cdcb8fc8225f8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  _dontDestroyOnLoad: 1
+  _dontDestroyOnLoad: 0
   _currentState: 0
   _flowState: 0
 --- !u!4 &825725157
