@@ -7,6 +7,7 @@ using TMPro;
 public class StageUI : MonoBehaviour
 {
     [SerializeField] private GameObject _vsPanel;
+    [SerializeField] private GameObject _gradationImage;
     [SerializeField] private GameObject _resultPanel;
     [SerializeField] private GameObject _victoryPanel;
     [SerializeField] private GameObject _defeatPanel;
@@ -19,6 +20,12 @@ public class StageUI : MonoBehaviour
     {
         _countdownIndicator.gameObject.SetActive(false);
         _resultPanel.gameObject.SetActive(false);
+    }
+
+    // 레드 팀일 때 UI 초기화
+    public void InitRedTeam()
+    {
+        _gradationImage.transform.Rotate(0f, 0f, 180f);
     }
 
     public void ShowPlayerInfo()

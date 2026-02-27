@@ -145,7 +145,10 @@ public class StageManager : NetworkBehaviour
         GameManager.Instance.SetTeam(myTeam);
 
         if (myTeam == Team.Red)
+        {
             _mainCamera.transform.Rotate(new Vector3(0, 0, 180f));
+            _stageUI.InitRedTeam();
+        }
  
         // DB로 부터 받아온 플레이어 정보 중 표시할 것 선정
         ShowPlayerInfo();
