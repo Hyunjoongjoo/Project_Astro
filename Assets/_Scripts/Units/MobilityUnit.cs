@@ -86,6 +86,7 @@ public class MobilityUnit : UnitBase, ITargetFinder
 
         agent.isStopped = true;
         agent.ResetPath();
+        agent.velocity = Vector3.zero;
     }
 
 

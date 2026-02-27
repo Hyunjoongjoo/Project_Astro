@@ -102,7 +102,7 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
         //부모에 붙였으므로 로컬 기준으로 정렬
         effects.transform.localPosition = Vector3.zero;
         effects.transform.localRotation = Quaternion.identity;
-        effects.transform.localScale = Vector3.one;
+        effects.transform.localScale = Vector3.one * 17f;
 
         Destroy(effects, _duration);
     }

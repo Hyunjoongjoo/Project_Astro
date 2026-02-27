@@ -12,6 +12,7 @@ public class HeroSpawner : NetworkBehaviour
     [SerializeField] private float _minDeployDistance = 1f;
     [SerializeField] private float _maxDeployDistance = 15f;
 
+    //PlayerRef 기준으로 분리하여 독립 쿨다운
     private readonly Dictionary<PlayerRef, TickTimer> _playerSummonTimers = new Dictionary<PlayerRef, TickTimer>();
 
     public override void Spawned()
@@ -19,7 +20,7 @@ public class HeroSpawner : NetworkBehaviour
         Instance = this;
     }
 
-    private bool CanSummon(PlayerRef player)
+    private bool CanSummon(PlayerRef player)//소환 가능한지 여부
     {
         if (!_playerSummonTimers.TryGetValue(player, out TickTimer timer))
         {

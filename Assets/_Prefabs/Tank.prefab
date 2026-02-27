@@ -613,7 +613,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DefenseSkill
   _duration: 5
   _damageReductionRate: 0.3
-  _effectPrefab: {fileID: 3479278419723618712, guid: b4b0419d3c6ad2d4a8b5133bfe5693d3, type: 3}
+  _effectPrefab: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}
 --- !u!114 &9158771151194973300
 MonoBehaviour:
   m_ObjectHideFlags: 0
