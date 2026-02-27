@@ -8,8 +8,8 @@ public enum StageState
     WaitingForPlayers,    // 플레이어 대기 중
     AssigningTeams,       // 팀 배정 중
     ShowingPlayerInfo,    // 플레이어 정보 표시
-    Countdown,            // 카운트다운
     AugmentSelection,     // 증강 선택 단계
+    Countdown,            // 카운트다운
     Playing,              // 게임 진행 중
     GameOver              // 게임 종료
 }
@@ -163,11 +163,10 @@ public class StageManager : NetworkBehaviour
 
         if (StateTimer <= 0)
         {
-            // 플레이어 정보 숨기고 카운트다운 시작
+            // 플레이어 정보 숨기고 증강 선택 시작
             RPC_HidePlayerInfo();
-            CurrentState = StageState.Countdown;
-            CountdownValue = 3;
-            StateTimer = COUNTDOWN_INTERVAL;
+            CurrentState = StageState.AugmentSelection;
+            EnterAugmentSelection();
         }
     }
 
@@ -175,7 +174,45 @@ public class StageManager : NetworkBehaviour
     private void RPC_HidePlayerInfo()
     {
         _stageUI.HidePlayerInfo();
-        _stageUI.ShowCountdown(3);
+    }
+
+    private void EnterAugmentSelection()
+    {
+        if (Object.HasStateAuthority)
+        {
+            // 모든 클라이언트에게 증강 UI를 띄우라고 알림
+            RPC_RequestAugmentSelection();
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_RequestAugmentSelection()
+    {
+        // 3장의 랜덤 카드를 뽑아 UI를 띄움
+        var options = AugmentManager.Instance.GetRandomAugments(AugmentType.Hero, 3);
+        AugmentManager.Instance.ShowAugmentWindow(options);
+
+        Debug.Log("[Stage] 증강 선택 시작!");
+    }
+
+    // 플레이어들이 증강을 선택하면 마스터에게 알림.
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_ReportAugmentComplete(PlayerRef player)
+    {
+        if (!_playerAugmentReady.ContainsKey(player))
+        {
+            _playerAugmentReady.Add(player, true);
+        }
+
+        // 모든 플레이어가 선택을 완료했는지 확인
+        if (_playerAugmentReady.Count == Runner.ActivePlayers.Count())
+        {
+            Debug.Log("모든 플레이어 증강 선택 완료. 게임을 시작합니다.");
+
+            CurrentState = StageState.Countdown;
+            CountdownValue = 4;
+            StateTimer = COUNTDOWN_INTERVAL;
+        }
     }
 
     private void UpdateCountdown()
@@ -195,52 +232,16 @@ public class StageManager : NetworkBehaviour
             }
             else
             {
-                // 증강 선택 단계
-                EnterAugmentSelection();
+                // 카운트 다운 종료 후 게임 시작
+                StartGame();
             }
         }
-    }
-    private void EnterAugmentSelection()
-    {
-        if (Object.HasStateAuthority)
-        {
-            CurrentState = StageState.AugmentSelection;
-            // 모든 클라이언트에게 증강 UI를 띄우라고 알림
-            RPC_RequestAugmentSelection();
-        }
-    }
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_RequestAugmentSelection()
-    {
-        _stageUI.HideCountdown(); // 카운트다운 텍스트 숨기기
-
-        // 3장의 랜덤 카드를 뽑아 UI를 띄움
-        var options = AugmentManager.Instance.GetRandomAugments(AugmentType.Hero, 3);
-        AugmentManager.Instance.ShowAugmentWindow(options);
-
-        Debug.Log("[Stage] 증강 선택 시작!");
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_UpdateCountdown(int value)
     {
         _stageUI.UpdateCountdown(value);
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_ReportAugmentComplete(PlayerRef player)
-    {
-        if (!_playerAugmentReady.ContainsKey(player))
-        {
-            _playerAugmentReady.Add(player, true);
-        }
-
-        // 모든 플레이어가 선택을 완료했는지 확인
-        if (_playerAugmentReady.Count == Runner.ActivePlayers.Count())
-        {
-            Debug.Log("모든 플레이어 증강 선택 완료. 게임을 시작합니다.");
-            StartGame();
-        }
     }
 
     private void StartGame()
@@ -311,7 +312,7 @@ public class StageManager : NetworkBehaviour
         if ( AugmentExp.TryGet(team, out int curExp) )
         {
             int value = AugmentExp.Set(team, curExp + amount);
-            RPC_UpdateAugmentGauge(value);
+            RPC_UpdateAugmentGauge(team, value);
         }
 
         else
@@ -323,7 +324,7 @@ public class StageManager : NetworkBehaviour
         if (AugmentExp.TryGet(team, out int curExp))
         {
             int value = AugmentExp.Set(team, curExp - amount);
-            RPC_UpdateAugmentGauge(value);
+            RPC_UpdateAugmentGauge(team, value);
         }
 
         else
@@ -331,9 +332,11 @@ public class StageManager : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_UpdateAugmentGauge(int value)
+    private void RPC_UpdateAugmentGauge(Team team, int value)
     {
-        _stageUI.UpdateAugmentGauge(value); // UI 갱신
+        Team myTeam = PlayerTeams.Get(Runner.LocalPlayer);
+        if (myTeam == team)
+            _stageUI.UpdateAugmentGauge(value); // UI 갱신
     }
 
     // =============== 여기부터 함교 파괴 감지 ~ 게임 종료 후 로비로 복귀까지 ===============

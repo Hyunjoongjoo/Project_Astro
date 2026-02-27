@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AugmentManager : Singleton<AugmentManager>
 {
@@ -9,6 +10,7 @@ public class AugmentManager : Singleton<AugmentManager>
 
     [Header("증강선택 UI")]
     [SerializeField] private GameObject _augmentWindowPrefab;
+    [SerializeField] private Button _toggleBtn;
 
     [Header("하단 영웅 카드 인벤토리")]
     [SerializeField] private GameObject _heroCardSlotPrefab; //히어로 핸드 카드 붙은 프리팹
@@ -44,9 +46,13 @@ public class AugmentManager : Singleton<AugmentManager>
     {
         // UIManager를 통해 팝업 형식으로 띄움
         var window = UIManager.Instance.ShowUI<AugmentWindowUI>(_augmentWindowPrefab, true);
+        _toggleBtn.gameObject.SetActive(true);
         if (window != null)
         {
             window.SetupAndOpen(datas);
+
+            _toggleBtn.onClick.RemoveAllListeners();
+            _toggleBtn.onClick.AddListener(() => window.Toggle());
         }
     }
     // 카드 선택 처리
@@ -61,6 +67,13 @@ public class AugmentManager : Singleton<AugmentManager>
         else if (data.type == AugmentType.Skill)
         {
             // 스킬 강화 로직
+        }
+
+        //토글버튼 비활성화, 리스너 정리
+        if (_toggleBtn != null)
+        {
+            _toggleBtn.gameObject.SetActive(false);
+            _toggleBtn.onClick.RemoveAllListeners(); 
         }
 
         UIManager.Instance.CloseTopPopup();
