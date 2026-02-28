@@ -3,13 +3,7 @@ using UnityEngine;
 
 public class BarrageSkill : NetworkBehaviour, IHeroSkill
 {
-    [Header("포격 설정")]
-    [SerializeField] private int _shotCount = 3;
-    [SerializeField] private float _shotInterval = 0.05f;
-    [SerializeField] private float _damageRatio = 1.0f;
-
-    [Header("이펙트")]
-    [SerializeField] private GameObject _projectileFxPrefab;
+    [SerializeField] private BarrageSkillSO _data;
 
     private TickTimer _shotTimer;
     private int _remainingShots;
@@ -18,7 +12,9 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
     private UnitBase _target;
     private bool _isFiring;
 
-    public int ShotCount => _shotCount;//나중에 증강에서 탄환수를 늘릴때 사용가능하게
+    public SkillDataSO Data => _data;
+
+    public int ShotCount => _data.shotCount;//나중에 증강에서 탄환수를 늘릴때 사용가능하게
 
     public bool CanUse(HeroController caster)
     {
@@ -43,7 +39,9 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
             return false;
         }
 
-        return true;
+        float dist = caster.GetAttackDistanceTo(target);
+
+        return dist <= _data.skillRange;
     }
 
     public bool Execute(HeroController caster)
@@ -56,14 +54,14 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
         _caster = caster;
         _target = caster.CurrentTarget;
 
-        _remainingShots = _shotCount;
+        _remainingShots = _data.shotCount;
         _isFiring = true;
 
         FireOnce();
 
         if (_remainingShots > 0)
         {
-            _shotTimer = TickTimer.CreateFromSeconds(Runner, _shotInterval);
+            _shotTimer = TickTimer.CreateFromSeconds(Runner, _data.shotInterval);
         }
         else
         {
@@ -98,7 +96,7 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
 
         if (_remainingShots > 0)
         {
-            _shotTimer = TickTimer.CreateFromSeconds(Runner, _shotInterval);
+            _shotTimer = TickTimer.CreateFromSeconds(Runner, _data.shotInterval);
         }
         else
         {
@@ -111,11 +109,11 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
     {
         _remainingShots--;
 
-        _caster.ApplyBarrageSkillDamage(_target, _damageRatio);
+        _caster.ApplyBarrageSkillDamage(_target, _data.damageMultiplier);
 
-        if (_projectileFxPrefab != null)
+        if (_data.effectPrefab != null)
         {
-            RPC_FireProjectile(_caster.Object.Id, _target.Object.Id);
+            RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team);
         }
     }
 
@@ -131,7 +129,7 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
 
     //투사체 연출
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_FireProjectile(NetworkId casterId, NetworkId targetId)
+    private void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team)
     {
         if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
         {
@@ -147,7 +145,7 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
         Vector3 end = targetObj.transform.position;
 
         GameObject projectileObj = Instantiate(
-            _projectileFxPrefab,
+            _data.effectPrefab,
             start,
             Quaternion.identity
         );
@@ -155,7 +153,7 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
         Projectile projectile = projectileObj.GetComponent<Projectile>();
         if (projectile != null)
         {
-            projectile.Fire(end);
+            projectile.Fire(end, team);
         }
     }
 }

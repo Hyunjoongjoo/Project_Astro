@@ -133,7 +133,7 @@ public class Bridge : Structure, IBasicAttack, ITargetFinder
         }
 
         var projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
-        projectile.GetComponent<Projectile>()?.Fire(targetPos);
+        projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
     }
 
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기

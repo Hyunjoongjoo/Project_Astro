@@ -2,9 +2,9 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public enum HeroSize
+public enum UnitSize
 {
-    Small, Large
+    Small, Medium, Large
 }
 public class HeroController : MobilityUnit, IBasicAttack
 {
@@ -14,14 +14,10 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private float _attackRange = 2f;
 
     [Header("스킬 스테이터스")]
-    //[SerializeField] private float _skillRange = 4f;
-    [SerializeField] private float _initSkillCooldown;//첫 쿨타임
-    [SerializeField] private float _skillCooldown = 6f;
     [SerializeField] private MonoBehaviour _skillComponent;
 
     [Header("타입")]
     [SerializeField] private AttackType _attackType;
-    [SerializeField] private HeroSize _heroSize;
 
     [Header("원거리")]
     [SerializeField] private GameObject _projectilePrefab;
@@ -32,6 +28,8 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
+    [Header("영웅 소환 쿨다운")]
+    [SerializeField] private float _summonCooldown;
 
 
     private UnitBase _currentTarget;
@@ -53,6 +51,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float AttackSpeed => _attackSpeed;
     public float AttackRange => _attackRange;
     public UnitBase CurrentTarget => _currentTarget;
+    public float SummonCooldown => _summonCooldown;
     public LayerMask AllyLayer
     {
         get
@@ -136,7 +135,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         _fsm = new UnitFSM();
 
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, _initSkillCooldown);
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skill.Data.initCooldown);
 
         CurrentState = UnitState.Idle;
     }
@@ -307,7 +306,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         bool success = _skill.Execute(this);
         if (success)
         {
-            _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillCooldown);
+            _skillTimer = TickTimer.CreateFromSeconds(Runner, _skill.Data.cooldown);
         }
 
         return success;
@@ -512,7 +511,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
-        projectile.GetComponent<Projectile>()?.Fire(targetPos);
+        projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
     }
 
     public void ForceStopMoveForSkill()//외부에서 StopMove를 사용가능하도록

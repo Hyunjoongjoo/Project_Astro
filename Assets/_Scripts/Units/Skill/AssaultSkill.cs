@@ -4,16 +4,9 @@ using DG.Tweening;
 
 public class AssaultSkill : NetworkBehaviour, IHeroSkill
 {
-    [Header("범위 설정")]
-    [SerializeField] private float _radius = 3f;
+    [SerializeField] private AssaultSkillSO _data;
 
-    [Header("데미지 설정")]
-    [SerializeField] private float _damageMultiplier = 1f;
-
-    [Header("이펙트")]
-    [SerializeField] private GameObject _effectPrefab;
-    [SerializeField] private float _effectScaleTime = 0.25f;
-
+    public SkillDataSO Data => _data;
     //public bool BlockAttackDuringSkill => true;
     //public bool BlockMoveDuringSkill => true;
 
@@ -26,7 +19,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
 
         float dist = caster.GetAttackDistanceTo(caster.CurrentTarget);
 
-        return dist <= caster.SearchRange;//강습에 맞게 스킬 자체는 탐지범위에 걸리면 시전하도록
+        return dist <= _data.skillRange;//기획서에 맞게 스킬범위를 새로 지정
     }
 
     public bool Execute(HeroController caster)
@@ -52,7 +45,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
 
         LayerMask targetMask = caster.TargetLayer;
 
-        Collider[] hits = Physics.OverlapSphere(warpPos, _radius, targetMask);
+        Collider[] hits = Physics.OverlapSphere(warpPos, _data.radius, targetMask);
 
         foreach (var hit in hits)
         {
@@ -62,20 +55,25 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
                 continue;
             }
 
-            float damage = caster.AttackPower * _damageMultiplier;
+            float damage = caster.AttackPower * _data.damageMultiplier;
             unit.TakeDamage(damage);
         }
 
         //이펙트
-        RPC_PlayEffect(warpPos);
+        RPC_PlayEffect(caster.Object.Id);
 
         return true;
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayEffect(Vector3 position)
+    private void RPC_PlayEffect(NetworkId casterId)
     {
-        PlayEffect(position);
+        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
+        {
+            return;
+        }
+
+        PlayEffect(casterObj.transform);
     }
 
     private UnitBase GetAssaultBaseTarget(HeroController caster)
@@ -89,28 +87,34 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
         return null;
     }
 
-    private void PlayEffect(Vector3 position)
+    private void PlayEffect(Transform casterTransform)
     {
-        if (_effectPrefab == null)
+        if (_data.effectPrefab == null)
         {
             return;
         }
 
-        GameObject effects = Instantiate(_effectPrefab, position, Quaternion.identity);
+        GameObject effects = Instantiate(
+         _data.effectPrefab,
+         casterTransform.position,
+         Quaternion.identity,
+         casterTransform
+     );
 
-        //파티클 재생
-        ParticleSystem particleSystem = effects.GetComponent<ParticleSystem>();
-        if (particleSystem != null)
+        effects.transform.localPosition = Vector3.zero;
+
+        ParticleSystem ps = effects.GetComponent<ParticleSystem>();
+        if (ps != null)
         {
-            particleSystem.Play();
+            ps.Play();
         }
 
-        //연출 (충격파 느낌)
         effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(_radius * 2f, _effectScaleTime).SetEase(Ease.OutQuad);
+        effects.transform.DOScale(_data.radius * 2f * 6.5f, _data.effectLifeTime).SetEase(Ease.OutQuad);
 
-        //파티클 종료 후 제거
-        float lifeTime = particleSystem != null ? particleSystem.main.duration + particleSystem.main.startLifetime.constantMax : 1f;
+        float lifeTime = ps != null
+            ? ps.main.duration + ps.main.startLifetime.constantMax
+            : 1f;
 
         Destroy(effects, lifeTime);
     }
@@ -120,7 +124,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, _radius);
+        Gizmos.DrawWireSphere(transform.position, _data.radius);
     }
 #endif
 }

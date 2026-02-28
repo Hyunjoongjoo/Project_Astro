@@ -536,7 +536,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 5.542556
-  m_Speed: 6
+  m_Speed: 7
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -560,31 +560,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8b2f4a5a7e52254ca4ac142269bc711, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeroController
-  maxHealth: 100
+  maxHealth: 150
   deffense: 0
   team: 0
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 7299576946842487594}
-  _moveSpeed: 6
+  _moveSpeed: 7
+  unitSize: 2
   _searchRange: 5
   _targetLayer:
     serializedVersion: 2
     m_Bits: 0
   _searchInterval: 0.3
-  _attackPower: 15
-  _attackSpeed: 1
-  _attackRange: 4
-  _initSkillCooldown: 4
-  _skillCooldown: 8
+  _attackPower: 10
+  _attackSpeed: 1.5
+  _attackRange: 2
   _skillComponent: {fileID: 4569985432753418785}
   _attackType: 1
-  _heroSize: 1
-  _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
+  _projectilePrefab: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
   _firePoint: {fileID: 128638915413792048}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
+  _summonCooldown: 13
 --- !u!114 &707048002635603553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -609,9 +608,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ee3b1320d30cd445b022376d94d2fef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DefenseSkill
-  _duration: 5
-  _damageReductionRate: 0.3
-  _effectPrefab: {fileID: 3479278419723618712, guid: b4b0419d3c6ad2d4a8b5133bfe5693d3, type: 3}
+  _data: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
 --- !u!114 &9158771151194973300
 MonoBehaviour:
   m_ObjectHideFlags: 0

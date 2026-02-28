@@ -1,4 +1,5 @@
-﻿using Fusion;
+﻿using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 
 public class HeroSpawner : NetworkBehaviour
@@ -11,9 +12,22 @@ public class HeroSpawner : NetworkBehaviour
     [SerializeField] private float _minDeployDistance = 1f;
     [SerializeField] private float _maxDeployDistance = 15f;
 
+    //PlayerRef 기준으로 분리하여 독립 쿨다운
+    private readonly Dictionary<PlayerRef, TickTimer> _playerSummonTimers = new Dictionary<PlayerRef, TickTimer>();
+
     public override void Spawned()
     {
         Instance = this;
+    }
+
+    private bool CanSummon(PlayerRef player)//소환 가능한지 여부
+    {
+        if (!_playerSummonTimers.TryGetValue(player, out TickTimer timer))
+        {
+            return true; // 아직 쿨 기록 없음 → 소환 가능
+        }
+
+        return timer.ExpiredOrNotRunning(Runner);
     }
 
     public bool CanDeployHero(Vector3 spawnPos, Team team)//해당 위치에 영웅 배치가 가능한지 검사
@@ -57,12 +71,27 @@ public class HeroSpawner : NetworkBehaviour
         return Mathf.Lerp(_minDeployTime, _maxDeployTime, time);
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_SpawnUnit(NetworkPrefabRef prefab, Vector3 spawnPos, Team team)
+    private void StartSummonCooldown(PlayerRef player, float cooldown)
     {
+        _playerSummonTimers[player] =
+            TickTimer.CreateFromSeconds(Runner, cooldown);
+    }
 
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_SpawnUnit(NetworkPrefabRef prefab, Vector3 spawnPos, Team team, RpcInfo info = default)
+    {
         if (prefab == default)
+        {
             return;
+        }
+
+        PlayerRef caller = info.Source;
+
+        if (!CanSummon(caller))
+        {
+            return;
+        }
 
         if (!CanDeployHero(spawnPos, team))
         {
@@ -84,6 +113,7 @@ public class HeroSpawner : NetworkBehaviour
                 hero.Setup(team);
                 //배치 및 지연 처리는 컨트롤러가 수행
                 hero.BeginDeploy(spawnPos, deployDelay);
+                StartSummonCooldown(caller, hero.SummonCooldown);
             });
 
         Debug.Log($"영웅 소환 완료!");
