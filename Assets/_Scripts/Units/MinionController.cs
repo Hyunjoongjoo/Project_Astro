@@ -12,7 +12,7 @@ public class MinionController : MobilityUnit, IBasicAttack
     [SerializeField] private float _attackSpeed = 1f;
     [SerializeField] private float _attackRange = 2f;
 
-    [Header("공격 타입")]
+    [Header("타입")]
     [SerializeField] private AttackType _attackType;
 
     [Header("원거리")]
@@ -283,7 +283,7 @@ public class MinionController : MobilityUnit, IBasicAttack
 
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
-        projectile.GetComponent<Projectile>()?.Fire(targetPos);
+        projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
     }
 
     private void OnTargetDied(UnitBase deadUnit)

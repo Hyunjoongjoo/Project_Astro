@@ -706,24 +706,23 @@ MonoBehaviour:
   _CurrentState: 0
   agent: {fileID: 3123802997670338100}
   _moveSpeed: 6
+  unitSize: 0
   _searchRange: 9
   _targetLayer:
     serializedVersion: 2
     m_Bits: 0
   _searchInterval: 0.3
-  _attackPower: 15
-  _attackSpeed: 1
+  _attackPower: 20
+  _attackSpeed: 1.5
   _attackRange: 5
-  _initSkillCooldown: 4
-  _skillCooldown: 8
   _skillComponent: {fileID: -2787799764655628976}
   _attackType: 1
-  _heroSize: 0
-  _projectilePrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
+  _projectilePrefab: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
   _firePoint: {fileID: 4892445714994426902}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
+  _summonCooldown: 11
 --- !u!114 &288590522490992711
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -748,10 +747,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f412337cf51d4b64eb67b637c5ab606f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BarrageSkill
-  _shotCount: 3
-  _shotInterval: 0.15
-  _damageRatio: 1
-  _projectileFxPrefab: {fileID: 8628947152704392403, guid: 3e984d6eeacc4994292ffe4374a67a86, type: 3}
+  _data: {fileID: 11400000, guid: 2858029cad763fe4e81a7364d1dd7fd8, type: 2}
 --- !u!114 &6970888073266845989
 MonoBehaviour:
   m_ObjectHideFlags: 0
