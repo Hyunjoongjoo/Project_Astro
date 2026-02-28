@@ -189,21 +189,36 @@ public class StageManager : NetworkBehaviour
 
         GameManager.Instance.SetTeam(myTeam);
 
-        if (myTeam == Team.Red)
-        {
-            _mainCamera.transform.Rotate(new Vector3(0, 0, 180f));
-            _stageUI.InitRedTeam();
-        }
- 
         // DB로 부터 받아온 플레이어 정보 중 표시할 것 선정
-        ShowPlayerInfo();
+        ShowPlayerInfo(myTeam);
     }
 
-    private void ShowPlayerInfo()
+    private void ShowPlayerInfo(Team myTeam)
     {
-        Debug.Log("플레이어 정보 표시");
+        // 플레이어 수와 팀에 따라 각 로컬 초기화
+        _stageUI.LocalInitialize(PlayerDataMap.Count, myTeam);
+
+        PlayerNetworkData[] data = new PlayerNetworkData[PlayerDataMap.Count];
+
+
+        // 배열에 플레이어 정보를 채울건데
+        // [나, 적1, 팀원, 적2] 순으로 채워짐.
+        // 1:1 이면 [나, 적] 으로 채워짐.
+        int index = 1;
         foreach (var player in PlayerDataMap)
-            _stageUI.ShowPlayerInfo(player.Value);
+        {
+            if (player.Key == Runner.LocalPlayer) // 나.
+                data[0] = player.Value;
+            else if (player.Value.Team == myTeam) // 나는 아닌데 같은 팀 -> 2:2라는 뜻
+                data[2] = player.Value;
+            else // 나도 아니고 같은 팀도 아님 -> 적이라는 뜻
+            {
+                data[index] = player.Value;
+                index += 2;
+            }  
+        }
+
+        _stageUI.ShowPlayerInfo(data);
     }
 
     private void UpdatePlayerInfoTimer()
