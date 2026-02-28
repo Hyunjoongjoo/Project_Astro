@@ -28,7 +28,7 @@ public class StageUI : MonoBehaviour
         _gradationImage.transform.Rotate(0f, 0f, 180f);
     }
 
-    public void ShowPlayerInfo()
+    public void ShowPlayerInfo(PlayerNetworkData playersData)
     {
         _vsPanel.SetActive(true);
         Debug.Log("매칭된 플레이어 정보를 보여줌");

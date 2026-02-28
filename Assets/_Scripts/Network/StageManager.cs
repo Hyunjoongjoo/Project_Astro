@@ -21,8 +21,13 @@ public class StageManager : NetworkBehaviour
     [Networked, HideInInspector] public int CountdownValue { get; set; }
 
     // 플레이어별 팀 정보 (PlayerRef를 키로 사용)
+    //[Networked, Capacity(4)]
+    //public NetworkDictionary<PlayerRef, Team> PlayerTeams => default;
+
+    // 구조체로 퓨전 접속 시 필요한 플레이어 정보 담기.
+    // 이게 되면 위에 플레이어 팀 딕셔너리 제거.
     [Networked, Capacity(4)]
-    public NetworkDictionary<PlayerRef, Team> PlayerTeams => default;
+    public NetworkDictionary<PlayerRef, PlayerNetworkData> PlayerDataMap => default;
 
     //플레이어별 증강 선택 완료 여부 추적용
     [Networked, Capacity(4)]
@@ -43,6 +48,8 @@ public class StageManager : NetworkBehaviour
     private readonly int GAME_DURATION = 240;
     private readonly float PLAYER_INFO_DURATION = 4f;
     private readonly float COUNTDOWN_INTERVAL = 1f;
+
+    private PlayerNetworkData _localPlayerMap = default;
 
     private void Awake()
     {
@@ -72,6 +79,24 @@ public class StageManager : NetworkBehaviour
         {
             CurrentState = StageState.WaitingForPlayers;
         }
+
+        // 각 로컬 유저들은 자신의 닉네임을 가져와서 마스터에게 쏴준다.
+        string myNickname = UserDataManager.Instance.ProfileModel.nickName;
+        RPC_SubmitPlayerData(Runner.LocalPlayer, myNickname);
+    }
+
+    // 마스터는 로컬에서 수신받은 닉네임으로 구조체를 만든다.
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_SubmitPlayerData(PlayerRef playerRef, NetworkString<_16> nickName)
+    {
+        var data = new PlayerNetworkData
+        {
+            PlayerName = nickName,
+            Team = Team.None // 아직 팀 배정 전
+        };
+
+        PlayerDataMap.Set(playerRef, data);
+        Debug.Log($"플레이어 데이터 수신 : {nickName} ({PlayerDataMap.Count}/{_requiredPlayerCount})");
     }
 
     // 네트워크 틱에 맞춘 Update 메서드임
@@ -104,7 +129,8 @@ public class StageManager : NetworkBehaviour
 
     private void CheckAllPlayersReady()
     {
-        if (Runner.ActivePlayers.Count() == _requiredPlayerCount)
+        if (Runner.ActivePlayers.Count() == _requiredPlayerCount
+            && PlayerDataMap.Count == _requiredPlayerCount)
         {
             AssignTeams();
             CurrentState = StageState.ShowingPlayerInfo;
@@ -120,12 +146,30 @@ public class StageManager : NetworkBehaviour
         // 반으로 나눔 ( 2 -> 1, 4 -> 2)
         int half = players.Count / 2;
 
-        // 앞 절반 블루팀, 뒤 절반 레드팀
-        for (int i = 0; i < half; i++)
-            PlayerTeams.Add(players[i], Team.Blue);
+        // ============== 구조체로 시도 ==============
 
-        for (int i = half; i < players.Count; i++)
-            PlayerTeams.Add(players[i], Team.Red);
+        for (int i = 0; i < players.Count; i++)
+        {
+            Team team = i < half ? Team.Blue : Team.Red;
+
+            // 기존 데이터에 팀만 업데이트
+            var data = PlayerDataMap.Get(players[i]);
+            data.Team = team;
+            PlayerDataMap.Set(players[i], data);
+        }
+
+        // ============== 여기까지 ==============
+
+        // ============== 기존 팀 배정 ==============
+
+        // 앞 절반 블루팀, 뒤 절반 레드팀
+        //for (int i = 0; i < half; i++)
+        //    PlayerTeams.Add(players[i], Team.Blue);
+
+        //for (int i = half; i < players.Count; i++)
+        //    PlayerTeams.Add(players[i], Team.Red);
+
+        // ============== 여기까지 ==============
 
         // 팀 자원인 증강 게이지도 추가함.
         AugmentExp.Add(Team.Blue, 0);
@@ -138,7 +182,8 @@ public class StageManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_NotifyTeamAssignment()
     {
-        Team myTeam = PlayerTeams.Get(Runner.LocalPlayer);
+        _localPlayerMap = PlayerDataMap.Get(Runner.LocalPlayer);
+        Team myTeam = _localPlayerMap.Team;
 
         Debug.Log($"팀 배정 완료! 내 팀 {myTeam}");
 
@@ -157,7 +202,8 @@ public class StageManager : NetworkBehaviour
     private void ShowPlayerInfo()
     {
         Debug.Log("플레이어 정보 표시");
-        _stageUI.ShowPlayerInfo();
+        foreach (var player in PlayerDataMap)
+            _stageUI.ShowPlayerInfo(player.Value);
     }
 
     private void UpdatePlayerInfoTimer()
@@ -337,7 +383,11 @@ public class StageManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_UpdateAugmentGauge(Team team, int value)
     {
-        Team myTeam = PlayerTeams.Get(Runner.LocalPlayer);
+        // if (class == null) 검사를 구조체로 하기.
+        if ( _localPlayerMap.Equals(default(PlayerNetworkData)) )
+            _localPlayerMap = PlayerDataMap.Get(Runner.LocalPlayer);
+
+        Team myTeam = _localPlayerMap.Team;
         if (myTeam == team)
             _stageUI.UpdateAugmentGauge(value); // UI 갱신
     }
@@ -367,9 +417,12 @@ public class StageManager : NetworkBehaviour
 
         _stageUI.goLobbyBtn.onClick.AddListener(ShutDownAndSceneChange);
 
-        Debug.Log($"승리팀 : {victory}, 내 팀 : {PlayerTeams.Get(Runner.LocalPlayer)}");
+        if (_localPlayerMap.Equals(default(PlayerNetworkData)))
+            _localPlayerMap = PlayerDataMap.Get(Runner.LocalPlayer);
 
-        Team myTeam = PlayerTeams.Get(Runner.LocalPlayer);
+        Team myTeam = _localPlayerMap.Team;
+
+        Debug.Log($"승리팀 : {victory}, 내 팀 : {myTeam}");
 
         // 일단 패널 아무거나 띄움. 나중에 UI매니저에게
         if (victory == Team.None) // 무승부도 존재하는 것으로 보임. 승리팀이 없으면 무승부
