@@ -1,16 +1,58 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class HpBarItem : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private Image _fillImg;
+    [SerializeField] private Color _blueTeamColor = Color.blue;
+    [SerializeField] private Color _redTeamColor = Color.red;
+    [SerializeField] private float _showDuration = 2f;
+    [SerializeField] private Vector3 _offset = new Vector3(0, 2.5f, 0);
+
+    private Transform _target;
+    private Camera _mainCam;
+    private float _timer;
+    private string _poolTag;
+
+    public void Setup(Transform target,Team team,float hpRatio,string poolTag)
     {
-        
+        _target = target;
+        _mainCam = Camera.main;
+        _poolTag = poolTag;
+
+        _fillImg.color = (team == Team.Blue) ? _blueTeamColor : _redTeamColor;
+        UpdateHp(hpRatio);
+
+        _timer = _showDuration;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void UpdateHp(float ratio)
     {
-        
+        _fillImg.fillAmount = ratio;
+        _timer = _showDuration;
+    }
+
+    private void LateUpdate()
+    {
+        if (_target == null || !_target.gameObject.activeInHierarchy)
+        {
+            Return();
+            return;
+        }
+
+        // 위치 추적
+        Vector3 screenPos = _mainCam.WorldToScreenPoint(_target.position + _offset);
+        transform.position = screenPos;
+
+        _timer -= Time.deltaTime;
+        if (_timer <= 0)
+        {
+            Return();
+        }
+    }
+
+    private void Return()
+    {
+        PoolManager.Instance.ReturnToPool(_poolTag, gameObject);
     }
 }
