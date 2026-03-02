@@ -1,14 +1,124 @@
 스트링 인덱스  ID,한국어 텍스트,기획용 비고
 id,textKor,note
 String,String,String
-name_item_attack001,강화 철갑탄,
-name_defence001,요새화 프로토콜,
-name_utility001,이온 추진기,
-name_hybrid001,광전사 모듈,
-des_effect_item_attack001_01,공격력 {0}% 증가,
-des_effect_item_defence001_01,체력이 {1}% 이하일 때 받는 피해량 {0}% 감소,
-des_effect_item_utility001_01,이동 속도 {0}% 증가,
-des_effect_item_hybrid001_01,공격력 {0}% 증가,
-des_effect_item_hybrid001_02,최대 체력 {0}% 감소,
-hero_role_01,,
-hero_role_01,,
+name_hero_corsair,커세어,커세어 영웅 이름
+name_hero_heavyrain,헤비레인,헤비레인 영웅 이름
+name_hero_tank,탱크,탱크 영웅 이름
+name_hero_angel,앤젤,앤젤 영웅 이름
+desc_hero_corsair,커세어 설명입니다,커세어 영웅 설명
+desc_hero_heavyrain,헤비레인 설명입니다,헤비레인 영웅 설명
+desc_hero_tank,탱크 설명입니다,탱크 영웅 설명
+desc_hero_angel,앤젤 설명입니다,앤젤 영웅 설명
+name_unit_minion,미니언,미니언 이름
+name_unit_superminion,강화 미니언,강화미니언 이름
+name_unit_bridge,함교,함교 이름
+name_unit_tower,포탑,포탑 이름
+desc_unit_minion,미니언 설명입니다,미니언 설명
+desc_unit_superminion,강화미니언 설명입니다,강화미니언 설명
+desc_unit_bridge,함교 설명입니다,함교 설명
+desc_unit_tower,포탑 설명입니다,포탑 설명
+skill_name_hero_corsair,코로나 폭발,커세어 기본 스킬 이름
+skill_name_hero_heavyrain,일점 사격,헤비레인 기본 스킬 이름
+skill_name_hero_tank,장갑 강화,탱크 기본 스킬 이름
+skill_name_hero_angel,긴급 수리,앤젤 기본 스킬 이름
+skill_desc_hero_corsair,자신 주변에 1회의 범위 대미지를 준다,커세어 기본 스킬 설명
+skill_desc_hero_heavyrain,기본 공격을 동시에 3발 발사한다,헤비레인 기본 스킬 설명
+skill_desc_hero_tank,본인의 받는 피해량이 감소한다,탱크 기본 스킬 설명
+skill_desc_hero_angel,본인을 제외한 아군 영웅 한 명의 체력을 회복시킨다,앤젤 기본 스킬 설명
+augment1_name_hero_corsair,태양의 불꽃,커세어 증강 스킬1 이름
+augment1_name_hero_heavyrain,초토화,헤비레인 증강 스킬1 이름
+augment1_name_hero_tank,성벽,탱크 증강 스킬1 이름
+augment1_name_hero_angel,나노봇 투여,앤젤 증강 스킬1 이름
+augment1_desc_hero_corsair,스킬의 범위가 증가한다,커세어 증강 스킬1 설명
+augment1_desc_hero_heavyrain,기본 공격을 동시에 5발 발사한다,헤비레인 증강 스킬1 설명
+augment1_desc_hero_tank,본인의 받는 피해량이 대폭 감소한다,탱크 증강 스킬1 설명
+augment1_desc_hero_angel,범위 내 아군을 회복시킨다,앤젤 증강 스킬1 설명
+hero_type_robot,전술 슈트,영웅의 heroType이 robot이면 정보창에 표시
+hero_type_spacecraft,우주 함선,영웅의 heroType이 spacecraft면 정보창에 표시
+hero_role_tank,방어형,영웅의 heroRole이 tank면 정보창에 표시
+hero_role_melee,강습형,영웅의 heroRole이 melee면 정보창에 표시
+hero_role_ranged,포격형,영웅의 heroRole이 ranged면 정보창에 표시
+hero_role_healer,지원형,영웅의 heroRole이 healer면 정보창에 표시
+hero_movetype_small,소형,영웅의 moveType이 small이면 정보창에 표시
+hero_movetype_large,대형,영웅의 moveType이 large이면 정보창에 표시
+hero_movetype_fixed,고정형,영웅의 moveType이 fixed이면 정보창에 표시
+name_item001,강화 철갑탄,아이템 이름
+name_item002,생명 유지 장치,아이템 이름
+name_item003,응급 의료 키트,아이템 이름
+name_item004,이온 추진기,아이템 이름
+name_item005,증폭 회로,아이템 이름
+name_item006,고출력 렌즈,아이템 이름
+name_item007,긴급 호출기,아이템 이름
+name_item008,티타늄 합금,아이템 이름
+name_item009,광전사 모듈,아이템 이름
+name_item010,저격용 위장막,아이템 이름
+des_effect_item001_01,공격력 20% 증가,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item002_01,최대 체력 20% 증가,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item003_01,치유력 20% 증가,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item004_01,이동 속도 20% 증가,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item005_01,체력이 40% 이하일 때 공격력 50% 증가,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item006_01,체력 70% 이상일 때 쿨타임 20% 감소,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item007_01,재소환 대기시간 20% 감소,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item007_02,최대 체력 30% 감소,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item008_01,받는 피해량 30% 감소,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item008_02,이동 속도 20% 감소,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item009_01,공격 속도 30% 증가,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item009_02,이동 속도 30% 증가,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item009_03,받는 피해량 30% 증가,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item010_01,공격력 20% 증가,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item010_02,공격 속도 30% 감소,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+ui_toast_item_equip_fail,영웅의 아이템 슬롯이 가득 찼습니다,아이템 장착 시 아이템 슬롯 max면 토스트 메시지 출력
+ui_toast_item_share_fail,상대의 아이템 보관함이 가득 찼습니다,아이템 전달 시 아군 보관함 max면 토스트 메시지 출력
+ui_toast_item_not_overlap,해당 아이템은 중복 장착이 불가능합니다,아이템 장착 시 중복 불가능 아이템이면 토스트 메시지 출력
+ui_augment_hero_name,영웅 획득 : {0},{0}에는 Hero 테이블의 heroName 참조
+ui_augment_hero_des,영웅 {0}을/를 사용할 수 있습니다,{0}에는 Hero 테이블의 heroName 참조
+ui_augment_hero_respawn,재소환 대기시간 : {0}초,{0}에는 HeroStat 테이블의 respawnCooldown 참조
+ui_augment_hero_skill_name,스킬 [{0}],{0}에는 영웅이 가진 기본 스킬의 이름 스트링 id 참조
+ui_augment_hero_skill_cooldown,쿨타임: {0}초,{0}에는 영웅이 가진 기본 스킬의 쿨타임 값 참조
+ui_toast_team_change_success,팀이 교체되었습니다.,
+ui_toast_team_change_failed,팀 교체 신청이 거절되었습니다.,
+ui_toast_team_change_unable,{N}초 후 팀 교체 신청 가능,{N} = 팀 교체 신청 가능하기까지 남은 시간 (단위: 초)
+ui_toast_team_change_In_progress,대상이 이미 팀 교체 요청을 진행하고 있습니다.,
+ui_toast_unexecutable_request,실행할 수 없는 요청입니다.,
+ui_toast_cancel_request,요청이 취소되었습니다.,
+ui_kick_out_Success,{0} 님을 내보냈습니다.,{0} = 대기실에서 내보낸 플레이어 계정 닉네임
+ui_toast_unable_enter_lobby_ban,추방당한 대기실에 다시 입장할 수 없습니다.,내보내진 대기실 재입장 시도 시 플레이어 화면에 출력될 토스트 메시지
+ui_toast_unexecutable_request,실행할 수 없는 요청입니다.,각종 기능 사용 중 실행할 수 없는 요청일 때 출력될 텍스트 메시지
+ui_toast_Admin_change,{0} 님에게 방장 권한을 위임했습니다.,{0} = 방장 권한을 넘겨 받은 플레이어 계정 닉네임
+ui_admin_Assign,대기실 방장이 되었습니다.,방장 권한을 위임 받아 새롭게 방장이 된 플레이어 화면에 출력될 토스트 메시
+ui_toast_game_start_unable,대기실 인원이 부족해 게임을 시작할 수 없습니다.,게임 시작 조건 만족하지 않은 상태에서 대기실 내 게임 시작 버튼 입력 시 출력될 토스트 메시지
+ui_toast_plz_typing_lobby_code,대기실 코드를 입력해주세요.,입력값 없는 상태에서 검색 버튼 입력 시 출력될 토스트 메시지
+ui_toast_lobby_code_8_letters,대기실 코드는 8글자입니다.,1~7 자리수 입력한 상태에서 검색 버튼 입력 시 출력될 토스트 메시지
+ui_toast_lobby_code_Invalid,입력한 대기실 코드가 유효하지 않습니다.,입력한 값과 일치하는 대기실 코드가 없을 때 출력될 메시지
+ui_toast_lobby_full,대기실이 가득 찼습니다,입장할 대기실 내 인원이 가득 찼을 때 출력될 메시지
+ui_toast_lobby_not_exist,존재하지 않는 대기실입니다.,입장할 대기실이 존재하지 않을 때 출력될 메시지
+ui_toast_lobby_entry_failed,입장에 실패했습니다. 다시 시도해 주세요.,"서버, 네트워크 오류로 인해 대기실 입장 실패 시 출력될 메시지"
+create_lobby,대기실 생성,
+search_lobby,대기실 찾기,
+select_game_mode,게임 모드를 선택하세요.,대기실 생성 팝업창 내 출력될 텍스트
+basics,기본,
+1v1_battle,1v1 전투,
+2v2_battle,2v2 전투,
+ui_lobby_name,{0}님의 게임,
+team1,1팀,
+team2,2팀,
+empty,비어 있음,빈 플레이어 슬롯 기본값
+join,참가,
+ui_lobby_code,대기실 코드: {1},대기실 내 출력될 대기실 코드
+game_start,게임 시작,
+change_admin,방장 변경,
+kick_out,내보내기,
+notification,알림,
+ui_check_change_admin,{0}님에게 방장권한을 위임하시겠습니까?,"방장 변경 의사 확인 팝업창 내 출력될 텍스트, {0} = 방장 권한을 넘겨줄 대상 플레이어 닉네임"
+cancel,취소,
+check,확인,
+ui_check_player_kick_out,{0}님을 내보내시겠습니까?,"내보내기 의사 확인 팝업창 화면 내 출력될 확인 문구, {0} = 대기실에서 내보낼 플레이어 계정 닉네임"
+ui_player_kicked_out,방장에 의해 대기실에서 내보내졌습니다.,대기실에서 내보내진 플레이어 화면에 출력될 팝업창 내 문구
+close,닫기,
+ui_plz_typed_lobby_code,대기실 코드를 입력해주세요.,대기실 검색 모달창 내 출력될 텍스트
+ui_noti_lobby_code,※ 대기실 코드는 알파벳 대문자 8자리로 입력할 수 있습니다.,대기실 검색 모달창 내 출력될 텍스트
+search,검색,
+lobby_info,대기실 정보,
+ui_lobby_admin,방장: {0},"대기실 정보 모달창 내 출력될  화면 출력 시점 대기실 방장 닉네임, {0} = 화면 출력 시점 방장인 플레이어 계정 닉네임"
+enter,입장,
+noti_exp_exchange_reward,최대 레벨을 달성한 영웅에게 지급될 경험치는 골드로 변환되었습니다.,대체 보상 지급 시 대전 보상 화면에 출력될 알림 문구

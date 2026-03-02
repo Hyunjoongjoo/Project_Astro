@@ -23,7 +23,9 @@ public class HeroStatusHandler
         {
             int growthStep = level - 1;
             resultStatus.BaseHp = (int)Math.Round(resultStatus.BaseHp + (resultStatus.ipLvHp * growthStep));
-            resultStatus.baseShield = (int)Math.Round(resultStatus.baseShield + (resultStatus.ipLvShield * growthStep));
+            //여현구
+            //3.2 테이블 변경으로 인한 주석처리
+            //resultStatus.baseShield = (int)Math.Round(resultStatus.baseShield + (resultStatus.ipLvShield * growthStep));
             resultStatus.baseAttackPower = (int)Math.Round(resultStatus.baseAttackPower + (resultStatus.ipLvAttackPower * growthStep));
             resultStatus.baseHealingPower = (int)Math.Round(resultStatus.baseHealingPower + (resultStatus.ipLvHealingPower * growthStep));
         }

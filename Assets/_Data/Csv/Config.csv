@@ -2,15 +2,26 @@
 id,configValue,note
 String,String,String
 game_time_limit,240,하나의 대전이 시작되어 종료되기까지의 제한 시간 (초). 제한 시간 만료 시 게임 결과 시퀀스 진행
-minion_spawn_time,15,이전 미니언 웨이스 생성 이후 {N}초가 지나면 다시 미니언 웨이브 생성
+minion_spawn_time,15,미니언 생성 주기. 이전 미니언 웨이브 생성 이후 {N}초가 지나면 다시 미니언 웨이브 생성
 minion_spawn_count,3,한 라인에서 생성되는 미니언 개수
-minion_spawn_plus_count,3,포탑 파괴시 추가되는 미니언 개수
+minion_spawn_plus_count,1,포탑 1개 파괴시 한 라인 당 추가되는 미니언 개수
 augment_select_time,20,증강 선택 시 주어지는 제한 시간 (초)
-augment_exp_minion,13,미니언 처치 시 획득하는 증강 경험치
-augment_exp_superminion,26,강화미니언 처치 시 획득하는 증강 경험치
-augment_exp_hero,26,영웅 처치 시 획득하는 증강 경험치
-augment_gauge,150,경험치(증강) 게이지 (레벨에 상관없이 고정)
-player_item_slot,3,플레이어가 최대 소지가능한 아이템(증강)개수
-hero_item_slot,2,한 영웅이 보유 가능한 최대 아이템 슬롯 수
+augment_exp_minion,10,미니언 처치 시 획득하는 증강 경험치
+augment_exp_superminion,20,강화미니언 처치 시 획득하는 증강 경험치
+augment_exp_hero,20,영웅 처치 시 획득하는 증강 경험치
+augment_gauge,120,"증강 선택까지 필요한 경험치의 양 (증강 횟수에 상관 없이 고정), 증강 게이지의 100% 기준"
+player_item_slot,3,플레이어 보관함에 소지 가능한 아이템 최대 개수
+hero_item_slot,2,한 영웅이 장착 가능한 아이템 최대 개수
 max_hero_level,12,게임 내 영웅 최대 레벨
 max_hero_exp,999999,영웅이 획득할 수 있는 경험치의 총 량 (임시값)
+augment_reinforce_number,6,스킬 증강 강화가 적용되는 기준이 되는 증강 횟수 (증강 n회 선택 후부터 스킬 증강 강화 적용)
+min_hero_hp,1,"영웅의 최종 체력 수치가 최소값 미만인 경우, 최소값 처리하고 나머지 버림"
+min_hero_attack_power,0,"영웅의 최종 공격력 수치가 최소값 미만인 경우, 최소값 처리하고 나머지 버림"
+min_hero_healing_power,0,"영웅의 최종 치유력 수치가 최소값 미만인 경우, 최소값 처리하고 나머지 버림"
+max_hero_attack_speed,0.9,"영웅 공격속도 변경 %가 최대값을 초과한 경우, 최대값으로 처리하고 나머지는 버림 (반드시 1 미만의 값을 입력할 것)"
+min_hero_attack_speed,-3,"영웅 공격속도 변경 %가 최소값 미만인 경우, 최소값으로 처리하고 나머지는 버림"
+max_hero_move_speed,3,"영웅 이동속도 변경 %가 최대값을 초과한 경우, 최대값으로 처리하고 나머지는 버림"
+min_hero_move_speed,-0.9,"영웅 이동속도 변경 %가 최소값 미만인 경우, 최소값으로 처리하고 나머지는 버림 (-1보다 높게 입력할 것)"
+min_hero_damage_reduce,-0.5,"영웅 받는 피해량 변경 %가 최소값 미만인 경우, 최소값으로 처리하고 나머지는 버림 (반드시 -1 미만의 값을 입력할 것)"
+max_hero_cooltime_reduce,0.5,"영웅 쿨타임 변경 %가 최대값을 초과한 경우, 최대값으로 처리하고 나머지는 버림 (반드시 1 미만의 값을 입력할 것)"
+max_hero_respawn_reduce,0.5,"영웅 재소환 대기시간 변경 %가 최소값 미만인 경우, 최소값으로 처리하고 나머지는 버림(반드시 1 미만의 값을 입력할 것)"
