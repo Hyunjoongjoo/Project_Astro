@@ -80,6 +80,8 @@ public class AugmentDeckManager
 
         return types;
     }
+
+    //카드 생성기
     private AugmentCard CreateCard(
         AugmentType type, List<string> excludeRefIds,
         List<string> ownedHeroIds, List<string> ownedSkillAugmentIds,
@@ -96,17 +98,57 @@ public class AugmentDeckManager
         switch (type)
         {
             case AugmentType.Hero:
-                // TODO: TableManager.Instance.HeroTable 연동 (LINQ 없이 for문 캐싱으로 구현 필요)
-                refId = "Hero_Target_ID";
-                title = "새로운 영웅 해금";
-                desc = "영웅을 해금합니다.";
+                List<HeroData> validHeroes = new List<HeroData>();
+                var allHeroes = TableManager.Instance.HeroTable.GetAll();
+
+                for (int i = 0; i < allHeroes.Count; i++)
+                {
+                    HeroData hero = allHeroes[i];
+
+                    //내 덱에 없는 영웅 & 이번 턴에 이미 띄운 카드가 아닐 것
+                    if (!ownedHeroIds.Contains(hero.id) && !excludeRefIds.Contains(hero.id))
+                    {
+                        validHeroes.Add(hero);
+                    }
+                }
+
+                if (validHeroes.Count > 0)
+                {
+                    HeroData pickedHero = validHeroes[Random.Range(0, validHeroes.Count)];
+                    refId = pickedHero.id;
+
+                    title = GetString(pickedHero.heroName);
+                    desc = GetString(pickedHero.heroDesc);
+
+                    //여기쯤 아이콘 연동? , 아이콘 출력 방식 필요함 어드레서블이든 리소스로드든
+                }
+                else return null; //뽑을 영웅이 없으면 null
                 break;
 
             case AugmentType.Item:
-                // TODO: TableManager.Instance.ItemTable 연동
-                refId = "Item_Target_ID";
-                title = "아이템 획득";
-                desc = "아이템 보관소로 들어갑니다.";
+                List<ItemData> validItems = new List<ItemData>();
+                var allItems = TableManager.Instance.ItemTable.GetAll();
+
+                for (int i = 0; i < allItems.Count; i++)
+                {
+                    ItemData item = allItems[i];
+
+                    //이번 턴에 중복으로 띄우지 않을 것
+                    if (!excludeRefIds.Contains(item.id))
+                    {
+                        validItems.Add(item);
+                    }
+                }
+
+                if (validItems.Count > 0)
+                {
+                    ItemData pickedItem = validItems[Random.Range(0, validItems.Count)];
+                    refId = pickedItem.id;
+                    title = GetString(pickedItem.name);
+                    desc = "";
+                    //여기쯤 아이콘 연동?
+                }
+                else return null;
                 break;
 
             case AugmentType.Skill:
@@ -116,9 +158,13 @@ public class AugmentDeckManager
                 {
                     SkillAugmentSO skill = _allSkillAugments[i];
 
+                    //1. 내필드의 영웅 강화 증강인가
+                    //2. 내가이미 집은 증강인가
+                    //3. 반대 트리 제외
+                    //4. 동시출현 방지
                     if (ownedHeroIds.Contains(skill.TargetHeroID) &&
                         !ownedSkillAugmentIds.Contains(skill.AugmentID) &&
-                        !ownedSkillAugmentIds.Contains(skill.ConflictID) &&
+                        (string.IsNullOrEmpty(skill.ConflictID) || !ownedSkillAugmentIds.Contains(skill.ConflictID)) &&
                         !excludeRefIds.Contains(skill.AugmentID))
                     {
                         validSkills.Add(skill);
@@ -155,12 +201,28 @@ public class AugmentDeckManager
             //받을 수 있는 스킬 증강이 단 하나라도 존재한다면? 최대아님
             if (ownedHeroIds.Contains(skill.TargetHeroID) &&
                 !ownedSkillAugmentIds.Contains(skill.AugmentID) &&
-                !ownedSkillAugmentIds.Contains(skill.ConflictID))
+                (string.IsNullOrEmpty(skill.ConflictID) || !ownedSkillAugmentIds.Contains(skill.ConflictID)))
             {
                 return false;
             }
         }
 
         return true;
+    }
+
+    //String테이블 가져오기
+    private string GetString(string stringId)
+    {
+        if (string.IsNullOrEmpty(stringId)) return "";
+
+        var stringData = TableManager.Instance.StringTable.Get(stringId);
+
+        if (stringData != null)
+        {
+            return stringData.textKor; 
+        }
+
+        //데이터가 누락되었다면 키값 띄우기
+        return stringId;
     }
 }
