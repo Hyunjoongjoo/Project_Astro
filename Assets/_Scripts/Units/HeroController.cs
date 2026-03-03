@@ -109,8 +109,10 @@ public class HeroController : MobilityUnit, IBasicAttack
             _attackRange = _heroData.AttackRange;
             _attackType = _heroData.NormalAttack.AttackType;
             searchRange = _heroData.SearchRange;
+            maxHealth = _heroData.MaxHealth;
+            moveSpeed = _heroData.MoveSpeed;
+            agent.speed = moveSpeed;
             _projectilePrefab = _heroData.NormalAttack.EffectPrefab;
-
             _summonCooldown = _heroData.SummonCooldown;
 
             EquipSkill(_heroData.NormalSkill);
@@ -151,18 +153,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         if (_currentSkill == null)
         {
-            if (newSkillData is BarrageSkillSO)
-            {
-                _currentSkill = gameObject.AddComponent<BarrageSkill>();
-            }
-            else if (newSkillData is DefenseSkillSO)
-            {
-                _currentSkill = gameObject.AddComponent<DefenseSkill>();
-            }
-            else if (newSkillData is SupportSkillSO)
-            {
-                _currentSkill = gameObject.AddComponent<SupportSkill>();
-            }
+            _currentSkill = newSkillData.CreateSkillComponent(gameObject);
         }
 
         _currentSkill.ChangeSkillData(newSkillData);
@@ -502,7 +493,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         _damageReductionRate = 0f;
     }
 
-    public void HealUnit(UnitBase target, float healRatio)
+    public void HealUnit(UnitBase target, float healAmount)
     {
         if (!Object.HasStateAuthority)
         {
@@ -513,8 +504,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         {
             return;
         }
-
-        float healAmount = target.MaxHealth * Mathf.Clamp01(healRatio);
 
         target.CurrentHealth = Mathf.Min(
             target.CurrentHealth + healAmount,

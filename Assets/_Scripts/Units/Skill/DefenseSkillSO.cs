@@ -7,12 +7,17 @@ public class DefenseSkillSO : SkillDataSO
     [SerializeField] private float _duration;
     [SerializeField] private float _damageReductionRate;
 
+    public override IHeroSkill CreateSkillComponent(GameObject owner)
+    {
+        return owner.AddComponent<DefenseSkill>();
+    }
+
     public override SkillRuntimeData CreateRuntimeData()
     {
         SkillRuntimeData runtime = base.CreateRuntimeData();
 
         runtime.Duration = Duration;
-        runtime.DamageMultiplier = DamageReductionRate;
+        runtime.DamageReductionRate = DamageReductionRate;
 
         return runtime;
     }

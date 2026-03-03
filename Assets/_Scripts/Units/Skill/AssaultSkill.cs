@@ -116,7 +116,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
         }
 
         effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(_data.Radius * 2f * 6.5f, _data.EffectLifeTime).SetEase(Ease.OutQuad);
+        effects.transform.DOScale(_data.Radius * 2f * 6.5f, _data.Duration).SetEase(Ease.OutQuad);
 
         float lifeTime = ps != null
             ? ps.main.duration + ps.main.startLifetime.constantMax

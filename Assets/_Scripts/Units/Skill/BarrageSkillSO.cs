@@ -8,11 +8,18 @@ public class BarrageSkillSO : SkillDataSO
     [SerializeField] private float _shotInterval = 0.05f;
     [SerializeField] private float _damageMultiplier = 1f;
 
+    public override IHeroSkill CreateSkillComponent(GameObject owner)
+    {
+        return owner.AddComponent<BarrageSkill>();
+    }
+
     public override SkillRuntimeData CreateRuntimeData()
     {
         SkillRuntimeData runtime = base.CreateRuntimeData();
 
         runtime.ShotCount = ShotCount;
+        runtime.ShotInterval = ShotInterval;
+        runtime.DamageMultiplier = DamageMultiplier;
 
         return runtime;
     }
