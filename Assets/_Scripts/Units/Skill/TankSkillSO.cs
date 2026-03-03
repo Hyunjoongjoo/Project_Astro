@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "DefenseSkillSO", menuName = "Scriptable Objects/DefenseSkillSO")]
-public class DefenseSkillSO : SkillDataSO
+public class TankSkillSO : SkillDataSO
 {
     [Header("방어형 설정")]
     [SerializeField] private float _duration;
@@ -9,7 +9,7 @@ public class DefenseSkillSO : SkillDataSO
 
     public override IHeroSkill CreateSkillComponent(GameObject owner)
     {
-        return owner.AddComponent<DefenseSkill>();
+        return owner.AddComponent<TankSkill>();
     }
 
     public override SkillRuntimeData CreateRuntimeData()

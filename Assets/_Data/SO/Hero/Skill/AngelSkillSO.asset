@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eecbd40ff0a75af42970a5c260b0b93c, type: 3}
+  m_Name: AngelSkillSO
+  m_EditorClassIdentifier: Assembly-CSharp::SupportSkillSO
+  _skillId: normalSkill_angel
+  _category: 1
+  _initCooldown: 5
+  _cooldown: 10
+  _skillRange: 3
+  _effectPrefab: {fileID: 7343538280686139031, guid: a8e905d0d5bf4144393d0b154082615b, type: 3}
+  _healAmount: 100
+  _duration: 0.5
+  _isAreaSkill: 0

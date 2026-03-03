@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "AssaultSkillSO", menuName = "Scriptable Objects/AssaultSkillSO")]
-public class AssaultSkillSO : SkillDataSO
+public class CorsairSkillSO : SkillDataSO
 {
     [Header("강습형 설정")]
     [SerializeField] private float _radius;
@@ -10,7 +10,7 @@ public class AssaultSkillSO : SkillDataSO
 
     public override IHeroSkill CreateSkillComponent(GameObject owner)
     {
-        return owner.AddComponent<AssaultSkill>();
+        return owner.AddComponent<CorsairSkill>();
     }
 
     public override SkillRuntimeData CreateRuntimeData()

@@ -21,6 +21,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     private float _attackPower;
     private float _attackSpeed;
     private float _attackRange;
+    private float _healAmount;
     private AttackType _attackType;
     private GameObject _projectilePrefab;
     private float _summonCooldown;
@@ -110,6 +111,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             _attackRange = _heroData.AttackRange;
             _attackType = _heroData.NormalAttack.AttackType;
             searchRange = _heroData.SearchRange;
+            _healAmount = _heroData.HealAmount;
             maxHealth = _heroData.MaxHealth;
             moveSpeed = _heroData.MoveSpeed;
             agent.speed = moveSpeed;
@@ -547,6 +549,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
     }
 
+    //스킬증강에 사용될 메서드
     private void ApplySkillAugments()
     {
         if (!Object.HasStateAuthority)
@@ -580,19 +583,16 @@ public class HeroController : MobilityUnit, IBasicAttack
             }
 
             SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
-
             if (so == null)
             {
                 continue;
             }
 
-            //이 영웅 대상 증강인지 체크
             if (so.TargetHeroID != _heroData.HeroID)
             {
                 continue;
             }
 
-            //티어 결정
             int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
 
             if (tierIndex >= so.Tiers.Length)

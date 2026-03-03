@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eecbd40ff0a75af42970a5c260b0b93c, type: 3}
-  m_Name: SupportSkillSO
+  m_Name: AngelAugmentSkillSO
   m_EditorClassIdentifier: Assembly-CSharp::SupportSkillSO
-  _skillId: 
-  _category: 1
+  _skillId: augmentSkill_angel_A
+  _category: 2
   _initCooldown: 5
   _cooldown: 10
   _skillRange: 3
-  _effectPrefab: {fileID: 7343538280686139031, guid: a8e905d0d5bf4144393d0b154082615b, type: 3}
+  _effectPrefab: {fileID: 8717233226799944948, guid: b586638b7e301934bacfc1af47cce4aa, type: 3}
   _healAmount: 100
   _duration: 0.5
-  _isAreaSkill: 0
+  _isAreaSkill: 1

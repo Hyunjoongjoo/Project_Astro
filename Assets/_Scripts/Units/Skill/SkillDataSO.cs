@@ -1,20 +1,18 @@
 ﻿using UnityEngine;
 
-public enum SkillCategory
+public enum SkillType
 {
-    BasicAttack,
-    BaseSkill,
-    AugmentA,
-    AugmentA_Enhanced,
-    AugmentB,
-    AugmentB_Enhanced
+    normal_attack,
+    normal_skill,
+    augment_skill,
+    augment_skill_enhance
 }
 
 public abstract class SkillDataSO : ScriptableObject
 {
     [Header("기본 설정")]
     [SerializeField] private string _skillId;
-    [SerializeField] private SkillCategory _category;
+    [SerializeField] private SkillType _skillType;
     [SerializeField] private float _initCooldown;
     [SerializeField] private float _cooldown;
     [SerializeField] private float _skillRange;
@@ -37,7 +35,7 @@ public abstract class SkillDataSO : ScriptableObject
         };
     }
     public string SkillId => _skillId;
-    public SkillCategory Category => _category;
+    public SkillType SkillType => _skillType;
     public float InitCooldown => _initCooldown;
     public float Cooldown => _cooldown;
     public float SkillRange => _skillRange;

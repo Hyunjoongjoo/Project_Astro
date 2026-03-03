@@ -2,9 +2,9 @@
 using UnityEngine;
 using DG.Tweening;
 
-public class AssaultSkill : NetworkBehaviour, IHeroSkill
+public class CorsairSkill : NetworkBehaviour, IHeroSkill
 {
-    [SerializeField] private AssaultSkillSO _data;
+    [SerializeField] private CorsairSkillSO _data;
 
     public SkillDataSO Data => _data;
 
@@ -76,7 +76,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
 
     public void ChangeSkillData(SkillDataSO newData)
     {
-        if (newData is AssaultSkillSO assaultData)
+        if (newData is CorsairSkillSO assaultData)
         {
             _data = assaultData;
         }

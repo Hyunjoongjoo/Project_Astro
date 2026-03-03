@@ -13,9 +13,10 @@ public class HeroDataSO : ScriptableObject
     [SerializeField] private float _attackSpeed;
     [SerializeField] private float _attackPower;
     [SerializeField] private float _searchRange;
+    [SerializeField] private float _healAmount;
 
     public NormalAttackDataSO NormalAttack => _normalAttack;
-    public string HeroId => _heroId;
+    public string HeroID => _heroId;
     public float MaxHealth => _maxHealth;
     public float MoveSpeed => _moveSpeed;
     public SkillDataSO NormalSkill => _normalSkill;
@@ -24,4 +25,5 @@ public class HeroDataSO : ScriptableObject
     public float AttackPower => _attackPower;
     public float AttackSpeed => _attackSpeed;
     public float SearchRange => _searchRange;
+    public float HealAmount => _healAmount;
 }

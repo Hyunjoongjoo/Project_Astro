@@ -22,3 +22,4 @@ MonoBehaviour:
   _attackSpeed: 1
   _attackPower: 10
   _searchRange: 7
+  _healAmount: 100
