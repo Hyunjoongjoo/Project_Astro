@@ -1424,7 +1424,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 9.85498, y: -30}
+  m_AnchoredPosition: {x: 9.855, y: -30}
   m_SizeDelta: {x: 19.71, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &104769489
@@ -5609,7 +5609,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 9.85498, y: -30}
+  m_AnchoredPosition: {x: 9.855, y: -30}
   m_SizeDelta: {x: 19.71, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &410949269
@@ -12399,10 +12399,10 @@ MonoBehaviour:
   _backgroundImg: {fileID: 918536614}
   _handleImg: {fileID: 1382158702}
   _switchDuration: 0.2
-  _bgOnSprite: {fileID: 21300000, guid: 0363d21a84dc6491e831bae874edc6ad, type: 3}
-  _bgOffSprite: {fileID: 21300000, guid: a1e436d26683241d787e58854a040e63, type: 3}
-  _handleOnSprite: {fileID: 21300000, guid: c426b035919094016adb99e1349aa315, type: 3}
-  _handleOffSprite: {fileID: 21300000, guid: d1b1739b99fa046a78d969b1957e55bb, type: 3}
+  _bgOnSprite: {fileID: 21300000, guid: a1e436d26683241d787e58854a040e63, type: 3}
+  _bgOffSprite: {fileID: 21300000, guid: 0363d21a84dc6491e831bae874edc6ad, type: 3}
+  _handleOnSprite: {fileID: 21300000, guid: d1b1739b99fa046a78d969b1957e55bb, type: 3}
+  _handleOffSprite: {fileID: 21300000, guid: c426b035919094016adb99e1349aa315, type: 3}
 --- !u!114 &918536614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15320,7 +15320,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 9.85498, y: -30}
+  m_AnchoredPosition: {x: 9.855, y: -30}
   m_SizeDelta: {x: 19.71, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1149960539
@@ -24494,10 +24494,10 @@ MonoBehaviour:
   _backgroundImg: {fileID: 1947321831}
   _handleImg: {fileID: 1361862450}
   _switchDuration: 0.2
-  _bgOnSprite: {fileID: 21300000, guid: 0363d21a84dc6491e831bae874edc6ad, type: 3}
-  _bgOffSprite: {fileID: 21300000, guid: a1e436d26683241d787e58854a040e63, type: 3}
-  _handleOnSprite: {fileID: 21300000, guid: c426b035919094016adb99e1349aa315, type: 3}
-  _handleOffSprite: {fileID: 21300000, guid: d1b1739b99fa046a78d969b1957e55bb, type: 3}
+  _bgOnSprite: {fileID: 21300000, guid: a1e436d26683241d787e58854a040e63, type: 3}
+  _bgOffSprite: {fileID: 21300000, guid: 0363d21a84dc6491e831bae874edc6ad, type: 3}
+  _handleOnSprite: {fileID: 21300000, guid: d1b1739b99fa046a78d969b1957e55bb, type: 3}
+  _handleOffSprite: {fileID: 21300000, guid: c426b035919094016adb99e1349aa315, type: 3}
 --- !u!1 &1951959138
 GameObject:
   m_ObjectHideFlags: 0
@@ -26894,10 +26894,10 @@ MonoBehaviour:
   _backgroundImg: {fileID: 2136594003}
   _handleImg: {fileID: 327090367}
   _switchDuration: 0.2
-  _bgOnSprite: {fileID: 21300000, guid: 0363d21a84dc6491e831bae874edc6ad, type: 3}
-  _bgOffSprite: {fileID: 21300000, guid: a1e436d26683241d787e58854a040e63, type: 3}
-  _handleOnSprite: {fileID: 21300000, guid: c426b035919094016adb99e1349aa315, type: 3}
-  _handleOffSprite: {fileID: 21300000, guid: d1b1739b99fa046a78d969b1957e55bb, type: 3}
+  _bgOnSprite: {fileID: 21300000, guid: a1e436d26683241d787e58854a040e63, type: 3}
+  _bgOffSprite: {fileID: 21300000, guid: 0363d21a84dc6491e831bae874edc6ad, type: 3}
+  _handleOnSprite: {fileID: 21300000, guid: d1b1739b99fa046a78d969b1957e55bb, type: 3}
+  _handleOffSprite: {fileID: 21300000, guid: c426b035919094016adb99e1349aa315, type: 3}
 --- !u!114 &2136594003
 MonoBehaviour:
   m_ObjectHideFlags: 0
