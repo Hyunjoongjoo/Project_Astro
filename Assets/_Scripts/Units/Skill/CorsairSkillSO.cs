@@ -1,12 +1,17 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "AssaultSkillSO", menuName = "Scriptable Objects/AssaultSkillSO")]
-public class AssaultSkillSO : SkillDataSO
+public class CorsairSkillSO : SkillDataSO
 {
     [Header("강습형 설정")]
     [SerializeField] private float _radius;
     [SerializeField] private float _damageMultiplier;
-    [SerializeField] private float _effectLifeTime;
+    [SerializeField] private float _duration;
+
+    public override IHeroSkill CreateSkillComponent(GameObject owner)
+    {
+        return owner.AddComponent<CorsairSkill>();
+    }
 
     public override SkillRuntimeData CreateRuntimeData()
     {
@@ -14,12 +19,12 @@ public class AssaultSkillSO : SkillDataSO
 
         runtime.Radius = _radius;
         runtime.DamageMultiplier = _damageMultiplier;
-        runtime.Duration = _effectLifeTime;
+        runtime.Duration = _duration;
         runtime.IsAreaSkill = true;
 
         return runtime;
     }
     public float Radius => _radius;
     public float DamageMultiplier => _damageMultiplier;
-    public float EffectLifeTime => _effectLifeTime;
+    public float Duration => _duration;
 }

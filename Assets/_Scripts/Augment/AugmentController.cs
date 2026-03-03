@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,6 +19,11 @@ public class AugmentController : NetworkBehaviour
     [Header("스킬 증강 데이터베이스")]
     [SerializeField] private List<SkillAugmentSO> _allSkillAugments;
 
+    //캐싱용
+    private AugmentData _localSelectedData;
+
+    //인스펙터 직렬화 해둘 히어로 아이콘SO
+    [SerializeField] private HeroIconDataSO _heroIconSO;
 
     private void Awake()
     {
@@ -30,18 +35,46 @@ public class AugmentController : NetworkBehaviour
     public override void Spawned()
     {
         //할당된 SO 데이터를 바탕으로 DeckManager 가동
-        _deckManager = new AugmentDeckManager(_allSkillAugments);
-
+        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO);
         //현재 씬에 있는 스테이지 매니저 찾아서 캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
     }
+
+    //HeroController에서 사용할 증강 SO 검색 함수26-03-03
+    public SkillAugmentSO GetSkillAugmentById(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return null;
+        }
+
+        foreach (var so in _allSkillAugments)
+        {
+            if (so != null && so.AugmentID == id)
+            {
+                return so;
+            }
+        }
+
+        return null;
+    }
+
 
     //카드 3장 뽑아서 화면에 띄우기
     //플레이어 상태 분석해서 맞춤 카드 3장 띄우기
     //UI에서 증강선택 토글 버튼 눌렀을 때 호출
     public void OpenAugmentWindow()
     {
-        if (_stageManager == null) return;
+        if (_stageManager == null)
+        {
+            _stageManager = FindFirstObjectByType<StageManager>();
+            if (_stageManager == null)
+            {
+                Debug.LogError("StageManager를 찾지 못함");
+                return;
+            }
+        }
+        Debug.Log("데이터 분석");
         PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer);
 
         //Config테이블에서 강화 달성 횟수 가져오기
@@ -52,37 +85,35 @@ public class AugmentController : NetworkBehaviour
 
         //덱매니저 넘겨주기 위해 NetworkArray를 일반 List<string>으로 변환
         List<string> myHeroes = new List<string>();
-        for (int i = 0; i < myData.OwnedHeroes.Length; i++)
+        for (int i = 0; i < SlotData_5.Length; i++) 
         {
-            if (myData.OwnedHeroes[i] != "")
+            string heroId = myData.OwnedHeroes.Get(i).Replace("\0", "").Trim();
+            if (!string.IsNullOrEmpty(heroId))
             {
-                myHeroes.Add(myData.OwnedHeroes[i].ToString());
+                myHeroes.Add(heroId);
             }
         }
 
         List<string> mySkills = new List<string>();
-        for (int i = 0; i < myData.OwnedSkillAugments.Length; i++)
+        for (int i = 0; i < SlotData_5.Length; i++)
         {
-
-            if (myData.OwnedSkillAugments[i] != "")
+            string skillId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+            if (!string.IsNullOrEmpty(skillId))
             {
-                mySkills.Add(myData.OwnedSkillAugments[i].ToString());
+                mySkills.Add(skillId);
             }
-
         }
 
-        //내 아이템 슬롯이 꽉 찼는지 검사
         bool isItemFull = true;
-        for (int i = 0; i < myData.InventoryItems.Length; i++)
+        for (int i = 0; i < SlotData_3.Length; i++)
         {
-            if (myData.InventoryItems[i] == "")
+            string itemId = myData.InventoryItems.Get(i).Replace("\0", "").Trim();
+            if (string.IsNullOrEmpty(itemId))
             {
                 isItemFull = false;
                 break;
             }
         }
-
-
 
         //덱매니저 실행해서 카드 3장 AugmentData형태로 뽑아오기
         List<AugmentData> cards = _deckManager.GenerateCards(
@@ -94,8 +125,12 @@ public class AugmentController : NetworkBehaviour
             reinforceNumber: reinforceNum
         );
 
+        Debug.Log($"생성된 카드 수: {cards.Count}");
+
         //뽑은 카드 팝업 띄우기
-        AugmentManager.Instance.ShowAugmentWindow(cards);
+        if (cards.Count > 0) AugmentManager.Instance.ShowAugmentWindow(cards);
+
+        else Debug.LogWarning("생성된 카드 없음");
     }
 
 
@@ -103,12 +138,13 @@ public class AugmentController : NetworkBehaviour
     public void SelectAugment(AugmentData data)
     {
         //서버에 요청하기
+        _localSelectedData = data;//카드기억
         RPC_RequestSelectAugment(data.targetId, data.type);
     }
 
     //클라 => 서버로 증강 선택 요청하기
     //꽉찼나 체크
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestSelectAugment(string targetId, AugmentType type, RpcInfo info = default)
     {
         //플레이어찾기
@@ -116,9 +152,9 @@ public class AugmentController : NetworkBehaviour
         bool isValid = true;
 
         //패킷이 날아오는 동안 슬롯이 꽉 찼는지 다시 한번 확인
-        if (type == AugmentType.Hero && IsArrayFull(data.OwnedHeroes)) isValid = false;
-        if (type == AugmentType.Item && IsArrayFull(data.InventoryItems)) isValid = false;
-        if (type == AugmentType.Skill && IsArrayFull(data.OwnedSkillAugments)) isValid = false;
+        if (type == AugmentType.Hero && IsSlotFull5(data.OwnedHeroes)) isValid = false;
+        if (type == AugmentType.Item && IsSlotFull3(data.InventoryItems)) isValid = false;
+        if (type == AugmentType.Skill && IsSlotFull5(data.OwnedSkillAugments)) isValid = false;
 
         //검증 통과 여부에 따라 컨펌 or 리젝트
         if (isValid)
@@ -139,6 +175,14 @@ public class AugmentController : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             AugmentExecutor.ApplyAugment(_stageManager, player, type, targetId);
+
+            //호스트만 처리하도록 안으로 이동
+            if (_stageManager.PlayerDataMap.TryGet(player, out PlayerNetworkData data))
+            {
+
+                //서버 승인이 떨어졌으므로, 100 게이지를 차감
+                _stageManager.DecreaseAugmentGauge(data.Team, 100);
+            }
         }
 
         //카드를 산 사람이 로컬이 맞다면, UI를 갱신
@@ -146,21 +190,18 @@ public class AugmentController : NetworkBehaviour
         {
             if (type == AugmentType.Hero)
             {
-                //id랑 타입만 받고 아이콘은 나중에
-                AugmentData localData = new AugmentData
+                if (_localSelectedData != null && _localSelectedData.targetId == targetId)
                 {
-                    targetId = targetId,
-                    type = type
-                };
+                //조립된 데이터를 UI 매니저에게 넘겨서 하단 덱에 카드 슬롯을 추가
+                    AugmentManager.Instance.AddHeroCard(_localSelectedData);
+                    _localSelectedData = null; // 다 썼으니 비워줌
+                }
 
                 //HeroIconSO가 추가되면 아이콘로직 추가
-
-                //조립된 데이터를 UI 매니저에게 넘겨서 하단 덱에 카드 슬롯을 추가
-                AugmentManager.Instance.AddHeroCard(localData);
             }
 
-            //서버 승인이 떨어졌으므로, 100 게이지를 차감
-            _stageManager.DecreaseAugmentGauge(GameManager.Instance.PlayerTeam, 100);
+            //토글버튼 숨김
+            AugmentManager.Instance.HideAugmentToggleBtn();
 
             //전투 시작 전이면 카드 다 골랐다고 스테이지에 보고
             if (_stageManager.CurrentState == StageState.AugmentSelection)
@@ -171,7 +212,7 @@ public class AugmentController : NetworkBehaviour
     }
 
     //반려
-    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_RejectAugment(PlayerRef player)
     {
         Debug.LogWarning("슬롯이 가득 차서 서버에서 장착 반려");
@@ -179,17 +220,24 @@ public class AugmentController : NetworkBehaviour
     }
 
 
-    //NetworkArray가 꽉 찼는지 검사
-
-    private bool IsArrayFull(NetworkArray<NetworkString<_32>> array)
+    //네트워크배열 대신 슬롯체크용
+    //5칸
+    private bool IsSlotFull5(SlotData_5 slotData)
     {
-        for (int i = 0; i < array.Length; i++)
+        for (int i = 0; i < SlotData_5.Length; i++)
         {
-            if (array[i] == "") return false; //빈칸이 하나라도 있으면 false
+            if (string.IsNullOrEmpty(slotData.Get(i).Replace("\0", "").Trim())) return false;
         }
         return true;
     }
 
-
-
+    //3칸
+    private bool IsSlotFull3(SlotData_3 slotData)
+    {
+        for (int i = 0; i < SlotData_3.Length; i++)
+        {
+            if (string.IsNullOrEmpty(slotData.Get(i).Replace("\0", "").Trim())) return false;
+        }
+        return true;
+    }
 }

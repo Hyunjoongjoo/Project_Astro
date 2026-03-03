@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
+using WebSocketSharp;
 
 public enum UnitSize
 {
@@ -20,6 +21,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     private float _attackPower;
     private float _attackSpeed;
     private float _attackRange;
+    private float _healAmount;
     private AttackType _attackType;
     private GameObject _projectilePrefab;
     private float _summonCooldown;
@@ -109,11 +111,16 @@ public class HeroController : MobilityUnit, IBasicAttack
             _attackRange = _heroData.AttackRange;
             _attackType = _heroData.NormalAttack.AttackType;
             searchRange = _heroData.SearchRange;
+            _healAmount = _heroData.HealAmount;
+            maxHealth = _heroData.MaxHealth;
+            moveSpeed = _heroData.MoveSpeed;
+            agent.speed = moveSpeed;
             _projectilePrefab = _heroData.NormalAttack.EffectPrefab;
-
             _summonCooldown = _heroData.SummonCooldown;
 
             EquipSkill(_heroData.NormalSkill);
+
+            ApplySkillAugments();
         }
 
         if (agent != null)
@@ -151,18 +158,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         if (_currentSkill == null)
         {
-            if (newSkillData is BarrageSkillSO)
-            {
-                _currentSkill = gameObject.AddComponent<BarrageSkill>();
-            }
-            else if (newSkillData is DefenseSkillSO)
-            {
-                _currentSkill = gameObject.AddComponent<DefenseSkill>();
-            }
-            else if (newSkillData is SupportSkillSO)
-            {
-                _currentSkill = gameObject.AddComponent<SupportSkill>();
-            }
+            _currentSkill = newSkillData.CreateSkillComponent(gameObject);
         }
 
         _currentSkill.ChangeSkillData(newSkillData);
@@ -333,7 +329,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
-
+        runtime.HealAmount = _healAmount;
         //증강적용시~~
 
         if (!_currentSkill.CanUse(this, runtime))
@@ -502,7 +498,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         _damageReductionRate = 0f;
     }
 
-    public void HealUnit(UnitBase target, float healRatio)
+    public void HealUnit(UnitBase target, float healAmount)
     {
         if (!Object.HasStateAuthority)
         {
@@ -513,8 +509,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         {
             return;
         }
-
-        float healAmount = target.MaxHealth * Mathf.Clamp01(healRatio);
 
         target.CurrentHealth = Mathf.Min(
             target.CurrentHealth + healAmount,
@@ -553,6 +547,70 @@ public class HeroController : MobilityUnit, IBasicAttack
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
         projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
+    }
+
+    //스킬증강에 사용될 메서드
+    private void ApplySkillAugments()
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        StageManager stageManager = FindFirstObjectByType<StageManager>();
+        if (stageManager == null)
+        {
+            return;
+        }
+
+        if (!stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out PlayerNetworkData data))
+        {
+            return;
+        }
+
+        if (_heroData == null)
+        {
+            return;
+        }
+
+        //3.3 여현구
+        //배열에서 구조체로 바뀌어서 여기 수정했습니다.
+        for (int i = 0; i < SlotData_5.Length; i++)
+        {
+            string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+
+            if (string.IsNullOrEmpty(augmentId))
+            {
+                continue;
+            }
+
+            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
+            if (so == null)
+            {
+                continue;
+            }
+
+            if (so.TargetHeroID != _heroData.HeroID)
+            {
+                continue;
+            }
+
+            int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
+
+            if (tierIndex >= so.Tiers.Length)
+            {
+                continue;
+            }
+
+            SkillDataSO newSkill = so.Tiers[tierIndex].CombatSkillData;
+
+            if (newSkill == null)
+            {
+                continue;
+            }
+
+            EquipSkill(newSkill);
+        }
     }
 
     public void ForceStopMoveForSkill()//외부에서 StopMove를 사용가능하도록

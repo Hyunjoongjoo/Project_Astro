@@ -67,7 +67,9 @@ MonoBehaviour:
   _CurrentState: 0
   _StateTimer: 0
   _CountdownValue: 0
-  _PlayerTeams:
+  _PlayerDataMap:
+    _items: []
+  _AugmentExp:
     _items: []
   _minionSpawnerPrefab:
     RawGuidValue: 837058bd486a26c44b56c81b8bd87058

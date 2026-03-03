@@ -2,9 +2,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class DefenseSkill : NetworkBehaviour, IHeroSkill
+public class TankSkill : NetworkBehaviour, IHeroSkill
 {
-    [SerializeField] private DefenseSkillSO _data;
+    [SerializeField] private TankSkillSO _data;
 
     private TickTimer _timer;
     private bool _isActive;
@@ -41,7 +41,7 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
 
     public void ChangeSkillData(SkillDataSO newData)
     {
-        if (newData is DefenseSkillSO defenseData)
+        if (newData is TankSkillSO defenseData)
         {
             _data = defenseData;
         }

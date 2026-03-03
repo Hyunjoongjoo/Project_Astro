@@ -10,14 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eef852513d3caa5468c3da8e1d287e95, type: 3}
-  m_Name: DefenseSkillSO
+  m_Name: TankAugmentSkillSO
   m_EditorClassIdentifier: Assembly-CSharp::DefenseSkillSO
-  _skillId: 
-  _heroId: 
-  _category: 1
+  _skillId: augmentSkill_tank_A
+  _heroId: hero_tank
+  _skillType: 2
   _initCooldown: 4
   _cooldown: 8
   _skillRange: 0
   _effectPrefab: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}
+  _skillName: augment1_name_hero_tank
+  _skillDescription: augment1_desc_hero_tank
+  _note: 
   _duration: 5
-  _damageReductionRate: 30
+  _damageReductionRate: 50

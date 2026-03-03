@@ -3,9 +3,9 @@ using Fusion;
 using UnityEngine;
 
 
-public class SupportSkill : NetworkBehaviour, IHeroSkill
+public class AngelSkill : NetworkBehaviour, IHeroSkill
 {
-    [SerializeField] private SupportSkillSO _data;
+    [SerializeField] private AngelSkillSO _data;
 
     public SkillDataSO Data => _data;
 
@@ -41,7 +41,7 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
 
     public void ChangeSkillData(SkillDataSO newData)
     {
-        if (newData is SupportSkillSO supportData)
+        if (newData is AngelSkillSO supportData)
         {
             _data = supportData;
         }
@@ -117,6 +117,6 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
         effects.transform.localScale = Vector3.zero;
         effects.transform.DOScale(2f, 0.2f).SetEase(Ease.OutBack);
 
-        Destroy(effects, _data.EffectLifeTime);
+        Destroy(effects, _data.Duration);
     }
 }

@@ -2,9 +2,9 @@
 using UnityEngine;
 using DG.Tweening;
 
-public class AssaultSkill : NetworkBehaviour, IHeroSkill
+public class CorsairSkill : NetworkBehaviour, IHeroSkill
 {
-    [SerializeField] private AssaultSkillSO _data;
+    [SerializeField] private CorsairSkillSO _data;
 
     public SkillDataSO Data => _data;
 
@@ -76,7 +76,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
 
     public void ChangeSkillData(SkillDataSO newData)
     {
-        if (newData is AssaultSkillSO assaultData)
+        if (newData is CorsairSkillSO assaultData)
         {
             _data = assaultData;
         }
@@ -116,7 +116,7 @@ public class AssaultSkill : NetworkBehaviour, IHeroSkill
         }
 
         effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(_data.Radius * 2f * 6.5f, _data.EffectLifeTime).SetEase(Ease.OutQuad);
+        effects.transform.DOScale(_data.Radius * 2f * 6.5f, _data.Duration).SetEase(Ease.OutQuad);
 
         float lifeTime = ps != null
             ? ps.main.duration + ps.main.startLifetime.constantMax

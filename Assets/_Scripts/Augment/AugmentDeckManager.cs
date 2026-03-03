@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,9 +14,13 @@ public class AugmentDeckManager
     //스킬증강 SO
     private List<SkillAugmentSO> _allSkillAugments;
 
-    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments)
+    //아이콘, 프리팹 가져올 SO
+    private HeroIconDataSO _heroIconSO;
+
+    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO)
     {
         _allSkillAugments = loadedSkillAugments;
+        _heroIconSO = heroIconSO;
     }
 
     public List<AugmentData> GenerateCards(
@@ -100,6 +105,7 @@ public class AugmentDeckManager
         string title = "";
         string desc = "";
         Sprite icon = null;
+        NetworkPrefabRef heroPrefab = default;
 
         switch (type)
         {
@@ -124,9 +130,12 @@ public class AugmentDeckManager
                     refId = pickedHero.id;
 
                     title = GetString(pickedHero.heroName);
-                    desc = GetString(pickedHero.heroDesc);
-
-                    //여기쯤 아이콘 연동? , 아이콘 출력 방식 필요함 어드레서블이든 리소스로드든
+                    desc = GetString(pickedHero.heroDesc); 
+                    if (_heroIconSO != null)
+                    {
+                        icon = _heroIconSO.GetIcon(refId);       // ID(hero_corsair 등)로 아이콘 획득
+                        heroPrefab = _heroIconSO.GetPrefab(refId); // ID로 네트워크 프리팹 획득
+                    }
                 }
                 else return null; //뽑을 영웅이 없으면 null
                 break;
@@ -199,7 +208,8 @@ public class AugmentDeckManager
             targetId = refId,
             name = title,
             description = desc,
-            icon = icon
+            icon = icon,
+            heroPrefab = heroPrefab
         };
     }
 

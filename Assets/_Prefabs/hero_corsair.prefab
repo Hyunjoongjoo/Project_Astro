@@ -370,7 +370,7 @@ GameObject:
   - component: {fileID: 479350263834020189}
   - component: {fileID: -3041197003229238917}
   m_Layer: 6
-  m_Name: Corsair
+  m_Name: hero_corsair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

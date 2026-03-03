@@ -1,18 +1,25 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "BarrageSkillSO", menuName = "Scriptable Objects/BarrageSkillSO")]
-public class BarrageSkillSO : SkillDataSO
+public class HeavyrainSkillSO : SkillDataSO
 {
     [Header("포격형 설정")]
     [SerializeField] private int _shotCount = 3;
     [SerializeField] private float _shotInterval = 0.05f;
     [SerializeField] private float _damageMultiplier = 1f;
 
+    public override IHeroSkill CreateSkillComponent(GameObject owner)
+    {
+        return owner.AddComponent<HeavyrainSkill>();
+    }
+
     public override SkillRuntimeData CreateRuntimeData()
     {
         SkillRuntimeData runtime = base.CreateRuntimeData();
 
         runtime.ShotCount = ShotCount;
+        runtime.ShotInterval = ShotInterval;
+        runtime.DamageMultiplier = DamageMultiplier;
 
         return runtime;
     }

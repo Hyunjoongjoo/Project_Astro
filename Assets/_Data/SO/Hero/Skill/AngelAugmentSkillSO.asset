@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eecbd40ff0a75af42970a5c260b0b93c, type: 3}
+  m_Name: AngelAugmentSkillSO
+  m_EditorClassIdentifier: Assembly-CSharp::SupportSkillSO
+  _skillId: augmentSkill_angel_A
+  _heroId: hero_angel
+  _skillType: 2
+  _initCooldown: 5
+  _cooldown: 10
+  _skillRange: 3
+  _effectPrefab: {fileID: 8717233226799944948, guid: b586638b7e301934bacfc1af47cce4aa, type: 3}
+  _skillName: augment1_name_hero_angel
+  _skillDescription: augment1_desc_hero_angel
+  _note: 
+  _healAmount: 100
+  _duration: 0.5
+  _isAreaSkill: 1
