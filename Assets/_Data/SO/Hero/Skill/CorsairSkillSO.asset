@@ -13,11 +13,15 @@ MonoBehaviour:
   m_Name: CorsairSkillSO
   m_EditorClassIdentifier: Assembly-CSharp::AssaultSkillSO
   _skillId: normalSkill_corsair
-  _category: 1
+  _heroId: hero_corsair
+  _skillType: 1
   _initCooldown: 2
   _cooldown: 4
   _skillRange: 4
   _effectPrefab: {fileID: 6393617126741755569, guid: 19138c6e05c43fe46a292e5d6d939efa, type: 3}
+  _skillName: skill_name_hero_corsair
+  _skillDescription: skill_desc_hero_corsair
+  _note: 
   _radius: 3
   _damageMultiplier: 1
   _duration: 0.5

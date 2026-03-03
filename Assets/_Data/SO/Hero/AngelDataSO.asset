@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AngelDataSO
   m_EditorClassIdentifier: Assembly-CSharp::HeroDataSO
   _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
-  _heroId: 
+  _heroId: hero_angel
   _maxHealth: 100
   _moveSpeed: 6
   _normalSkill: {fileID: 11400000, guid: 6772757a4f7e87844aab3f0e0e51521e, type: 2}

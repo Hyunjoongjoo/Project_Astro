@@ -13,10 +13,14 @@ MonoBehaviour:
   m_Name: TankAugmentSkillSO
   m_EditorClassIdentifier: Assembly-CSharp::DefenseSkillSO
   _skillId: augmentSkill_tank_A
-  _category: 2
+  _heroId: hero_tank
+  _skillType: 2
   _initCooldown: 4
   _cooldown: 8
   _skillRange: 0
   _effectPrefab: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}
+  _skillName: augment1_name_hero_tank
+  _skillDescription: augment1_desc_hero_tank
+  _note: 
   _duration: 5
   _damageReductionRate: 50

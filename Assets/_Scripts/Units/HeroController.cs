@@ -329,7 +329,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
-
+        runtime.HealAmount = _healAmount;
         //증강적용시~~
 
         if (!_currentSkill.CanUse(this, runtime))

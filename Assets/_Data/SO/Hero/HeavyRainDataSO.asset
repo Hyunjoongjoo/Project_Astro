@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: HeavyRainDataSO
   m_EditorClassIdentifier: Assembly-CSharp::HeroDataSO
   _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
-  _heroId: 
+  _heroId: hero_heavyrain
   _maxHealth: 80
   _moveSpeed: 6
   _normalSkill: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
@@ -22,3 +22,4 @@ MonoBehaviour:
   _attackSpeed: 1.5
   _attackPower: 20
   _searchRange: 9
+  _healAmount: 0

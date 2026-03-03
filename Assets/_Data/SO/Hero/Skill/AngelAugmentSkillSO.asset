@@ -13,11 +13,15 @@ MonoBehaviour:
   m_Name: AngelAugmentSkillSO
   m_EditorClassIdentifier: Assembly-CSharp::SupportSkillSO
   _skillId: augmentSkill_angel_A
-  _category: 2
+  _heroId: hero_angel
+  _skillType: 2
   _initCooldown: 5
   _cooldown: 10
   _skillRange: 3
   _effectPrefab: {fileID: 8717233226799944948, guid: b586638b7e301934bacfc1af47cce4aa, type: 3}
+  _skillName: augment1_name_hero_angel
+  _skillDescription: augment1_desc_hero_angel
+  _note: 
   _healAmount: 100
   _duration: 0.5
   _isAreaSkill: 1
