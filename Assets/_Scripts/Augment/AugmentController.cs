@@ -65,7 +65,8 @@ public class AugmentController : NetworkBehaviour
         List<string> myHeroes = new List<string>();
         for (int i = 0; i < myData.OwnedHeroes.Length; i++)
         {
-            if (!string.IsNullOrEmpty(myData.OwnedHeroes[i].ToString()))
+            string heroId = myData.OwnedHeroes[i].ToString().Trim('\0');
+            if (!string.IsNullOrEmpty(heroId))
             {
                 myHeroes.Add(myData.OwnedHeroes[i].ToString());
             }
@@ -74,8 +75,8 @@ public class AugmentController : NetworkBehaviour
         List<string> mySkills = new List<string>();
         for (int i = 0; i < myData.OwnedSkillAugments.Length; i++)
         {
-
-            if (!string.IsNullOrEmpty(myData.OwnedSkillAugments[i].ToString()))
+            string skillId = myData.OwnedSkillAugments[i].ToString().Trim('\0');
+            if (!string.IsNullOrEmpty(skillId))
             {
                 mySkills.Add(myData.OwnedSkillAugments[i].ToString());
             }
@@ -86,7 +87,8 @@ public class AugmentController : NetworkBehaviour
         bool isItemFull = true;
         for (int i = 0; i < myData.InventoryItems.Length; i++)
         {
-            if (string.IsNullOrEmpty(myData.InventoryItems[i].ToString()))
+            string itemId = myData.InventoryItems[i].ToString().Trim('\0');
+            if (string.IsNullOrEmpty(itemId))
             {
                 isItemFull = false;
                 break;
@@ -199,9 +201,19 @@ public class AugmentController : NetworkBehaviour
 
     private bool IsArrayFull(NetworkArray<NetworkString<_32>> array)
     {
+        if (array.Length == 0)
+        {
+            Debug.LogError("NetworkArray의 길이가 0");
+            return true;
+        }
+
         for (int i = 0; i < array.Length; i++)
         {
-            if (string.IsNullOrEmpty(array[i].ToString())) return false; //빈칸이 하나라도 있으면 false
+            string val = array[i].ToString().Trim('\0');
+            if (string.IsNullOrEmpty(val))
+            {
+                return false; 
+            }
         }
         return true;
     }

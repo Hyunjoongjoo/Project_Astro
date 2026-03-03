@@ -16,7 +16,7 @@ public static class AugmentExecutor
             case AugmentType.Hero:
                 for (int i = 0; i < playerData.OwnedHeroes.Length; i++)
                 {
-                    if (string.IsNullOrEmpty(playerData.OwnedHeroes[i].ToString()))
+                    if (string.IsNullOrEmpty(playerData.OwnedHeroes[i].ToString().Trim('\0')))
                     {
                         playerData.OwnedHeroes.Set(i, refId); //넣기
                         break;
@@ -27,7 +27,7 @@ public static class AugmentExecutor
             case AugmentType.Item:
                 for (int i = 0; i < playerData.InventoryItems.Length; i++)
                 {
-                    if (string.IsNullOrEmpty(playerData.InventoryItems[i].ToString()))
+                    if (string.IsNullOrEmpty(playerData.InventoryItems[i].ToString().Trim('\0')))
                     {
                         playerData.InventoryItems.Set(i, refId);
                         break;
@@ -38,7 +38,7 @@ public static class AugmentExecutor
             case AugmentType.Skill:
                 for (int i = 0; i < playerData.OwnedSkillAugments.Length; i++)
                 {
-                    if (string.IsNullOrEmpty(playerData.OwnedSkillAugments[i].ToString()))
+                    if (string.IsNullOrEmpty(playerData.OwnedSkillAugments[i].ToString().Trim('\0')))
                     {
                         playerData.OwnedSkillAugments.Set(i, refId);
                         break;
