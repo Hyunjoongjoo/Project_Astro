@@ -41,7 +41,16 @@ public class AugmentController : NetworkBehaviour
     //UI에서 증강선택 토글 버튼 눌렀을 때 호출
     public void OpenAugmentWindow()
     {
-        if (_stageManager == null) return;
+        if (_stageManager == null)
+        {
+            _stageManager = FindFirstObjectByType<StageManager>();
+            if (_stageManager == null)
+            {
+                Debug.LogError("StageManager를 찾지 못함");
+                return;
+            }
+        }
+        Debug.Log("데이터 분석");
         PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer);
 
         //Config테이블에서 강화 달성 횟수 가져오기
@@ -94,8 +103,12 @@ public class AugmentController : NetworkBehaviour
             reinforceNumber: reinforceNum
         );
 
+        Debug.Log($"생성된 카드 수: {cards.Count}");
+
         //뽑은 카드 팝업 띄우기
-        AugmentManager.Instance.ShowAugmentWindow(cards);
+        if (cards.Count > 0) AugmentManager.Instance.ShowAugmentWindow(cards);
+
+        else Debug.LogWarning("생성된 카드 없음");
     }
 
 
@@ -189,7 +202,4 @@ public class AugmentController : NetworkBehaviour
         }
         return true;
     }
-
-
-
 }
