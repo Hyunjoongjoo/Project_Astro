@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
+using WebSocketSharp;
 
 public enum UnitSize
 {
@@ -116,6 +117,8 @@ public class HeroController : MobilityUnit, IBasicAttack
             _summonCooldown = _heroData.SummonCooldown;
 
             EquipSkill(_heroData.NormalSkill);
+
+            ApplySkillAugments();
         }
 
         if (agent != null)
@@ -542,6 +545,70 @@ public class HeroController : MobilityUnit, IBasicAttack
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
         projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
+    }
+
+    private void ApplySkillAugments()
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        StageManager stageManager = FindFirstObjectByType<StageManager>();
+        if (stageManager == null)
+        {
+            return;
+        }
+
+        if (!stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out PlayerNetworkData data))
+        {
+            return;
+        }
+
+        if (_heroData == null)
+        {
+            return;
+        }
+
+        foreach (var augmentNetworkString in data.OwnedSkillAugments)
+        {
+            string augmentId = augmentNetworkString.ToString();
+
+            if (string.IsNullOrEmpty(augmentId))
+            {
+                continue;
+            }
+
+            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
+
+            if (so == null)
+            {
+                continue;
+            }
+
+            //이 영웅 대상 증강인지 체크
+            if (so.TargetHeroID != _heroData.HeroID)
+            {
+                continue;
+            }
+
+            //티어 결정
+            int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
+
+            if (tierIndex >= so.Tiers.Length)
+            {
+                continue;
+            }
+
+            SkillDataSO newSkill = so.Tiers[tierIndex].CombatSkillData;
+
+            if (newSkill == null)
+            {
+                continue;
+            }
+
+            EquipSkill(newSkill);
+        }
     }
 
     public void ForceStopMoveForSkill()//외부에서 StopMove를 사용가능하도록
