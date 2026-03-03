@@ -5,7 +5,6 @@ public class ItemData : ITableData
 {
     public string id;
     public string name;
-    public ItemType itemType;
     public string iconImage;
     public string effectGroupId;
     public bool isStackable;

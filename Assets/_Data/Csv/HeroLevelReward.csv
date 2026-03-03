@@ -1,6 +1,15 @@
 영웅 레벨 달성 보상 테이블 기본키,레벨 달성 보상이 지급될 영웅,보상 해금 레벨,해금 보상 ID,기획용 비고
 id,heroId,level,rewardId,note
 String,String,Int,String,String
-Lv03_Reward_Hero_Knight,Hero_Knight,3,Passive_Skill_Hero_Knight_01,기획용 컬럼입니다. 게임에 사용되지 않습니다.
-Lv06_Reward_Hero_Knight,Hero_Knight,6,Augment_Skill_Hero_Knight_01,기획용 컬럼입니다. 게임에 사용되지 않습니다.
-Lv09_Reward__Hero_Knight,Hero_Knight,9,Passive_Skill_Hero_Knight_02,기획용 컬럼입니다. 게임에 사용되지 않습니다.
+lv03_reward_hero_knight,hero_corsair,3,passive_skill_hero_corsair_01,커세어 패시브스킬 1 해금
+lv06_reward_hero_knight,hero_corsair,6,augment_skill_hero_corsair_01,커세어 증강스킬 해금
+lv09_reward_hero_knight,hero_corsair,9,passive_skill_hero_corsair_02,커세어 패시브스킬 2 해금
+lv03_reward_hero_heavyrain,hero_heavyrain,3,passive_skill_hero_heavyrain_01,헤비레인 패시브스킬 1 해금
+lv06_reward_hero_heavyrain,hero_heavyrain,6,augment_skill_hero_heavyrain_01,헤비레인 증강스킬 해금
+lv09_reward_hero_heavyrain,hero_heavyrain,9,passive_skill_hero_heavyrain_02,헤비레인 패시브스킬 2 해금
+lv03_reward_hero_tank,hero_tank,3,passive_skill_hero_tank_01,탱크 패시브스킬 1 해금
+lv06_reward_hero_tank,hero_tank,6,augment_skill_hero_tank_01,탱크 증강스킬 해금
+lv09_reward_hero_tank,hero_tank,9,passive_skill_hero_tank_02,탱크 패시브스킬 2 해금
+lv03_reward_hero_angel,hero_angel,3,passive_skill_hero_angel_01,앤젤 패시브스킬 1 해금
+lv06_reward_hero_angel,hero_angel,6,augment_skill_hero_angel_01,앤젤 증강스킬 해금
+lv09_reward_hero_angel,hero_angel,9,passive_skill_hero_angel_02,앤젤 패시브스킬 2 해금
