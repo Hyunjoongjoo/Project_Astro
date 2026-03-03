@@ -53,7 +53,18 @@ public class AugmentManager : Singleton<AugmentManager>
             window.SetupAndOpen(datas);
 
             _toggleBtn.onClick.RemoveAllListeners();
-            _toggleBtn.onClick.AddListener(() => window.Toggle());
+            _toggleBtn.onClick.AddListener(() =>
+            {
+                if (window != null)
+                {
+                    window.Toggle();
+                }
+                else
+                {
+                    HideAugmentToggleBtn();
+                }
+            });
+
         }
     }
 

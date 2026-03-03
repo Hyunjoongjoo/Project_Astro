@@ -72,6 +72,7 @@ public class UnitStat : MonoBehaviour
 
 
         MapStat(EffectType.IncreaseAttackSpeed, AttackSpeed);
+        MapStat(EffectType.DecreaseAttackSpeed, AttackSpeed);
         MapStat(EffectType.DecreaseCooldown, CooldownReduction);
         MapStat(EffectType.DecreaseRespawnTime, RespawnTime);
 

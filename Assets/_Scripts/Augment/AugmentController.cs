@@ -63,7 +63,7 @@ public class AugmentController : NetworkBehaviour
         List<string> myHeroes = new List<string>();
         for (int i = 0; i < myData.OwnedHeroes.Length; i++)
         {
-            if (myData.OwnedHeroes[i] != "")
+            if (!string.IsNullOrEmpty(myData.OwnedHeroes[i].ToString()))
             {
                 myHeroes.Add(myData.OwnedHeroes[i].ToString());
             }
@@ -73,7 +73,7 @@ public class AugmentController : NetworkBehaviour
         for (int i = 0; i < myData.OwnedSkillAugments.Length; i++)
         {
 
-            if (myData.OwnedSkillAugments[i] != "")
+            if (!string.IsNullOrEmpty(myData.OwnedSkillAugments[i].ToString()))
             {
                 mySkills.Add(myData.OwnedSkillAugments[i].ToString());
             }
@@ -84,7 +84,7 @@ public class AugmentController : NetworkBehaviour
         bool isItemFull = true;
         for (int i = 0; i < myData.InventoryItems.Length; i++)
         {
-            if (myData.InventoryItems[i] == "")
+            if (string.IsNullOrEmpty(myData.InventoryItems[i].ToString()))
             {
                 isItemFull = false;
                 break;
@@ -175,6 +175,9 @@ public class AugmentController : NetworkBehaviour
             //서버 승인이 떨어졌으므로, 100 게이지를 차감
             _stageManager.DecreaseAugmentGauge(GameManager.Instance.PlayerTeam, 100);
 
+            //토글버튼 숨김
+            AugmentManager.Instance.HideAugmentToggleBtn();
+
             //전투 시작 전이면 카드 다 골랐다고 스테이지에 보고
             if (_stageManager.CurrentState == StageState.AugmentSelection)
             {
@@ -198,7 +201,7 @@ public class AugmentController : NetworkBehaviour
     {
         for (int i = 0; i < array.Length; i++)
         {
-            if (array[i] == "") return false; //빈칸이 하나라도 있으면 false
+            if (string.IsNullOrEmpty(array[i].ToString())) return false; //빈칸이 하나라도 있으면 false
         }
         return true;
     }

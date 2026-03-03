@@ -36,7 +36,8 @@ public enum EffectType
     IncreaseAttackRange,
     IncreaseSkillRange,
     IncreaseDetectionRange, //탐지 범위
-    DecreaseCooldown,      
+    DecreaseCooldown,
+    DecreaseAttackSpeed,
 
     IncreaseMoveSpeed,
     DecreaseMoveSpeed,
