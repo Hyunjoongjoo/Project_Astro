@@ -14,8 +14,6 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
 
     public SkillDataSO Data => _data;
 
-    public int ShotCount => _data.ShotCount;//나중에 증강에서 탄환수를 늘릴때 사용가능하게
-
     public bool CanUse(HeroController caster, SkillRuntimeData runtime)
     {
         if (caster == null)
