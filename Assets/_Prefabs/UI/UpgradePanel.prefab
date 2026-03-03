@@ -362,7 +362,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -71.038055, y: 0, z: -100.499756, w: 0}
+  m_margin: {x: -71.038055, y: 0, z: -159.89606, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1033,7 +1033,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -161.72989, y: 0, z: 73.377625, w: 0}
+  m_margin: {x: -107.733185, y: 0, z: 73.377625, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1244,7 +1244,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -66.032166, y: 0, z: -97.20935, w: 0}
+  m_margin: {x: -66.032166, y: 0, z: -156.60571, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1380,7 +1380,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -161.72989, y: 0, z: 73.377625, w: 0}
+  m_margin: {x: -116.732635, y: 0, z: 73.377625, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1667,7 +1667,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -80.58972, y: 0, z: -101.377075, w: 0}
+  m_margin: {x: -80.58972, y: 0, z: -140.97461, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1741,9 +1741,15 @@ MonoBehaviour:
   _uiName: 
   _fadeDuration: 0.25
   _scaleDuration: 0.25
+  _iconImg: {fileID: 6151232790459238157}
+  _nameTxt: {fileID: 2236793842566830764}
+  _levelTxt: {fileID: 2854597568788960241}
+  _heroExpBar: {fileID: 5281538863712174718}
+  _heroExpTxt: {fileID: 5277784171113111946}
   _hpDiffTxt: {fileID: 5758631764168571132}
   _atkDiffTxt: {fileID: 6525213203623535615}
   _healDiffTxt: {fileID: 2789399990210256708}
+  _healPanel: {fileID: 733288717937414504}
   _hpPlusTxt: {fileID: 225068289334852963}
   _atkPlusTxt: {fileID: 6689908679789113064}
   _healPlusTxt: {fileID: 7605928827354233263}
@@ -1887,7 +1893,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -2308,7 +2314,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -161.72989, y: 0, z: 73.377625, w: 0}
+  m_margin: {x: -91.53415, y: 0, z: 73.377625, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
