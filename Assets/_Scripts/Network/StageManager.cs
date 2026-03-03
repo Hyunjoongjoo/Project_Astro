@@ -253,10 +253,9 @@ public class StageManager : NetworkBehaviour
     private void RPC_RequestAugmentSelection()
     {
         // 3장의 랜덤 카드를 뽑아 UI를 띄움
-        var options = AugmentManager.Instance.GetRandomAugments(AugmentType.Hero, 3);
-        AugmentManager.Instance.ShowAugmentWindow(options);
+        AugmentController.Instance.OpenAugmentWindow();
 
-        Debug.Log("[Stage] 증강 선택 시작!");
+        Debug.Log("증강 선택 시작!");
     }
 
     // 플레이어들이 증강을 선택하면 마스터에게 알림.
