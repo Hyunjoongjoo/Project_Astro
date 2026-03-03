@@ -383,7 +383,7 @@ public class StageManager : NetworkBehaviour
             Debug.LogError("증강 게이지 증가 실패");
     }
 
-    private void DecreaseAugmentGauge(Team team, int amount)
+    public void DecreaseAugmentGauge(Team team, int amount)
     {
         if (AugmentExp.TryGet(team, out int curExp))
         {

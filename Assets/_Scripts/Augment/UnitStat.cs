@@ -118,7 +118,8 @@ public class UnitStat : MonoBehaviour
             //내부적으로 _isDirty 플래그를 체크하여 필요할 때만 재계산된 값을 반환
             return stat.Value;
         }
-        return 0f; //매핑되지 않은 스탯을 물어보면 0 반환
+
         Debug.LogWarning("매핑 안 된 스탯임");
+        return 0f; //매핑되지 않은 스탯을 물어보면 0 반환
     }
 }

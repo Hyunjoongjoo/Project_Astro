@@ -155,6 +155,7 @@ MonoBehaviour:
   _heroExpBar: {fileID: 3874328148939017080}
   _heroExpTxt: {fileID: 645872403871813698}
   _detailPopupPrefab: {fileID: 7479665002333910777, guid: c35b523773e40f94d8340a7725b35660, type: 3}
+  _heroIcons: {fileID: 11400000, guid: 59f5c354744c3014e8112428c930f6a4, type: 2}
 --- !u!1 &2871427269351507783
 GameObject:
   m_ObjectHideFlags: 0

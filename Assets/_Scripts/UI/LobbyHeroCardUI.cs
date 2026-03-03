@@ -4,12 +4,16 @@ using UnityEngine.UI;
 
 public class LobbyHeroCardUI : MonoBehaviour
 {
+    [Header("기본 설정")]
     [SerializeField] private Image _iconImg;
     [SerializeField] private TMP_Text _nameTxt;
     [SerializeField] private TMP_Text _levelTxt;
     [SerializeField] private Image _heroExpBar;
     [SerializeField] private TMP_Text _heroExpTxt;
+    [Header("상세설명 팝업 프리팹")]
     [SerializeField] private GameObject _detailPopupPrefab;
+    [Header("아이콘 SO")]
+    [SerializeField] private HeroIconDataSO _heroIcons;
 
     private HeroData _heroData;
     private HeroDbModel _userHeroData;
@@ -21,12 +25,25 @@ public class LobbyHeroCardUI : MonoBehaviour
         _userHeroData = UserDataManager.Instance.HeroesModel.Find(h => h.heroId == _heroData.id);
         var levelData = TableManager.Instance.HeroLevelTable.Get(_userHeroData.level.ToString());
 
+        //테이블 상의 아이콘 SO에서 가져오기
+        if (_heroIcons != null)
+        {
+            _iconImg.sprite = _heroIcons.GetIcon(data.heroIcon);
+        }
 
-        _nameTxt.text = data.heroName;
+        _nameTxt.text = TableManager.Instance.GetString(data.heroName);
         _levelTxt.text = _userHeroData.level.ToString();
 
-        _heroExpBar.fillAmount = (float)_userHeroData.exp / levelData.expRequirement;
-        _heroExpTxt.text = $"{_userHeroData.exp} / {levelData.expRequirement}";
+        if (levelData != null)
+        {
+            _heroExpBar.fillAmount = (float)_userHeroData.exp / levelData.expRequirement;
+            _heroExpTxt.text = $"{_userHeroData.exp} / {levelData.expRequirement}";
+        }
+        else
+        {
+            _heroExpBar.fillAmount = 1f;
+            _heroExpTxt.text = "MAX";
+        }
 
         //아이콘 이미지 어드레서블로연결 나중에
     }

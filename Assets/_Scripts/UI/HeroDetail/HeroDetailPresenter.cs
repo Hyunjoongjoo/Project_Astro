@@ -7,8 +7,9 @@ public class HeroDetailPresenter : MonoBehaviour
     [SerializeField] private GameObject _confirmPopupPrefab;
     [SerializeField] private GameObject _upgradeResultPrefab;
 
-    [Header("스텟 아이콘 SO")]
+    [Header("리소스 SO")]
     [SerializeField] private StatIconDataSO _statIcons;
+    [SerializeField] private HeroIconDataSO _heroIcons;
 
     private HeroData _heroData;
     private HeroDbModel _userHeroData;
@@ -52,11 +53,27 @@ public class HeroDetailPresenter : MonoBehaviour
             return;
         }
 
-        // 1. 기본 정보 전달
-        _view.SetHeroBaseInfo(_heroData.heroName, _heroData.heroDesc,
-                             _heroData.heroType.ToString(), _heroData.heroRole.ToString());
+        //스트링 테이블 참조
+        string translatedName = TableManager.Instance.GetString(_heroData.heroName);
+        string translatedDesc = TableManager.Instance.GetString(_heroData.heroDesc);
+        string typeKey = $"hero_type_{_heroData.heroType.ToString().ToLower()}";
+        string roleKey = $"hero_role_{_heroData.heroRole.ToString().ToLower()}";
 
-        // 2. 레벨/경험치 로직 처리
+        //기본 정보 전달
+        _view.SetHeroBaseInfo(
+            translatedName,
+            translatedDesc,
+            TableManager.Instance.GetString(typeKey),
+            TableManager.Instance.GetString(roleKey)
+        );
+
+        //아이콘 이미지 설정
+        if (_heroIcons != null)
+        {
+            _view.SetHeroImage(_heroIcons.GetIcon(_heroData.heroIcon));
+        }
+
+        //레벨/경험치 로직 처리
         var levelData = TableManager.Instance.HeroLevelTable.Get(_userHeroData.level.ToString());
 
         if (levelData != null)
@@ -75,7 +92,7 @@ public class HeroDetailPresenter : MonoBehaviour
             _view.SetUpgradeButton(true, "최고 레벨", true);
         }
 
-        // 3. 스텟 페이지 갱신
+        //스텟 페이지 갱신
         UpdateStatPage();
     }
 
@@ -160,30 +177,41 @@ public class HeroDetailPresenter : MonoBehaviour
         }
     }
 
+    //스텟 페이지 갱신
     private void UpdateStatPage()
     {
         _view.ClearStats();
         HeroStatData status = HeroManager.Instance.GetStatus(_heroData.id);
+        HeroStatData tableBase = TableManager.Instance.HeroStatTable.Get(_heroData.heroStatId);
         if (status == null) return;
 
-        _view.AddStatItem("체력", status.BaseHp.ToString(), _statIcons.GetIcon(StatType.Hp));
-        _view.AddStatItem("공격력", status.baseAttackPower.ToString(), _statIcons.GetIcon(StatType.AttackPower));
-        _view.AddStatItem("치유력", status.baseHealingPower.ToString(), _statIcons.GetIcon(StatType.HealingPower));
+        //성장수치 보여줄 애들은 성장수치도 보여주기
+        _view.AddStatItem("체력", $"{status.BaseHp} <color=#000BFF>(+{tableBase.ipLvHp})</color>", _statIcons.GetIcon(StatType.Hp));
+        _view.AddStatItem("공격력", $"{status.baseAttackPower} <color=#000BFF>(+{tableBase.ipLvAttackPower})</color>", _statIcons.GetIcon(StatType.AttackPower));
+
+        if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0)
+            _view.AddStatItem("치유력", $"{status.baseHealingPower} <color=#000BFF>(+{tableBase.ipLvHealingPower})</color>", _statIcons.GetIcon(StatType.HealingPower));
+
         _view.AddStatItem("공격 속도", status.attackSpeed.ToString("F2"), _statIcons.GetIcon(StatType.AttackSpeed));
         _view.AddStatItem("이동 속도", status.moveSpeed.ToString("F1"), _statIcons.GetIcon(StatType.MoveSpeed));
         _view.AddStatItem("공격 범위", status.detectionRange.ToString("F1"), _statIcons.GetIcon(StatType.DetectionRange));
+        _view.AddStatItem("재소환 시간", status.spawnCooldown.ToString("F1"), _statIcons.GetIcon(StatType.RespawnTime));
+        _view.AddStatItem("쿨타임 증감", status.cooltimeReduce.ToString("F1"), _statIcons.GetIcon(StatType.SkillCooldown));
+        _view.AddStatItem("피해 감소량", status.damageReduce.ToString("F1"), _statIcons.GetIcon(StatType.DamageReduction));
+
+        string typeKey = $"hero_movetype_{status.moveType.ToString().ToLower()}";
+        _view.AddStatItem("이동 유형", TableManager.Instance.GetString(typeKey), _statIcons.GetIcon(StatType.MoveType));
     }
 
     private void ShowUpgradeResult(HeroStatData oldStat)
     {
-        // 1. 갱신된(새로운) 런타임 스텟 가져오기
+        //갱신된 런타임 스텟 가져오기
         HeroStatData newStat = HeroManager.Instance.GetStatus(_heroData.id);
 
-        // 2. 테이블 원본 데이터 가져오기 (ipLv 수치를 확인하기 위함)
-        // HeroData의 statId가 Stat_Hero_Knight 형태라면 그걸 사용
+        //테이블 원본 데이터 가져오기 (ipLv 수치를 확인하기 위함)
         HeroStatData tableBase = TableManager.Instance.HeroStatTable.Get(_heroData.heroStatId);
 
-        // 3. 결과 팝업 띄우기
+        //결과 팝업 띄우기
         var resultUI = UIManager.Instance.ShowUI<UpgradeResultPopup>(_upgradeResultPrefab);
         if (resultUI != null)
         {

@@ -37,6 +37,10 @@ public class HeroDetailView : BaseUI
         _heroTypeTxt.text = type;
         _heroRoleTxt.text = role;
     }
+    public void SetHeroImage(Sprite icon)
+    {
+        _heroPilotImg.sprite = icon;
+    }
 
     // 레벨 및 경험치 세팅
     public void SetLevelInfo(int level, int currentExp, float maxExp)
