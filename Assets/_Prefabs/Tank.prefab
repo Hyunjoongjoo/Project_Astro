@@ -562,7 +562,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HeroController
   maxHealth: 150
   deffense: 0
-  team: 0
+  _team: 0
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 7299576946842487594}
@@ -573,17 +573,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
-  _attackPower: 10
-  _attackSpeed: 1.5
-  _attackRange: 2
-  _skillComponent: {fileID: 4569985432753418785}
-  _attackType: 1
-  _projectilePrefab: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  _heroData: {fileID: 11400000, guid: 3493e78db420021419319cf9713f7ef5, type: 2}
   _firePoint: {fileID: 128638915413792048}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
-  _summonCooldown: 13
 --- !u!114 &707048002635603553
 MonoBehaviour:
   m_ObjectHideFlags: 0

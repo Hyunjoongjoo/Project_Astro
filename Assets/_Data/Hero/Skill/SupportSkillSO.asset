@@ -12,9 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eecbd40ff0a75af42970a5c260b0b93c, type: 3}
   m_Name: SupportSkillSO
   m_EditorClassIdentifier: Assembly-CSharp::SupportSkillSO
-  initCooldown: 5
-  cooldown: 10
-  skillRange: 3
-  effectPrefab: {fileID: 3479278419723618712, guid: 6135948fdbd8dbc498c368cf6640858f, type: 3}
-  healAmount: 100
-  effectLifeTime: 0.6
+  _skillId: 
+  _heroId: 
+  _category: 1
+  _initCooldown: 5
+  _cooldown: 10
+  _skillRange: 3
+  _effectPrefab: {fileID: 7343538280686139031, guid: a8e905d0d5bf4144393d0b154082615b, type: 3}
+  _healAmount: 100
+  _effectLifeTime: 0.6
+  _isAreaSkill: 0

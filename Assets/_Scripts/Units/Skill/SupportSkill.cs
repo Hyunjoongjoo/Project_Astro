@@ -9,19 +9,19 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
 
     public SkillDataSO Data => _data;
 
-    public bool CanUse(HeroController caster)
+    public bool CanUse(HeroController caster, SkillRuntimeData runtime)
     {
-        return FindHealTarget(caster) != null;
+        return FindHealTarget(caster, runtime) != null;
     }
 
-    public bool Execute(HeroController caster)
+    public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
         if (!caster.Object.HasStateAuthority)
         {
             return false;
         }
 
-        UnitBase target = FindHealTarget(caster);
+        UnitBase target = FindHealTarget(caster, runtime);
         if (target == null)
         {
             return false;
@@ -29,19 +29,27 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
 
         float before = target.CurrentHealth;
 
-        caster.HealUnit(target, _data.healAmount);
+        caster.HealUnit(target, runtime.HealAmount);
 
         float after = target.CurrentHealth;
         float healed = after - before;
 
-        RPC_PlayHealEffect(target.Object.Id);
+        RPC_PlayHealEffect(target.Object.Id, runtime.EffectLifeTime);
 
         return true;
     }
 
-    private UnitBase FindHealTarget(HeroController caster)
+    public void ChangeSkillData(SkillDataSO newData)
     {
-        Collider[] hits = Physics.OverlapSphere(caster.transform.position, _data.skillRange, caster.AllyLayer);
+        if (newData is SupportSkillSO supportData)
+        {
+            _data = supportData;
+        }
+    }
+
+    private UnitBase FindHealTarget(HeroController caster, SkillRuntimeData runtime)
+    {
+        Collider[] hits = Physics.OverlapSphere(caster.transform.position, runtime.SkillRange, caster.AllyLayer);
 
         UnitBase best = null;
         float bestDist = float.MaxValue;
@@ -87,9 +95,9 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayHealEffect(NetworkId targetId)
+    private void RPC_PlayHealEffect(NetworkId targetId, float effectLifeTime)
     {
-        if (_data.effectPrefab == null)
+        if (_data.EffectPrefab == null)
         {
             return;
         }
@@ -100,7 +108,7 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
         }
 
         GameObject effects = Instantiate(
-            _data.effectPrefab,
+            _data.EffectPrefab,
             targetObj.transform.position,
             Quaternion.identity,
             targetObj.transform //자식으로 부착
@@ -109,6 +117,6 @@ public class SupportSkill : NetworkBehaviour, IHeroSkill
         effects.transform.localScale = Vector3.zero;
         effects.transform.DOScale(2f, 0.2f).SetEase(Ease.OutBack);
 
-        Destroy(effects, _data.effectLifeTime);
+        Destroy(effects, _data.EffectLifeTime);
     }
 }

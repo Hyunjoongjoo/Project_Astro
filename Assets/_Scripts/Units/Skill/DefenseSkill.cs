@@ -12,12 +12,12 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
 
     public SkillDataSO Data => _data;
 
-    public bool CanUse(HeroController caster)
+    public bool CanUse(HeroController caster, SkillRuntimeData runtime)
     {
         return !_isActive;
     }
 
-    public bool Execute(HeroController caster)
+    public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
         if (!caster.Object.HasStateAuthority)
         {
@@ -31,10 +31,20 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
 
         _caster = caster;
 
-        ActivateDefense();
+        _isActive = true;
+        _timer = TickTimer.CreateFromSeconds(Runner, runtime.Duration);
+        _caster.SetDamageReduction(runtime.DamageReductionRate);
         RPC_PlayEffect(caster.Object.Id);
 
         return true;
+    }
+
+    public void ChangeSkillData(SkillDataSO newData)
+    {
+        if (newData is DefenseSkillSO defenseData)
+        {
+            _data = defenseData;
+        }
     }
 
     public override void FixedUpdateNetwork()
@@ -57,10 +67,7 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
 
     private void ActivateDefense()
     {
-        _isActive = true;
-        _timer = TickTimer.CreateFromSeconds(Runner, _data.duration);
-
-        _caster.SetDamageReduction(_data.damageReductionRate);
+        
     }
 
     private void DeactivateDefense()
@@ -77,7 +84,7 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_PlayEffect(NetworkId casterId)
     {
-        if (_data.effectPrefab == null)
+        if (_data.EffectPrefab == null)
         {
             return;
         }
@@ -90,7 +97,7 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
         Transform casterTransform = casterObject.transform;
 
         GameObject effects = Instantiate(
-            _data.effectPrefab,
+            _data.EffectPrefab,
             casterTransform.position,
             casterTransform.rotation,
             casterTransform//부모 지정
@@ -101,6 +108,6 @@ public class DefenseSkill : NetworkBehaviour, IHeroSkill
         effects.transform.localRotation = Quaternion.identity;
         effects.transform.localScale = Vector3.one * 17f;
 
-        Destroy(effects, _data.duration);
+        Destroy(effects, _data.Duration);
     }
 }

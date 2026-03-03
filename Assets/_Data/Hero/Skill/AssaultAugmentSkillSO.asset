@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0bbcce7672e42b4478f90e67e39749d2, type: 3}
-  m_Name: AssaultSkillSO
+  m_Name: AssaultAugmentSkillSO
   m_EditorClassIdentifier: Assembly-CSharp::AssaultSkillSO
   _skillId: 
   _heroId: 
-  _category: 1
+  _category: 2
   _initCooldown: 2
   _cooldown: 4
   _skillRange: 4
   _effectPrefab: {fileID: 6393617126741755569, guid: 19138c6e05c43fe46a292e5d6d939efa, type: 3}
   _radius: 3
-  _damageMultiplier: 1
+  _damageMultiplier: 1.3
   _effectLifeTime: 0.6

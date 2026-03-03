@@ -8,19 +8,8 @@ public enum UnitSize
 }
 public class HeroController : MobilityUnit, IBasicAttack
 {
-    [Header("공격 스테이터스")]
-    [SerializeField] private float _attackPower = 10f;
-    [SerializeField] private float _attackSpeed = 1f;
-    [SerializeField] private float _attackRange = 2f;
 
-    [Header("스킬 스테이터스")]
-    [SerializeField] private MonoBehaviour _skillComponent;
-
-    [Header("타입")]
-    [SerializeField] private AttackType _attackType;
-
-    [Header("원거리")]
-    [SerializeField] private GameObject _projectilePrefab;
+    [SerializeField] private HeroDataSO _heroData;
     [SerializeField] private Transform _firePoint;
 
     [Header("타워 레퍼런스")]
@@ -28,8 +17,12 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
-    [Header("영웅 소환 쿨다운")]
-    [SerializeField] private float _summonCooldown;
+    private float _attackPower;
+    private float _attackSpeed;
+    private float _attackRange;
+    private AttackType _attackType;
+    private GameObject _projectilePrefab;
+    private float _summonCooldown;
 
 
     private UnitBase _currentTarget;
@@ -44,7 +37,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     private Vector3 _deployTarget;
     private TickTimer _deployDelayTimer;
 
-    private IHeroSkill _skill; //영웅별로 서로 다른 스킬을 처리하기 위한 스킬 인터페이스
+    private IHeroSkill _currentSkill;
     private float _damageReductionRate = 0f;
 
     public float AttackPower => _attackPower;
@@ -58,12 +51,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         {
             return team == Team.Blue ? LayerMask.GetMask("BlueTeam") : LayerMask.GetMask("RedTeam");
         }
-    }
-
-    private void Awake()
-    {
-        // 인스펙터에서 할당된 스킬 컴포넌트를 IHeroSkill 인터페이스로 캐스팅하여 사용
-        _skill = _skillComponent as IHeroSkill;
     }
 
     public void Setup(Team myTeam)
@@ -114,6 +101,21 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
+        if (_heroData != null)
+        {
+            // 기본 스탯
+            _attackPower = _heroData.AttackPower;
+            _attackSpeed = _heroData.AttackSpeed;
+            _attackRange = _heroData.AttackRange;
+            _attackType = _heroData.NormalAttack.AttackType;
+            searchRange = _heroData.SearchRange;
+            _projectilePrefab = _heroData.NormalAttack.EffectPrefab;
+
+            _summonCooldown = _heroData.SummonCooldown;
+
+            EquipSkill(_heroData.NormalSkill);
+        }
+
         if (agent != null)
         {
             agent.enabled = false;
@@ -135,10 +137,39 @@ public class HeroController : MobilityUnit, IBasicAttack
         _fsm = new UnitFSM();
 
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skill.Data.initCooldown);
+        //_skillTimer = TickTimer.CreateFromSeconds(Runner, _skill.Data.initCooldown);
 
         CurrentState = UnitState.Idle;
     }
+
+    public void EquipSkill(SkillDataSO newSkillData)
+    {
+        if (newSkillData == null)
+        {
+            return;
+        }
+
+        if (_currentSkill == null)
+        {
+            if (newSkillData is BarrageSkillSO)
+            {
+                _currentSkill = gameObject.AddComponent<BarrageSkill>();
+            }
+            else if (newSkillData is DefenseSkillSO)
+            {
+                _currentSkill = gameObject.AddComponent<DefenseSkill>();
+            }
+            else if (newSkillData is SupportSkillSO)
+            {
+                _currentSkill = gameObject.AddComponent<SupportSkill>();
+            }
+        }
+
+        _currentSkill.ChangeSkillData(newSkillData);
+
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, newSkillData.InitCooldown);
+    }
+
 
     public override void FixedUpdateNetwork()
     {
@@ -147,6 +178,11 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         // 사망 상태면 행동 중단
         if (CurrentState == UnitState.Dead) return;
+
+        if (_fsm == null)
+        {
+            return;
+        }
 
         _fsm.TickSkill(Runner);
 
@@ -178,14 +214,8 @@ public class HeroController : MobilityUnit, IBasicAttack
         bool inRange = false;
         if (hasTarget)
         {
-            //이동 중인지 여부 (네비 기준)
-            bool isApproaching = agent.hasPath && !agent.pathPending;
-
-            //실제 전투 거리 판정은 콜라이더 기준
             float combatDistance = GetAttackDistanceTo(_currentTarget);
-            bool isCombatInRange = combatDistance <= _attackRange;
-
-            inRange = isApproaching && isCombatInRange;
+            inRange = combatDistance <= _attackRange;
         }
 
         bool isDead = CurrentState == UnitState.Dead;//FSM에도 사망 여부를 전달(의도치 않은 상태 전이 방지)
@@ -292,22 +322,33 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private bool TryUseSkill()//스킬 쿨타임/조건 체크 후 스킬 실행 시도
     {
-        if (_skill == null)
+        if (_currentSkill == null)
+        {
             return false;
+        }
 
         if (!_skillTimer.ExpiredOrNotRunning(Runner))
+        {
             return false;
+        }
 
-        if (!_skill.CanUse(this))
+        SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
+
+        //증강적용시~~
+
+        if (!_currentSkill.CanUse(this, runtime))
+        {
             return false;
+        }
 
+        bool success = _currentSkill.Execute(this, runtime);
+        if (!success)
+        {
+            return false;
+        }
         _fsm.EnterSkill(Runner, 0.15f);
 
-        bool success = _skill.Execute(this);
-        if (success)
-        {
-            _skillTimer = TickTimer.CreateFromSeconds(Runner, _skill.Data.cooldown);
-        }
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, runtime.Cooldown);
 
         return success;
     }

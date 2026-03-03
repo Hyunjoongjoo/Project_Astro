@@ -12,7 +12,7 @@ public class HeroSpawner : NetworkBehaviour
     [SerializeField] private float _minDeployDistance = 1f;
     [SerializeField] private float _maxDeployDistance = 15f;
 
-    //PlayerRef 기준으로 분리하여 독립 쿨다운
+    // 플레이어,영웅 프리팹 기준으로 소환 쿨다운을 분리 관리
     private readonly Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer> _summonTimers
     = new Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer>();
 
@@ -83,6 +83,12 @@ public class HeroSpawner : NetworkBehaviour
     //UI에서 사용할수있도록 메서드로 지정한 플레이어와 프리팹에 대한 남은 소환 쿨타임을 반환
     public float GetRemainingCooldown(PlayerRef player, NetworkPrefabRef prefab)
     {
+        //Runner가 아직 준비되지 않았으면 쿨 없음으로 처리
+        if (Runner == null || !Runner.IsRunning)
+        {
+            return 0f;
+        }
+
         var key = (player, prefab);
 
         if (!_summonTimers.TryGetValue(key, out TickTimer timer))

@@ -14,9 +14,9 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
 
     public SkillDataSO Data => _data;
 
-    public int ShotCount => _data.shotCount;//나중에 증강에서 탄환수를 늘릴때 사용가능하게
+    public int ShotCount => _data.ShotCount;//나중에 증강에서 탄환수를 늘릴때 사용가능하게
 
-    public bool CanUse(HeroController caster)
+    public bool CanUse(HeroController caster, SkillRuntimeData runtime)
     {
         if (caster == null)
         {
@@ -41,12 +41,12 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
 
         float dist = caster.GetAttackDistanceTo(target);
 
-        return dist <= _data.skillRange;
+        return dist <= _data.SkillRange;
     }
 
-    public bool Execute(HeroController caster)
+    public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
-        if (!CanUse(caster))
+        if (!CanUse(caster, runtime))
         {
             return false;
         }
@@ -54,14 +54,14 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
         _caster = caster;
         _target = caster.CurrentTarget;
 
-        _remainingShots = _data.shotCount;
+        _remainingShots = runtime.ShotCount;
         _isFiring = true;
 
         FireOnce();
 
         if (_remainingShots > 0)
         {
-            _shotTimer = TickTimer.CreateFromSeconds(Runner, _data.shotInterval);
+            _shotTimer = TickTimer.CreateFromSeconds(Runner, runtime.ShotInterval);
         }
         else
         {
@@ -69,6 +69,14 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
         }
 
         return true;
+    }
+
+    public void ChangeSkillData(SkillDataSO newData)
+    {
+        if (newData is BarrageSkillSO barrageData)
+        {
+            _data = barrageData;
+        }
     }
 
     public override void FixedUpdateNetwork()
@@ -96,7 +104,7 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
 
         if (_remainingShots > 0)
         {
-            _shotTimer = TickTimer.CreateFromSeconds(Runner, _data.shotInterval);
+            _shotTimer = TickTimer.CreateFromSeconds(Runner, _data.ShotInterval);
         }
         else
         {
@@ -109,9 +117,9 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
     {
         _remainingShots--;
 
-        _caster.ApplyBarrageSkillDamage(_target, _data.damageMultiplier);
+        _caster.ApplyBarrageSkillDamage(_target, _data.DamageMultiplier);
 
-        if (_data.effectPrefab != null)
+        if (_data.EffectPrefab != null)
         {
             RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team);
         }
@@ -145,7 +153,7 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
         Vector3 end = targetObj.transform.position;
 
         GameObject projectileObj = Instantiate(
-            _data.effectPrefab,
+            _data.EffectPrefab,
             start,
             Quaternion.identity
         );

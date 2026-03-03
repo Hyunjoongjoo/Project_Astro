@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66aa9d4d3bd023940b7267bb838ee85a, type: 3}
   m_Name: BarrageSkillSO
   m_EditorClassIdentifier: Assembly-CSharp::BarrageSkillSO
-  initCooldown: 4
-  cooldown: 8
-  skillRange: 5
-  effectPrefab: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
-  shotCount: 3
-  shotInterval: 0.05
-  damageMultiplier: 1
+  _skillId: 
+  _heroId: 
+  _category: 1
+  _initCooldown: 4
+  _cooldown: 8
+  _skillRange: 5
+  _effectPrefab: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
+  _shotCount: 3
+  _shotInterval: 0.05
+  _damageMultiplier: 1
