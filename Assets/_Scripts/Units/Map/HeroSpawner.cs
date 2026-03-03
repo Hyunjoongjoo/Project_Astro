@@ -13,18 +13,21 @@ public class HeroSpawner : NetworkBehaviour
     [SerializeField] private float _maxDeployDistance = 15f;
 
     //PlayerRef 기준으로 분리하여 독립 쿨다운
-    private readonly Dictionary<PlayerRef, TickTimer> _playerSummonTimers = new Dictionary<PlayerRef, TickTimer>();
+    private readonly Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer> _summonTimers
+    = new Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer>();
 
     public override void Spawned()
     {
         Instance = this;
     }
 
-    private bool CanSummon(PlayerRef player)//소환 가능한지 여부
+    private bool CanSummon(PlayerRef player, NetworkPrefabRef prefab)//소환 가능한지 여부
     {
-        if (!_playerSummonTimers.TryGetValue(player, out TickTimer timer))
+        var key = (player, prefab);
+
+        if (!_summonTimers.TryGetValue(key, out TickTimer timer))
         {
-            return true; // 아직 쿨 기록 없음 → 소환 가능
+            return true;
         }
 
         return timer.ExpiredOrNotRunning(Runner);
@@ -71,10 +74,28 @@ public class HeroSpawner : NetworkBehaviour
         return Mathf.Lerp(_minDeployTime, _maxDeployTime, time);
     }
 
-    private void StartSummonCooldown(PlayerRef player, float cooldown)
+    private void StartSummonCooldown(PlayerRef player, NetworkPrefabRef prefab, float cooldown)
     {
-        _playerSummonTimers[player] =
-            TickTimer.CreateFromSeconds(Runner, cooldown);
+        var key = (player, prefab);
+        _summonTimers[key] = TickTimer.CreateFromSeconds(Runner, cooldown);
+    }
+
+    //UI에서 사용할수있도록 메서드로 지정한 플레이어와 프리팹에 대한 남은 소환 쿨타임을 반환
+    public float GetRemainingCooldown(PlayerRef player, NetworkPrefabRef prefab)
+    {
+        var key = (player, prefab);
+
+        if (!_summonTimers.TryGetValue(key, out TickTimer timer))
+        {
+            return 0f;
+        }
+
+        if (timer.ExpiredOrNotRunning(Runner))
+        {
+            return 0f;
+        }
+
+        return timer.RemainingTime(Runner).GetValueOrDefault();
     }
 
 
@@ -88,7 +109,7 @@ public class HeroSpawner : NetworkBehaviour
 
         PlayerRef caller = info.Source;
 
-        if (!CanSummon(caller))
+        if (!CanSummon(caller, prefab))
         {
             return;
         }
@@ -113,7 +134,7 @@ public class HeroSpawner : NetworkBehaviour
                 hero.Setup(team);
                 //배치 및 지연 처리는 컨트롤러가 수행
                 hero.BeginDeploy(spawnPos, deployDelay);
-                StartSummonCooldown(caller, hero.SummonCooldown);
+                StartSummonCooldown(caller, prefab, hero.SummonCooldown);
             });
 
         Debug.Log($"영웅 소환 완료!");
