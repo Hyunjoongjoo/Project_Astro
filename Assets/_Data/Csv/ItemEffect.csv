@@ -1,0 +1,18 @@
+효과 ID,효과 그룹 ID,효과 종류,효과 수치,발동 조건,발동 조건 값,대상,설명 텍스트,기획용 비고
+id,effectGroupId,effectType,effectValue,triggerCondition,triggerValue,target,effectDesc,note
+String,String,EffectType,String,TriggerCondition,String,Target,String,String
+effect_item001_01,effect_group_item001,increase_attack_power,20,passive,0,self,des_effect_item001_01,강화 철갑탄 : 공격력 20%
+effect_item002_01,effect_group_item002,increase_max_hp,20,passive,0,self,des_effect_item002_01,생명 유지 장치 : 체력 20%
+effect_item003_01,effect_group_item003,increase_heal_power,20,passive,0,self,des_effect_item003_01,응급 의료 키트 : 치유력 20%
+effect_item004_01,effect_group_item004,increase_move_speed,20,passive,0,self,des_effect_item004_01,이온 추진기 : 이동 속도 20%
+effect_item005_01,effect_group_item005,increase_attack_power,50,hp_below,40,self,des_effect_item005_01,증폭 회로 : 체력 40% 이하 공격력 50% 증가
+effect_item006_01,effect_group_item006,decrease_cooldown,20,hp_above,70,self,des_effect_item006_01,고출력 렌즈 : 체력 70% 이상 쿨타임 20% 감소
+effect_item007_01,effect_group_item007,decrease_respawn_time,20,passive,0,self,des_effect_item007_01,긴급 호출기1 : 재소환 대기시간 20% 감소
+effect_item007_02,effect_group_item007,decrease_max_hp,30,passive,0,self,des_effect_item007_02,긴급 호출기1 : 체력 30% 감소
+effect_item008_01,effect_group_item008,decrease_damage_taken,30,passive,0,self,des_effect_item008_01,티타늄 합금1 : 받는 피해량 30% 감소
+effect_item008_02,effect_group_item008,decrease_move_speed,20,passive,0,self,des_effect_item008_02,티타늄 합금2 : 이동 속도 20% 감소
+effect_item009_01,effect_group_item009,increase_attack_speed,30,passive,0,self,des_effect_item009_01,광전사 모듈1 : 공격 속도 30% 증가
+effect_item009_02,effect_group_item009,increase_move_speed,30,passive,0,self,des_effect_item009_02,광전사 모듈2 : 이동 속도 30% 증가
+effect_item009_03,effect_group_item009,increase_damage_taken,30,passive,0,self,des_effect_item009_03,광전사 모듈3 : 받는 피해량 30% 증가
+effect_item010_01,effect_group_item010,increase_attack_power,20,passive,0,self,des_effect_item010_01,저격용 위장막1 : 공격력 20% 증가
+effect_item010_02,effect_group_item010,decrease_attack_speed,20,passive,0,self,des_effect_item010_02,저격용 위장막2 : 공격 속도 30% 감소

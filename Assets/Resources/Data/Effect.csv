@@ -1,0 +1,8 @@
+효과 데이터 테이블 (Index는 고유해야 함),,,,,,
+Index,EffectGroupID,EffectType,EffectValue,TriggerCondition,TriggerValue,TargetType
+int,int,Enum,float,Enum,float,Enum
+1,1001,AtkUp,15,None,0,Self
+2,1002,AtkSpdUp,30,HpBelow,50,Self
+3,2001,DmgReduce,10,None,0,Self
+4,4001,AtkUp,30,None,0,Self
+5,4001,HpDown,30,None,0,Self

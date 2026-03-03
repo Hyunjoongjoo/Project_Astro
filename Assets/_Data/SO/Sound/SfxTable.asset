@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea272001bbc854d4189c3919379ac6cf, type: 3}
+  m_Name: SfxTable
+  m_EditorClassIdentifier: Assembly-CSharp::SFXTable
+  _entries:
+  - SfxList: 0
+    clip: {fileID: 8300000, guid: 28772123d55b6884fb2e9004b5c4bd52, type: 3}
+  - SfxList: 1
+    clip: {fileID: 8300000, guid: d534a9ec2c30fc2468977fde86d2446f, type: 3}
