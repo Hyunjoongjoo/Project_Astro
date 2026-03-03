@@ -22,6 +22,9 @@ public class AugmentController : NetworkBehaviour
     //캐싱용
     private AugmentData _localSelectedData;
 
+    //인스펙터 직렬화 해둘 히어로 아이콘SO
+    [SerializeField] private HeroIconDataSO _heroIconSO;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -32,8 +35,7 @@ public class AugmentController : NetworkBehaviour
     public override void Spawned()
     {
         //할당된 SO 데이터를 바탕으로 DeckManager 가동
-        _deckManager = new AugmentDeckManager(_allSkillAugments);
-
+        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO);
         //현재 씬에 있는 스테이지 매니저 찾아서 캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
     }
@@ -173,6 +175,14 @@ public class AugmentController : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             AugmentExecutor.ApplyAugment(_stageManager, player, type, targetId);
+
+            //호스트만 처리하도록 안으로 이동
+            if (_stageManager.PlayerDataMap.TryGet(player, out PlayerNetworkData data))
+            {
+
+                //서버 승인이 떨어졌으므로, 100 게이지를 차감
+                _stageManager.DecreaseAugmentGauge(data.Team, 100);
+            }
         }
 
         //카드를 산 사람이 로컬이 맞다면, UI를 갱신
@@ -189,9 +199,6 @@ public class AugmentController : NetworkBehaviour
 
                 //HeroIconSO가 추가되면 아이콘로직 추가
             }
-
-            //서버 승인이 떨어졌으므로, 100 게이지를 차감
-            _stageManager.DecreaseAugmentGauge(GameManager.Instance.PlayerTeam, 100);
 
             //토글버튼 숨김
             AugmentManager.Instance.HideAugmentToggleBtn();
