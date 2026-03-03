@@ -1,9 +1,9 @@
 ﻿using Fusion;
 using UnityEngine;
 
-public class BarrageSkill : NetworkBehaviour, IHeroSkill
+public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
 {
-    [SerializeField] private BarrageSkillSO _data;
+    [SerializeField] private HeavyrainSkillSO _data;
 
     private TickTimer _shotTimer;
     private int _remainingShots;
@@ -71,7 +71,7 @@ public class BarrageSkill : NetworkBehaviour, IHeroSkill
 
     public void ChangeSkillData(SkillDataSO newData)
     {
-        if (newData is BarrageSkillSO barrageData)
+        if (newData is HeavyrainSkillSO barrageData)
         {
             _data = barrageData;
         }

@@ -60231,7 +60231,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f34ed423aa32da64b99a8d7d364e6a65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AugmentController
-  _allSkillAugments: []
+  _allSkillAugments:
+  - {fileID: 0}
 --- !u!114 &1921911175
 MonoBehaviour:
   m_ObjectHideFlags: 0

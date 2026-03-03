@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: CorsairDataSO
   m_EditorClassIdentifier: Assembly-CSharp::HeroDataSO
   _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
-  _heroId: 
+  _heroId: hero_corsair
   _maxHealth: 80
   _moveSpeed: 6
   _normalSkill: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
@@ -22,3 +22,4 @@ MonoBehaviour:
   _attackSpeed: 1
   _attackPower: 15
   _searchRange: 6
+  _healAmount: 0

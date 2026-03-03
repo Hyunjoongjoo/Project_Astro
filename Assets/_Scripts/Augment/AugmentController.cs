@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,6 +37,26 @@ public class AugmentController : NetworkBehaviour
         //현재 씬에 있는 스테이지 매니저 찾아서 캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
     }
+
+    //HeroController에서 사용할 증강 SO 검색 함수26-03-03
+    public SkillAugmentSO GetSkillAugmentById(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return null;
+        }
+
+        foreach (var so in _allSkillAugments)
+        {
+            if (so != null && so.AugmentID == id)
+            {
+                return so;
+            }
+        }
+
+        return null;
+    }
+
 
     //카드 3장 뽑아서 화면에 띄우기
     //플레이어 상태 분석해서 맞춤 카드 3장 띄우기

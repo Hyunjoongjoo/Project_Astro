@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "SupportSkillSO", menuName = "Scriptable Objects/SupportSkillSO")]
-public class SupportSkillSO : SkillDataSO
+public class AngelSkillSO : SkillDataSO
 {
     [Header("지원형 설정")]
     [SerializeField] private float _healAmount;
@@ -10,7 +10,7 @@ public class SupportSkillSO : SkillDataSO
 
     public override IHeroSkill CreateSkillComponent(GameObject owner)
     {
-        return owner.AddComponent<SupportSkill>();
+        return owner.AddComponent<AngelSkill>();
     }
 
     public override SkillRuntimeData CreateRuntimeData()
