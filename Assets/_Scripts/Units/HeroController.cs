@@ -573,9 +573,11 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        foreach (var augmentNetworkString in data.OwnedSkillAugments)
+        //3.3 여현구
+        //배열에서 구조체로 바뀌어서 여기 수정했습니다.
+        for (int i = 0; i < SlotData_5.Length; i++)
         {
-            string augmentId = augmentNetworkString.ToString();
+            string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
 
             if (string.IsNullOrEmpty(augmentId))
             {
