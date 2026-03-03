@@ -2,11 +2,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+//3.3 여현구
+//증강 관련 UI연출, 클라이언트 조작만 담당하도록 분리.
+
 public class AugmentManager : Singleton<AugmentManager>
 {
-    [Header("증강 SO")]
-    [SerializeField] private AugmentDataSO _masterSO;
-    private AugmentDeck _deck;
+    //3.3 구버전 데이터SO및 Deck 컨트롤러가 담당
+    //[Header("증강 SO")]
+    //[SerializeField] private AugmentDataSO _masterSO;
+    //private AugmentDeck _deck;
 
     [Header("증강선택 UI")]
     [SerializeField] private GameObject _augmentWindowPrefab;
@@ -18,15 +22,6 @@ public class AugmentManager : Singleton<AugmentManager>
 
     private StageManager _cachedStageManager;
 
-    protected override void Awake()
-    {
-        base.Awake();
-        if(_masterSO != null)
-        {
-            _deck = new AugmentDeck(_masterSO);
-        }
-    }
-
     // 2026-03-03 윤혁 수정 : 증강 여닫는 버튼만 보여주고 숨기기 (Show, Hide)
     public void ShowAugmentToggleBtn()
     {
@@ -35,8 +30,8 @@ public class AugmentManager : Singleton<AugmentManager>
             _toggleBtn.onClick.RemoveAllListeners();
             _toggleBtn.onClick.AddListener(() =>
             {
-                var options = GetRandomAugments(AugmentType.Hero, 3);
-                ShowAugmentWindow(options);
+                AugmentController.Instance.OpenAugmentWindow();
+                HideAugmentToggleBtn();
             });
             _toggleBtn.gameObject.SetActive(true);
         }  
@@ -48,26 +43,9 @@ public class AugmentManager : Singleton<AugmentManager>
             _toggleBtn.gameObject.SetActive(false);
     }
 
-    // 3장의 랜덤 카드 추출
-    public List<AugmentData> GetRandomAugments(AugmentType type, int count = 3)
-    {
-        List<AugmentData> result = new List<AugmentData>();
-        List<string> exclude = new List<string>();
-
-        for (int i = 0; i < count; i++)
-        {
-            var card = _deck.GetRandomCard(type, exclude);
-            if (card != null)
-            {
-                result.Add(card);
-                exclude.Add(card.id);
-            }
-        }
-        return result;
-    }
     public void ShowAugmentWindow(List<AugmentData> datas)
     {
-        // UIManager를 통해 팝업 형식으로 띄움
+        //UIManager를 통해 팝업 형식으로 띄움
         var window = UIManager.Instance.ShowUI<AugmentWindowUI>(_augmentWindowPrefab, true);
         _toggleBtn.gameObject.SetActive(true);
         if (window != null)
@@ -78,47 +56,16 @@ public class AugmentManager : Singleton<AugmentManager>
             _toggleBtn.onClick.AddListener(() => window.Toggle());
         }
     }
-    // 카드 선택 처리
+
+    //카드 선택 시 호출
     public void SelectAugment(AugmentData data)
     {
-        Debug.Log($"[Augment] 선택됨: {data.name} ({data.type})");
+        Debug.Log($"유저가 카드 선택함: {data.name}");
 
-        if (data.type == AugmentType.Hero)
-        {
-            AddHeroCard(data);
-        }
-        else if (data.type == AugmentType.Skill)
-        {
-            // 스킬 강화 로직
-        }
-
-        //토글버튼 비활성화, 리스너 정리
-        if (_toggleBtn != null)
-        {
-            _toggleBtn.gameObject.SetActive(false);
-            _toggleBtn.onClick.RemoveAllListeners(); 
-        }
-
-        UIManager.Instance.CloseTopPopup();
-
-        // 2026-03-03 윤혁 수정 : 카드 선택 완료 인게임 플레이 중일 때 처리 로직 분리
-        // 선택 완료 후 게임 상태에 따른 처리
-        if (_cachedStageManager == null)
-            _cachedStageManager = FindFirstObjectByType<StageManager>();
-
-        if (_cachedStageManager != null)
-        {
-            // 전투 시작 전 최초 증강 선택 상태일 땐 RPC를 쏜다.
-            if (_cachedStageManager.CurrentState == StageState.AugmentSelection)
-                _cachedStageManager.RPC_ReportAugmentComplete(_cachedStageManager.Runner.LocalPlayer);
-
-            else // 그 외 증강 선택은 인게임 플레이 중일 때.
-            {
-                _cachedStageManager.DecreaseAugmentGauge(
-                    GameManager.Instance.PlayerTeam, 100);
-            }
-        }
+        //서버에 장착 승인 요청
+        AugmentController.Instance.SelectAugment(data);
     }
+
 
     //하단 UI패널에 영웅 카드 추가
     public void AddHeroCard(AugmentData data)
@@ -129,4 +76,70 @@ public class AugmentManager : Singleton<AugmentManager>
             card.Setup(data);
         }
     }
+
+    //3.3 AugmentController의 실제 로직으로 이관
+
+    //// 3장의 랜덤 카드 추출
+    //public List<AugmentData> GetRandomAugments(AugmentType type, int count = 3)
+    //{
+    //    List<AugmentData> result = new List<AugmentData>();
+    //    List<string> exclude = new List<string>();
+
+    //    for (int i = 0; i < count; i++)
+    //    {
+    //        var card = _deck.GetRandomCard(type, exclude);
+    //        if (card != null)
+    //        {
+    //            result.Add(card);
+    //            exclude.Add(card.id);
+    //        }
+    //    }
+    //    return result;
+    //}
+
+
+
+    //// 카드 선택 처리
+    //public void SelectAugment(AugmentData data)
+    //{
+    //    Debug.Log($"[Augment] 선택됨: {data.name} ({data.type})");
+
+    //    if (data.type == AugmentType.Hero)
+    //    {
+    //        AddHeroCard(data);
+    //    }
+    //    else if (data.type == AugmentType.Skill)
+    //    {
+    //        // 스킬 강화 로직
+    //    }
+
+    //    //토글버튼 비활성화, 리스너 정리
+    //    if (_toggleBtn != null)
+    //    {
+    //        _toggleBtn.gameObject.SetActive(false);
+    //        _toggleBtn.onClick.RemoveAllListeners(); 
+    //    }
+
+    //    UIManager.Instance.CloseTopPopup();
+
+    //    // 2026-03-03 윤혁 수정 : 카드 선택 완료 인게임 플레이 중일 때 처리 로직 분리
+    //    // 선택 완료 후 게임 상태에 따른 처리
+    //    if (_cachedStageManager == null)
+    //        _cachedStageManager = FindFirstObjectByType<StageManager>();
+
+    //    if (_cachedStageManager != null)
+    //    {
+    //        // 전투 시작 전 최초 증강 선택 상태일 땐 RPC를 쏜다.
+    //        if (_cachedStageManager.CurrentState == StageState.AugmentSelection)
+    //            _cachedStageManager.RPC_ReportAugmentComplete(_cachedStageManager.Runner.LocalPlayer);
+
+    //        else // 그 외 증강 선택은 인게임 플레이 중일 때.
+    //        {
+    //            _cachedStageManager.DecreaseAugmentGauge(
+    //                GameManager.Instance.PlayerTeam, 100);
+    //        }
+    //    }
+    //}
+
+
 }

@@ -18,7 +18,7 @@ public class AugmentDeckManager
         _allSkillAugments = loadedSkillAugments;
     }
 
-    public List<AugmentCard> GenerateCards(
+    public List<AugmentData> GenerateCards(
         bool isFirstSelection,
         List<string> ownedHeroIds,
         List<string> ownedSkillAugmentIds,
@@ -26,7 +26,7 @@ public class AugmentDeckManager
         int totalAugmentPicks,
         int reinforceNumber)
     {
-        List<AugmentCard> drawnCards = new List<AugmentCard>();
+        List<AugmentData> drawnCards = new List<AugmentData>();
         List<string> excludeRefIds = new List<string>();
 
         //보유 영웅 수 및 스킬 Max 여부 판별
@@ -40,12 +40,12 @@ public class AugmentDeckManager
         for (int i = 0; i < 3; i++)
         {
             AugmentType targetType = slotTypes[i];
-            AugmentCard newCard = CreateCard(targetType, excludeRefIds, ownedHeroIds, ownedSkillAugmentIds, totalAugmentPicks, reinforceNumber);
+            AugmentData newCard = CreateCard(targetType, excludeRefIds, ownedHeroIds, ownedSkillAugmentIds, totalAugmentPicks, reinforceNumber);
 
             if (newCard != null)
             {
                 drawnCards.Add(newCard); 
-                excludeRefIds.Add(newCard.ReferenceId);  
+                excludeRefIds.Add(newCard.targetId);  
             } 
             else
             {
@@ -69,20 +69,26 @@ public class AugmentDeckManager
         for (int i = 0; i < types.Length; i++)
         {
             if (types[i] == AugmentType.Hero && heroCount >= 5)
+            {
                 types[i] = isSkillMax ? AugmentType.Item : AugmentType.Skill;
+            }
 
             else if (types[i] == AugmentType.Skill && isSkillMax)
+            {
                 types[i] = isItemFull ? AugmentType.Hero : AugmentType.Item;
+            }
 
             else if (types[i] == AugmentType.Item && isItemFull)
+            {
                 types[i] = isSkillMax ? AugmentType.Hero : AugmentType.Skill;
+            }
         }
 
         return types;
     }
 
     //카드 생성기
-    private AugmentCard CreateCard(
+    private AugmentData CreateCard(
         AugmentType type, List<string> excludeRefIds,
         List<string> ownedHeroIds, List<string> ownedSkillAugmentIds,
         int totalPicks, int reinforceNum)
@@ -186,7 +192,15 @@ public class AugmentDeckManager
                 break;
         }
 
-        return new AugmentCard(instanceId, type, refId, title, desc, icon);
+        return new AugmentData()
+        {
+            instanceId = instanceId,
+            type = type,
+            targetId = refId,
+            name = title,
+            description = desc,
+            icon = icon
+        };
     }
 
     /// <summary>
