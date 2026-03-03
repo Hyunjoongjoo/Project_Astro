@@ -125,6 +125,10 @@ public class StageUI : MonoBehaviour
     public void UpdateAugmentGauge(int value)
     {
         _augmentGauge.value = value;
+        if (_augmentGauge.value >= 100f)
+            AugmentManager.Instance.ShowAugmentToggleBtn();
+        else
+            AugmentManager.Instance.HideAugmentToggleBtn();
     }
 
     public void ShowResultPanel(bool isVictory)

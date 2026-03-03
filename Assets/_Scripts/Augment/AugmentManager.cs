@@ -16,6 +16,8 @@ public class AugmentManager : Singleton<AugmentManager>
     [SerializeField] private GameObject _heroCardSlotPrefab; //히어로 핸드 카드 붙은 프리팹
     [SerializeField] Transform _slotContainer;
 
+    private StageManager _cachedStageManager;
+
     protected override void Awake()
     {
         base.Awake();
@@ -23,6 +25,27 @@ public class AugmentManager : Singleton<AugmentManager>
         {
             _deck = new AugmentDeck(_masterSO);
         }
+    }
+
+    // 2026-03-03 윤혁 수정 : 증강 여닫는 버튼만 보여주고 숨기기 (Show, Hide)
+    public void ShowAugmentToggleBtn()
+    {
+        if (_toggleBtn != null && _toggleBtn.gameObject.activeSelf == false)
+        {
+            _toggleBtn.onClick.RemoveAllListeners();
+            _toggleBtn.onClick.AddListener(() =>
+            {
+                var options = GetRandomAugments(AugmentType.Hero, 3);
+                ShowAugmentWindow(options);
+            });
+            _toggleBtn.gameObject.SetActive(true);
+        }  
+    }
+
+    public void HideAugmentToggleBtn()
+    {
+        if (_toggleBtn.gameObject.activeSelf)
+            _toggleBtn.gameObject.SetActive(false);
     }
 
     // 3장의 랜덤 카드 추출
@@ -78,11 +101,22 @@ public class AugmentManager : Singleton<AugmentManager>
 
         UIManager.Instance.CloseTopPopup();
 
-        // 선택 완료 후 게임 상태 전환
-        var stageManager = Object.FindFirstObjectByType<StageManager>();
-        if (stageManager != null)
+        // 2026-03-03 윤혁 수정 : 카드 선택 완료 인게임 플레이 중일 때 처리 로직 분리
+        // 선택 완료 후 게임 상태에 따른 처리
+        if (_cachedStageManager == null)
+            _cachedStageManager = FindFirstObjectByType<StageManager>();
+
+        if (_cachedStageManager != null)
         {
-            stageManager.RPC_ReportAugmentComplete(stageManager.Runner.LocalPlayer);
+            // 전투 시작 전 최초 증강 선택 상태일 땐 RPC를 쏜다.
+            if (_cachedStageManager.CurrentState == StageState.AugmentSelection)
+                _cachedStageManager.RPC_ReportAugmentComplete(_cachedStageManager.Runner.LocalPlayer);
+
+            else // 그 외 증강 선택은 인게임 플레이 중일 때.
+            {
+                _cachedStageManager.DecreaseAugmentGauge(
+                    GameManager.Instance.PlayerTeam, 100);
+            }
         }
     }
 
