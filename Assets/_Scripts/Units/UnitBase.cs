@@ -18,12 +18,12 @@ public abstract class UnitBase : NetworkBehaviour
 
     protected NetworkObject selfNetworkObj;
 
-    public Team team;
+    [Networked]public Team team { get; set; }
 
     public float MaxHealth => maxHealth;
     public UnitType UnitType => unitType;
     public bool IsDead { get; private set; }
-    [Networked, HideInInspector] public float CurrentHealth { get; set; }
+    [Networked, HideInInspector, OnChangedRender(nameof(OnHealthChanged))] public float CurrentHealth { get; set; }
     [Networked, HideInInspector] public UnitState CurrentState { get; set; }
 
     // 죽었을 때 이벤트를 알리며 자신의 타입을 알림
@@ -97,5 +97,17 @@ public abstract class UnitBase : NetworkBehaviour
             ObjectContainer.Instance.IncreaseAugmentGauge(team, unitType);
 
         Runner.Despawn(selfNetworkObj);
+    }
+
+    // 체력이 변했을 때 모든 클라이언트에서 실행될 콜백
+    public void OnHealthChanged()
+    {
+        if (CurrentHealth <= 0 || IsDead) return;
+
+        // 모든 클라이언트의 화면에서 HP바 매니저 호출
+        if (HpBarManager.Instance != null)
+        {
+            HpBarManager.Instance.OnUnitDamaged(transform, team, CurrentHealth, maxHealth);
+        }
     }
 }

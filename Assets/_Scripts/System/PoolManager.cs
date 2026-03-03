@@ -42,7 +42,7 @@ public class PoolManager : Singleton<PoolManager>
     }
 
     //풀에서 꺼내서 활성화시키기
-    public GameObject SpawnFromPool(string tag, Vector3 positon, Quaternion rotation)
+    public GameObject SpawnFromPool(string tag, Vector3 positon, Quaternion rotation, Transform parent = null)
     {
         if (!_poolDict.ContainsKey(tag)) return null;
 
@@ -57,6 +57,8 @@ public class PoolManager : Singleton<PoolManager>
         {
             objectToSpawn = _poolDict[tag].Dequeue();
         }
+
+        if (parent != null) objectToSpawn.transform.SetParent(parent); //부모설정 , 캔버스자식으로 넣기용
 
         objectToSpawn.transform.SetPositionAndRotation(positon, rotation);
         objectToSpawn.SetActive(true);
