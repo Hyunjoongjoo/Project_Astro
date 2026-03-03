@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: AssaultSkillSO
   m_EditorClassIdentifier: Assembly-CSharp::AssaultSkillSO
   _skillId: 
-  _heroId: 
   _category: 1
   _initCooldown: 2
   _cooldown: 4
@@ -21,4 +20,4 @@ MonoBehaviour:
   _effectPrefab: {fileID: 6393617126741755569, guid: 19138c6e05c43fe46a292e5d6d939efa, type: 3}
   _radius: 3
   _damageMultiplier: 1
-  _effectLifeTime: 0.6
+  _duration: 0.5

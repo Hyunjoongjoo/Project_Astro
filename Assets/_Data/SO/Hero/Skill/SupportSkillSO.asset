@@ -13,12 +13,11 @@ MonoBehaviour:
   m_Name: SupportSkillSO
   m_EditorClassIdentifier: Assembly-CSharp::SupportSkillSO
   _skillId: 
-  _heroId: 
   _category: 1
   _initCooldown: 5
   _cooldown: 10
   _skillRange: 3
   _effectPrefab: {fileID: 7343538280686139031, guid: a8e905d0d5bf4144393d0b154082615b, type: 3}
   _healAmount: 100
-  _effectLifeTime: 0.6
+  _duration: 0.5
   _isAreaSkill: 0
