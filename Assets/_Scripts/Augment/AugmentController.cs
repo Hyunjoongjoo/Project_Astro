@@ -19,6 +19,8 @@ public class AugmentController : NetworkBehaviour
     [Header("스킬 증강 데이터베이스")]
     [SerializeField] private List<SkillAugmentSO> _allSkillAugments;
 
+    //캐싱용
+    private AugmentData _localSelectedData;
 
     private void Awake()
     {
@@ -116,6 +118,7 @@ public class AugmentController : NetworkBehaviour
     public void SelectAugment(AugmentData data)
     {
         //서버에 요청하기
+        _localSelectedData = data;//카드기억
         RPC_RequestSelectAugment(data.targetId, data.type);
     }
 
@@ -159,17 +162,14 @@ public class AugmentController : NetworkBehaviour
         {
             if (type == AugmentType.Hero)
             {
-                //id랑 타입만 받고 아이콘은 나중에
-                AugmentData localData = new AugmentData
+                if (_localSelectedData != null && _localSelectedData.targetId == targetId)
                 {
-                    targetId = targetId,
-                    type = type
-                };
+                //조립된 데이터를 UI 매니저에게 넘겨서 하단 덱에 카드 슬롯을 추가
+                    AugmentManager.Instance.AddHeroCard(_localSelectedData);
+                    _localSelectedData = null; // 다 썼으니 비워줌
+                }
 
                 //HeroIconSO가 추가되면 아이콘로직 추가
-
-                //조립된 데이터를 UI 매니저에게 넘겨서 하단 덱에 카드 슬롯을 추가
-                AugmentManager.Instance.AddHeroCard(localData);
             }
 
             //서버 승인이 떨어졌으므로, 100 게이지를 차감
