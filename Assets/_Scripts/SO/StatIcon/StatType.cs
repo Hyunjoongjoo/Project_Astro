@@ -8,5 +8,6 @@
     DamageReduction,    // 받는 피해량 감소
     SkillCooldown,      // 스킬 쿨타임 감소
     RespawnTime,        // 재소환 대기시간
-    DetectionRange      // 탐지 범위
+    DetectionRange,      // 탐지 범위
+    MoveType
 }

@@ -64,4 +64,10 @@ public class TableManager : Singleton<TableManager>
 
         Debug.Log("[TableManager] 데이터 리플렉션 완료");
     }
+
+    public string GetString(string id)
+    {
+        var data = StringTable.Get(id);
+        return data != null ? data.textKor : id; // 데이터가 없으면 ID라도 노출
+    }
 }
