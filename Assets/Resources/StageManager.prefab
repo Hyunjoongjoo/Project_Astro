@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2910827184041789664}
   - component: {fileID: 7318732167956481804}
   - component: {fileID: -2723386092329298971}
-  - component: {fileID: 8164791881352277722}
   m_Layer: 0
   m_Name: StageManager
   m_TagString: Untagged
@@ -52,7 +51,6 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: -2723386092329298971}
-  - {fileID: 8164791881352277722}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-2723386092329298971
 MonoBehaviour:
@@ -75,16 +73,3 @@ MonoBehaviour:
     _items: []
   _minionSpawnerPrefab:
     RawGuidValue: 837058bd486a26c44b56c81b8bd87058
---- !u!114 &8164791881352277722
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3175966959674991452}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f34ed423aa32da64b99a8d7d364e6a65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AugmentController
-  _allSkillAugments: []

@@ -3502,7 +3502,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AugmentManager
   _dontDestroyOnLoad: 0
-  _masterSO: {fileID: 11400000, guid: 2eb710d974001b34cbbee6410a54a84a, type: 2}
   _augmentWindowPrefab: {fileID: 4106133892853824477, guid: 1f36554bda3c65842b069e4845963db7, type: 3}
   _toggleBtn: {fileID: 1180466687}
   _heroCardSlotPrefab: {fileID: 8006802584929967089, guid: 1e71b10ac1aafed47b1e5f4250316636, type: 3}
@@ -60202,6 +60201,71 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1916946603}
   m_CullTransparentMesh: 0
+--- !u!1 &1921911173
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1921911176}
+  - component: {fileID: 1921911175}
+  - component: {fileID: 1921911174}
+  m_Layer: 0
+  m_Name: AugmentSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1921911174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921911173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f34ed423aa32da64b99a8d7d364e6a65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AugmentController
+  _allSkillAugments: []
+--- !u!114 &1921911175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921911173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 317028679
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1921911174}
+  ForceRemoteRenderTimeframe: 0
+--- !u!4 &1921911176
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921911173}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1939246948
 GameObject:
   m_ObjectHideFlags: 0
@@ -62842,3 +62906,4 @@ SceneRoots:
   - {fileID: 1872343878}
   - {fileID: 361258459}
   - {fileID: 912783117}
+  - {fileID: 1921911176}

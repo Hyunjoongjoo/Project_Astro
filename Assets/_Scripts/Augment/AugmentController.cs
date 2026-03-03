@@ -108,7 +108,7 @@ public class AugmentController : NetworkBehaviour
 
     //클라 => 서버로 증강 선택 요청하기
     //꽉찼나 체크
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestSelectAugment(string targetId, AugmentType type, RpcInfo info = default)
     {
         //플레이어찾기
@@ -171,7 +171,7 @@ public class AugmentController : NetworkBehaviour
     }
 
     //반려
-    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_RejectAugment(PlayerRef player)
     {
         Debug.LogWarning("슬롯이 가득 차서 서버에서 장착 반려");
