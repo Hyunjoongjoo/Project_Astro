@@ -83,39 +83,35 @@ public class AugmentController : NetworkBehaviour
 
         //덱매니저 넘겨주기 위해 NetworkArray를 일반 List<string>으로 변환
         List<string> myHeroes = new List<string>();
-        for (int i = 0; i < myData.OwnedHeroes.Length; i++)
+        for (int i = 0; i < SlotData_5.Length; i++) 
         {
-            string heroId = myData.OwnedHeroes[i].ToString().Trim('\0');
+            string heroId = myData.OwnedHeroes.Get(i).Replace("\0", "").Trim();
             if (!string.IsNullOrEmpty(heroId))
             {
-                myHeroes.Add(myData.OwnedHeroes[i].ToString());
+                myHeroes.Add(heroId);
             }
         }
 
         List<string> mySkills = new List<string>();
-        for (int i = 0; i < myData.OwnedSkillAugments.Length; i++)
+        for (int i = 0; i < SlotData_5.Length; i++)
         {
-            string skillId = myData.OwnedSkillAugments[i].ToString().Trim('\0');
+            string skillId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
             if (!string.IsNullOrEmpty(skillId))
             {
-                mySkills.Add(myData.OwnedSkillAugments[i].ToString());
+                mySkills.Add(skillId);
             }
-
         }
 
-        //내 아이템 슬롯이 꽉 찼는지 검사
         bool isItemFull = true;
-        for (int i = 0; i < myData.InventoryItems.Length; i++)
+        for (int i = 0; i < SlotData_3.Length; i++)
         {
-            string itemId = myData.InventoryItems[i].ToString().Trim('\0');
+            string itemId = myData.InventoryItems.Get(i).Replace("\0", "").Trim();
             if (string.IsNullOrEmpty(itemId))
             {
                 isItemFull = false;
                 break;
             }
         }
-
-
 
         //덱매니저 실행해서 카드 3장 AugmentData형태로 뽑아오기
         List<AugmentData> cards = _deckManager.GenerateCards(
@@ -154,9 +150,9 @@ public class AugmentController : NetworkBehaviour
         bool isValid = true;
 
         //패킷이 날아오는 동안 슬롯이 꽉 찼는지 다시 한번 확인
-        if (type == AugmentType.Hero && IsArrayFull(data.OwnedHeroes)) isValid = false;
-        if (type == AugmentType.Item && IsArrayFull(data.InventoryItems)) isValid = false;
-        if (type == AugmentType.Skill && IsArrayFull(data.OwnedSkillAugments)) isValid = false;
+        if (type == AugmentType.Hero && IsSlotFull5(data.OwnedHeroes)) isValid = false;
+        if (type == AugmentType.Item && IsSlotFull3(data.InventoryItems)) isValid = false;
+        if (type == AugmentType.Skill && IsSlotFull5(data.OwnedSkillAugments)) isValid = false;
 
         //검증 통과 여부에 따라 컨펌 or 리젝트
         if (isValid)
@@ -217,23 +213,23 @@ public class AugmentController : NetworkBehaviour
     }
 
 
-    //NetworkArray가 꽉 찼는지 검사
-
-    private bool IsArrayFull(NetworkArray<NetworkString<_32>> array)
+    //네트워크배열 대신 슬롯체크용
+    //5칸
+    private bool IsSlotFull5(SlotData_5 slotData)
     {
-        if (array.Length == 0)
+        for (int i = 0; i < SlotData_5.Length; i++)
         {
-            Debug.LogError("NetworkArray의 길이가 0");
-            return true;
+            if (string.IsNullOrEmpty(slotData.Get(i).Replace("\0", "").Trim())) return false;
         }
+        return true;
+    }
 
-        for (int i = 0; i < array.Length; i++)
+    //3칸
+    private bool IsSlotFull3(SlotData_3 slotData)
+    {
+        for (int i = 0; i < SlotData_3.Length; i++)
         {
-            string val = array[i].ToString().Trim('\0');
-            if (string.IsNullOrEmpty(val))
-            {
-                return false; 
-            }
+            if (string.IsNullOrEmpty(slotData.Get(i).Replace("\0", "").Trim())) return false;
         }
         return true;
     }

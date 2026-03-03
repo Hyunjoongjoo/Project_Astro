@@ -17,14 +17,11 @@ public struct PlayerNetworkData : INetworkStruct
     public int TotalAugmentPicks;
 
     //내 필드/덱에 소환한 영웅 ID 목록 (최대 5마리)
-    [Capacity(5)]
-    public NetworkArray<NetworkString<_32>> OwnedHeroes => default;
+    public SlotData_5 OwnedHeroes;
 
     //내가 선택해서 장착한 스킬 증강 ID 목록 (최대 5개 => 영웅당 1개)
-    [Capacity(5)]
-    public NetworkArray<NetworkString<_32>> OwnedSkillAugments => default;
-
+    public SlotData_5 OwnedSkillAugments;
+    
     //내 보관소에 들어있는 아이템 증강 ID 목록 (Config테이블 3개)
-    [Capacity(3)]
-    public NetworkArray<NetworkString<_32>> InventoryItems => default;
+    public SlotData_3 InventoryItems;
 }
