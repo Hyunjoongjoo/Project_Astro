@@ -18,7 +18,8 @@ public abstract class UnitBase : NetworkBehaviour
 
     protected NetworkObject selfNetworkObj;
 
-    [Networked]public Team team { get; set; }
+    public Team team;
+    [Networked] public Team networkedTeam {  get;  set; }
 
     public float MaxHealth => maxHealth;
     public UnitType UnitType => unitType;
@@ -36,6 +37,7 @@ public abstract class UnitBase : NetworkBehaviour
             selfNetworkObj = GetComponent<NetworkObject>();
             CurrentHealth = maxHealth;
             IsDead = false;
+            networkedTeam = team;
         }
     }
 
@@ -107,7 +109,7 @@ public abstract class UnitBase : NetworkBehaviour
         // 모든 클라이언트의 화면에서 HP바 매니저 호출
         if (HpBarManager.Instance != null)
         {
-            HpBarManager.Instance.OnUnitDamaged(transform, team, CurrentHealth, maxHealth);
+            HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, maxHealth);
         }
     }
 }

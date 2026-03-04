@@ -11,7 +11,40 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
 
     public bool CanUse(HeroController caster, SkillRuntimeData runtime)
     {
-        return FindHealTarget(caster, runtime) != null;
+        if (!runtime.IsAreaSkill)
+        {
+            return FindHealTarget(caster, runtime) != null;
+        }
+        else
+        {
+            // 범위 힐일 경우 영웅or미니언 중 한 명이라도 힐 가능한지 검사
+            Collider[] hits = Physics.OverlapSphere(
+                caster.transform.position,
+                runtime.Radius,
+                caster.AllyLayer
+            );
+
+            foreach (var hit in hits)
+            {
+                UnitBase unit = hit.GetComponentInParent<UnitBase>();
+                if (unit == null || unit.IsDead)
+                {
+                    continue;
+                }
+
+                if (unit.UnitType != UnitType.Hero && unit.UnitType != UnitType.Minion)
+                {
+                    continue;
+                }
+
+                if (unit.CurrentHealth < unit.MaxHealth)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
@@ -21,20 +54,62 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
             return false;
         }
 
-        UnitBase target = FindHealTarget(caster, runtime);
-        if (target == null)
+        if (!runtime.IsAreaSkill)
         {
-            return false;
+            //기존 단일 힐
+            UnitBase target = FindHealTarget(caster, runtime);
+            if (target == null)
+            {
+                return false;
+            }
+
+            caster.HealUnit(target, runtime.HealAmount);
+            RPC_PlayHealEffect(target.Object.Id, runtime.EffectLifeTime);
         }
+        else
+        {
+            //범위 힐
+            Collider[] hits = Physics.OverlapSphere(
+                caster.transform.position,
+                runtime.Radius,
+                caster.AllyLayer
+            );
 
-        float before = target.CurrentHealth;
+            bool healedAnyone = false;
 
-        caster.HealUnit(target, runtime.HealAmount);
+            foreach (var hit in hits)
+            {
+                UnitBase unit = hit.GetComponent<UnitBase>();
+                if (unit == null || unit.IsDead)
+                {
+                    continue;
+                }
 
-        float after = target.CurrentHealth;
-        float healed = after - before;
+                if (unit.CurrentHealth >= unit.MaxHealth)
+                {
+                    continue;
+                }
 
-        RPC_PlayHealEffect(target.Object.Id, runtime.EffectLifeTime);
+                if (unit.UnitType != UnitType.Hero && unit.UnitType != UnitType.Minion)
+                {
+                    continue;
+                }
+
+                //if (unit == caster) //본인 포함 여부에 따라 본인제외시 추가
+                //{
+                //    continue;
+                //}
+
+                caster.HealUnit(unit, runtime.HealAmount);
+                RPC_PlayHealEffect(unit.Object.Id, runtime.EffectLifeTime);
+                healedAnyone = true;
+            }
+
+            if (!healedAnyone)
+            {
+                return false;
+            }
+        }
 
         return true;
     }
@@ -117,6 +192,6 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
         effects.transform.localScale = Vector3.zero;
         effects.transform.DOScale(2f, 0.2f).SetEase(Ease.OutBack);
 
-        Destroy(effects, _data.Duration);
+        Destroy(effects, effectLifeTime);
     }
 }
