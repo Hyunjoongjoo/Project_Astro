@@ -6,6 +6,7 @@ public class TankSkill : NetworkBehaviour, IHeroSkill
 {
     [SerializeField] private TankSkillSO _data;
 
+    private StatModifier _damageReductionModifier;
     private TickTimer _timer;
     private bool _isActive;
     private HeroController _caster;
@@ -33,7 +34,10 @@ public class TankSkill : NetworkBehaviour, IHeroSkill
 
         _isActive = true;
         _timer = TickTimer.CreateFromSeconds(Runner, runtime.Duration);
-        _caster.SetDamageReduction(runtime.DamageReductionRate);
+        _damageReductionModifier = new StatModifier(runtime.DamageReductionRate, StatModType.Flat, this);
+
+        _caster.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, _damageReductionModifier);
+
         RPC_PlayEffect(caster.Object.Id);
 
         return true;
@@ -76,7 +80,7 @@ public class TankSkill : NetworkBehaviour, IHeroSkill
 
         if (_caster != null)
         {
-            _caster.ClearDamageReduction();
+            _caster.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);
             _caster = null;
         }
     }

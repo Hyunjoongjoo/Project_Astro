@@ -18,13 +18,12 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
-    private float _attackPower;
-    private float _attackSpeed;
+    [SerializeField] private UnitStat _unitStat;
+
     private float _attackRange;
-    private float _healAmount;
+    private float _respawnTime;
     private AttackType _attackType;
     private GameObject _projectilePrefab;
-    private float _summonCooldown;
 
 
     private UnitBase _currentTarget;
@@ -40,13 +39,14 @@ public class HeroController : MobilityUnit, IBasicAttack
     private TickTimer _deployDelayTimer;
 
     private IHeroSkill _currentSkill;
-    private float _damageReductionRate = 0f;
 
-    public float AttackPower => _attackPower;
-    public float AttackSpeed => _attackSpeed;
     public float AttackRange => _attackRange;
     public UnitBase CurrentTarget => _currentTarget;
-    public float SummonCooldown => _summonCooldown;
+    public float RespawnTime => _respawnTime;
+    public float AttackPower => _unitStat.Attack.Value;
+    public float AttackSpeed => _unitStat.AttackSpeed.Value;
+    public float HealPower => _unitStat.HealPower.Value;
+    public UnitStat UnitStat => _unitStat;
     public LayerMask AllyLayer
     {
         get
@@ -95,34 +95,37 @@ public class HeroController : MobilityUnit, IBasicAttack
     public override void Spawned()
     {
         base.Spawned();
-
         unitType = UnitType.Hero;
-
         if (!Object.HasStateAuthority)
         {
             return;
         }
 
-        if (_heroData != null)
+        if (_unitStat == null)
         {
-            // 기본 스탯
-            _attackPower = _heroData.AttackPower;
-            _attackSpeed = _heroData.AttackSpeed;
-            _attackRange = _heroData.AttackRange;
-            _attackType = _heroData.NormalAttack.AttackType;
-            searchRange = _heroData.SearchRange;
-            _healAmount = _heroData.HealAmount;
-            maxHealth = _heroData.MaxHealth;
-            moveSpeed = _heroData.MoveSpeed;
-            agent.speed = moveSpeed;
-            _projectilePrefab = _heroData.NormalAttack.EffectPrefab;
-            _summonCooldown = _heroData.SummonCooldown;
-
-            EquipSkill(_heroData.NormalSkill);
-
-            ApplySkillAugments();
+            _unitStat = GetComponent<UnitStat>();
         }
 
+        HeroStatData statData = HeroManager.Instance.GetStatus(_heroData.HeroID);
+        if (statData == null)
+        {
+            return;
+        }
+        //UnitStat 초기화
+        _unitStat.Init(statData);
+        //Stat 기반 값 적용
+        maxHealth = _unitStat.MaxHp.Value;
+        moveSpeed = _unitStat.MoveSpeed.Value;
+        searchRange = _unitStat.DetectRange.Value;
+        _respawnTime = _unitStat.RespawnTime.Value;
+        agent.speed = moveSpeed;
+        //공격 관련
+        _attackRange = _heroData.AttackRange;
+        _attackType = _heroData.NormalAttack.AttackType;
+        _projectilePrefab = _heroData.NormalAttack.EffectPrefab;
+        //스킬
+        EquipSkill(_heroData.NormalSkill);
+        ApplySkillAugments();
         if (agent != null)
         {
             agent.enabled = false;
@@ -139,12 +142,14 @@ public class HeroController : MobilityUnit, IBasicAttack
             agent.ResetPath();
         }
 
-        _damageReductionRate = 0f;
-
         _fsm = new UnitFSM();
 
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-        //_skillTimer = TickTimer.CreateFromSeconds(Runner, _skill.Data.initCooldown);
+
+        if (_currentSkill != null)
+        {
+            _skillTimer = TickTimer.CreateFromSeconds(Runner, _currentSkill.Data.InitCooldown);
+        }
 
         CurrentState = UnitState.Idle;
     }
@@ -329,8 +334,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
-        runtime.HealAmount = _healAmount;
-        //증강적용시~~
+        runtime.HealAmount = HealPower;
 
         if (!_currentSkill.CanUse(this, runtime))
         {
@@ -344,7 +348,10 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
         _fsm.EnterSkill(Runner, 0.15f);
 
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, runtime.Cooldown);
+        float cooldownReduction = _unitStat.CooldownReduction.Value;
+        float finalCooldown = runtime.Cooldown * (1f - cooldownReduction);
+
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, finalCooldown);
 
         return success;
     }
@@ -475,27 +482,19 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        target.TakeDamage(_attackPower);
+        target.TakeDamage(AttackPower);
     }
 
     public override void TakeDamage(float amount)
     {
-        if (_damageReductionRate > 0f)
+        float reduction = _unitStat.DamageReduction.Value;
+
+        if (reduction > 0f)
         {
-            amount *= (1f - _damageReductionRate);
+            amount *= (1f - reduction);
         }
 
         base.TakeDamage(amount);
-    }
-
-    public void SetDamageReduction(float rate)
-    {
-        _damageReductionRate = Mathf.Clamp01(rate);
-    }
-
-    public void ClearDamageReduction()
-    {
-        _damageReductionRate = 0f;
     }
 
     public void HealUnit(UnitBase target, float healAmount)
@@ -529,7 +528,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        float baseDamage = _attackPower;
+        float baseDamage = AttackPower;
         float finalDamage = baseDamage * damageRatio;
 
         target.TakeDamage(finalDamage);
@@ -631,8 +630,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         _fsm?.ForceDead();
         StopMove();
-
-        ClearDamageReduction();
 
         // 목표 이벤트 구독 해제 후 부모 Die 호출 (Despawn)
         if (_currentTarget != null)

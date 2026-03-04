@@ -717,6 +717,7 @@ MonoBehaviour:
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
+  _unitStat: {fileID: 288590522490992711}
 --- !u!114 &288590522490992711
 MonoBehaviour:
   m_ObjectHideFlags: 0
