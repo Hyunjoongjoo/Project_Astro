@@ -107,6 +107,10 @@ public class AugmentDeckManager
         Sprite icon = null;
         NetworkPrefabRef heroPrefab = default;
 
+        //쿨타임 저장용
+        float baseCooldown = 0f;
+        float currentCooldown = 0f;
+
         switch (type)
         {
             case AugmentType.Hero:
@@ -130,11 +134,18 @@ public class AugmentDeckManager
                     refId = pickedHero.id;
 
                     title = GetString(pickedHero.heroName);
-                    desc = GetString(pickedHero.heroDesc); 
+                    desc = GetString(pickedHero.heroDesc);
                     if (_heroIconSO != null)
                     {
-                        icon = _heroIconSO.GetIcon(refId);       // ID(hero_corsair 등)로 아이콘 획득
-                        heroPrefab = _heroIconSO.GetPrefab(refId); // ID로 네트워크 프리팹 획득
+                        icon = _heroIconSO.GetIcon(refId);       //ID로 아이콘
+                        heroPrefab = _heroIconSO.GetPrefab(refId); //네트워크 프리팹
+                    }
+                    //HeroStatTable에서 쿨타임 가져오기(이건 성장x라서)
+                    var heroStat = TableManager.Instance.HeroStatTable.Get(pickedHero.heroStatId);
+                    if (heroStat != null)
+                    {
+                        baseCooldown = heroStat.spawnCooldown;
+                        currentCooldown = heroStat.spawnCooldown;
                     }
                 }
                 else return null; //뽑을 영웅이 없으면 null
@@ -161,7 +172,6 @@ public class AugmentDeckManager
                     refId = pickedItem.id;
                     title = GetString(pickedItem.name);
                     desc = "";
-                    //여기쯤 아이콘 연동?
                 }
                 else return null;
                 break;
@@ -209,7 +219,9 @@ public class AugmentDeckManager
             name = title,
             description = desc,
             icon = icon,
-            heroPrefab = heroPrefab
+            heroPrefab = heroPrefab,
+            baseSpawnCooldown = baseCooldown,       
+            currentSpawnCooldown = currentCooldown
         };
     }
 
