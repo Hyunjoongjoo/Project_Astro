@@ -11,6 +11,9 @@ public class AugmentCardUI : MonoBehaviour
 
     private AugmentData _data;
 
+    //3.4 더블클릭방지용 변수선언
+    private bool _isClicked = false;
+
     public void Setup(AugmentData data)
     {
         _data = data;
@@ -18,9 +21,18 @@ public class AugmentCardUI : MonoBehaviour
         _descTxt.text = _data.description;
         _iconImg.sprite = _data.icon;
 
+        _isClicked = false;
+        _selectBtn.interactable = true;
+
         _selectBtn.onClick.RemoveAllListeners();
         _selectBtn.onClick.AddListener(() =>
         {
+            if (_isClicked) return;
+
+            //나중에 풀링 방식으로 바꿔도 쓸 수 있도록 초기화 (지금은 카드 Destroy됨)
+            _isClicked = true;
+            _selectBtn.interactable = false;
+
             AugmentManager.Instance.SelectAugment(data);
             GetComponentInParent<AugmentWindowUI>().Close();
         });
