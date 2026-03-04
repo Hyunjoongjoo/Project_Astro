@@ -14,33 +14,33 @@ public static class AugmentExecutor
         switch (type)
         {
             case AugmentType.Hero:
-                for (int i = 0; i < playerData.OwnedHeroes.Length; i++)
+                for (int i = 0; i < SlotData_5.Length; i++) 
                 {
-                    if (string.IsNullOrEmpty(playerData.OwnedHeroes[i].ToString()))
+                    if (string.IsNullOrEmpty(playerData.OwnedHeroes.Get(i).Replace("\0", "").Trim()))
                     {
-                        playerData.OwnedHeroes.Set(i, refId); //넣기
+                        playerData.OwnedHeroes = playerData.OwnedHeroes.Set(i, refId);
                         break;
                     }
                 }
                 break;
 
             case AugmentType.Item:
-                for (int i = 0; i < playerData.InventoryItems.Length; i++)
+                for (int i = 0; i < SlotData_3.Length; i++)
                 {
-                    if (string.IsNullOrEmpty(playerData.InventoryItems[i].ToString()))
+                    if (string.IsNullOrEmpty(playerData.InventoryItems.Get(i).Replace("\0", "").Trim()))
                     {
-                        playerData.InventoryItems.Set(i, refId);
+                        playerData.InventoryItems = playerData.InventoryItems.Set(i, refId);
                         break;
                     }
                 }
                 break;
 
             case AugmentType.Skill:
-                for (int i = 0; i < playerData.OwnedSkillAugments.Length; i++)
+                for (int i = 0; i < SlotData_5.Length; i++)
                 {
-                    if (string.IsNullOrEmpty(playerData.OwnedSkillAugments[i].ToString()))
+                    if (string.IsNullOrEmpty(playerData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim()))
                     {
-                        playerData.OwnedSkillAugments.Set(i, refId);
+                        playerData.OwnedSkillAugments = playerData.OwnedSkillAugments.Set(i, refId);
                         break;
                     }
                 }

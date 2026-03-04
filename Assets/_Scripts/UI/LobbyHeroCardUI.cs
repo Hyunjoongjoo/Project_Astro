@@ -28,7 +28,7 @@ public class LobbyHeroCardUI : MonoBehaviour
         //테이블 상의 아이콘 SO에서 가져오기
         if (_heroIcons != null)
         {
-            _iconImg.sprite = _heroIcons.GetIcon(data.heroIcon);
+            _iconImg.sprite = _heroIcons.GetIcon(data.id);
         }
 
         _nameTxt.text = TableManager.Instance.GetString(data.heroName);

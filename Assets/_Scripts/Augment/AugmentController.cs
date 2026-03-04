@@ -22,6 +22,9 @@ public class AugmentController : NetworkBehaviour
     //캐싱용
     private AugmentData _localSelectedData;
 
+    //인스펙터 직렬화 해둘 히어로 아이콘SO
+    [SerializeField] private HeroIconDataSO _heroIconSO;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -32,8 +35,7 @@ public class AugmentController : NetworkBehaviour
     public override void Spawned()
     {
         //할당된 SO 데이터를 바탕으로 DeckManager 가동
-        _deckManager = new AugmentDeckManager(_allSkillAugments);
-
+        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO);
         //현재 씬에 있는 스테이지 매니저 찾아서 캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
     }
@@ -83,37 +85,35 @@ public class AugmentController : NetworkBehaviour
 
         //덱매니저 넘겨주기 위해 NetworkArray를 일반 List<string>으로 변환
         List<string> myHeroes = new List<string>();
-        for (int i = 0; i < myData.OwnedHeroes.Length; i++)
+        for (int i = 0; i < SlotData_5.Length; i++) 
         {
-            if (!string.IsNullOrEmpty(myData.OwnedHeroes[i].ToString()))
+            string heroId = myData.OwnedHeroes.Get(i).Replace("\0", "").Trim();
+            if (!string.IsNullOrEmpty(heroId))
             {
-                myHeroes.Add(myData.OwnedHeroes[i].ToString());
+                myHeroes.Add(heroId);
             }
         }
 
         List<string> mySkills = new List<string>();
-        for (int i = 0; i < myData.OwnedSkillAugments.Length; i++)
+        for (int i = 0; i < SlotData_5.Length; i++)
         {
-
-            if (!string.IsNullOrEmpty(myData.OwnedSkillAugments[i].ToString()))
+            string skillId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+            if (!string.IsNullOrEmpty(skillId))
             {
-                mySkills.Add(myData.OwnedSkillAugments[i].ToString());
+                mySkills.Add(skillId);
             }
-
         }
 
-        //내 아이템 슬롯이 꽉 찼는지 검사
         bool isItemFull = true;
-        for (int i = 0; i < myData.InventoryItems.Length; i++)
+        for (int i = 0; i < SlotData_3.Length; i++)
         {
-            if (string.IsNullOrEmpty(myData.InventoryItems[i].ToString()))
+            string itemId = myData.InventoryItems.Get(i).Replace("\0", "").Trim();
+            if (string.IsNullOrEmpty(itemId))
             {
                 isItemFull = false;
                 break;
             }
         }
-
-
 
         //덱매니저 실행해서 카드 3장 AugmentData형태로 뽑아오기
         List<AugmentData> cards = _deckManager.GenerateCards(
@@ -152,9 +152,9 @@ public class AugmentController : NetworkBehaviour
         bool isValid = true;
 
         //패킷이 날아오는 동안 슬롯이 꽉 찼는지 다시 한번 확인
-        if (type == AugmentType.Hero && IsArrayFull(data.OwnedHeroes)) isValid = false;
-        if (type == AugmentType.Item && IsArrayFull(data.InventoryItems)) isValid = false;
-        if (type == AugmentType.Skill && IsArrayFull(data.OwnedSkillAugments)) isValid = false;
+        if (type == AugmentType.Hero && IsSlotFull5(data.OwnedHeroes)) isValid = false;
+        if (type == AugmentType.Item && IsSlotFull3(data.InventoryItems)) isValid = false;
+        if (type == AugmentType.Skill && IsSlotFull5(data.OwnedSkillAugments)) isValid = false;
 
         //검증 통과 여부에 따라 컨펌 or 리젝트
         if (isValid)
@@ -175,6 +175,14 @@ public class AugmentController : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             AugmentExecutor.ApplyAugment(_stageManager, player, type, targetId);
+
+            //호스트만 처리하도록 안으로 이동
+            if (_stageManager.PlayerDataMap.TryGet(player, out PlayerNetworkData data))
+            {
+
+                //서버 승인이 떨어졌으므로, 100 게이지를 차감
+                _stageManager.DecreaseAugmentGauge(data.Team, 100);
+            }
         }
 
         //카드를 산 사람이 로컬이 맞다면, UI를 갱신
@@ -191,9 +199,6 @@ public class AugmentController : NetworkBehaviour
 
                 //HeroIconSO가 추가되면 아이콘로직 추가
             }
-
-            //서버 승인이 떨어졌으므로, 100 게이지를 차감
-            _stageManager.DecreaseAugmentGauge(GameManager.Instance.PlayerTeam, 100);
 
             //토글버튼 숨김
             AugmentManager.Instance.HideAugmentToggleBtn();
@@ -215,13 +220,23 @@ public class AugmentController : NetworkBehaviour
     }
 
 
-    //NetworkArray가 꽉 찼는지 검사
-
-    private bool IsArrayFull(NetworkArray<NetworkString<_32>> array)
+    //네트워크배열 대신 슬롯체크용
+    //5칸
+    private bool IsSlotFull5(SlotData_5 slotData)
     {
-        for (int i = 0; i < array.Length; i++)
+        for (int i = 0; i < SlotData_5.Length; i++)
         {
-            if (string.IsNullOrEmpty(array[i].ToString())) return false; //빈칸이 하나라도 있으면 false
+            if (string.IsNullOrEmpty(slotData.Get(i).Replace("\0", "").Trim())) return false;
+        }
+        return true;
+    }
+
+    //3칸
+    private bool IsSlotFull3(SlotData_3 slotData)
+    {
+        for (int i = 0; i < SlotData_3.Length; i++)
+        {
+            if (string.IsNullOrEmpty(slotData.Get(i).Replace("\0", "").Trim())) return false;
         }
         return true;
     }
