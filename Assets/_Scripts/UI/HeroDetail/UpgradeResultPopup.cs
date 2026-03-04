@@ -31,7 +31,7 @@ public class UpgradeResultPopup : BaseUI
         _levelTxt.text = $"Lv. {userHero.level}";
 
         if (iconSO != null)
-            _iconImg.sprite = iconSO.GetIcon(heroData.heroIcon);
+            _iconImg.sprite = iconSO.GetIcon(heroData.id);
 
         // 경험치 바는 레벨업 직후이므로 다음 레벨 데이터 참조
         var levelData = TableManager.Instance.HeroLevelTable.Get(userHero.level.ToString());
