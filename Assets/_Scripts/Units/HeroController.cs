@@ -1,7 +1,7 @@
 ﻿using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
-using WebSocketSharp;
+
 
 public enum UnitSize
 {
@@ -168,6 +168,11 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         _currentSkill.ChangeSkillData(newSkillData);
 
+        if (_skillTimer.IsRunning)
+        {
+            return;
+        }
+
         _skillTimer = TickTimer.CreateFromSeconds(Runner, newSkillData.InitCooldown);
     }
 
@@ -328,14 +333,14 @@ public class HeroController : MobilityUnit, IBasicAttack
             return false;
         }
 
-        if (!_skillTimer.ExpiredOrNotRunning(Runner))
+        if (_skillTimer.IsRunning && !_skillTimer.Expired(Runner))
         {
             return false;
         }
 
         SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
         runtime.HealAmount = HealPower;
-
+        Debug.Log("스킬 쿨 : " + runtime.Cooldown);
         if (!_currentSkill.CanUse(this, runtime))
         {
             return false;
@@ -348,7 +353,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
         _fsm.EnterSkill(Runner, 0.15f);
 
-        float cooldownReduction = _unitStat.CooldownReduction.Value;
+        float cooldownReduction = Mathf.Clamp(_unitStat.CooldownReduction.Value, 0f, 0.9f);
         float finalCooldown = runtime.Cooldown * (1f - cooldownReduction);
 
         _skillTimer = TickTimer.CreateFromSeconds(Runner, finalCooldown);
