@@ -271,10 +271,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HpBarItem
   _fillImg: {fileID: 2660419694357845164}
-  _blueTeamColor: {r: 1, g: 1, b: 1, a: 1}
-  _redTeamColor: {r: 1, g: 0, b: 0, a: 1}
+  _blueTeamSpr: {fileID: 21300000, guid: 4ddc2082251c84e67adbea97fdabceb1, type: 3}
+  _redTeamSpr: {fileID: 21300000, guid: 78b3e96079f8a4c05a3f6d5919d4156a, type: 3}
   _showDuration: 2
-  _offset: {x: 0, y: 2.5, z: 0}
+  _offset: {x: 0, y: 2, z: 0}
 --- !u!114 &3513295326999495967
 MonoBehaviour:
   m_ObjectHideFlags: 0
