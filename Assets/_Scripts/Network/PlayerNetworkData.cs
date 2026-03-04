@@ -25,6 +25,17 @@ public struct PlayerNetworkData : INetworkStruct
     //내 보관소에 들어있는 아이템 증강 ID 목록 (Config테이블 3개)
     public SlotData_3 InventoryItems;
 
-    //내가 사용한 영웅들 비트값으로 처리하기 위한 목록 (최대 32개)
-    public uint UsedHeroBitmask;
+    // [Networked] 속성을 사용하여 딕셔너리 선언 (최대 32개까지 저장 가능하도록 설정)
+    [Networked, Capacity(32)]
+    public NetworkDictionary<NetworkString<_32>, NetworkBool> UsedHeroes => default;
+
+    // 영웅 사용 기록 메서드
+    public void MarkHeroUsed(string heroId)
+    {
+        if (UsedHeroes.Count < 32)
+        {
+            // Dictionary이므로 중복 ID는 알아서 처리됨
+            UsedHeroes.Set(heroId, true);
+        }
+    }
 }

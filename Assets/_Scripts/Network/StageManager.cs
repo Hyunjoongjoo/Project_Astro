@@ -121,22 +121,10 @@ public class StageManager : NetworkBehaviour
         {
             PlayerName = nickName,
             Team = Team.None,
-            UsedHeroBitmask = 0
         };
 
         PlayerDataMap.Set(playerRef, data);
         Debug.Log($"플레이어 데이터 수신 : {nickName} ({PlayerDataMap.Count}/{_requiredPlayerCount})");
-    }
-
-    // 사용한 영웅 비트값으로 체크하는 메서드임!
-    public void MarkHeroUsed(PlayerRef player, int heroId)
-    {
-        if (Object.HasStateAuthority && PlayerDataMap.TryGet(player, out var data))
-        {
-            // heroId는 CSV 상의 인덱스(0~31)라고 가정
-            data.UsedHeroBitmask |= (uint)(1 << heroId);
-            PlayerDataMap.Set(player, data);
-        }
     }
 
     // 네트워크 틱에 맞춘 Update 메서드임
@@ -492,35 +480,32 @@ public class StageManager : NetworkBehaviour
         }
 
         List<HeroResultData> resultHeroes = new List<HeroResultData>();
-        var allHeroData = TableManager.Instance.HeroTable.GetAll();
 
-        for (int i = 0; i < 32; i++)
+        // 내 딕셔너리에 담긴 모든 Key(ID)를 순회
+        foreach (var heroEntry in _localPlayerMap.UsedHeroes)
         {
-            if ((_localPlayerMap.UsedHeroBitmask & (1 << i)) != 0)
+            string heroId = heroEntry.Key.ToString();
+
+            // 테이블에서 해당 ID 데이터 가져오기
+            var tableData = TableManager.Instance.HeroTable.Get(heroId);
+            var heroModel = _userDataManager.HeroesModel.Find(h => h.heroId == heroId);
+
+            var maxExp = TableManager.Instance.HeroLevelTable.Get(heroId);
+
+            if (tableData != null && heroModel != null)
             {
-                if (i < allHeroData.Count)
+                resultHeroes.Add(new HeroResultData
                 {
-                    var table = allHeroData[i];
-                    var model = _userDataManager.HeroesModel.Find(h => h.heroId == table.id);
+                    Name       = tableData.heroName,
+                    IconPath   = tableData.heroIcon,
+                    Level      = heroModel.level,      
+                    CurrentExp = heroModel.exp,
+                    AddedExp   = reward.HeroExp,
+                    MaxExp     = maxExp.expRequirement
+                });
 
-                    if (model != null)
-                    {
-                        var modelMaxExp = TableManager.Instance.HeroLevelTable.Get(model.level.ToString()).expRequirement;
-
-                        resultHeroes.Add(new HeroResultData
-                        {
-                            Name       = table.heroName,
-                            IconPath   = table.heroIcon,
-                            Level      = model.level,
-                            CurrentExp = model.exp,
-                            AddedExp   = reward.HeroExp,
-                            MaxExp     = modelMaxExp
-                        });
-
-                        // DB 업데이트는 여기서 그대로 진행
-                        _ = _userDataManager.UpdateHero(table.id, model.level, model.exp + reward.HeroExp, model.isUnlock);
-                    }
-                }
+                // DB 업데이트
+                _ = _userDataManager.UpdateHero(heroId, heroModel.level, heroModel.exp + reward.HeroExp, heroModel.isUnlock);
             }
         }
 
