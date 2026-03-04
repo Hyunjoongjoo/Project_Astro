@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    private StageManager _stageManager;
+
     [SerializeField] private Image _iconImg;
     [SerializeField] private LayerMask _groundLayer;
     private AugmentData _data;
@@ -24,6 +26,9 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         _data = data;
         _iconImg.sprite = data.icon;
         _mainCam = Camera.main;
+
+        //스테이지매니저캐싱
+        _stageManager = FindFirstObjectByType<StageManager>();
 
         UpdateCooldownUI();
     }
@@ -69,6 +74,12 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        //게임 playing(카운트다운끝) 상태 아니면 드래그 막기
+        if (_stageManager != null && _stageManager.CurrentState != StageState.Playing)
+        {
+            eventData.pointerDrag = null;
+            return;
+        }
         //쿨타임 중이면 드래그 무시
         if (IsCooldown)
         {
