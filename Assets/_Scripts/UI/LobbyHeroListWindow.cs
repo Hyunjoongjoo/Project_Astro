@@ -9,8 +9,11 @@ public class LobbyHeroListWindow : BaseUI
 
     public override void Open()
     {
+        if (!gameObject.activeSelf)
+        {
+            RefreshHeroList();
+        }
         base.Open();
-        RefreshHeroList();
     }
 
     private void RefreshHeroList()
