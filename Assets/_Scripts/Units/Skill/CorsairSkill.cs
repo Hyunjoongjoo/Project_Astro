@@ -17,14 +17,12 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
 
         float dist = caster.GetAttackDistanceTo(caster.CurrentTarget);
 
-        Debug.Log($"<color=yellow>[SkillFail]</color> 거리 부족: 현재 {dist} / 필요 {_data.SkillRange}");
         return dist <= _data.SkillRange;//기획서에 맞게 스킬범위를 새로 지정
 
     }
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
-        Debug.Log($"[Skill Execute] {caster.name} skill 실행 | EffectPrefab: {runtime.EffectPrefab}");
         if (!caster.Object.HasStateAuthority)
         {
             return false;
@@ -57,7 +55,6 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
             }
 
             float damage = caster.AttackPower * runtime.DamageMultiplier;
-            Debug.Log($"<color=red>[SkillExecute]</color> Corsair 스킬 발동! 중심지: {warpPos}, 예상 데미지: {damage}");
 
             unit.TakeDamage(damage);
         }
@@ -87,6 +84,7 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
         return null;
     }
 
+    public void TickSkill(NetworkRunner runner) { }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()

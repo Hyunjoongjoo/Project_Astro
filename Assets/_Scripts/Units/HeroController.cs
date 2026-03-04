@@ -117,23 +117,12 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-     
-
         if (_unitStat == null)
         {
             _unitStat = GetComponent<UnitStat>();
         }
 
-        Debug.Log($"HeroID : {_heroData.HeroID}");
         HeroStatData statData = HeroManager.Instance.GetStatus(_heroData.HeroID);
-        if (statData == null)
-        {
-            Debug.Log("CSV 데이터 못찾음");
-        }
-        else
-        {
-            Debug.Log($"CSV HP : {statData.BaseHp}");
-        }
 
         //UnitStat 초기화
         _unitStat.Init(statData);
@@ -144,8 +133,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         searchRange = _unitStat.DetectRange.Value;
         _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = moveSpeed;
-        Debug.Log($"<color=cyan>[StatCheck]</color> {name} 초기화 완료 | HP: {maxHealth}, 공격력: {AttackPower}, 공속: {AttackSpeed}, 이속: {moveSpeed}");
-
 
         //스킬
         EquipSkill(_heroData.NormalSkill);
@@ -160,7 +147,6 @@ public class HeroController : MobilityUnit, IBasicAttack
                 transform.position = hit.position;
             }
 
-            //나중에 영웅 크기 적용할것이라면...
 
             agent.enabled = true;
             agent.ResetPath();
@@ -188,7 +174,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         _currentSkill = _skillComponent as IHeroSkill;
-        Debug.Log($"<color=magenta>[SkillEquip]</color> {name} 스킬 장착: {_skillData.SkillName}, 초기 쿨타임: {_skillData.InitCooldown}s");
+
         if (_currentSkill == null)
         {
             return;
@@ -209,6 +195,8 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         // StateAuthority가 없는 클라이언트는 서버 상태를 그대로 반영만 함
         if (!Object.HasStateAuthority) return;
+
+        _currentSkill?.TickSkill(Runner);
 
         // 사망 상태면 행동 중단
         if (CurrentState == UnitState.Dead) return;
@@ -498,7 +486,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        RPC_FireProjectile(Object.Id, _currentTarget.Object.Id, team);
+        RPC_FireProjectile(Object.Id, _currentTarget.Object.Id, team, false);
 
         ApplyBasicAttackDamage(_currentTarget);
     }
@@ -570,7 +558,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     //기본 공격
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team)
+    public void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team, bool isSkill)
     {
         if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
         {
@@ -588,7 +576,28 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        if (hero._projectile == null)
+        GameObject projectilePrefab = null;
+
+        if (isSkill)
+        {
+            if (hero._skillData == null)
+            {
+                return;
+            }
+
+            projectilePrefab = hero._skillData.EffectPrefab;
+        }
+        else
+        {
+            projectilePrefab = hero._projectile;
+        }
+
+        if (projectilePrefab == null)
+        {
+            return;
+        }
+
+        if (hero._firePoint == null)
         {
             return;
         }
@@ -596,7 +605,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         Vector3 start = hero._firePoint.position;
         Vector3 end = targetObj.transform.position;
 
-        GameObject projectileObj = Instantiate(hero._projectile, start, Quaternion.identity);
+        GameObject projectileObj = Instantiate(projectilePrefab, start, Quaternion.identity);
 
         Projectile projectile = projectileObj.GetComponent<Projectile>();
 

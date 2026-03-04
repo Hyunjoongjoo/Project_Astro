@@ -75,4 +75,6 @@ public class TankSkill : MonoBehaviour, IHeroSkill
             _caster = null;
         }
     }
+
+    public void TickSkill(NetworkRunner runner){}
 }

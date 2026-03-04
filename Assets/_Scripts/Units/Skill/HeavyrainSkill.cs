@@ -7,7 +7,6 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 
     private TickTimer _shotTimer;
     private int _remainingShots;
-
     private HeroController _caster;
     private UnitBase _target;
     private bool _isFiring;
@@ -32,6 +31,7 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
         }
 
         UnitBase target = caster.CurrentTarget;
+
         if (target == null || target.IsDead)
         {
             return false;
@@ -39,28 +39,35 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 
         float dist = caster.GetAttackDistanceTo(target);
 
-        return dist <= _data.SkillRange;
+        return dist <= runtime.SkillRange;
     }
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
-        Debug.Log($"[Skill Execute] {caster.name} skill 실행 | EffectPrefab: {runtime.EffectPrefab}");
         if (!CanUse(caster, runtime))
         {
             return false;
         }
 
+        UnitBase target = caster.CurrentTarget;
+
+        if (target == null || target.IsDead)
+        {
+            return false;
+        }
+
         _caster = caster;
-        _target = caster.CurrentTarget;
+        _target = target;
 
         _remainingShots = runtime.ShotCount;
         _isFiring = true;
 
-        FireOnce();
+        //첫 발 즉시 발사
+        FireOnce(runtime);
 
         if (_remainingShots > 0)
         {
-            _shotTimer = TickTimer.CreateFromSeconds(_caster.Runner, runtime.ShotInterval);
+            _shotTimer = TickTimer.CreateFromSeconds(caster.Runner, runtime.ShotInterval);
         }
         else
         {
@@ -68,6 +75,43 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
         }
 
         return true;
+    }
+
+    public void TickSkill(NetworkRunner runner)
+    {
+        if (!_isFiring)
+        {
+            return;
+        }
+
+        if (_caster == null || _target == null)
+        {
+            StopFiring();
+            return;
+        }
+
+        if (_target.IsDead || _target.Object == null)
+        {
+            StopFiring();
+            return;
+        }
+
+        if (!_shotTimer.ExpiredOrNotRunning(runner))
+        {
+            return;
+        }
+
+        if (_remainingShots <= 0)
+        {
+            StopFiring();
+            return;
+        }
+
+        SkillRuntimeData runtime = _data.CreateRuntimeData();
+
+        FireOnce(runtime);
+
+        _shotTimer = TickTimer.CreateFromSeconds(runner, runtime.ShotInterval);
     }
 
     public void ChangeSkillData(SkillDataSO newData)
@@ -78,49 +122,15 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
         }
     }
 
-    private void Update()
+    private void FireOnce(SkillRuntimeData runtime)
     {
-        if (_caster == null || !_caster.Object.HasStateAuthority)
-        {
-            return;
-        }
-
-        if (!_isFiring)
-        {
-            return;
-        }
-
-        if (!_shotTimer.IsRunning || !_shotTimer.Expired(_caster.Runner))
-        {
-            return;
-        }
-
-        if (_remainingShots <= 0 ||
-            _caster == null ||
-            _target == null ||
-            _target.Object == null ||
-            _target.IsDead)
+        if (_caster == null || _target == null)
         {
             StopFiring();
             return;
         }
 
-        FireOnce();
-
-        if (_remainingShots > 0)
-        {
-            _shotTimer = TickTimer.CreateFromSeconds(_caster.Runner, _data.ShotInterval);
-        }
-        else
-        {
-            StopFiring();
-        }
-    }
-
-    //데미지는 영웅컨트롤러로 위임, 연출만 RPC
-    private void FireOnce()
-    {
-        if (_caster == null || _target == null || _target.Object == null)
+        if (_target.IsDead || _target.Object == null)
         {
             StopFiring();
             return;
@@ -128,13 +138,13 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 
         _remainingShots--;
 
-        _caster.ApplyBarrageSkillDamage(_target, _data.DamageMultiplier);
+        //서버에서 데미지 적용
+        _caster.ApplyBarrageSkillDamage(_target, runtime.DamageMultiplier);
 
-        _caster.RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team);
-
+        //모든 클라이언트에 발사 연출
+        _caster.RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team, true);
     }
 
-    // 포격 종료 처리
     private void StopFiring()
     {
         _shotTimer = TickTimer.None;
@@ -144,3 +154,6 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
         _isFiring = false;
     }
 }
+
+    
+
