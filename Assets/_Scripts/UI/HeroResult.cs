@@ -11,29 +11,45 @@ public class HeroResult : MonoBehaviour
     [SerializeField] private Slider _expSlider;
     [SerializeField] private TextMeshProUGUI _expPercentText;
 
+    [SerializeField] private Image _expSliderFillImage;
+
     public void Setup(HeroResultData data)
     {
-        // 1. 기본 정보 세팅
         _heroNameText.text = data.Name;
         _levelText.text = $"LV {data.Level}";
 
-        // 아이콘 로직 (Addressables나 Resources에 맞춰 경로 사용)
-        // _heroIcon.sprite = Managers.Resource.Load<Sprite>(data.IconPath);
+        // 만약 직접 할당 안 했다면 코드에서 찾기 (구조: Slider -> Fill Area -> Fill)
+        if (_expSliderFillImage == null)
+            _expSliderFillImage = _expSlider.fillRect.GetComponent<Image>();
 
-        // 원래 경험치
         float startValue = (float)data.CurrentExp / data.MaxExp;
-
-        // 습득한 경험치 적용
         float endValue = (float)(data.CurrentExp + data.AddedExp) / data.MaxExp;
+
+        // 1.0 이상이면 1.0으로 고정 (슬라이더 범위를 넘지 않게)
+        float finalTargetValue = Mathf.Min(endValue, 1f);
 
         _expSlider.value = startValue;
 
-        // 1.5초 동안 부드럽게 차오르는 애니메이션
-        _expSlider.DOValue(endValue, 1.5f).SetEase(Ease.OutCubic).OnUpdate(() =>
-        {
-            // 차오르는 동안 퍼센트 텍스트 갱신
-            int currentPercent = Mathf.RoundToInt(_expSlider.value * 100);
-            _expPercentText.text = $"{currentPercent}%";
-        });
+        // 애니메이션 시작
+        _expSlider.DOValue(finalTargetValue, 1.5f)
+            .SetEase(Ease.OutCubic)
+            .OnUpdate(() =>
+            {
+                int currentPercent = Mathf.RoundToInt(_expSlider.value * 100);
+                _expPercentText.text = $"{currentPercent}%";
+
+                if (_expSlider.value >= 1f)
+                {
+                    _expSliderFillImage.color = Color.green;
+                }
+            })
+            .OnComplete(() =>
+            {
+                if (endValue >= 1f)
+                {
+                    _expSliderFillImage.color = Color.green;
+                    _expSlider.transform.DOPunchScale(Vector3.one * 0.05f, 0.3f);
+                }
+            });
     }
 }

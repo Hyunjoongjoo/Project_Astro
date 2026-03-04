@@ -965,3 +965,4 @@ MonoBehaviour:
   _levelText: {fileID: 1267598181591097542}
   _expSlider: {fileID: 9134970967356253566}
   _expPercentText: {fileID: 5103487313705260007}
+  _expSliderFillImage: {fileID: 6677693128618307230}

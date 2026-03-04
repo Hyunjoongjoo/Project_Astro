@@ -119,13 +119,10 @@ public class HeroController : MobilityUnit, IBasicAttack
             _summonCooldown = _heroData.SummonCooldown;
 
             StageManager stageManager = FindFirstObjectByType<StageManager>();
+            
             if (stageManager != null)
             {
-                if (stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out var data))
-                {
-                    data.MarkHeroUsed(_heroData.HeroID);
-                    Debug.Log($"[HeroRecord] {_heroData.HeroID} 기록 완료 (Dictionary)");
-                }
+                stageManager.MarkHeroUsed(Runner.LocalPlayer, _heroData.HeroID);
             }
 
             EquipSkill(_heroData.NormalSkill);

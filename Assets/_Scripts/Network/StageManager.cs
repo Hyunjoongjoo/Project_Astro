@@ -480,32 +480,41 @@ public class StageManager : NetworkBehaviour
         }
 
         List<HeroResultData> resultHeroes = new List<HeroResultData>();
+        var allHeroTable = TableManager.Instance.HeroTable.GetAll();
 
-        // 내 딕셔너리에 담긴 모든 Key(ID)를 순회
-        foreach (var heroEntry in _localPlayerMap.UsedHeroes)
+        for (int i = 0; i < 32; i++)
         {
-            string heroId = heroEntry.Key.ToString();
-
-            // 테이블에서 해당 ID 데이터 가져오기
-            var tableData = TableManager.Instance.HeroTable.Get(heroId);
-            var heroModel = _userDataManager.HeroesModel.Find(h => h.heroId == heroId);
-
-            var maxExp = TableManager.Instance.HeroLevelTable.Get(heroId);
-
-            if (tableData != null && heroModel != null)
+            // 내 비트마스크에서 i번째 비트가 켜져 있는지 확인
+            if ((_localPlayerMap.UsedHeroBitmask & (1u << i)) != 0)
             {
-                resultHeroes.Add(new HeroResultData
+                if (i < allHeroTable.Count)
                 {
-                    Name       = tableData.heroName,
-                    IconPath   = tableData.heroIcon,
-                    Level      = heroModel.level,      
-                    CurrentExp = heroModel.exp,
-                    AddedExp   = reward.HeroExp,
-                    MaxExp     = maxExp.expRequirement
-                });
+                    var tableData = allHeroTable[i];
+                    string heroId = tableData.id;
 
-                // DB 업데이트
-                _ = _userDataManager.UpdateHero(heroId, heroModel.level, heroModel.exp + reward.HeroExp, heroModel.isUnlock);
+                    // 유저의 영웅 보유 모델(레벨/경험치 정보) 가져오기
+                    var heroModel = _userDataManager.HeroesModel.Find(h => h.heroId == heroId);
+
+                    if (heroModel != null)
+                    {
+                        // 테이블에서 해당 레벨의 최대 경험치 정보 가져오기 (예시 테이블 참조)
+                        var levelData = TableManager.Instance.HeroLevelTable.Get(heroId);
+                        int maxExp = (levelData != null) ? levelData.expRequirement : 10000;
+
+                        resultHeroes.Add(new HeroResultData
+                        {
+                            Name       = tableData.heroName,
+                            IconPath   = tableData.heroIcon,
+                            Level      = heroModel.level,
+                            CurrentExp = heroModel.exp,
+                            AddedExp   = reward.HeroExp,
+                            MaxExp     = maxExp
+                        });
+
+                        // 3. 개별 영웅 경험치 DB 업데이트
+                        _ = _userDataManager.UpdateHero(heroId, heroModel.level, heroModel.exp + reward.HeroExp, heroModel.isUnlock);
+                    }
+                }
             }
         }
 
@@ -515,6 +524,20 @@ public class StageManager : NetworkBehaviour
 
         // UI 출력
         GameManager.Instance.ChangeState(GameState.Result);
+    }
+    public void MarkHeroUsed(PlayerRef player, string heroId)
+    {
+        if (Object.HasStateAuthority && PlayerDataMap.TryGet(player, out var data))
+        {
+            int index = TableManager.Instance.HeroTable.GetAll().FindIndex(h => h.id == heroId);
+
+            if (index >= 0 && index < 32)
+            {
+                data.UsedHeroBitmask |= 1u << index;
+                PlayerDataMap.Set(player, data);
+                Debug.Log($"[HeroRecord] {heroId}를 {index}번 비트에 저장했습니다.");
+            }
+        }
     }
 
     public async void ShutDownAndSceneChange()
