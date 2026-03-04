@@ -247,7 +247,6 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         //FSM 결과에 따라 행동 처리
         ApplyState(_fsm.State);
-        Debug.Log($"<color=white>[FSM]</color> {name} Current AI State: {_fsm.State}, Target: {(_currentTarget != null ? _currentTarget.name : "None")}");
     }
 
     //FSM 결과에 따라 실제 유닛 행동을 적용 (AIState : 판단, UnitState : 애니메이션 등 표현)
@@ -344,7 +343,6 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private bool TryUseSkill()//스킬 쿨타임/조건 체크 후 스킬 실행 시도
     {
-        Debug.Log($"{name} TryUseSkill 진입");
         if (_currentSkill == null)
         {
             return false;
@@ -352,12 +350,12 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         if (!_skillTimer.ExpiredOrNotRunning(Runner))
         {
-            Debug.Log("스킬 쿨타임 중");
+
             return false;
         }
 
         SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
-        Debug.Log($"[Skill] {name} RuntimeData 생성됨 | EffectPrefab: {runtime.EffectPrefab}");
+
         if (!_currentSkill.CanUse(this, runtime))
         {
             return false;
@@ -401,8 +399,8 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
 
-        float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
-        _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
+        float attackCooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
+        _attackTimer = TickTimer.CreateFromSeconds(Runner, attackCooldown);
     }
 
     private void RefreshTarget()

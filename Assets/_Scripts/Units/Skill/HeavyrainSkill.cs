@@ -138,11 +138,12 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 
         _remainingShots--;
 
+        //모든 클라이언트에 발사 연출
+        _caster.RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team, true);
+
         //서버에서 데미지 적용
         _caster.ApplyBarrageSkillDamage(_target, runtime.DamageMultiplier);
 
-        //모든 클라이언트에 발사 연출
-        _caster.RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team, true);
     }
 
     private void StopFiring()
