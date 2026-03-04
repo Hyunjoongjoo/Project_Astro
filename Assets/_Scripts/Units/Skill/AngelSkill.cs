@@ -50,6 +50,7 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
+        Debug.Log($"[Skill Execute] {caster.name} skill 실행 | EffectPrefab: {runtime.EffectPrefab}");
         if (!caster.Object.HasStateAuthority)
         {
             return false;

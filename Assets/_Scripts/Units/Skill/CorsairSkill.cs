@@ -17,12 +17,14 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
 
         float dist = caster.GetAttackDistanceTo(caster.CurrentTarget);
 
+        Debug.Log($"<color=yellow>[SkillFail]</color> 거리 부족: 현재 {dist} / 필요 {_data.SkillRange}");
         return dist <= _data.SkillRange;//기획서에 맞게 스킬범위를 새로 지정
+
     }
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
-        Debug.Log("Corsair Execute");
+        Debug.Log($"[Skill Execute] {caster.name} skill 실행 | EffectPrefab: {runtime.EffectPrefab}");
         if (!caster.Object.HasStateAuthority)
         {
             return false;
@@ -55,11 +57,13 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
             }
 
             float damage = caster.AttackPower * runtime.DamageMultiplier;
+            Debug.Log($"<color=red>[SkillExecute]</color> Corsair 스킬 발동! 중심지: {warpPos}, 예상 데미지: {damage}");
+
             unit.TakeDamage(damage);
         }
 
         //이펙트
-        caster.RPC_PlaySkillEffect(warpPos, Quaternion.identity, SkillEffectType.Corsair, runtime.Duration, runtime.Radius * 2f * 6.5f);
+        caster.RPC_PlaySkillEffect(warpPos, Quaternion.identity, SkillEffectType.Corsair, runtime.Duration, runtime.Radius * 2f);
 
         return true;
     }
@@ -82,38 +86,6 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
 
         return null;
     }
-
-    //private void PlayEffect(Transform casterTransform)
-    //{
-    //    if (_data.EffectPrefab == null)
-    //    {
-    //        return;
-    //    }
-
-    //    GameObject effects = Instantiate(
-    //     _data.EffectPrefab,
-    //     casterTransform.position,
-    //     Quaternion.identity,
-    //     casterTransform
-    // );
-
-    //    effects.transform.localPosition = Vector3.zero;
-
-    //    ParticleSystem ps = effects.GetComponent<ParticleSystem>();
-    //    if (ps != null)
-    //    {
-    //        ps.Play();
-    //    }
-
-    //    effects.transform.localScale = Vector3.zero;
-    //    effects.transform.DOScale(_data.Radius * 2f * 6.5f, _data.Duration).SetEase(Ease.OutQuad);
-
-    //    float lifeTime = ps != null
-    //        ? ps.main.duration + ps.main.startLifetime.constantMax
-    //        : 1f;
-
-    //    Destroy(effects, lifeTime);
-    //}
 
 
 #if UNITY_EDITOR

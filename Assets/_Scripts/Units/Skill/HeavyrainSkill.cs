@@ -44,6 +44,7 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
+        Debug.Log($"[Skill Execute] {caster.name} skill 실행 | EffectPrefab: {runtime.EffectPrefab}");
         if (!CanUse(caster, runtime))
         {
             return false;

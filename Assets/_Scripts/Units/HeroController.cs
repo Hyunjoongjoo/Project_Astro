@@ -146,7 +146,6 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         //UnitStat 초기화
         _unitStat.Init(statData);
-
         //Stat 기반 값 적용
         maxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = maxHealth;
@@ -154,6 +153,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         searchRange = _unitStat.DetectRange.Value;
         _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = moveSpeed;
+        Debug.Log($"<color=cyan>[StatCheck]</color> {name} 초기화 완료 | HP: {maxHealth}, 공격력: {AttackPower}, 공속: {AttackSpeed}, 이속: {moveSpeed}");
 
 
         //스킬
@@ -197,7 +197,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         _currentSkill = _skillComponent as IHeroSkill;
-
+        Debug.Log($"<color=magenta>[SkillEquip]</color> {name} 스킬 장착: {_skillData.SkillName}, 초기 쿨타임: {_skillData.InitCooldown}s");
         if (_currentSkill == null)
         {
             return;
@@ -268,7 +268,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         //FSM 결과에 따라 행동 처리
         ApplyState(_fsm.State);
-        Debug.Log("상태 : " + _fsm.State);
+        Debug.Log($"<color=white>[FSM]</color> {name} Current AI State: {_fsm.State}, Target: {(_currentTarget != null ? _currentTarget.name : "None")}");
     }
 
     //FSM 결과에 따라 실제 유닛 행동을 적용 (AIState : 판단, UnitState : 애니메이션 등 표현)
@@ -378,9 +378,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
-        Debug.Log($"Skill : {_currentSkill.Data.SkillName}");
-        Debug.Log($"Cooldown(SO) : {_currentSkill.Data.Cooldown}");
-        Debug.Log($"Cooldown(Runtime) : {runtime.Cooldown}");
+        Debug.Log($"[Skill] {name} RuntimeData 생성됨 | EffectPrefab: {runtime.EffectPrefab}");
         runtime.HealAmount = HealPower;
         Debug.Log($"{name} 스킬 쿨 : {runtime.Cooldown}");
         if (!_currentSkill.CanUse(this, runtime))
@@ -425,7 +423,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             AttackRanged(_currentTarget.transform.position);
         }
 
-        // 다음 공격 가능 시간 설정 (AttackSpeed = 초당 공격 횟수)
+
         float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
         _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
     }
@@ -511,9 +509,9 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        ApplyBasicAttackDamage(_currentTarget);
-
         RPC_FireProjectile(Object.Id, _currentTarget.Object.Id, team);
+
+        ApplyBasicAttackDamage(_currentTarget);
     }
 
     //모든 기본 공격은 이 메서드를 통해 TakeDamage로 진입

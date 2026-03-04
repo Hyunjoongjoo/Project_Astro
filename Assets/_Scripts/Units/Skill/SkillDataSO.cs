@@ -29,6 +29,8 @@ public abstract class SkillDataSO : ScriptableObject
         {
             Cooldown = _cooldown,
             SkillRange = _skillRange,
+            EffectPrefab = _effectPrefab,
+            EffectLifeTime = _effectLifeTime,
             IsAreaSkill = false,
             ShotCount = 1,
             DamageMultiplier = 1f,
@@ -40,12 +42,12 @@ public abstract class SkillDataSO : ScriptableObject
     public string SkillId => _skillId;
     public string HeroId => _heroId;
     public SkillType SkillType => _skillType;
+    public string SkillName => _skillName;
+    public string SkillDescription => _skillDescription;
+    public string Note => _note;
     public float InitCooldown => _initCooldown;
     public float Cooldown => _cooldown;
     public float SkillRange => _skillRange;
     public GameObject EffectPrefab => _effectPrefab;
-    public string SkillName => _skillName;
-    public string SkillDescription => _skillDescription;
-    public string Note => _note;
     public float EffectLifeTime => _effectLifeTime;
 }
