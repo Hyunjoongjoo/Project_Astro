@@ -1,7 +1,7 @@
 ﻿using DG.Tweening;
 using Fusion;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
+
 
 
 public class AngelSkill : MonoBehaviour, IHeroSkill

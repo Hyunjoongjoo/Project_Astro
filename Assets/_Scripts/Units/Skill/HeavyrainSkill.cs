@@ -97,6 +97,7 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
         if (_remainingShots <= 0 ||
             _caster == null ||
             _target == null ||
+            _target.Object == null ||
             _target.IsDead)
         {
             StopFiring();
@@ -118,6 +119,12 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
     //데미지는 영웅컨트롤러로 위임, 연출만 RPC
     private void FireOnce()
     {
+        if (_caster == null || _target == null || _target.Object == null)
+        {
+            StopFiring();
+            return;
+        }
+
         _remainingShots--;
 
         _caster.ApplyBarrageSkillDamage(_target, _data.DamageMultiplier);

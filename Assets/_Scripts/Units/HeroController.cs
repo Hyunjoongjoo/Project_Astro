@@ -143,8 +143,10 @@ public class HeroController : MobilityUnit, IBasicAttack
         {
             Debug.Log($"CSV HP : {statData.BaseHp}");
         }
+
         //UnitStat 초기화
         _unitStat.Init(statData);
+
         //Stat 기반 값 적용
         maxHealth = _unitStat.MaxHp.Value;
         moveSpeed = _unitStat.MoveSpeed.Value;
