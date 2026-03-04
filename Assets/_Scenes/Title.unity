@@ -4382,6 +4382,7 @@ GameObject:
   - component: {fileID: 1403576594}
   - component: {fileID: 1403576593}
   - component: {fileID: 1403576595}
+  - component: {fileID: 1403576596}
   m_Layer: 0
   m_Name: UserDataManager
   m_TagString: Untagged
@@ -4429,6 +4430,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee7cc5fcd46382243b71255ea36ed2b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeroManager
+  _dontDestroyOnLoad: 1
+--- !u!114 &1403576596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403576592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3b6c632393253f4598df8049f109b02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UserDataStore
   _dontDestroyOnLoad: 1
 --- !u!1 &1425347252
 GameObject:
@@ -6535,7 +6549,6 @@ GameObject:
   - component: {fileID: 1782207119}
   - component: {fileID: 1782207118}
   - component: {fileID: 1782207123}
-  - component: {fileID: 1782207122}
   - component: {fileID: 1782207121}
   - component: {fileID: 1782207120}
   m_Layer: 0
@@ -6558,7 +6571,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleController
   _authService: {fileID: 1782207123}
-  _userDataStore: {fileID: 1782207122}
+  _userDataStore: {fileID: 1403576596}
   _loginController: {fileID: 1782207121}
   _signUpController: {fileID: 1782207120}
 --- !u!4 &1782207119
@@ -6606,19 +6619,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoginController
   _loginView: {fileID: 447407635}
---- !u!114 &1782207122
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1782207117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3b6c632393253f4598df8049f109b02, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UserDataStore
-  _dontDestroyOnLoad: 1
 --- !u!114 &1782207123
 MonoBehaviour:
   m_ObjectHideFlags: 0
