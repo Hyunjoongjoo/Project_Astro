@@ -200,8 +200,8 @@ public class StageManager : NetworkBehaviour
         // ============== 여기까지 ==============
 
         // 팀 자원인 증강 게이지도 추가함.
-        AugmentExp.Add(Team.Blue, 0);
-        AugmentExp.Add(Team.Red, 0);
+        AugmentExp.Add(Team.Blue, 100);
+        AugmentExp.Add(Team.Red, 100);
 
         // RPC로 모든 클라이언트에 팀 배정 알림
         RPC_NotifyTeamAssignment();
