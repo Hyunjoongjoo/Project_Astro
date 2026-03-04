@@ -11,4 +11,8 @@ public class AugmentData
     public string description;//증강에 띄울 설명
     public Sprite icon;       //증강에 띄울 아이콘
     public NetworkPrefabRef heroPrefab;
+
+    [Header("Runtime Stats")]
+    public float baseSpawnCooldown;    //원본 쿨타임
+    public float currentSpawnCooldown; //최종
 }
