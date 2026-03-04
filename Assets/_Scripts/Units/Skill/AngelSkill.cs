@@ -1,5 +1,4 @@
-﻿using DG.Tweening;
-using Fusion;
+﻿using Fusion;
 using UnityEngine;
 
 
@@ -27,7 +26,7 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
 
             foreach (var hit in hits)
             {
-                UnitBase unit = hit.GetComponentInParent<UnitBase>();
+                UnitBase unit = hit.GetComponent<UnitBase>();
                 if (unit == null || unit.IsDead)
                 {
                     continue;
@@ -144,10 +143,10 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
                 continue;
             }
 
-            if (unit == caster)
-            {
-                continue;
-            }
+            //if (unit == caster)
+            //{
+            //    continue;
+            //}
 
             if (unit.IsDead)
             {

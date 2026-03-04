@@ -27,7 +27,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private GameObject _corsairFx;
     [SerializeField] private GameObject _angelFx;
     [SerializeField] private GameObject _tankFx;
-    [SerializeField] private GameObject _HeavyrainFx;
+    [SerializeField] private GameObject _HeavyRainFx;
     [SerializeField] private GameObject _projectileFx;
 
     [SerializeField] private UnitStat _unitStat;
@@ -379,8 +379,6 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
         Debug.Log($"[Skill] {name} RuntimeData 생성됨 | EffectPrefab: {runtime.EffectPrefab}");
-        runtime.HealAmount = HealPower;
-        Debug.Log($"{name} 스킬 쿨 : {runtime.Cooldown}");
         if (!_currentSkill.CanUse(this, runtime))
         {
             return false;
@@ -621,38 +619,39 @@ public class HeroController : MobilityUnit, IBasicAttack
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot, SkillEffectType type, float lifeTime, float scale)
     {
-        GameObject prefab = null;
+        Debug.Log("RPC_PlaySkillEffect 실행됨");
+        GameObject fx = null;
 
         switch (type)
         {
             case SkillEffectType.Corsair:
-                prefab = _corsairFx;
+                fx = Instantiate(_corsairFx, pos, rot);
                 break;
 
-            case SkillEffectType.Angel:
-                prefab = _angelFx;
-                break;
+            //case SkillEffectType.Angel: //시전자도 이펙트를 쓴다면..
+            //    fx = Instantiate(_angelFx, pos, rot);
+            //    break;
 
             case SkillEffectType.Tank:
-                prefab = _tankFx;
+                fx = Instantiate(_tankFx, pos, rot, transform);
                 break;
 
             case SkillEffectType.HeavyRain:
-                prefab = _HeavyrainFx;
+                fx = Instantiate(_HeavyRainFx, pos, rot);
                 break;
         }
 
-        if (prefab == null)
-            return;
-
-        GameObject fx = Instantiate(prefab, pos, rot);
-        fx.transform.localScale = Vector3.one * scale;
-        Destroy(fx, lifeTime);
+        if (fx != null)
+        {
+            fx.transform.localScale = Vector3.one * scale;
+            Destroy(fx, lifeTime);
+        }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlayHealEffect(NetworkId targetId, SkillEffectType type, float lifeTime)
     {
+        Debug.Log("RPC_PlayHealEffect 실행됨");
         if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
         {
             return;
@@ -673,9 +672,11 @@ public class HeroController : MobilityUnit, IBasicAttack
         GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, targetObj.transform);
 
         effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(2f, 0.2f).SetEase(Ease.OutBack);
+        effects.transform.DOScale(5f, 0.5f).SetEase(Ease.OutBack);
 
         Destroy(effects, lifeTime);
+
+
     }
 
     //스킬증강에 사용될 메서드
@@ -687,6 +688,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         StageManager stageManager = FindFirstObjectByType<StageManager>();
+
         if (stageManager == null)
         {
             return;

@@ -39,7 +39,7 @@ public class TankSkill : MonoBehaviour, IHeroSkill
 
         _caster.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, _damageReductionModifier);
 
-        _caster.RPC_PlaySkillEffect(caster.transform.position, caster.transform.rotation, SkillEffectType.Tank, runtime.Duration, runtime.Radius * 6.5f);
+        _caster.RPC_PlaySkillEffect(caster.transform.position, caster.transform.rotation, SkillEffectType.Tank, runtime.Duration, 12f);
 
         return true;
     }

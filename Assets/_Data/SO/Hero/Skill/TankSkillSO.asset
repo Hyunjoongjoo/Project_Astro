@@ -15,12 +15,13 @@ MonoBehaviour:
   _skillId: normalSkill_tank
   _heroId: hero_tank
   _skillType: 1
+  _skillName: skill_name_hero_tank
+  _skillDescription: skill_desc_hero_tank
+  _note: 
   _initCooldown: 4
   _cooldown: 8
   _skillRange: 0
   _effectPrefab: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}
-  _skillName: skill_name_hero_tank
-  _skillDescription: skill_desc_hero_tank
-  _note: 
+  _effectLifeTime: 5
   _duration: 5
-  _damageReductionRate: 30
+  _damageReductionRate: 0.3
