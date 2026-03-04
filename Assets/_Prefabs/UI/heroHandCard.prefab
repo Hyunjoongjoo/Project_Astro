@@ -580,6 +580,8 @@ MonoBehaviour:
   _groundLayer:
     serializedVersion: 2
     m_Bits: 128
+  _cooldownCover: {fileID: 204617536065845859}
+  _cooldownText: {fileID: 7344840667621078537}
 --- !u!114 &1857677499821193337
 MonoBehaviour:
   m_ObjectHideFlags: 0
