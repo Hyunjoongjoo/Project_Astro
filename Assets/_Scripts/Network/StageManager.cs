@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,6 +13,23 @@ public enum StageState
     Countdown,            // 카운트다운
     Playing,              // 게임 진행 중
     GameOver              // 게임 종료
+}
+
+public struct RewardData
+{
+    public int UserExp;
+    public int HeroExp;
+    public int GoldAmount;
+}
+
+public struct HeroResultData
+{
+    public string Name;        
+    public string IconPath;    
+    public int    Level;          
+    public int    CurrentExp;     
+    public int    AddedExp;       
+    public int    MaxExp;         
 }
 
 public class StageManager : NetworkBehaviour
@@ -38,6 +56,8 @@ public class StageManager : NetworkBehaviour
 
     [SerializeField] private NetworkPrefabRef _minionSpawnerPrefab;
 
+    private UserDataManager _userDataManager;
+
     ObjectContainer _objectContainer;
     private StageUI _stageUI;
     private Camera _mainCamera;
@@ -51,12 +71,20 @@ public class StageManager : NetworkBehaviour
 
     private PlayerNetworkData _localPlayerMap = default;
 
+    private readonly RewardData _winReward = new RewardData { UserExp = 10, HeroExp = 10, GoldAmount = 1000 };
+    private readonly RewardData _drawReward = new RewardData { UserExp = 9, HeroExp = 9, GoldAmount = 800 };
+    private readonly RewardData _loseReward = new RewardData { UserExp = 8, HeroExp = 8, GoldAmount = 500 };
+
     private void Awake()
     {
         _mainCamera = Camera.main;
         _stageUI = FindFirstObjectByType<StageUI>();
         if (_stageUI == null)
             Debug.Log("스테이지 UI 찾지 못함");
+
+        _userDataManager = FindFirstObjectByType<UserDataManager>();
+        if (_userDataManager == null)
+            Debug.Log("UserDataManager 찾지 못함");
     }
 
     public void Initialize(MatchType matchType, int requiredPlayerCount)
@@ -92,11 +120,23 @@ public class StageManager : NetworkBehaviour
         var data = new PlayerNetworkData
         {
             PlayerName = nickName,
-            Team = Team.None // 아직 팀 배정 전
+            Team = Team.None,
+            UsedHeroBitmask = 0
         };
 
         PlayerDataMap.Set(playerRef, data);
         Debug.Log($"플레이어 데이터 수신 : {nickName} ({PlayerDataMap.Count}/{_requiredPlayerCount})");
+    }
+
+    // 사용한 영웅 비트값으로 체크하는 메서드임!
+    public void MarkHeroUsed(PlayerRef player, int heroId)
+    {
+        if (Object.HasStateAuthority && PlayerDataMap.TryGet(player, out var data))
+        {
+            // heroId는 CSV 상의 인덱스(0~31)라고 가정
+            data.UsedHeroBitmask |= (uint)(1 << heroId);
+            PlayerDataMap.Set(player, data);
+        }
     }
 
     // 네트워크 틱에 맞춘 Update 메서드임
@@ -428,34 +468,67 @@ public class StageManager : NetworkBehaviour
     {
         Debug.Log("게임오버 RPC 진입 성공");
         _stageUI.gameObject.SetActive(true);
-
         _stageUI.goLobbyBtn.onClick.AddListener(ShutDownAndSceneChange);
 
         if (_localPlayerMap.Equals(default(PlayerNetworkData)))
             _localPlayerMap = PlayerDataMap.Get(Runner.LocalPlayer);
 
         Team myTeam = _localPlayerMap.Team;
-
         Debug.Log($"승리팀 : {victory}, 내 팀 : {myTeam}");
 
-        // 일단 패널 아무거나 띄움. 나중에 UI매니저에게
-        if (victory == Team.None) // 무승부도 존재하는 것으로 보임. 승리팀이 없으면 무승부
+        bool isWin = (myTeam == victory);
+        bool isDraw = (victory == Team.None);
+
+        // 승패 결과에 따른 리워드 세팅
+        RewardData reward = (victory == Team.None) ? _drawReward : (myTeam == victory ? _winReward : _loseReward);
+
+        // DB에 업데이트
+        _ = _userDataManager.UpdateWallet(reward.GoldAmount);
+        _ = _userDataManager.UpdateUserDb(reward.UserExp);
+
+        if (victory != Team.None)
         {
-            Debug.Log("무승부입니다.");
-            // TODO : bool 값으로 승리 또는 패배만 띄우는데 무승부 처리도 필요
-            _stageUI.ShowResultPanel(true); 
+            _ = _userDataManager.UpdateRecord(isWin ? 1 : 0, isWin ? 0 : 1);
         }
-        else if (myTeam == victory)
+
+        List<HeroResultData> resultHeroes = new List<HeroResultData>();
+        var allHeroData = TableManager.Instance.HeroTable.GetAll();
+
+        for (int i = 0; i < 32; i++)
         {
-            Debug.Log("승리했습니다!!");
-            _stageUI.ShowResultPanel(true);
+            if ((_localPlayerMap.UsedHeroBitmask & (1 << i)) != 0)
+            {
+                if (i < allHeroData.Count)
+                {
+                    var table = allHeroData[i];
+                    var model = _userDataManager.HeroesModel.Find(h => h.heroId == table.id);
+
+                    if (model != null)
+                    {
+                        var modelMaxExp = TableManager.Instance.HeroLevelTable.Get(model.level.ToString()).expRequirement;
+
+                        resultHeroes.Add(new HeroResultData
+                        {
+                            Name       = table.heroName,
+                            IconPath   = table.heroIcon,
+                            Level      = model.level,
+                            CurrentExp = model.exp,
+                            AddedExp   = reward.HeroExp,
+                            MaxExp     = modelMaxExp
+                        });
+
+                        // DB 업데이트는 여기서 그대로 진행
+                        _ = _userDataManager.UpdateHero(table.id, model.level, model.exp + reward.HeroExp, model.isUnlock);
+                    }
+                }
+            }
         }
-        else
-        {
-            Debug.Log("패배했습니다!!");
-            _stageUI.ShowResultPanel(false);
-        }
-        
+
+        // 획득한 골드량과 함께 UI 호출
+        //_stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, reward.GoldAmount, reward.UserExp); //이건 나중에 유저 경험치도 하게된다면.
+        _stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, reward.GoldAmount);
+
+        // UI 출력
         GameManager.Instance.ChangeState(GameState.Result);
     }
 
