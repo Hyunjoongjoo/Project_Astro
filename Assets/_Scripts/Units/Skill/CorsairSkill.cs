@@ -59,7 +59,7 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
         }
 
         //이펙트
-        caster.RPC_PlaySkillEffect(warpPos, Quaternion.identity, SkillEffectType.Corsair, runtime.Duration);
+        caster.RPC_PlaySkillEffect(warpPos, Quaternion.identity, SkillEffectType.Corsair, runtime.Duration, runtime.Radius * 2f * 6.5f);
 
         return true;
     }
@@ -83,37 +83,37 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
         return null;
     }
 
-    private void PlayEffect(Transform casterTransform)
-    {
-        if (_data.EffectPrefab == null)
-        {
-            return;
-        }
+    //private void PlayEffect(Transform casterTransform)
+    //{
+    //    if (_data.EffectPrefab == null)
+    //    {
+    //        return;
+    //    }
 
-        GameObject effects = Instantiate(
-         _data.EffectPrefab,
-         casterTransform.position,
-         Quaternion.identity,
-         casterTransform
-     );
+    //    GameObject effects = Instantiate(
+    //     _data.EffectPrefab,
+    //     casterTransform.position,
+    //     Quaternion.identity,
+    //     casterTransform
+    // );
 
-        effects.transform.localPosition = Vector3.zero;
+    //    effects.transform.localPosition = Vector3.zero;
 
-        ParticleSystem ps = effects.GetComponent<ParticleSystem>();
-        if (ps != null)
-        {
-            ps.Play();
-        }
+    //    ParticleSystem ps = effects.GetComponent<ParticleSystem>();
+    //    if (ps != null)
+    //    {
+    //        ps.Play();
+    //    }
 
-        effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(_data.Radius * 2f * 6.5f, _data.Duration).SetEase(Ease.OutQuad);
+    //    effects.transform.localScale = Vector3.zero;
+    //    effects.transform.DOScale(_data.Radius * 2f * 6.5f, _data.Duration).SetEase(Ease.OutQuad);
 
-        float lifeTime = ps != null
-            ? ps.main.duration + ps.main.startLifetime.constantMax
-            : 1f;
+    //    float lifeTime = ps != null
+    //        ? ps.main.duration + ps.main.startLifetime.constantMax
+    //        : 1f;
 
-        Destroy(effects, lifeTime);
-    }
+    //    Destroy(effects, lifeTime);
+    //}
 
 
 #if UNITY_EDITOR

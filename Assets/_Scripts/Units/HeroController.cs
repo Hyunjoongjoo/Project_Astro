@@ -149,6 +149,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         //Stat 기반 값 적용
         maxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = maxHealth;
         moveSpeed = _unitStat.MoveSpeed.Value;
         searchRange = _unitStat.DetectRange.Value;
         _respawnTime = _unitStat.RespawnTime.Value;
@@ -620,7 +621,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot, SkillEffectType type, float lifeTime)
+    public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot, SkillEffectType type, float lifeTime, float scale)
     {
         GameObject prefab = null;
 
@@ -647,6 +648,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
 
         GameObject fx = Instantiate(prefab, pos, rot);
+        fx.transform.localScale = Vector3.one * scale;
         Destroy(fx, lifeTime);
     }
 
