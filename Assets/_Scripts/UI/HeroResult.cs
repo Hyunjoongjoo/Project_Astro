@@ -12,20 +12,22 @@ public class HeroResult : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _expPercentText;
 
     [SerializeField] private Image _expSliderFillImage;
+    [SerializeField] private HeroIconDataSO _heroIconDataSo;
 
     public void Setup(HeroResultData data)
     {
-        _heroNameText.text = data.Name;
-        _levelText.text = $"LV {data.Level}";
+        _heroIcon.sprite   = _heroIconDataSo.GetIcon(data.HeroId);
+        _heroNameText.text = TableManager.Instance.GetString(data.HeroId);
+        _levelText.text    = $"LV {data.Level}";
 
-        // 만약 직접 할당 안 했다면 코드에서 찾기 (구조: Slider -> Fill Area -> Fill)
+        // 만약 직접 할당 안 했다면 코드에서 찾기
         if (_expSliderFillImage == null)
             _expSliderFillImage = _expSlider.fillRect.GetComponent<Image>();
 
         float startValue = (float)data.CurrentExp / data.MaxExp;
         float endValue = (float)(data.CurrentExp + data.AddedExp) / data.MaxExp;
 
-        // 1.0 이상이면 1.0으로 고정 (슬라이더 범위를 넘지 않게)
+        // 1.0 이상이면 1.0으로 고정
         float finalTargetValue = Mathf.Min(endValue, 1f);
 
         _expSlider.value = startValue;

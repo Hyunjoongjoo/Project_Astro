@@ -142,24 +142,28 @@ public class StageUI : MonoBehaviour
     {
         _victoryPanel.SetActive(isVictory);
         _defeatPanel.SetActive(!isVictory);
-        _resultPanel.SetActive(true);
 
-        // 2. 골드 텍스트 설정 (천 단위 콤마 추가)
+        // 골드 텍스트 설정
         if (_resultGoldText != null)
             _resultGoldText.text = gold.ToString("N0");
 
-        // 3. 기존에 생성되어 있던 슬롯들 청소 (재시작 등을 대비)
+        // 기존에 생성되어 있던 프리팹 삭제
         foreach (Transform child in _heroListPanel)
             Destroy(child.gameObject);
 
-        // 4. 사용한 영웅들만 프리팹 생성 및 데이터 주입
+        Debug.Log(heroes.Count);
+
+        // 사용한 영웅들만 프리팹 생성 및 데이터 주입
         foreach (var data in heroes)
         {
+            Debug.Log(data.HeroId);
             GameObject listObj = Instantiate(_heroResultPrefab, _heroListPanel);
             if (listObj.TryGetComponent<HeroResult>(out var list))
             {
                 list.Setup(data);
             }
         }
+
+        _resultPanel.SetActive(true);
     }
 }

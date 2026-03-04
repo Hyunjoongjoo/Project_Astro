@@ -24,8 +24,7 @@ public struct RewardData
 
 public struct HeroResultData
 {
-    public string Name;        
-    public string IconPath;    
+    public string HeroId;        
     public int    Level;          
     public int    CurrentExp;     
     public int    AddedExp;       
@@ -121,6 +120,7 @@ public class StageManager : NetworkBehaviour
         {
             PlayerName = nickName,
             Team = Team.None,
+            UsedHeroBitmask = 0
         };
 
         PlayerDataMap.Set(playerRef, data);
@@ -458,11 +458,11 @@ public class StageManager : NetworkBehaviour
         _stageUI.gameObject.SetActive(true);
         _stageUI.goLobbyBtn.onClick.AddListener(ShutDownAndSceneChange);
 
-        if (_localPlayerMap.Equals(default(PlayerNetworkData)))
-            _localPlayerMap = PlayerDataMap.Get(Runner.LocalPlayer);
+        _localPlayerMap = PlayerDataMap.Get(Runner.LocalPlayer);
 
         Team myTeam = _localPlayerMap.Team;
-        Debug.Log($"승리팀 : {victory}, 내 팀 : {myTeam}");
+        Debug.Log($"승리팀 : {victory}, 내 팀 : {myTeam}, 비트마스크 : {_localPlayerMap.UsedHeroBitmask}");
+
 
         bool isWin = (myTeam == victory);
         bool isDraw = (victory == Team.None);
@@ -503,8 +503,7 @@ public class StageManager : NetworkBehaviour
 
                         resultHeroes.Add(new HeroResultData
                         {
-                            Name       = tableData.heroName,
-                            IconPath   = tableData.heroIcon,
+                            HeroId     = tableData.heroName,
                             Level      = heroModel.level,
                             CurrentExp = heroModel.exp,
                             AddedExp   = reward.HeroExp,
@@ -525,17 +524,26 @@ public class StageManager : NetworkBehaviour
         // UI 출력
         GameManager.Instance.ChangeState(GameState.Result);
     }
-    public void MarkHeroUsed(PlayerRef player, string heroId)
+    public void MarkHeroUsed(PlayerRef unitOwner, string heroId)
     {
-        if (Object.HasStateAuthority && PlayerDataMap.TryGet(player, out var data))
+        if (!Object.HasStateAuthority) return;
+
+        if (PlayerDataMap.TryGet(unitOwner, out var data))
         {
             int index = TableManager.Instance.HeroTable.GetAll().FindIndex(h => h.id == heroId);
 
             if (index >= 0 && index < 32)
             {
-                data.UsedHeroBitmask |= 1u << index;
-                PlayerDataMap.Set(player, data);
-                Debug.Log($"[HeroRecord] {heroId}를 {index}번 비트에 저장했습니다.");
+                uint bit = 1u << index;
+
+                // 중복 방지 (이미 저장된 비트면 리턴)
+                if ((data.UsedHeroBitmask & bit) != 0) return;
+
+                // 해당 유닛 주인(unitOwner)의 비트마스크만 갱신
+                data.UsedHeroBitmask |= bit;
+                PlayerDataMap.Set(unitOwner, data);
+
+                Debug.Log($"[HeroRecord] 플레이어 {unitOwner}의 데이터중 {index}번 비트에 {heroId} 저장.");
             }
         }
     }
