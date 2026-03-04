@@ -70,7 +70,7 @@ public class HeroDetailPresenter : MonoBehaviour
         //아이콘 이미지 설정
         if (_heroIcons != null)
         {
-            _view.SetHeroImage(_heroIcons.GetIcon(_heroData.heroIcon));
+            _view.SetHeroImage(_heroIcons.GetIcon(_heroData.id));
         }
 
         //레벨/경험치 로직 처리
