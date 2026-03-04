@@ -22,6 +22,7 @@ MonoBehaviour:
   _cooldown: 8
   _skillRange: 5
   _effectPrefab: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
+  _effectScale: 3
   _effectLifeTime: 0.5
   _shotCount: 3
   _shotInterval: 0.05

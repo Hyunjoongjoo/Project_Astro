@@ -63,7 +63,7 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
         }
 
         //이펙트
-        caster.RPC_PlaySkillEffect(warpPos, Quaternion.identity, SkillEffectType.Corsair, runtime.Duration, runtime.Radius * 2f);
+        caster.RPC_PlaySkillEffect(warpPos, Quaternion.identity);
 
         return true;
     }

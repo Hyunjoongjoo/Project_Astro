@@ -502,14 +502,10 @@ MonoBehaviour:
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
-  _corsairFx: {fileID: 6393617126741755569, guid: 19138c6e05c43fe46a292e5d6d939efa, type: 3}
-  _angelFx: {fileID: 2393817908272368249, guid: 26169785b8e30c944a512729256a05cd, type: 3}
-  _tankFx: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}
-  _HeavyrainFx: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
-  _projectileFx: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
   _unitStat: {fileID: 250558184794622207}
   _skillData: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
   _skillComponent: {fileID: 5510236954846484131}
+  _projectile: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
 --- !u!114 &250558184794622207
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -8,10 +8,7 @@ public enum UnitSize
 {
     Small, Medium, Large
 }
-public enum SkillEffectType
-{
-    Corsair, Angel, Tank, HeavyRain
-}
+
 public class HeroController : MobilityUnit, IBasicAttack
 {
 
@@ -23,13 +20,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
-    [Header("이펙트")]
-    [SerializeField] private GameObject _corsairFx;
-    [SerializeField] private GameObject _angelFx;
-    [SerializeField] private GameObject _tankFx;
-    [SerializeField] private GameObject _HeavyRainFx;
-    [SerializeField] private GameObject _projectileFx;
-
     [SerializeField] private UnitStat _unitStat;
     [SerializeField] private SkillDataSO _skillData;
     [SerializeField] private MonoBehaviour _skillComponent;
@@ -37,6 +27,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     private float _attackRange;
     private float _respawnTime;
     private AttackType _attackType;
+    private GameObject _projectile;
 
     private UnitBase _currentTarget;
 
@@ -119,7 +110,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         _attackRange = _heroData.AttackRange;
         _attackType = _heroData.NormalAttack.AttackType;
-        _projectileFx = _heroData.NormalAttack.EffectPrefab;
+        _projectile = _heroData.NormalAttack.EffectPrefab;
 
         if (!Object.HasStateAuthority)
         {
@@ -497,7 +488,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     //Projectile 연출 및 기본 공격 데미지 적용
     private void AttackRanged(Vector3 targetPos)
     {
-        if (_projectileFx == null || _firePoint == null)
+        if (_projectile == null || _firePoint == null)
         {
             return;
         }
@@ -597,8 +588,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        GameObject prefab = hero._projectileFx;
-        if (prefab == null)
+        if (hero._projectile == null)
         {
             return;
         }
@@ -606,7 +596,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         Vector3 start = hero._firePoint.position;
         Vector3 end = targetObj.transform.position;
 
-        GameObject projectileObj = Instantiate(hero._projectileFx, start, Quaternion.identity);
+        GameObject projectileObj = Instantiate(hero._projectile, start, Quaternion.identity);
 
         Projectile projectile = projectileObj.GetComponent<Projectile>();
 
@@ -617,66 +607,69 @@ public class HeroController : MobilityUnit, IBasicAttack
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot, SkillEffectType type, float lifeTime, float scale)
+    public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)
     {
         Debug.Log("RPC_PlaySkillEffect 실행됨");
-        GameObject fx = null;
-
-        switch (type)
-        {
-            case SkillEffectType.Corsair:
-                fx = Instantiate(_corsairFx, pos, rot);
-                break;
-
-            //case SkillEffectType.Angel: //시전자도 이펙트를 쓴다면..
-            //    fx = Instantiate(_angelFx, pos, rot);
-            //    break;
-
-            case SkillEffectType.Tank:
-                fx = Instantiate(_tankFx, pos, rot, transform);
-                break;
-
-            case SkillEffectType.HeavyRain:
-                fx = Instantiate(_HeavyRainFx, pos, rot);
-                break;
-        }
-
-        if (fx != null)
-        {
-            fx.transform.localScale = Vector3.one * scale;
-            Destroy(fx, lifeTime);
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_PlayHealEffect(NetworkId targetId, SkillEffectType type, float lifeTime)
-    {
-        Debug.Log("RPC_PlayHealEffect 실행됨");
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
+        if (_skillData == null)
         {
             return;
         }
 
-        GameObject prefab = null;
-
-        if (type == SkillEffectType.Angel)
-        {
-            prefab = _angelFx;
-        }
+        GameObject prefab = _skillData.EffectPrefab;
 
         if (prefab == null)
         {
             return;
         }
 
-        GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, targetObj.transform);
+        Transform parent = null;
+
+        if (_skillData.AttachType == EffectAttachType.Caster)
+        {
+            parent = transform;
+        }
+
+        GameObject fx = Instantiate(prefab, pos, rot, parent);
+
+        fx.transform.localScale = Vector3.one * _skillData.EffectScale;
+
+        Destroy(fx, _skillData.EffectLifeTime);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayHealEffect(NetworkId targetId)
+    {
+        if (_skillData == null)
+        {
+            return;
+        }
+
+        Debug.Log("RPC_PlayHealEffect 실행됨");
+        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
+        {
+            return;
+        }
+
+        GameObject prefab = _skillData.EffectPrefab;
+
+        if (prefab == null)
+        {
+            return;
+        }
+
+        Transform parent = null;
+
+        if (_skillData.AttachType == EffectAttachType.Target)
+        {
+            parent = targetObj.transform;
+        }
+
+        GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, parent);
 
         effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(5f, 0.5f).SetEase(Ease.OutBack);
+        effects.transform.DOScale(_skillData.EffectScale, 0.5f).SetEase(Ease.OutBack);
 
-        Destroy(effects, lifeTime);
-
-
+        Destroy(effects, _skillData.EffectLifeTime);
     }
 
     //스킬증강에 사용될 메서드

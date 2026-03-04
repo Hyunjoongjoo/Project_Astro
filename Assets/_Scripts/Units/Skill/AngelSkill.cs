@@ -65,7 +65,7 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
             }
 
             caster.HealUnit(target, runtime.HealAmount);
-            caster.RPC_PlayHealEffect(target.Object.Id, SkillEffectType.Angel, runtime.EffectLifeTime);
+            caster.RPC_PlayHealEffect(target.Object.Id);
         }
         else
         {
@@ -102,7 +102,7 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
                 //}
 
                 caster.HealUnit(unit, runtime.HealAmount);
-                caster.RPC_PlayHealEffect(unit.Object.Id, SkillEffectType.Angel, runtime.EffectLifeTime);
+                caster.RPC_PlayHealEffect(unit.Object.Id);
                 healedAnyone = true;
             }
 

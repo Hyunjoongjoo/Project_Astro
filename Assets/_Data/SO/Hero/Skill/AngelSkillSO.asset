@@ -21,8 +21,10 @@ MonoBehaviour:
   _initCooldown: 5
   _cooldown: 10
   _skillRange: 3
-  _effectPrefab: {fileID: 3479278419723618712, guid: 6135948fdbd8dbc498c368cf6640858f, type: 3}
-  _effectLifeTime: 1
+  _effectPrefab: {fileID: 7343538280686139031, guid: a8e905d0d5bf4144393d0b154082615b, type: 3}
+  _effectScale: 2
+  _effectLifeTime: 2
+  _attachType: 2
   _radius: 0
   _healAmount: 100
   _duration: 0.5
