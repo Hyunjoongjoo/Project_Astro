@@ -2,7 +2,7 @@
 using UnityEngine;
 using DG.Tweening;
 
-public class CorsairSkill : NetworkBehaviour, IHeroSkill
+public class CorsairSkill : MonoBehaviour, IHeroSkill
 {
     [SerializeField] private CorsairSkillSO _data;
 
@@ -22,6 +22,7 @@ public class CorsairSkill : NetworkBehaviour, IHeroSkill
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
+        Debug.Log("Corsair Execute");
         if (!caster.Object.HasStateAuthority)
         {
             return false;
@@ -58,20 +59,9 @@ public class CorsairSkill : NetworkBehaviour, IHeroSkill
         }
 
         //이펙트
-        RPC_PlayEffect(caster.Object.Id);
+        caster.RPC_PlaySkillEffect(warpPos, Quaternion.identity, SkillEffectType.Corsair, runtime.Duration);
 
         return true;
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayEffect(NetworkId casterId)
-    {
-        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
-        {
-            return;
-        }
-
-        PlayEffect(casterObj.transform);
     }
 
     public void ChangeSkillData(SkillDataSO newData)

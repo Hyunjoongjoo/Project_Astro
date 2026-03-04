@@ -7,11 +7,6 @@ public class TankSkillSO : SkillDataSO
     [SerializeField] private float _duration;
     [SerializeField] private float _damageReductionRate;
 
-    public override IHeroSkill CreateSkillComponent(GameObject owner)
-    {
-        return owner.AddComponent<TankSkill>();
-    }
-
     public override SkillRuntimeData CreateRuntimeData()
     {
         SkillRuntimeData runtime = base.CreateRuntimeData();

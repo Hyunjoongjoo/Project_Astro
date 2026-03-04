@@ -701,7 +701,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HeroController
   maxHealth: 80
   deffense: 0
-  _team: 0
+  team: 0
+  _networkedTeam: 0
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 3123802997670338100}
@@ -717,7 +718,14 @@ MonoBehaviour:
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
+  _corsairFx: {fileID: 0}
+  _angelFx: {fileID: 0}
+  _tankFx: {fileID: 0}
+  _HeavyrainFx: {fileID: 0}
+  _projectileFx: {fileID: 0}
   _unitStat: {fileID: 288590522490992711}
+  _skillData: {fileID: 11400000, guid: 2858029cad763fe4e81a7364d1dd7fd8, type: 2}
+  _skillComponent: {fileID: -2787799764655628976}
 --- !u!114 &288590522490992711
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -761,7 +769,6 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 9043486588942551580}
-  - {fileID: -2787799764655628976}
   - {fileID: 7704040667658692594}
   ForceRemoteRenderTimeframe: 0
 --- !u!136 &-3351744654108456150

@@ -9,16 +9,10 @@ public class AngelSkillSO : SkillDataSO
     [SerializeField] private float _duration;
     [SerializeField] private bool _isAreaSkill;
 
-    public override IHeroSkill CreateSkillComponent(GameObject owner)
-    {
-        return owner.AddComponent<AngelSkill>();
-    }
-
     public override SkillRuntimeData CreateRuntimeData()
     {
         SkillRuntimeData runtime = base.CreateRuntimeData();
 
-        runtime.Radius = _radius;
         runtime.HealAmount = _healAmount;
         runtime.Duration = _duration;
         runtime.SkillRange = SkillRange;

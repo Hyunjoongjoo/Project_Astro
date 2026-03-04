@@ -1,7 +1,7 @@
 ﻿using Fusion;
 using UnityEngine;
 
-public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
+public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 {
     [SerializeField] private HeavyrainSkillSO _data;
 
@@ -59,7 +59,7 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
 
         if (_remainingShots > 0)
         {
-            _shotTimer = TickTimer.CreateFromSeconds(Runner, runtime.ShotInterval);
+            _shotTimer = TickTimer.CreateFromSeconds(_caster.Runner, runtime.ShotInterval);
         }
         else
         {
@@ -77,14 +77,19 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
         }
     }
 
-    public override void FixedUpdateNetwork()
+    private void Update()
     {
+        if (_caster == null || !_caster.Object.HasStateAuthority)
+        {
+            return;
+        }
+
         if (!_isFiring)
         {
             return;
         }
 
-        if (!_shotTimer.IsRunning || !_shotTimer.Expired(Runner))
+        if (!_shotTimer.IsRunning || !_shotTimer.Expired(_caster.Runner))
         {
             return;
         }
@@ -102,7 +107,7 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
 
         if (_remainingShots > 0)
         {
-            _shotTimer = TickTimer.CreateFromSeconds(Runner, _data.ShotInterval);
+            _shotTimer = TickTimer.CreateFromSeconds(_caster.Runner, _data.ShotInterval);
         }
         else
         {
@@ -117,10 +122,8 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
 
         _caster.ApplyBarrageSkillDamage(_target, _data.DamageMultiplier);
 
-        if (_data.EffectPrefab != null)
-        {
-            RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team);
-        }
+        _caster.RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team);
+
     }
 
     // 포격 종료 처리
@@ -131,35 +134,5 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
         _target = null;
         _caster = null;
         _isFiring = false;
-    }
-
-    //투사체 연출
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team)
-    {
-        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
-        {
-            return;
-        }
-
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
-        {
-            return;
-        }
-
-        Vector3 start = casterObj.transform.position;
-        Vector3 end = targetObj.transform.position;
-
-        GameObject projectileObj = Instantiate(
-            _data.EffectPrefab,
-            start,
-            Quaternion.identity
-        );
-
-        Projectile projectile = projectileObj.GetComponent<Projectile>();
-        if (projectile != null)
-        {
-            projectile.Fire(end, team);
-        }
     }
 }

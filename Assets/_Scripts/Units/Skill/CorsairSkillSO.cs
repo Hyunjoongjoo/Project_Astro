@@ -8,11 +8,6 @@ public class CorsairSkillSO : SkillDataSO
     [SerializeField] private float _damageMultiplier;
     [SerializeField] private float _duration;
 
-    public override IHeroSkill CreateSkillComponent(GameObject owner)
-    {
-        return owner.AddComponent<CorsairSkill>();
-    }
-
     public override SkillRuntimeData CreateRuntimeData()
     {
         SkillRuntimeData runtime = base.CreateRuntimeData();

@@ -1,4 +1,5 @@
-﻿using Fusion;
+﻿using DG.Tweening;
+using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -6,6 +7,10 @@ using UnityEngine.AI;
 public enum UnitSize
 {
     Small, Medium, Large
+}
+public enum SkillEffectType
+{
+    Corsair, Angel, Tank, HeavyRain
 }
 public class HeroController : MobilityUnit, IBasicAttack
 {
@@ -18,13 +23,20 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
+    [Header("이펙트")]
+    [SerializeField] private GameObject _corsairFx;
+    [SerializeField] private GameObject _angelFx;
+    [SerializeField] private GameObject _tankFx;
+    [SerializeField] private GameObject _HeavyrainFx;
+    [SerializeField] private GameObject _projectileFx;
+
     [SerializeField] private UnitStat _unitStat;
+    [SerializeField] private SkillDataSO _skillData;
+    [SerializeField] private MonoBehaviour _skillComponent;
 
     private float _attackRange;
     private float _respawnTime;
     private AttackType _attackType;
-    private GameObject _projectilePrefab;
-
 
     private UnitBase _currentTarget;
 
@@ -95,21 +107,41 @@ public class HeroController : MobilityUnit, IBasicAttack
     public override void Spawned()
     {
         base.Spawned();
+
+        if (Object.HasStateAuthority)
+        {
+            networkedTeam = team;
+        }
+
+        _currentSkill = _skillComponent as IHeroSkill;
+
         unitType = UnitType.Hero;
+
+        _attackRange = _heroData.AttackRange;
+        _attackType = _heroData.NormalAttack.AttackType;
+        _projectileFx = _heroData.NormalAttack.EffectPrefab;
+
         if (!Object.HasStateAuthority)
         {
             return;
         }
+
+     
 
         if (_unitStat == null)
         {
             _unitStat = GetComponent<UnitStat>();
         }
 
+        Debug.Log($"HeroID : {_heroData.HeroID}");
         HeroStatData statData = HeroManager.Instance.GetStatus(_heroData.HeroID);
         if (statData == null)
         {
-            return;
+            Debug.Log("CSV 데이터 못찾음");
+        }
+        else
+        {
+            Debug.Log($"CSV HP : {statData.BaseHp}");
         }
         //UnitStat 초기화
         _unitStat.Init(statData);
@@ -119,10 +151,8 @@ public class HeroController : MobilityUnit, IBasicAttack
         searchRange = _unitStat.DetectRange.Value;
         _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = moveSpeed;
-        //공격 관련
-        _attackRange = _heroData.AttackRange;
-        _attackType = _heroData.NormalAttack.AttackType;
-        _projectilePrefab = _heroData.NormalAttack.EffectPrefab;
+
+
         //스킬
         EquipSkill(_heroData.NormalSkill);
         ApplySkillAugments();
@@ -130,14 +160,14 @@ public class HeroController : MobilityUnit, IBasicAttack
         {
             agent.enabled = false;
 
-            // 스폰 위치가 네비 밖이거나 겹쳐있을 경우 보정
+            //// 스폰 위치가 네비 밖이거나 겹쳐있을 경우 보정
             if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
             {
                 transform.position = hit.position;
             }
 
             //나중에 영웅 크기 적용할것이라면...
-            
+
             agent.enabled = true;
             agent.ResetPath();
         }
@@ -145,11 +175,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         _fsm = new UnitFSM();
 
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-
-        if (_currentSkill != null)
-        {
-            _skillTimer = TickTimer.CreateFromSeconds(Runner, _currentSkill.Data.InitCooldown);
-        }
 
         CurrentState = UnitState.Idle;
     }
@@ -161,19 +186,28 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        if (_currentSkill == null)
+        _skillData = newSkillData;
+
+        if (_skillComponent == null)
         {
-            _currentSkill = newSkillData.CreateSkillComponent(gameObject);
+            return;
         }
 
-        _currentSkill.ChangeSkillData(newSkillData);
+        _currentSkill = _skillComponent as IHeroSkill;
+
+        if (_currentSkill == null)
+        {
+            return;
+        }
+
+        _currentSkill.ChangeSkillData(_skillData);
 
         if (_skillTimer.IsRunning)
         {
             return;
         }
 
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, newSkillData.InitCooldown);
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillData.InitCooldown);
     }
 
 
@@ -231,7 +265,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         //FSM 결과에 따라 행동 처리
         ApplyState(_fsm.State);
-
+        Debug.Log("상태 : " + _fsm.State);
     }
 
     //FSM 결과에 따라 실제 유닛 행동을 적용 (AIState : 판단, UnitState : 애니메이션 등 표현)
@@ -328,19 +362,24 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private bool TryUseSkill()//스킬 쿨타임/조건 체크 후 스킬 실행 시도
     {
+        Debug.Log($"{name} TryUseSkill 진입");
         if (_currentSkill == null)
         {
             return false;
         }
 
-        if (_skillTimer.IsRunning && !_skillTimer.Expired(Runner))
+        if (!_skillTimer.ExpiredOrNotRunning(Runner))
         {
+            Debug.Log("스킬 쿨타임 중");
             return false;
         }
 
         SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
+        Debug.Log($"Skill : {_currentSkill.Data.SkillName}");
+        Debug.Log($"Cooldown(SO) : {_currentSkill.Data.Cooldown}");
+        Debug.Log($"Cooldown(Runtime) : {runtime.Cooldown}");
         runtime.HealAmount = HealPower;
-        Debug.Log("스킬 쿨 : " + runtime.Cooldown);
+        Debug.Log($"{name} 스킬 쿨 : {runtime.Cooldown}");
         if (!_currentSkill.CanUse(this, runtime))
         {
             return false;
@@ -353,8 +392,8 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
         _fsm.EnterSkill(Runner, 0.15f);
 
-        float cooldownReduction = Mathf.Clamp(_unitStat.CooldownReduction.Value, 0f, 0.9f);
-        float finalCooldown = runtime.Cooldown * (1f - cooldownReduction);
+        float cooldownReduction = Mathf.Clamp(_unitStat?.CooldownReduction?.Value ?? 0f, 0f, 0.9f);
+        float finalCooldown = Mathf.Max(0.1f, runtime.Cooldown * (1f - cooldownReduction));
 
         _skillTimer = TickTimer.CreateFromSeconds(Runner, finalCooldown);
 
@@ -459,7 +498,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     //Projectile 연출 및 기본 공격 데미지 적용
     private void AttackRanged(Vector3 targetPos)
     {
-        if (_projectilePrefab == null || _firePoint == null)
+        if (_projectileFx == null || _firePoint == null)
         {
             return;
         }
@@ -471,7 +510,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         ApplyBasicAttackDamage(_currentTarget);
 
-        RPC_FireProjectile(targetPos);
+        RPC_FireProjectile(Object.Id, _currentTarget.Object.Id, team);
     }
 
     //모든 기본 공격은 이 메서드를 통해 TakeDamage로 진입
@@ -539,18 +578,102 @@ public class HeroController : MobilityUnit, IBasicAttack
         target.TakeDamage(finalDamage);
     }
 
-    //기본 공격 / 포격형 스킬 공통 투사체 연출
+    //기본 공격
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_FireProjectile(Vector3 targetPos)
+    public void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team)
     {
-        if (_projectilePrefab == null || _firePoint == null)
+        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
         {
             return;
         }
 
-        GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
+        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
+        {
+            return;
+        }
 
-        projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
+        HeroController hero = casterObj.GetComponent<HeroController>();
+        if (hero == null)
+        {
+            return;
+        }
+
+        GameObject prefab = hero._projectileFx;
+        if (prefab == null)
+        {
+            return;
+        }
+
+        Vector3 start = hero._firePoint.position;
+        Vector3 end = targetObj.transform.position;
+
+        GameObject projectileObj = Instantiate(hero._projectileFx, start, Quaternion.identity);
+
+        Projectile projectile = projectileObj.GetComponent<Projectile>();
+
+        if (projectile != null)
+        {
+            projectile.Fire(end, team);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot, SkillEffectType type, float lifeTime)
+    {
+        GameObject prefab = null;
+
+        switch (type)
+        {
+            case SkillEffectType.Corsair:
+                prefab = _corsairFx;
+                break;
+
+            case SkillEffectType.Angel:
+                prefab = _angelFx;
+                break;
+
+            case SkillEffectType.Tank:
+                prefab = _tankFx;
+                break;
+
+            case SkillEffectType.HeavyRain:
+                prefab = _HeavyrainFx;
+                break;
+        }
+
+        if (prefab == null)
+            return;
+
+        GameObject fx = Instantiate(prefab, pos, rot);
+        Destroy(fx, lifeTime);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayHealEffect(NetworkId targetId, SkillEffectType type, float lifeTime)
+    {
+        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
+        {
+            return;
+        }
+
+        GameObject prefab = null;
+
+        if (type == SkillEffectType.Angel)
+        {
+            prefab = _angelFx;
+        }
+
+        if (prefab == null)
+        {
+            return;
+        }
+
+        GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, targetObj.transform);
+
+        effects.transform.localScale = Vector3.zero;
+        effects.transform.DOScale(2f, 0.2f).SetEase(Ease.OutBack);
+
+        Destroy(effects, lifeTime);
     }
 
     //스킬증강에 사용될 메서드

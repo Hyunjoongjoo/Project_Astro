@@ -8,6 +8,8 @@ public class SkillRuntimeData
     public float SkillRange;
     public bool IsAreaSkill;
     public float EffectLifeTime;
+    public GameObject EffectPrefab;
+
 
     //강습형
     public float DamageMultiplier;

@@ -21,8 +21,7 @@ public abstract class SkillDataSO : ScriptableObject
     [SerializeField] private float _cooldown;
     [SerializeField] private float _skillRange;
     [SerializeField] private GameObject _effectPrefab;
-
-    public abstract IHeroSkill CreateSkillComponent(GameObject owner);
+    [SerializeField] private float _effectLifeTime;
 
     public virtual SkillRuntimeData CreateRuntimeData()
     {
@@ -48,4 +47,5 @@ public abstract class SkillDataSO : ScriptableObject
     public string SkillName => _skillName;
     public string SkillDescription => _skillDescription;
     public string Note => _note;
+    public float EffectLifeTime => _effectLifeTime;
 }

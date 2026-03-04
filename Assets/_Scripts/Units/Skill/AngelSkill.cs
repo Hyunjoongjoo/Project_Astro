@@ -1,9 +1,10 @@
 ﻿using DG.Tweening;
 using Fusion;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 
-public class AngelSkill : NetworkBehaviour, IHeroSkill
+public class AngelSkill : MonoBehaviour, IHeroSkill
 {
     [SerializeField] private AngelSkillSO _data;
 
@@ -64,7 +65,7 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
             }
 
             caster.HealUnit(target, runtime.HealAmount);
-            RPC_PlayHealEffect(target.Object.Id, runtime.EffectLifeTime);
+            caster.RPC_PlayHealEffect(target.Object.Id, SkillEffectType.Angel, runtime.EffectLifeTime);
         }
         else
         {
@@ -101,7 +102,7 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
                 //}
 
                 caster.HealUnit(unit, runtime.HealAmount);
-                RPC_PlayHealEffect(unit.Object.Id, runtime.EffectLifeTime);
+                caster.RPC_PlayHealEffect(unit.Object.Id, SkillEffectType.Angel, runtime.EffectLifeTime);
                 healedAnyone = true;
             }
 
@@ -167,31 +168,5 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
         }
 
         return best;
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayHealEffect(NetworkId targetId, float effectLifeTime)
-    {
-        if (_data.EffectPrefab == null)
-        {
-            return;
-        }
-
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
-        {
-            return;
-        }
-
-        GameObject effects = Instantiate(
-            _data.EffectPrefab,
-            targetObj.transform.position,
-            Quaternion.identity,
-            targetObj.transform //자식으로 부착
-        );
-
-        effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(2f, 0.2f).SetEase(Ease.OutBack);
-
-        Destroy(effects, effectLifeTime);
     }
 }
