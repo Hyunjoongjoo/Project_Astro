@@ -2,7 +2,7 @@
 using UnityEngine;
 using DG.Tweening;
 
-public class CorsairSkill : NetworkBehaviour, IHeroSkill
+public class CorsairSkill : MonoBehaviour, IHeroSkill
 {
     [SerializeField] private CorsairSkillSO _data;
 
@@ -18,6 +18,7 @@ public class CorsairSkill : NetworkBehaviour, IHeroSkill
         float dist = caster.GetAttackDistanceTo(caster.CurrentTarget);
 
         return dist <= _data.SkillRange;//기획서에 맞게 스킬범위를 새로 지정
+
     }
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
@@ -54,24 +55,14 @@ public class CorsairSkill : NetworkBehaviour, IHeroSkill
             }
 
             float damage = caster.AttackPower * runtime.DamageMultiplier;
+
             unit.TakeDamage(damage);
         }
 
         //이펙트
-        RPC_PlayEffect(caster.Object.Id);
+        caster.RPC_PlaySkillEffect(warpPos, Quaternion.identity);
 
         return true;
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayEffect(NetworkId casterId)
-    {
-        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
-        {
-            return;
-        }
-
-        PlayEffect(casterObj.transform);
     }
 
     public void ChangeSkillData(SkillDataSO newData)
@@ -93,38 +84,7 @@ public class CorsairSkill : NetworkBehaviour, IHeroSkill
         return null;
     }
 
-    private void PlayEffect(Transform casterTransform)
-    {
-        if (_data.EffectPrefab == null)
-        {
-            return;
-        }
-
-        GameObject effects = Instantiate(
-         _data.EffectPrefab,
-         casterTransform.position,
-         Quaternion.identity,
-         casterTransform
-     );
-
-        effects.transform.localPosition = Vector3.zero;
-
-        ParticleSystem ps = effects.GetComponent<ParticleSystem>();
-        if (ps != null)
-        {
-            ps.Play();
-        }
-
-        effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(_data.Radius * 2f * 6.5f, _data.Duration).SetEase(Ease.OutQuad);
-
-        float lifeTime = ps != null
-            ? ps.main.duration + ps.main.startLifetime.constantMax
-            : 1f;
-
-        Destroy(effects, lifeTime);
-    }
-
+    public void TickSkill(NetworkRunner runner) { }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()

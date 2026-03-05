@@ -8,11 +8,6 @@ public class HeavyrainSkillSO : SkillDataSO
     [SerializeField] private float _shotInterval = 0.05f;
     [SerializeField] private float _damageMultiplier = 1f;
 
-    public override IHeroSkill CreateSkillComponent(GameObject owner)
-    {
-        return owner.AddComponent<HeavyrainSkill>();
-    }
-
     public override SkillRuntimeData CreateRuntimeData()
     {
         SkillRuntimeData runtime = base.CreateRuntimeData();

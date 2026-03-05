@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 //현재 스탯을 계산하여 유닛에게 달아줄 관리자
@@ -93,7 +93,11 @@ public class UnitStat : MonoBehaviour
     {
         if (_statMap.TryGetValue(type, out Stat stat))
         {
+            float before = stat.Value;
+
             stat.AddModifier(modifier);
+            Debug.Log($"<color=green>[StatMod]</color> {type} 변경: {before} -> {stat.Value} (Source: {modifier.Source})");
+
         }
         else
         {
