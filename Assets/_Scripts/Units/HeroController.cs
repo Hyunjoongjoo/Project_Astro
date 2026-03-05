@@ -1,4 +1,5 @@
-﻿using DG.Tweening;
+﻿using System.Collections.Generic;
+using DG.Tweening;
 using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
@@ -40,6 +41,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     private bool _isDeploying;
     private Vector3 _deployTarget;
     private TickTimer _deployDelayTimer;
+    private TickTimer _deployFailSafeTimer;
 
     private IHeroSkill _currentSkill;
 
@@ -73,7 +75,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     }
 
     //스포너에서 전달받은 위치와 지연 시간을 기준으로 배치 시작
-    //배치완료전 까지는 전투,FSM로직 동작x
+    //배치완료전 까지는 전투,FSM로직x
     public void BeginDeploy(Vector3 targetPos, float deployDelay)
     {
         if (!Object.HasStateAuthority)
@@ -83,7 +85,10 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         _deployTarget = targetPos;
         _deployDelayTimer = TickTimer.CreateFromSeconds(Runner, deployDelay);
+        float failSafeTime = deployDelay + 1.5f;
+        _deployFailSafeTimer = TickTimer.CreateFromSeconds(Runner, failSafeTime);
         _isDeploying = true;
+        MoveTo(_deployTarget);
     }
 
     private void FinishDeploy()//배치완료
@@ -93,6 +98,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         //배치 직후 바로 타겟 탐색 가능하도록 초기화
         agent.ResetPath();
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _fsm?.ForceDetect();
     }
 
     public override void Spawned()
@@ -196,7 +202,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         // StateAuthority가 없는 클라이언트는 서버 상태를 그대로 반영만 함
         if (!Object.HasStateAuthority) return;
 
-        _currentSkill?.TickSkill(Runner);
 
         // 사망 상태면 행동 중단
         if (CurrentState == UnitState.Dead) return;
@@ -206,7 +211,6 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        _fsm.TickSkill(Runner);
 
         if (_isDeploying)
         {
@@ -216,13 +220,35 @@ public class HeroController : MobilityUnit, IBasicAttack
                 return;
             }
 
-            MoveTo(_deployTarget);
+            if (!agent.hasPath)
+            {
+                MoveTo(_deployTarget);
+            }
 
-            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            //네비 도착 or 실제 거리 도착 둘중 하나면 탈출(고장 방지)
+            float dist = Vector3.Distance(transform.position, _deployTarget);
+            //콜라이더 크기에 따라 수치 수정해야 될수 있음
+            if ((!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance) || dist < 0.5f)
             {
                 FinishDeploy();
+                return;
             }
+            //충돌로 배치가 너무 오래 걸리는 경우 배치 강제 종료
+            if (_deployFailSafeTimer.Expired(Runner))
+            {
+                FinishDeploy();
+                return;
+            }
+
             return;
+        }
+        _currentSkill?.TickSkill(Runner);
+        _fsm.TickSkill(Runner);
+
+        //타겟이 죽었는데 아직 참조 남아있는 경우 즉시 재탐색
+        if (_currentTarget == null || _currentTarget.IsDead)
+        {
+            _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         }
 
         //탐지 상태일 때만 타겟 재탐색
@@ -444,30 +470,49 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private UnitBase GetClosestTower()
     {
-        // 함교도 없으면 타겟 없음 (사실상 게임 종료)
-        if (_enemyBridge == null) return null;
-
-        // 두 타워가 모두 없으면 함교
-        if (_enemyTowerA == null && _enemyTowerB == null) return _enemyBridge;
-
-        // 타워가 하나만 남은 경우 타워나 함교 중 가까운 쪽
-        if (_enemyTowerA == null)
+        //두 타워 다 없으면 null
+        if (_enemyTowerA == null && _enemyTowerB == null)
         {
-            float distTower = Vector3.Distance(transform.position, _enemyTowerB.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _enemyBridge.transform.position);
-            return distBridge < distTower ? _enemyBridge : _enemyTowerB;
+            return null;
         }
 
-        if (_enemyTowerB == null)
+        //둘 중 하나만 남았는데
+        //내가 공격하던 타워가 아니라면
+        //함교로 이동
+        if (_enemyTowerA != null && _enemyTowerB == null)
         {
-            float distTower = Vector3.Distance(transform.position, _enemyTowerA.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _enemyBridge.transform.position);
-            return distBridge < distTower ? _enemyBridge : _enemyTowerA;
+            if (_currentTarget == _enemyTowerA)
+            {
+                return _enemyTowerA;
+            }
+
+            return null;
         }
 
-        // 두 타워가 모두 살아있다면 둘 중 가까운 넘
-        float distA = Vector3.Distance(transform.position, _enemyTowerA.transform.position);
-        float distB = Vector3.Distance(transform.position, _enemyTowerB.transform.position);
+        if (_enemyTowerA == null && _enemyTowerB != null)
+        {
+            if (_currentTarget == _enemyTowerB)
+            {
+                return _enemyTowerB;
+            }
+
+            return null;
+        }
+
+        //둘 다 살아있으면 처음 선택한 타워 유지
+        if (_currentTarget == _enemyTowerA)
+        {
+            return _enemyTowerA;
+        }
+
+        if (_currentTarget == _enemyTowerB)
+        {
+            return _enemyTowerB;
+        }
+
+        float distA = (transform.position - _enemyTowerA.transform.position).sqrMagnitude;
+        float distB = (transform.position - _enemyTowerB.transform.position).sqrMagnitude;
+
         return distA <= distB ? _enemyTowerA : _enemyTowerB;
     }
 
@@ -756,6 +801,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         // 타이머를 즉시 만료시켜 다음 틱에 바로 재탐색
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _fsm?.ForceDetect();
     }
 
     public override void Die()

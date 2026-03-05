@@ -16,6 +16,10 @@ public class UnitFSM
     {
         State = UnitAIState.Dead;
     }
+    public void ForceDetect()//즉시 탐지 상태로 전환
+    {
+        State = UnitAIState.Detect;
+    }
 
     public void EnterSkill(NetworkRunner runner, float duration)
     {

@@ -1,6 +1,7 @@
 using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 //1. 유저 현재 상태 분석
 //2. 예외처리 or 한쪽 선택시 나머지 밴
@@ -14,13 +15,17 @@ public class AugmentDeckManager
     //스킬증강 SO
     private List<SkillAugmentSO> _allSkillAugments;
 
+    //영웅 기본 스킬을 찾기 위한 모든 스킬 데이터 모음
+    private List<SkillDataSO> _allBaseSkills;
+
     //아이콘, 프리팹 가져올 SO
     private HeroIconDataSO _heroIconSO;
 
-    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO)
+    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO, List<SkillDataSO> loadedBaseSkills)
     {
         _allSkillAugments = loadedSkillAugments;
         _heroIconSO = heroIconSO;
+        _allBaseSkills = loadedBaseSkills;
     }
 
     public List<AugmentData> GenerateCards(
@@ -111,6 +116,16 @@ public class AugmentDeckManager
         float baseCooldown = 0f;
         float currentCooldown = 0f;
 
+        //영웅,스킬용 변수
+        HeroType hType = default;
+        HeroRole hRole = default;
+        MoveType mType = default;
+        SkillDataSO bSkill = null;
+
+        string tHeroName = "";
+        Sprite tHeroIcon = null;
+        string bSkillName = "";
+
         switch (type)
         {
             case AugmentType.Hero:
@@ -135,6 +150,10 @@ public class AugmentDeckManager
 
                     title = GetString(pickedHero.heroName);
                     desc = GetString(pickedHero.heroDesc);
+
+                    hType = pickedHero.heroType;
+                    hRole = pickedHero.heroRole;
+
                     if (_heroIconSO != null)
                     {
                         icon = _heroIconSO.GetIcon(refId);       //ID로 아이콘
@@ -146,6 +165,14 @@ public class AugmentDeckManager
                     {
                         baseCooldown = heroStat.spawnCooldown;
                         currentCooldown = heroStat.spawnCooldown;
+                        mType = heroStat.moveType;
+                    }
+                    //해당 영웅의 기본 스킬 데이터 찾아오기
+                    if (_allBaseSkills != null)
+                    {
+                        bSkill = _allBaseSkills.FirstOrDefault(s =>
+                            s.HeroId == refId &&
+                            s.SkillType == SkillType.normal_skill);
                     }
                 }
                 else return null; //뽑을 영웅이 없으면 null
@@ -203,9 +230,22 @@ public class AugmentDeckManager
                     int tierIndex = (totalPicks >= reinforceNum) ? 1 : 0;
 
                     refId = pickedSkill.AugmentID;
-                    title = pickedSkill.Title;
                     icon = pickedSkill.Icon;
-                    desc = pickedSkill.Tiers[tierIndex].Description;
+
+                    title = GetString(pickedSkill.TitleStringID);
+                    desc = GetString(pickedSkill.Tiers[tierIndex].DescStringID);
+                    bSkill = pickedSkill.Tiers[tierIndex].CombatSkillData;
+                    //스킬 증강 카드일 때 영웅의 원본 정보들을 추적해서 채워줌
+                    var heroData = TableManager.Instance.HeroTable.Get(pickedSkill.TargetHeroID);
+                    if (heroData != null) tHeroName = GetString(heroData.heroName);
+
+                    if (_heroIconSO != null) tHeroIcon = _heroIconSO.GetIcon(pickedSkill.TargetHeroID);
+
+                    if (_allBaseSkills != null)
+                    {
+                        var baseSkill = _allBaseSkills.FirstOrDefault(s => s.HeroId == pickedSkill.TargetHeroID && s.SkillType == SkillType.normal_skill);
+                        if (baseSkill != null) bSkillName = baseSkill.SkillName;
+                    }
                 }
                 else return null;
                 break;
@@ -216,12 +256,21 @@ public class AugmentDeckManager
             instanceId = instanceId,
             type = type,
             targetId = refId,
-            name = title,
+            titleName = title,
             description = desc,
-            icon = icon,
+            mainIcon = icon,
             heroPrefab = heroPrefab,
             baseSpawnCooldown = baseCooldown,       
-            currentSpawnCooldown = currentCooldown
+            currentSpawnCooldown = currentCooldown,
+
+            heroType = hType,
+            heroRole = hRole,
+            moveType = mType,
+            skillData = bSkill,
+
+            targetHeroName = tHeroName,  
+            targetHeroIcon = tHeroIcon,   
+            baseSkillName = bSkillName
         };
     }
 
