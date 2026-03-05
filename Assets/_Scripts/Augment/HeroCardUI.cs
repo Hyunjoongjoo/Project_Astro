@@ -46,9 +46,14 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI
         if (_descTxt != null) _descTxt.text = string.Format(descFormat, data.titleName);
 
         //4. 타입 정보 세팅
-        if (_heroTypeTxt != null) _heroTypeTxt.text = GetHeroTypeString(data.heroType);
-        if (_heroRoleTxt != null) _heroRoleTxt.text = GetHeroRoleString(data.heroRole);
-        if (_moveTypeTxt != null) _moveTypeTxt.text = GetMoveTypeString(data.moveType);
+        if (_heroTypeTxt != null)
+            _heroTypeTxt.text = TableManager.Instance.GetString($"hero_type_{data.heroType.ToString().ToLower()}");
+
+        if (_heroRoleTxt != null)
+            _heroRoleTxt.text = TableManager.Instance.GetString($"hero_role_{data.heroRole.ToString().ToLower()}");
+
+        if (_moveTypeTxt != null)
+            _moveTypeTxt.text = TableManager.Instance.GetString($"hero_movetype_{data.moveType.ToString().ToLower()}");
 
         //5. 재소환 쿨타임 세팅
         string respawnFormat = TableManager.Instance.GetString("ui_augment_hero_respawn");
@@ -78,19 +83,4 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI
         AugmentManager.Instance.SelectAugment(_data);
         GetComponentInParent<AugmentWindowUI>().Close();
     }
-
-    //Enum 값을 한글 스트링으로 변환 (추후 String 테이블 ID로 연결 오늘내로)
-    private string GetHeroTypeString(HeroType type) => type == HeroType.SpaceCraft ? "우주 함선" : "전술 슈트";
-    private string GetHeroRoleString(HeroRole role)
-    {
-        switch (role)
-        {
-            case HeroRole.Melee: return "강습형";
-            case HeroRole.Ranged: return "포격형";
-            case HeroRole.Tank: return "방어형";
-            case HeroRole.Healer: return "지원형";
-            default: return "";
-        }
-    }
-    private string GetMoveTypeString(MoveType type) => type == MoveType.Small ? "소형" : "대형";
 }
