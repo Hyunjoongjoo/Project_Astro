@@ -245,6 +245,12 @@ public class HeroController : MobilityUnit, IBasicAttack
         _currentSkill?.TickSkill(Runner);
         _fsm.TickSkill(Runner);
 
+        //타겟이 죽었는데 아직 참조 남아있는 경우 즉시 재탐색
+        if (_currentTarget == null || _currentTarget.IsDead)
+        {
+            _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        }
+
         //탐지 상태일 때만 타겟 재탐색
         if (_fsm.State == UnitAIState.Detect && _searchTimer.ExpiredOrNotRunning(Runner))
         {
@@ -464,30 +470,49 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private UnitBase GetClosestTower()
     {
-        // 함교도 없으면 타겟 없음 (사실상 게임 종료)
-        if (_enemyBridge == null) return null;
-
-        // 두 타워가 모두 없으면 함교
-        if (_enemyTowerA == null && _enemyTowerB == null) return _enemyBridge;
-
-        // 타워가 하나만 남은 경우 타워나 함교 중 가까운 쪽
-        if (_enemyTowerA == null)
+        //두 타워 다 없으면 null
+        if (_enemyTowerA == null && _enemyTowerB == null)
         {
-            float distTower = Vector3.Distance(transform.position, _enemyTowerB.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _enemyBridge.transform.position);
-            return distBridge < distTower ? _enemyBridge : _enemyTowerB;
+            return null;
         }
 
-        if (_enemyTowerB == null)
+        //둘 중 하나만 남았는데
+        //내가 공격하던 타워가 아니라면
+        //함교로 이동
+        if (_enemyTowerA != null && _enemyTowerB == null)
         {
-            float distTower = Vector3.Distance(transform.position, _enemyTowerA.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _enemyBridge.transform.position);
-            return distBridge < distTower ? _enemyBridge : _enemyTowerA;
+            if (_currentTarget == _enemyTowerA)
+            {
+                return _enemyTowerA;
+            }
+
+            return null;
         }
 
-        // 두 타워가 모두 살아있다면 둘 중 가까운 넘
-        float distA = Vector3.Distance(transform.position, _enemyTowerA.transform.position);
-        float distB = Vector3.Distance(transform.position, _enemyTowerB.transform.position);
+        if (_enemyTowerA == null && _enemyTowerB != null)
+        {
+            if (_currentTarget == _enemyTowerB)
+            {
+                return _enemyTowerB;
+            }
+
+            return null;
+        }
+
+        //둘 다 살아있으면 처음 선택한 타워 유지
+        if (_currentTarget == _enemyTowerA)
+        {
+            return _enemyTowerA;
+        }
+
+        if (_currentTarget == _enemyTowerB)
+        {
+            return _enemyTowerB;
+        }
+
+        float distA = (transform.position - _enemyTowerA.transform.position).sqrMagnitude;
+        float distB = (transform.position - _enemyTowerB.transform.position).sqrMagnitude;
+
         return distA <= distB ? _enemyTowerA : _enemyTowerB;
     }
 

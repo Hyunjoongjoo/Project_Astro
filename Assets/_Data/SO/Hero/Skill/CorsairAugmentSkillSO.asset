@@ -18,8 +18,8 @@ MonoBehaviour:
   _skillName: augment1_name_hero_corsair
   _skillDescription: augment1_desc_hero_corsair
   _note: 
-  _initCooldown: 4
-  _cooldown: 8
+  _initCooldown: 2
+  _cooldown: 4
   _skillRange: 4
   _effectPrefab: {fileID: 6393617126741755569, guid: 19138c6e05c43fe46a292e5d6d939efa, type: 3}
   _effectScale: 40
