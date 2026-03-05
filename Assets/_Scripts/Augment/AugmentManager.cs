@@ -71,7 +71,7 @@ public class AugmentManager : Singleton<AugmentManager>
     //카드 선택 시 호출
     public void SelectAugment(AugmentData data)
     {
-        Debug.Log($"유저가 카드 선택함: {data.name}");
+        Debug.Log($"유저가 카드 선택함: {data.titleName}");
 
         //서버에 장착 승인 요청
         AugmentController.Instance.SelectAugment(data);
