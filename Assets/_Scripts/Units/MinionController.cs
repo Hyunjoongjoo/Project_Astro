@@ -1,10 +1,7 @@
 ﻿using Fusion;
 using UnityEngine;
 
-public enum AttackType
-{
-    Melee, Range
-}
+
 public class MinionController : MobilityUnit, IBasicAttack
 {
     [Header("공격 스테이터스")]

@@ -4,29 +4,22 @@ using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
 
-
-public enum UnitSize
-{
-    Small, Medium, Large
-}
-
 public class HeroController : MobilityUnit, IBasicAttack
 {
 
     [SerializeField] private string _heroId;
     [SerializeField] private NormalAttackDataSO _normalAttack;
-    [SerializeField] private SkillDataSO _normalSkill;
     [SerializeField] private float _attackRange;
     [SerializeField] private Transform _firePoint;
+    [SerializeField] private UnitStat _unitStat;
+    [SerializeField] private SkillDataSO _skillData;
+    [SerializeField] private SkillDataSO _normalSkill;
+    [SerializeField] private MonoBehaviour _skillComponent;
 
     [Header("타워 레퍼런스")]
     [SerializeField] private UnitBase _enemyTowerA;
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
-
-    [SerializeField] private UnitStat _unitStat;
-    [SerializeField] private SkillDataSO _skillData;
-    [SerializeField] private MonoBehaviour _skillComponent;
 
     private float _respawnTime;
     private AttackType _attackType;
@@ -131,6 +124,21 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         HeroStatData statData = HeroManager.Instance.GetStatus(_heroId);
 
+        Debug.Log(
+ $"[받아온 스텟]\n" +
+ $"HeroID: {_heroId}\n" +
+ $"BaseHp: {statData.BaseHp}\n" +
+ $"ipLvHp: {statData.ipLvHp}\n" +
+ $"baseAttackPower: {statData.baseAttackPower}\n" +
+ $"ipLvAttackPower: {statData.ipLvAttackPower}\n" +
+ $"baseHealingPower: {statData.baseHealingPower}\n" +
+ $"ipLvHealingPower: {statData.ipLvHealingPower}\n" +
+ $"attackSpeed: {statData.attackSpeed}\n" +
+ $"spawnCooldown: {statData.spawnCooldown}\n" +
+ $"moveSpeed: {statData.moveSpeed}\n" +
+ $"detectionRange: {statData.detectionRange}\n"
+ );
+
         //UnitStat 초기화
         _unitStat.Init(statData);
         //Stat 기반 값 적용
@@ -141,9 +149,24 @@ public class HeroController : MobilityUnit, IBasicAttack
         _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = moveSpeed;
 
+        Debug.Log(
+$"[적용된 스텟]\n" +
+$"MaxHp: {_unitStat.MaxHp.Value}\n" +
+$"Attack: {_unitStat.Attack.Value}\n" +
+$"HealPower: {_unitStat.HealPower.Value}\n" +
+$"AttackSpeed: {_unitStat.AttackSpeed.Value}\n" +
+$"RespawnTime: {_unitStat.RespawnTime.Value}\n" +
+$"MoveSpeed: {_unitStat.MoveSpeed.Value}\n" +
+$"DetectRange: {_unitStat.DetectRange.Value}\n" +
+$"DamageReduction: {_unitStat.DamageReduction.Value}\n" +
+$"CooldownReduction: {_unitStat.CooldownReduction.Value}"
+);
+
         //스킬
         EquipSkill(_normalSkill);
+
         ApplySkillAugments();
+
         if (agent != null)
         {
             agent.enabled = false;
