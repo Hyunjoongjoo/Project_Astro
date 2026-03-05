@@ -1,6 +1,7 @@
-﻿using Fusion;
+﻿using DG.Tweening;
+using ExitGames.Client.Photon.StructWrapping;
+using Fusion;
 using UnityEngine;
-using DG.Tweening;
 
 public class CorsairSkill : MonoBehaviour, IHeroSkill
 {
@@ -34,22 +35,44 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
             return false;
         }
 
-        //워프 위치 계산 (타겟 정중앙)
-        Vector3 warpPos = target.transform.position;
-        warpPos.y = caster.transform.position.y; //지면 보정
+        //이동 방향 계산
+        Vector3 dir = target.transform.position - caster.transform.position;
+
+        if (dir.sqrMagnitude > 0.001f)
+        {
+            dir.Normalize();
+        }
+        else
+        {
+            dir = caster.transform.forward;
+        }
+
+        //워프 위치 계산, 살짝 앞에 위치하도록 보정
+        Vector3 center = target.transform.position - dir * 1.2f;
+        center.y = caster.transform.position.y; //지면 보정
+
+        caster.ForceStopMoveForSkill();
 
         //워프
-        caster.transform.position = warpPos;
-        caster.ForceStopMoveForSkill();
+        if (caster.Agent != null)
+        {
+            caster.Agent.Warp(center);
+            caster.Agent.ResetPath();
+        }
+        else
+        {
+            caster.transform.position = center;
+        }
+
 
         LayerMask targetMask = caster.TargetLayer;
 
-        Collider[] hits = Physics.OverlapSphere(warpPos, runtime.Radius, targetMask);
+        Collider[] hits = Physics.OverlapSphere(center, runtime.Radius, targetMask);
 
         foreach (var hit in hits)
         {
             UnitBase unit = hit.GetComponent<UnitBase>();
-            if (unit == null || unit.IsDead)
+            if (unit == null || unit.IsDead || unit == caster || unit.team == caster.team)
             {
                 continue;
             }
@@ -60,7 +83,7 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
         }
 
         //이펙트
-        caster.RPC_PlaySkillEffect(warpPos, Quaternion.identity);
+        caster.RPC_PlaySkillEffect(center, Quaternion.identity);
 
         return true;
     }

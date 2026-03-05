@@ -497,7 +497,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
-  _heroData: {fileID: 11400000, guid: 9050d0253bdda444cbbfed7931f8de18, type: 2}
+  _heroId: hero_corsair
+  _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
+  _normalSkill: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
+  _attackRange: 3
   _firePoint: {fileID: 533690703149539074}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
@@ -505,7 +508,6 @@ MonoBehaviour:
   _unitStat: {fileID: 250558184794622207}
   _skillData: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
   _skillComponent: {fileID: 5510236954846484131}
-  _projectile: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
 --- !u!114 &250558184794622207
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -22,6 +22,15 @@ public class AugmentManager : Singleton<AugmentManager>
 
     private StageManager _cachedStageManager;
 
+    private void Start()
+    {
+        //토글버튼 최상단 컨테이너로 가게
+        if (UIManager.Instance.TopContainer != null && _toggleBtn != null)
+        {
+            _toggleBtn.transform.SetParent(UIManager.Instance.TopContainer);
+        }
+    }
+
     // 2026-03-03 윤혁 수정 : 증강 여닫는 버튼만 보여주고 숨기기 (Show, Hide)
     public void ShowAugmentToggleBtn()
     {

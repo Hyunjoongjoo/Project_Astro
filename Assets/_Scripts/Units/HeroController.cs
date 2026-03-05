@@ -4,28 +4,23 @@ using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
 
-
-public enum UnitSize
-{
-    Small, Medium, Large
-}
-
 public class HeroController : MobilityUnit, IBasicAttack
 {
 
-    [SerializeField] private HeroDataSO _heroData;
+    [SerializeField] private string _heroId;
+    [SerializeField] private NormalAttackDataSO _normalAttack;
+    [SerializeField] private float _attackRange;
     [SerializeField] private Transform _firePoint;
+    [SerializeField] private UnitStat _unitStat;
+    [SerializeField] private SkillDataSO _skillData;
+    [SerializeField] private SkillDataSO _normalSkill;
+    [SerializeField] private MonoBehaviour _skillComponent;
 
     [Header("타워 레퍼런스")]
     [SerializeField] private UnitBase _enemyTowerA;
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
-    [SerializeField] private UnitStat _unitStat;
-    [SerializeField] private SkillDataSO _skillData;
-    [SerializeField] private MonoBehaviour _skillComponent;
-
-    private float _attackRange;
     private float _respawnTime;
     private AttackType _attackType;
     private GameObject _projectile;
@@ -52,6 +47,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float AttackSpeed => _unitStat.AttackSpeed.Value;
     public float HealPower => _unitStat.HealPower.Value;
     public UnitStat UnitStat => _unitStat;
+    public NavMeshAgent Agent => agent;
     public LayerMask AllyLayer
     {
         get
@@ -114,9 +110,8 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         unitType = UnitType.Hero;
 
-        _attackRange = _heroData.AttackRange;
-        _attackType = _heroData.NormalAttack.AttackType;
-        _projectile = _heroData.NormalAttack.EffectPrefab;
+        _attackType = _normalAttack.AttackType;
+        _projectile = _normalAttack.EffectPrefab;
 
         if (!Object.HasStateAuthority)
         {
@@ -128,7 +123,22 @@ public class HeroController : MobilityUnit, IBasicAttack
             _unitStat = GetComponent<UnitStat>();
         }
 
-        HeroStatData statData = HeroManager.Instance.GetStatus(_heroData.HeroID);
+        HeroStatData statData = HeroManager.Instance.GetStatus(_heroId);
+
+        Debug.Log(
+ $"[받아온 스텟]\n" +
+ $"HeroID: {_heroId}\n" +
+ $"BaseHp: {statData.BaseHp}\n" +
+ $"ipLvHp: {statData.ipLvHp}\n" +
+ $"baseAttackPower: {statData.baseAttackPower}\n" +
+ $"ipLvAttackPower: {statData.ipLvAttackPower}\n" +
+ $"baseHealingPower: {statData.baseHealingPower}\n" +
+ $"ipLvHealingPower: {statData.ipLvHealingPower}\n" +
+ $"attackSpeed: {statData.attackSpeed}\n" +
+ $"spawnCooldown: {statData.spawnCooldown}\n" +
+ $"moveSpeed: {statData.moveSpeed}\n" +
+ $"detectionRange: {statData.detectionRange}\n"
+ );
 
         //UnitStat 초기화
         _unitStat.Init(statData);
@@ -140,9 +150,24 @@ public class HeroController : MobilityUnit, IBasicAttack
         _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = moveSpeed;
 
+        Debug.Log(
+$"[적용된 스텟]\n" +
+$"MaxHp: {_unitStat.MaxHp.Value}\n" +
+$"Attack: {_unitStat.Attack.Value}\n" +
+$"HealPower: {_unitStat.HealPower.Value}\n" +
+$"AttackSpeed: {_unitStat.AttackSpeed.Value}\n" +
+$"RespawnTime: {_unitStat.RespawnTime.Value}\n" +
+$"MoveSpeed: {_unitStat.MoveSpeed.Value}\n" +
+$"DetectRange: {_unitStat.DetectRange.Value}\n" +
+$"DamageReduction: {_unitStat.DamageReduction.Value}\n" +
+$"CooldownReduction: {_unitStat.CooldownReduction.Value}"
+);
+
         //스킬
-        EquipSkill(_heroData.NormalSkill);
+        EquipSkill(_normalSkill);
+
         ApplySkillAugments();
+
         if (agent != null)
         {
             agent.enabled = false;
@@ -248,6 +273,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         //타겟이 죽었는데 아직 참조 남아있는 경우 즉시 재탐색
         if (_currentTarget == null || _currentTarget.IsDead)
         {
+            _currentTarget = null;
             _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         }
 
@@ -661,7 +687,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)
     {
-        Debug.Log("RPC_PlaySkillEffect 실행됨");
         if (_skillData == null)
         {
             return;
@@ -674,14 +699,19 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        Transform parent = null;
+        GameObject fx;
 
+        //캐스터에 붙는 이펙트
         if (_skillData.AttachType == EffectAttachType.Caster)
         {
-            parent = transform;
+            fx = Instantiate(prefab, transform);
+            fx.transform.localPosition = Vector3.zero;
+            fx.transform.localRotation = Quaternion.identity;
         }
-
-        GameObject fx = Instantiate(prefab, pos, rot, parent);
+        else//월드 좌표 기준 이펙트
+        {
+            fx = Instantiate(prefab, pos, rot);
+        }
 
         fx.transform.localScale = Vector3.one * _skillData.EffectScale;
 
@@ -744,11 +774,6 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        if (_heroData == null)
-        {
-            return;
-        }
-
         //3.3 여현구
         //배열에서 구조체로 바뀌어서 여기 수정했습니다.
         for (int i = 0; i < SlotData_5.Length; i++)
@@ -766,7 +791,7 @@ public class HeroController : MobilityUnit, IBasicAttack
                 continue;
             }
 
-            if (so.TargetHeroID != _heroData.HeroID)
+            if (so.TargetHeroID != _heroId)
             {
                 continue;
             }
