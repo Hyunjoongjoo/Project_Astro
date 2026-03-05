@@ -1,4 +1,5 @@
-﻿using DG.Tweening;
+﻿using System.Collections.Generic;
+using DG.Tweening;
 using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
@@ -40,6 +41,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     private bool _isDeploying;
     private Vector3 _deployTarget;
     private TickTimer _deployDelayTimer;
+    private TickTimer _deployFailSafeTimer;
 
     private IHeroSkill _currentSkill;
 
@@ -73,7 +75,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     }
 
     //스포너에서 전달받은 위치와 지연 시간을 기준으로 배치 시작
-    //배치완료전 까지는 전투,FSM로직 동작x
+    //배치완료전 까지는 전투,FSM로직x
     public void BeginDeploy(Vector3 targetPos, float deployDelay)
     {
         if (!Object.HasStateAuthority)
@@ -83,7 +85,10 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         _deployTarget = targetPos;
         _deployDelayTimer = TickTimer.CreateFromSeconds(Runner, deployDelay);
+        float failSafeTime = deployDelay + 1.5f;
+        _deployFailSafeTimer = TickTimer.CreateFromSeconds(Runner, failSafeTime);
         _isDeploying = true;
+        MoveTo(_deployTarget);
     }
 
     private void FinishDeploy()//배치완료
@@ -93,6 +98,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         //배치 직후 바로 타겟 탐색 가능하도록 초기화
         agent.ResetPath();
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _fsm?.ForceDetect();
     }
 
     public override void Spawned()
@@ -196,7 +202,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         // StateAuthority가 없는 클라이언트는 서버 상태를 그대로 반영만 함
         if (!Object.HasStateAuthority) return;
 
-        _currentSkill?.TickSkill(Runner);
 
         // 사망 상태면 행동 중단
         if (CurrentState == UnitState.Dead) return;
@@ -206,7 +211,6 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        _fsm.TickSkill(Runner);
 
         if (_isDeploying)
         {
@@ -216,14 +220,30 @@ public class HeroController : MobilityUnit, IBasicAttack
                 return;
             }
 
-            MoveTo(_deployTarget);
+            if (!agent.hasPath)
+            {
+                MoveTo(_deployTarget);
+            }
 
-            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            //네비 도착 or 실제 거리 도착 둘중 하나면 탈출(고장 방지)
+            float dist = Vector3.Distance(transform.position, _deployTarget);
+            //콜라이더 크기에 따라 수치 수정해야 될수 있음
+            if ((!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance) || dist < 0.5f)
             {
                 FinishDeploy();
+                return;
             }
+            //충돌로 배치가 너무 오래 걸리는 경우 배치 강제 종료
+            if (_deployFailSafeTimer.Expired(Runner))
+            {
+                FinishDeploy();
+                return;
+            }
+
             return;
         }
+        _currentSkill?.TickSkill(Runner);
+        _fsm.TickSkill(Runner);
 
         //탐지 상태일 때만 타겟 재탐색
         if (_fsm.State == UnitAIState.Detect && _searchTimer.ExpiredOrNotRunning(Runner))
@@ -756,6 +776,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         // 타이머를 즉시 만료시켜 다음 틱에 바로 재탐색
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _fsm?.ForceDetect();
     }
 
     public override void Die()

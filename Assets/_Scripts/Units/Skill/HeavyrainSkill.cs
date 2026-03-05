@@ -10,6 +10,7 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
     private HeroController _caster;
     private UnitBase _target;
     private bool _isFiring;
+    private SkillRuntimeData _runtime;
 
     public SkillDataSO Data => _data;
 
@@ -59,6 +60,8 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
         _caster = caster;
         _target = target;
 
+        _runtime = runtime;
+
         _remainingShots = runtime.ShotCount;
         _isFiring = true;
 
@@ -79,18 +82,22 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 
     public void TickSkill(NetworkRunner runner)
     {
+        if (_caster == null)
+        {
+            return;
+        }
+
+        if (!_caster.Object.HasStateAuthority)
+        {
+            return;
+        }
+
         if (!_isFiring)
         {
             return;
         }
 
-        if (_caster == null || _target == null)
-        {
-            StopFiring();
-            return;
-        }
-
-        if (_target.IsDead || _target.Object == null)
+        if (_target == null || _target.IsDead || _target.Object == null)
         {
             StopFiring();
             return;
@@ -107,11 +114,10 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
             return;
         }
 
-        SkillRuntimeData runtime = _data.CreateRuntimeData();
 
-        FireOnce(runtime);
+        FireOnce(_runtime);
 
-        _shotTimer = TickTimer.CreateFromSeconds(runner, runtime.ShotInterval);
+        _shotTimer = TickTimer.CreateFromSeconds(runner, _runtime.ShotInterval);
     }
 
     public void ChangeSkillData(SkillDataSO newData)
@@ -153,6 +159,8 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
         _target = null;
         _caster = null;
         _isFiring = false;
+
+        _runtime = null;
     }
 }
 
