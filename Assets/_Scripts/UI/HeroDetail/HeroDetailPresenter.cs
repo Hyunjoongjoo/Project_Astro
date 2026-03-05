@@ -92,7 +92,10 @@ public class HeroDetailPresenter : MonoBehaviour
             _view.SetUpgradeButton(true, "최고 레벨", true);
         }
 
-        //스텟 페이지 갱신
+        //스와이프 페이지 갱신
+        UpdateSkillDesPage();
+        UpdateAugmentDesPage();
+        UpdateLevelRewardDesPage();
         UpdateStatPage();
     }
 
@@ -186,6 +189,20 @@ public class HeroDetailPresenter : MonoBehaviour
                 "골드가 부족하여 레벨업할 수 없습니다."
             );
         }
+    }
+
+    private void UpdateSkillDesPage()
+    {
+        _view.ClearDescription(DescriptionType.Skill);
+
+    } 
+    private void UpdateAugmentDesPage()
+    {
+        _view.ClearDescription(DescriptionType.Augment);
+    }
+    private void UpdateLevelRewardDesPage()
+    {
+        _view.ClearDescription(DescriptionType.LevelReward);
     }
 
     //스텟 페이지 갱신
