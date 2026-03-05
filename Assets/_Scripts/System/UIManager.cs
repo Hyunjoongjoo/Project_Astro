@@ -33,14 +33,12 @@ public class UIManager : Singleton<UIManager>
     {
         if (_uiRoot != null) return;
 
-        //기존 씬에 Canvas가 있는지 먼저 확인
-        Canvas existingCanvas = Object.FindFirstObjectByType<Canvas>();
-        GameObject rootObj;
+        GameObject rootObj = GameObject.FindWithTag("MainCanvas"); //태그로 메인캔버스찾기
 
-        if (existingCanvas != null)
+        if (rootObj != null)
         {
             // 씬에 이미 캔버스가 있다면 그걸 루트로 사용
-            rootObj = existingCanvas.gameObject;
+            Canvas canvas = rootObj.GetOrAddComponent<Canvas>();
             rootObj.name = "@UI_Root";
         }
         else

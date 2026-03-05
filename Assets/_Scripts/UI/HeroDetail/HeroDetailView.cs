@@ -2,6 +2,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum DescriptionType
+{
+    Skill,
+    Augment,
+    LevelReward
+}
 public class HeroDetailView : BaseUI
 {
     [Header("메인 정보")]
@@ -16,6 +22,12 @@ public class HeroDetailView : BaseUI
     [SerializeField] private TMP_Text _heroExpTxt;
     [SerializeField] private Image _heroExpBar;
 
+    [Header("상세 설명 설정")]
+    [SerializeField] private Transform _skillDesContainer;
+    [SerializeField] private Transform _augmentDesContainer;
+    [SerializeField] private Transform _levelRewardDesContainer;
+    [SerializeField] private GameObject _desPanelPrefab;
+
     [Header("스텟 페이지 설정")]
     [SerializeField] private Transform _statContainer;
     [SerializeField] private GameObject _statPanelPrefab;
@@ -28,6 +40,15 @@ public class HeroDetailView : BaseUI
 
     // Presenter에서 버튼 클릭 이벤트를 연결하기 위한 프로퍼티
     public Button UpgradeBtn => _upgradeBtn;
+
+    // 타입에 맞는 컨테이너를 반환하는 헬퍼 프로퍼티/메서드
+    private Transform GetContainer(DescriptionType type) => type switch
+    {
+        DescriptionType.Skill => _skillDesContainer,
+        DescriptionType.Augment => _augmentDesContainer,
+        DescriptionType.LevelReward => _levelRewardDesContainer,
+        _ => null
+    };
 
     // 기본 정보 세팅
     public void SetHeroBaseInfo(string name, string desc, string type, string role)
@@ -72,6 +93,14 @@ public class HeroDetailView : BaseUI
         foreach (Transform child in _statContainer) Destroy(child.gameObject);
     }
 
+    //상세설명 판넬 초기화
+    public void ClearDescription(DescriptionType type)
+    {
+        Transform container = GetContainer(type);
+        if (container == null) return;
+        foreach (Transform child in container) Destroy(child.gameObject);
+    }
+
     public void AddStatItem(string name, string value, Sprite icon)
     {
         GameObject obj = Instantiate(_statPanelPrefab, _statContainer);
@@ -81,4 +110,15 @@ public class HeroDetailView : BaseUI
         }
     }
 
+    public void AddDescriptionItem(DescriptionType type, string name, string des)
+    {
+        Transform container = GetContainer(type);
+        if (container == null) return;
+
+        GameObject obj = Instantiate(_desPanelPrefab, container);
+        if (obj.TryGetComponent(out DescriptionPanelUI desItem))
+        {
+            desItem.SetDes(name, des);
+        }
+    }
 }
