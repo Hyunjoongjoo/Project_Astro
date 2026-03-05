@@ -574,7 +574,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
-  _heroData: {fileID: 11400000, guid: 3493e78db420021419319cf9713f7ef5, type: 2}
+  _heroId: hero_tank
+  _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
+  _normalSkill: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
+  _attackRange: 2
   _firePoint: {fileID: 128638915413792048}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
@@ -582,7 +585,6 @@ MonoBehaviour:
   _unitStat: {fileID: 707048002635603553}
   _skillData: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
   _skillComponent: {fileID: 4569985432753418785}
-  _projectile: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
 --- !u!114 &707048002635603553
 MonoBehaviour:
   m_ObjectHideFlags: 0

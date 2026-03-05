@@ -13,7 +13,10 @@ public enum UnitSize
 public class HeroController : MobilityUnit, IBasicAttack
 {
 
-    [SerializeField] private HeroDataSO _heroData;
+    [SerializeField] private string _heroId;
+    [SerializeField] private NormalAttackDataSO _normalAttack;
+    [SerializeField] private SkillDataSO _normalSkill;
+    [SerializeField] private float _attackRange;
     [SerializeField] private Transform _firePoint;
 
     [Header("타워 레퍼런스")]
@@ -25,7 +28,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private SkillDataSO _skillData;
     [SerializeField] private MonoBehaviour _skillComponent;
 
-    private float _attackRange;
     private float _respawnTime;
     private AttackType _attackType;
     private GameObject _projectile;
@@ -114,9 +116,8 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         unitType = UnitType.Hero;
 
-        _attackRange = _heroData.AttackRange;
-        _attackType = _heroData.NormalAttack.AttackType;
-        _projectile = _heroData.NormalAttack.EffectPrefab;
+        _attackType = _normalAttack.AttackType;
+        _projectile = _normalAttack.EffectPrefab;
 
         if (!Object.HasStateAuthority)
         {
@@ -128,7 +129,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             _unitStat = GetComponent<UnitStat>();
         }
 
-        HeroStatData statData = HeroManager.Instance.GetStatus(_heroData.HeroID);
+        HeroStatData statData = HeroManager.Instance.GetStatus(_heroId);
 
         //UnitStat 초기화
         _unitStat.Init(statData);
@@ -141,7 +142,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         agent.speed = moveSpeed;
 
         //스킬
-        EquipSkill(_heroData.NormalSkill);
+        EquipSkill(_normalSkill);
         ApplySkillAugments();
         if (agent != null)
         {
@@ -248,6 +249,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         //타겟이 죽었는데 아직 참조 남아있는 경우 즉시 재탐색
         if (_currentTarget == null || _currentTarget.IsDead)
         {
+            _currentTarget = null;
             _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         }
 
@@ -744,11 +746,6 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        if (_heroData == null)
-        {
-            return;
-        }
-
         //3.3 여현구
         //배열에서 구조체로 바뀌어서 여기 수정했습니다.
         for (int i = 0; i < SlotData_5.Length; i++)
@@ -766,7 +763,7 @@ public class HeroController : MobilityUnit, IBasicAttack
                 continue;
             }
 
-            if (so.TargetHeroID != _heroData.HeroID)
+            if (so.TargetHeroID != _heroId)
             {
                 continue;
             }
