@@ -19,6 +19,10 @@ public class AugmentController : NetworkBehaviour
     [Header("스킬 증강 데이터베이스")]
     [SerializeField] private List<SkillAugmentSO> _allSkillAugments;
 
+    //영웅들의 기본 스킬 SO들을 담아둘 리스트 추가
+    [Header("기본 스킬 데이터베이스 (영웅 카드용)")]
+    [SerializeField] private List<SkillDataSO> _allBaseSkills;
+
     //캐싱용
     private AugmentData _localSelectedData;
 
@@ -35,7 +39,7 @@ public class AugmentController : NetworkBehaviour
     public override void Spawned()
     {
         //할당된 SO 데이터를 바탕으로 DeckManager 가동
-        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO);
+        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO, _allBaseSkills);
         //현재 씬에 있는 스테이지 매니저 찾아서 캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
     }
