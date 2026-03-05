@@ -4,8 +4,8 @@ using UnityEngine.UI;
 public class HpBarItem : MonoBehaviour
 {
     [SerializeField] private Image _fillImg;
-    [SerializeField] private Color _blueTeamColor = Color.blue;
-    [SerializeField] private Color _redTeamColor = Color.red;
+    [SerializeField] private Sprite _blueTeamSpr;
+    [SerializeField] private Sprite _redTeamSpr;
     [SerializeField] private float _showDuration = 2f;
     [SerializeField] private Vector3 _offset = new Vector3(0, 2.5f, 0);
 
@@ -20,7 +20,7 @@ public class HpBarItem : MonoBehaviour
         _mainCam = Camera.main;
         _poolTag = poolTag;
 
-        _fillImg.color = (team == Team.Blue) ? _blueTeamColor : _redTeamColor;
+        _fillImg.sprite = (team == Team.Blue) ? _blueTeamSpr : _redTeamSpr;
         UpdateHp(hpRatio);
 
         _timer = _showDuration;

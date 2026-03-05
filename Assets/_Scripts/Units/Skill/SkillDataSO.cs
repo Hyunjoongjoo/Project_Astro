@@ -7,6 +7,12 @@ public enum SkillType
     augment_skill,
     augment_skill_enhance
 }
+public enum EffectAttachType
+{
+    World,      // 그냥 월드에 생성
+    Caster,     // 시전자에 붙음
+    Target      // 타겟에 붙음
+}
 
 public abstract class SkillDataSO : ScriptableObject
 {
@@ -21,8 +27,9 @@ public abstract class SkillDataSO : ScriptableObject
     [SerializeField] private float _cooldown;
     [SerializeField] private float _skillRange;
     [SerializeField] private GameObject _effectPrefab;
-
-    public abstract IHeroSkill CreateSkillComponent(GameObject owner);
+    [SerializeField] private float _effectScale;
+    [SerializeField] private float _effectLifeTime;
+    [SerializeField] private EffectAttachType _attachType;
 
     public virtual SkillRuntimeData CreateRuntimeData()
     {
@@ -30,6 +37,8 @@ public abstract class SkillDataSO : ScriptableObject
         {
             Cooldown = _cooldown,
             SkillRange = _skillRange,
+            EffectPrefab = _effectPrefab,
+            EffectLifeTime = _effectLifeTime,
             IsAreaSkill = false,
             ShotCount = 1,
             DamageMultiplier = 1f,
@@ -41,11 +50,14 @@ public abstract class SkillDataSO : ScriptableObject
     public string SkillId => _skillId;
     public string HeroId => _heroId;
     public SkillType SkillType => _skillType;
+    public string SkillName => _skillName;
+    public string SkillDescription => _skillDescription;
+    public string Note => _note;
     public float InitCooldown => _initCooldown;
     public float Cooldown => _cooldown;
     public float SkillRange => _skillRange;
     public GameObject EffectPrefab => _effectPrefab;
-    public string SkillName => _skillName;
-    public string SkillDescription => _skillDescription;
-    public string Note => _note;
+    public float EffectScale => _effectScale;
+    public float EffectLifeTime => _effectLifeTime;
+    public EffectAttachType AttachType => _attachType;
 }

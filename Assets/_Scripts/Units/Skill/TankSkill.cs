@@ -2,10 +2,11 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class TankSkill : NetworkBehaviour, IHeroSkill
+public class TankSkill : MonoBehaviour, IHeroSkill
 {
     [SerializeField] private TankSkillSO _data;
 
+    private StatModifier _damageReductionModifier;
     private TickTimer _timer;
     private bool _isActive;
     private HeroController _caster;
@@ -19,6 +20,7 @@ public class TankSkill : NetworkBehaviour, IHeroSkill
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
+        Debug.Log($"[Skill Execute] {caster.name} skill 실행 | EffectPrefab: {runtime.EffectPrefab}");
         if (!caster.Object.HasStateAuthority)
         {
             return false;
@@ -32,9 +34,12 @@ public class TankSkill : NetworkBehaviour, IHeroSkill
         _caster = caster;
 
         _isActive = true;
-        _timer = TickTimer.CreateFromSeconds(Runner, runtime.Duration);
-        _caster.SetDamageReduction(runtime.DamageReductionRate);
-        RPC_PlayEffect(caster.Object.Id);
+        _timer = TickTimer.CreateFromSeconds(caster.Runner, runtime.Duration);
+        _damageReductionModifier = new StatModifier(runtime.DamageReductionRate, StatModType.Flat, this);
+
+        _caster.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, _damageReductionModifier);
+
+        _caster.RPC_PlaySkillEffect(caster.transform.position, caster.transform.rotation);
 
         return true;
     }
@@ -47,27 +52,17 @@ public class TankSkill : NetworkBehaviour, IHeroSkill
         }
     }
 
-    public override void FixedUpdateNetwork()
+    private void Update()
     {
-        if (!Object.HasStateAuthority)
-        {
-            return;
-        }
-
         if (!_isActive)
         {
             return;
         }
 
-        if (_timer.Expired(Runner))
+        if (_timer.Expired(_caster.Runner))
         {
             DeactivateDefense();
         }
-    }
-
-    private void ActivateDefense()
-    {
-        
     }
 
     private void DeactivateDefense()
@@ -76,38 +71,10 @@ public class TankSkill : NetworkBehaviour, IHeroSkill
 
         if (_caster != null)
         {
-            _caster.ClearDamageReduction();
+            _caster.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);
             _caster = null;
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayEffect(NetworkId casterId)
-    {
-        if (_data.EffectPrefab == null)
-        {
-            return;
-        }
-
-        if (!Runner.TryFindObject(casterId, out NetworkObject casterObject))
-        {
-            return;
-        }
-
-        Transform casterTransform = casterObject.transform;
-
-        GameObject effects = Instantiate(
-            _data.EffectPrefab,
-            casterTransform.position,
-            casterTransform.rotation,
-            casterTransform//부모 지정
-        );
-
-        //부모에 붙였으므로 로컬 기준으로 정렬
-        effects.transform.localPosition = Vector3.zero;
-        effects.transform.localRotation = Quaternion.identity;
-        effects.transform.localScale = Vector3.one * 17f;
-
-        Destroy(effects, _data.Duration);
-    }
+    public void TickSkill(NetworkRunner runner){}
 }

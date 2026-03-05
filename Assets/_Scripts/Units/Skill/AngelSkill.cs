@@ -1,9 +1,9 @@
-﻿using DG.Tweening;
-using Fusion;
+﻿using Fusion;
 using UnityEngine;
 
 
-public class AngelSkill : NetworkBehaviour, IHeroSkill
+
+public class AngelSkill : MonoBehaviour, IHeroSkill
 {
     [SerializeField] private AngelSkillSO _data;
 
@@ -26,7 +26,7 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
 
             foreach (var hit in hits)
             {
-                UnitBase unit = hit.GetComponentInParent<UnitBase>();
+                UnitBase unit = hit.GetComponent<UnitBase>();
                 if (unit == null || unit.IsDead)
                 {
                     continue;
@@ -64,7 +64,7 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
             }
 
             caster.HealUnit(target, runtime.HealAmount);
-            RPC_PlayHealEffect(target.Object.Id, runtime.EffectLifeTime);
+            caster.RPC_PlayHealEffect(target.Object.Id);
         }
         else
         {
@@ -101,7 +101,7 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
                 //}
 
                 caster.HealUnit(unit, runtime.HealAmount);
-                RPC_PlayHealEffect(unit.Object.Id, runtime.EffectLifeTime);
+                caster.RPC_PlayHealEffect(unit.Object.Id);
                 healedAnyone = true;
             }
 
@@ -142,10 +142,10 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
                 continue;
             }
 
-            if (unit == caster)
-            {
-                continue;
-            }
+            //if (unit == caster)
+            //{
+            //    continue;
+            //}
 
             if (unit.IsDead)
             {
@@ -169,29 +169,5 @@ public class AngelSkill : NetworkBehaviour, IHeroSkill
         return best;
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayHealEffect(NetworkId targetId, float effectLifeTime)
-    {
-        if (_data.EffectPrefab == null)
-        {
-            return;
-        }
-
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
-        {
-            return;
-        }
-
-        GameObject effects = Instantiate(
-            _data.EffectPrefab,
-            targetObj.transform.position,
-            Quaternion.identity,
-            targetObj.transform //자식으로 부착
-        );
-
-        effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(2f, 0.2f).SetEase(Ease.OutBack);
-
-        Destroy(effects, effectLifeTime);
-    }
+    public void TickSkill(NetworkRunner runner){}
 }
