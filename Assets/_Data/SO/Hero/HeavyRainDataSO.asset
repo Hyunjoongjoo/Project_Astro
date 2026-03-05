@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 096b58b82b4fe5a49bf4e04fda6d9540, type: 3}
+  m_Name: HeavyRainDataSO
+  m_EditorClassIdentifier: Assembly-CSharp::HeroDataSO
+  _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
+  _heroId: hero_heavyrain
+  _maxHealth: 80
+  _moveSpeed: 6
+  _normalSkill: {fileID: 11400000, guid: 2858029cad763fe4e81a7364d1dd7fd8, type: 2}
+  _summonCooldown: 11
+  _attackRange: 5
+  _attackSpeed: 1.5
+  _attackPower: 20
+  _searchRange: 9
+  _healAmount: 0

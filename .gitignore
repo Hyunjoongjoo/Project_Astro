@@ -80,6 +80,8 @@ crashlytics-build.properties
 
 # Third-party Assets
 /[Aa]ssets/SecurityAssets/
+/[Aa]ssets/Plugins/Demigiant/
+/[Aa]ssets/GeneratedLocalRepo/
 
 # Visual Studio Code (VSC)
 .vscode/
@@ -107,9 +109,9 @@ crashlytics-build.properties
 /[Aa]ssets/ExternalDependencyManager.meta
 
 /[Aa]ssets/Plugins/x86_64/FirebaseCppApp*
-/[Aa]ssets/Plugins/Android/Firebase/
-/[Aa]ssets/Plugins/iOS/Firebase/
-/[Aa]ssets/Plugins/tvOS/Firebase/
+/[Aa]ssets/Plugins/Android/
+/[Aa]ssets/Plugins/iOS/
+/[Aa]ssets/Plugins/tvOS/
 
 # 파일과 메타 파일을 세트로 이그노어
 /[Aa]ssets/[Ss]treaming[Aa]ssets/google-services-desktop.json
@@ -132,3 +134,10 @@ crashlytics-build.properties
 # iOS용 설정
 /[Aa]ssets/GoogleService-Info.plist
 /[Aa]ssets/GoogleService-Info.plist.meta
+
+
+# =========================================================================
+# Photon Fusion Package Files
+# =========================================================================
+
+/[Aa]ssets/Photon/

@@ -1,0 +1,7 @@
+아이템 데이터 테이블,,,,,,,
+ItemID,Name,Type,EffectGroupID,IconImage,IsStackable,Description
+int,string,Enum,int,string,bool,string
+1001,강화 철갑탄,Attack,1001,Icon_Ammo,1,기본 공격력 증가 아이템
+1002,초전도 가속기,Attack,1002,Icon_Accelerator,1,체력 50% 미만 시 공속 증가
+2001,티타늄 합금,Defense,2001,Icon_Alloy,1,받는 피해 감소
+4001,광전사 모듈,Hybrid,4001,Icon_Berserker,0,공격력 증가 및 체력 감소
