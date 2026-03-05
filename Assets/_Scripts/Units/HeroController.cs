@@ -134,6 +134,14 @@ public class HeroController : MobilityUnit, IBasicAttack
         _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = moveSpeed;
 
+        // 비트 마스킹 처리
+        StageManager stageManager = FindFirstObjectByType<StageManager>();
+
+        if (stageManager != null)
+        {
+            stageManager.MarkHeroUsed(Object.InputAuthority, _heroData.HeroID);
+        }
+
         //스킬
         EquipSkill(_heroData.NormalSkill);
         ApplySkillAugments();
