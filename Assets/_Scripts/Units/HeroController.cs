@@ -47,6 +47,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float AttackSpeed => _unitStat.AttackSpeed.Value;
     public float HealPower => _unitStat.HealPower.Value;
     public UnitStat UnitStat => _unitStat;
+    public NavMeshAgent Agent => agent;
     public LayerMask AllyLayer
     {
         get
@@ -686,7 +687,6 @@ $"CooldownReduction: {_unitStat.CooldownReduction.Value}"
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)
     {
-        Debug.Log("RPC_PlaySkillEffect 실행됨");
         if (_skillData == null)
         {
             return;
@@ -699,14 +699,19 @@ $"CooldownReduction: {_unitStat.CooldownReduction.Value}"
             return;
         }
 
-        Transform parent = null;
+        GameObject fx;
 
+        //캐스터에 붙는 이펙트
         if (_skillData.AttachType == EffectAttachType.Caster)
         {
-            parent = transform;
+            fx = Instantiate(prefab, transform);
+            fx.transform.localPosition = Vector3.zero;
+            fx.transform.localRotation = Quaternion.identity;
         }
-
-        GameObject fx = Instantiate(prefab, pos, rot, parent);
+        else//월드 좌표 기준 이펙트
+        {
+            fx = Instantiate(prefab, pos, rot);
+        }
 
         fx.transform.localScale = Vector3.one * _skillData.EffectScale;
 
