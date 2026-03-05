@@ -1,13 +1,12 @@
 ﻿using Fusion;
 using UnityEngine;
 
-public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
+public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 {
     [SerializeField] private HeavyrainSkillSO _data;
 
     private TickTimer _shotTimer;
     private int _remainingShots;
-
     private HeroController _caster;
     private UnitBase _target;
     private bool _isFiring;
@@ -32,6 +31,7 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
         }
 
         UnitBase target = caster.CurrentTarget;
+
         if (target == null || target.IsDead)
         {
             return false;
@@ -39,7 +39,7 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
 
         float dist = caster.GetAttackDistanceTo(target);
 
-        return dist <= _data.SkillRange;
+        return dist <= runtime.SkillRange;
     }
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
@@ -49,17 +49,25 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
             return false;
         }
 
+        UnitBase target = caster.CurrentTarget;
+
+        if (target == null || target.IsDead)
+        {
+            return false;
+        }
+
         _caster = caster;
-        _target = caster.CurrentTarget;
+        _target = target;
 
         _remainingShots = runtime.ShotCount;
         _isFiring = true;
 
-        FireOnce();
+        //첫 발 즉시 발사
+        FireOnce(runtime);
 
         if (_remainingShots > 0)
         {
-            _shotTimer = TickTimer.CreateFromSeconds(Runner, runtime.ShotInterval);
+            _shotTimer = TickTimer.CreateFromSeconds(caster.Runner, runtime.ShotInterval);
         }
         else
         {
@@ -67,6 +75,43 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
         }
 
         return true;
+    }
+
+    public void TickSkill(NetworkRunner runner)
+    {
+        if (!_isFiring)
+        {
+            return;
+        }
+
+        if (_caster == null || _target == null)
+        {
+            StopFiring();
+            return;
+        }
+
+        if (_target.IsDead || _target.Object == null)
+        {
+            StopFiring();
+            return;
+        }
+
+        if (!_shotTimer.ExpiredOrNotRunning(runner))
+        {
+            return;
+        }
+
+        if (_remainingShots <= 0)
+        {
+            StopFiring();
+            return;
+        }
+
+        SkillRuntimeData runtime = _data.CreateRuntimeData();
+
+        FireOnce(runtime);
+
+        _shotTimer = TickTimer.CreateFromSeconds(runner, runtime.ShotInterval);
     }
 
     public void ChangeSkillData(SkillDataSO newData)
@@ -77,53 +122,30 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
         }
     }
 
-    public override void FixedUpdateNetwork()
+    private void FireOnce(SkillRuntimeData runtime)
     {
-        if (!_isFiring)
-        {
-            return;
-        }
-
-        if (!_shotTimer.IsRunning || !_shotTimer.Expired(Runner))
-        {
-            return;
-        }
-
-        if (_remainingShots <= 0 ||
-            _caster == null ||
-            _target == null ||
-            _target.IsDead)
+        if (_caster == null || _target == null)
         {
             StopFiring();
             return;
         }
 
-        FireOnce();
-
-        if (_remainingShots > 0)
-        {
-            _shotTimer = TickTimer.CreateFromSeconds(Runner, _data.ShotInterval);
-        }
-        else
+        if (_target.IsDead || _target.Object == null)
         {
             StopFiring();
+            return;
         }
-    }
 
-    //데미지는 영웅컨트롤러로 위임, 연출만 RPC
-    private void FireOnce()
-    {
         _remainingShots--;
 
-        _caster.ApplyBarrageSkillDamage(_target, _data.DamageMultiplier);
+        //모든 클라이언트에 발사 연출
+        _caster.RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team, true);
 
-        if (_data.EffectPrefab != null)
-        {
-            RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team);
-        }
+        //서버에서 데미지 적용
+        _caster.ApplyBarrageSkillDamage(_target, runtime.DamageMultiplier);
+
     }
 
-    // 포격 종료 처리
     private void StopFiring()
     {
         _shotTimer = TickTimer.None;
@@ -132,34 +154,7 @@ public class HeavyrainSkill : NetworkBehaviour, IHeroSkill
         _caster = null;
         _isFiring = false;
     }
-
-    //투사체 연출
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team)
-    {
-        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
-        {
-            return;
-        }
-
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
-        {
-            return;
-        }
-
-        Vector3 start = casterObj.transform.position;
-        Vector3 end = targetObj.transform.position;
-
-        GameObject projectileObj = Instantiate(
-            _data.EffectPrefab,
-            start,
-            Quaternion.identity
-        );
-
-        Projectile projectile = projectileObj.GetComponent<Projectile>();
-        if (projectile != null)
-        {
-            projectile.Fire(end, team);
-        }
-    }
 }
+
+    
+

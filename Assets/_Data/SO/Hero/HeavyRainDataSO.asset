@@ -16,7 +16,7 @@ MonoBehaviour:
   _heroId: hero_heavyrain
   _maxHealth: 80
   _moveSpeed: 6
-  _normalSkill: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
+  _normalSkill: {fileID: 11400000, guid: 2858029cad763fe4e81a7364d1dd7fd8, type: 2}
   _summonCooldown: 11
   _attackRange: 5
   _attackSpeed: 1.5

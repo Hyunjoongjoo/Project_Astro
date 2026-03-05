@@ -15,13 +15,16 @@ MonoBehaviour:
   _skillId: normalSkill_heavyrain
   _heroId: hero_heavyrain
   _skillType: 1
+  _skillName: skill_name_hero_heavyrain
+  _skillDescription: skill_desc_hero_heavyrain
+  _note: 
   _initCooldown: 4
   _cooldown: 8
   _skillRange: 5
   _effectPrefab: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
-  _skillName: skill_name_hero_heavyrain
-  _skillDescription: skill_desc_hero_heavyrain
-  _note: 
+  _effectScale: 40
+  _effectLifeTime: 0.5
+  _attachType: 0
   _shotCount: 3
-  _shotInterval: 0.05
+  _shotInterval: 0.2
   _damageMultiplier: 1

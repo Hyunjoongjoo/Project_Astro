@@ -829,6 +829,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7230683875294501226, guid: ce244b7b0cdd7424f858393b3a26bfc1, type: 3}
+      propertyPath: maxHealth
+      value: 800
+      objectReference: {fileID: 0}
+    - target: {fileID: 7230683875294501226, guid: ce244b7b0cdd7424f858393b3a26bfc1, type: 3}
       propertyPath: _projectilePrefab
       value: 
       objectReference: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
@@ -9467,6 +9471,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7230683875294501226, guid: ce244b7b0cdd7424f858393b3a26bfc1, type: 3}
+      propertyPath: maxHealth
+      value: 800
+      objectReference: {fileID: 0}
+    - target: {fileID: 7230683875294501226, guid: ce244b7b0cdd7424f858393b3a26bfc1, type: 3}
       propertyPath: _projectilePrefab
       value: 
       objectReference: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
@@ -12675,6 +12683,10 @@ PrefabInstance:
     - target: {fileID: 7230683875294501226, guid: ce244b7b0cdd7424f858393b3a26bfc1, type: 3}
       propertyPath: team
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7230683875294501226, guid: ce244b7b0cdd7424f858393b3a26bfc1, type: 3}
+      propertyPath: maxHealth
+      value: 800
       objectReference: {fileID: 0}
     - target: {fileID: 7230683875294501226, guid: ce244b7b0cdd7424f858393b3a26bfc1, type: 3}
       propertyPath: _projectilePrefab
@@ -48172,6 +48184,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
+      propertyPath: maxHealth
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
       propertyPath: _attackPower
       value: 20
       objectReference: {fileID: 0}
@@ -49022,6 +49038,10 @@ PrefabInstance:
     - target: {fileID: 7230683875294501226, guid: ce244b7b0cdd7424f858393b3a26bfc1, type: 3}
       propertyPath: team
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7230683875294501226, guid: ce244b7b0cdd7424f858393b3a26bfc1, type: 3}
+      propertyPath: maxHealth
+      value: 800
       objectReference: {fileID: 0}
     - target: {fileID: 7230683875294501226, guid: ce244b7b0cdd7424f858393b3a26bfc1, type: 3}
       propertyPath: _projectilePrefab
@@ -50558,6 +50578,10 @@ PrefabInstance:
     - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
       propertyPath: team
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
+      propertyPath: maxHealth
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
       propertyPath: _attackPower

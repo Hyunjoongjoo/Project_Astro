@@ -1,12 +1,14 @@
-﻿using Fusion;
+﻿using DG.Tweening;
+using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
-using WebSocketSharp;
+
 
 public enum UnitSize
 {
     Small, Medium, Large
 }
+
 public class HeroController : MobilityUnit, IBasicAttack
 {
 
@@ -18,14 +20,14 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
-    private float _attackPower;
-    private float _attackSpeed;
-    private float _attackRange;
-    private float _healAmount;
-    private AttackType _attackType;
-    private GameObject _projectilePrefab;
-    private float _summonCooldown;
+    [SerializeField] private UnitStat _unitStat;
+    [SerializeField] private SkillDataSO _skillData;
+    [SerializeField] private MonoBehaviour _skillComponent;
 
+    private float _attackRange;
+    private float _respawnTime;
+    private AttackType _attackType;
+    private GameObject _projectile;
 
     private UnitBase _currentTarget;
 
@@ -40,13 +42,14 @@ public class HeroController : MobilityUnit, IBasicAttack
     private TickTimer _deployDelayTimer;
 
     private IHeroSkill _currentSkill;
-    private float _damageReductionRate = 0f;
 
-    public float AttackPower => _attackPower;
-    public float AttackSpeed => _attackSpeed;
     public float AttackRange => _attackRange;
     public UnitBase CurrentTarget => _currentTarget;
-    public float SummonCooldown => _summonCooldown;
+    public float RespawnTime => _respawnTime;
+    public float AttackPower => _unitStat.Attack.Value;
+    public float AttackSpeed => _unitStat.AttackSpeed.Value;
+    public float HealPower => _unitStat.HealPower.Value;
+    public UnitStat UnitStat => _unitStat;
     public LayerMask AllyLayer
     {
         get
@@ -96,62 +99,62 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         base.Spawned();
 
+        if (Object.HasStateAuthority)
+        {
+            networkedTeam = team;
+        }
+
+        _currentSkill = _skillComponent as IHeroSkill;
+
         unitType = UnitType.Hero;
+
+        _attackRange = _heroData.AttackRange;
+        _attackType = _heroData.NormalAttack.AttackType;
+        _projectile = _heroData.NormalAttack.EffectPrefab;
 
         if (!Object.HasStateAuthority)
         {
             return;
         }
 
-        if (_heroData != null)
+        if (_unitStat == null)
         {
-            // 기본 스탯
-            _attackPower = _heroData.AttackPower;
-            _attackSpeed = _heroData.AttackSpeed;
-            _attackRange = _heroData.AttackRange;
-            _attackType = _heroData.NormalAttack.AttackType;
-            searchRange = _heroData.SearchRange;
-            _healAmount = _heroData.HealAmount;
-            maxHealth = _heroData.MaxHealth;
-            moveSpeed = _heroData.MoveSpeed;
-            agent.speed = moveSpeed;
-            _projectilePrefab = _heroData.NormalAttack.EffectPrefab;
-            _summonCooldown = _heroData.SummonCooldown;
-
-            StageManager stageManager = FindFirstObjectByType<StageManager>();
-            
-            if (stageManager != null)
-            {
-                stageManager.MarkHeroUsed(Runner.LocalPlayer, _heroData.HeroID);
-            }
-
-            EquipSkill(_heroData.NormalSkill);
-
-            ApplySkillAugments();
+            _unitStat = GetComponent<UnitStat>();
         }
 
+        HeroStatData statData = HeroManager.Instance.GetStatus(_heroData.HeroID);
+
+        //UnitStat 초기화
+        _unitStat.Init(statData);
+        //Stat 기반 값 적용
+        maxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = maxHealth;
+        moveSpeed = _unitStat.MoveSpeed.Value;
+        searchRange = _unitStat.DetectRange.Value;
+        _respawnTime = _unitStat.RespawnTime.Value;
+        agent.speed = moveSpeed;
+
+        //스킬
+        EquipSkill(_heroData.NormalSkill);
+        ApplySkillAugments();
         if (agent != null)
         {
             agent.enabled = false;
 
-            // 스폰 위치가 네비 밖이거나 겹쳐있을 경우 보정
+            //// 스폰 위치가 네비 밖이거나 겹쳐있을 경우 보정
             if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
             {
                 transform.position = hit.position;
             }
 
-            //나중에 영웅 크기 적용할것이라면...
-            
+
             agent.enabled = true;
             agent.ResetPath();
         }
 
-        _damageReductionRate = 0f;
-
         _fsm = new UnitFSM();
 
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-        //_skillTimer = TickTimer.CreateFromSeconds(Runner, _skill.Data.initCooldown);
 
         CurrentState = UnitState.Idle;
     }
@@ -163,14 +166,28 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        if (_currentSkill == null)
+        _skillData = newSkillData;
+
+        if (_skillComponent == null)
         {
-            _currentSkill = newSkillData.CreateSkillComponent(gameObject);
+            return;
         }
 
-        _currentSkill.ChangeSkillData(newSkillData);
+        _currentSkill = _skillComponent as IHeroSkill;
 
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, newSkillData.InitCooldown);
+        if (_currentSkill == null)
+        {
+            return;
+        }
+
+        _currentSkill.ChangeSkillData(_skillData);
+
+        if (_skillTimer.IsRunning)
+        {
+            return;
+        }
+
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillData.InitCooldown);
     }
 
 
@@ -178,6 +195,8 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         // StateAuthority가 없는 클라이언트는 서버 상태를 그대로 반영만 함
         if (!Object.HasStateAuthority) return;
+
+        _currentSkill?.TickSkill(Runner);
 
         // 사망 상태면 행동 중단
         if (CurrentState == UnitState.Dead) return;
@@ -228,7 +247,6 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         //FSM 결과에 따라 행동 처리
         ApplyState(_fsm.State);
-
     }
 
     //FSM 결과에 따라 실제 유닛 행동을 적용 (AIState : 판단, UnitState : 애니메이션 등 표현)
@@ -332,12 +350,11 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         if (!_skillTimer.ExpiredOrNotRunning(Runner))
         {
+
             return false;
         }
 
         SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
-        runtime.HealAmount = _healAmount;
-        //증강적용시~~
 
         if (!_currentSkill.CanUse(this, runtime))
         {
@@ -351,7 +368,10 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
         _fsm.EnterSkill(Runner, 0.15f);
 
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, runtime.Cooldown);
+        float cooldownReduction = Mathf.Clamp(_unitStat?.CooldownReduction?.Value ?? 0f, 0f, 0.9f);
+        float finalCooldown = Mathf.Max(0.1f, runtime.Cooldown * (1f - cooldownReduction));
+
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, finalCooldown);
 
         return success;
     }
@@ -378,9 +398,9 @@ public class HeroController : MobilityUnit, IBasicAttack
             AttackRanged(_currentTarget.transform.position);
         }
 
-        // 다음 공격 가능 시간 설정 (AttackSpeed = 초당 공격 횟수)
-        float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
-        _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
+
+        float attackCooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
+        _attackTimer = TickTimer.CreateFromSeconds(Runner, attackCooldown);
     }
 
     private void RefreshTarget()
@@ -454,7 +474,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     //Projectile 연출 및 기본 공격 데미지 적용
     private void AttackRanged(Vector3 targetPos)
     {
-        if (_projectilePrefab == null || _firePoint == null)
+        if (_projectile == null || _firePoint == null)
         {
             return;
         }
@@ -464,9 +484,9 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        ApplyBasicAttackDamage(_currentTarget);
+        RPC_FireProjectile(Object.Id, _currentTarget.Object.Id, team, false);
 
-        RPC_FireProjectile(targetPos);
+        ApplyBasicAttackDamage(_currentTarget);
     }
 
     //모든 기본 공격은 이 메서드를 통해 TakeDamage로 진입
@@ -482,27 +502,19 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        target.TakeDamage(_attackPower);
+        target.TakeDamage(AttackPower);
     }
 
     public override void TakeDamage(float amount)
     {
-        if (_damageReductionRate > 0f)
+        float reduction = _unitStat.DamageReduction.Value;
+
+        if (reduction > 0f)
         {
-            amount *= (1f - _damageReductionRate);
+            amount *= (1f - reduction);
         }
 
         base.TakeDamage(amount);
-    }
-
-    public void SetDamageReduction(float rate)
-    {
-        _damageReductionRate = Mathf.Clamp01(rate);
-    }
-
-    public void ClearDamageReduction()
-    {
-        _damageReductionRate = 0f;
     }
 
     public void HealUnit(UnitBase target, float healAmount)
@@ -536,24 +548,135 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        float baseDamage = _attackPower;
+        float baseDamage = AttackPower;
         float finalDamage = baseDamage * damageRatio;
 
         target.TakeDamage(finalDamage);
     }
 
-    //기본 공격 / 포격형 스킬 공통 투사체 연출
+    //기본 공격
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_FireProjectile(Vector3 targetPos)
+    public void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team, bool isSkill)
     {
-        if (_projectilePrefab == null || _firePoint == null)
+        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
         {
             return;
         }
 
-        GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
+        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
+        {
+            return;
+        }
 
-        projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
+        HeroController hero = casterObj.GetComponent<HeroController>();
+        if (hero == null)
+        {
+            return;
+        }
+
+        GameObject projectilePrefab = null;
+
+        if (isSkill)
+        {
+            if (hero._skillData == null)
+            {
+                return;
+            }
+
+            projectilePrefab = hero._skillData.EffectPrefab;
+        }
+        else
+        {
+            projectilePrefab = hero._projectile;
+        }
+
+        if (projectilePrefab == null)
+        {
+            return;
+        }
+
+        if (hero._firePoint == null)
+        {
+            return;
+        }
+
+        Vector3 start = hero._firePoint.position;
+        Vector3 end = targetObj.transform.position;
+
+        GameObject projectileObj = Instantiate(projectilePrefab, start, Quaternion.identity);
+
+        Projectile projectile = projectileObj.GetComponent<Projectile>();
+
+        if (projectile != null)
+        {
+            projectile.Fire(end, team);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)
+    {
+        Debug.Log("RPC_PlaySkillEffect 실행됨");
+        if (_skillData == null)
+        {
+            return;
+        }
+
+        GameObject prefab = _skillData.EffectPrefab;
+
+        if (prefab == null)
+        {
+            return;
+        }
+
+        Transform parent = null;
+
+        if (_skillData.AttachType == EffectAttachType.Caster)
+        {
+            parent = transform;
+        }
+
+        GameObject fx = Instantiate(prefab, pos, rot, parent);
+
+        fx.transform.localScale = Vector3.one * _skillData.EffectScale;
+
+        Destroy(fx, _skillData.EffectLifeTime);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayHealEffect(NetworkId targetId)
+    {
+        if (_skillData == null)
+        {
+            return;
+        }
+
+        Debug.Log("RPC_PlayHealEffect 실행됨");
+        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
+        {
+            return;
+        }
+
+        GameObject prefab = _skillData.EffectPrefab;
+
+        if (prefab == null)
+        {
+            return;
+        }
+
+        Transform parent = null;
+
+        if (_skillData.AttachType == EffectAttachType.Target)
+        {
+            parent = targetObj.transform;
+        }
+
+        GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, parent);
+
+        effects.transform.localScale = Vector3.zero;
+        effects.transform.DOScale(_skillData.EffectScale, 0.5f).SetEase(Ease.OutBack);
+
+        Destroy(effects, _skillData.EffectLifeTime);
     }
 
     //스킬증강에 사용될 메서드
@@ -565,6 +688,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         StageManager stageManager = FindFirstObjectByType<StageManager>();
+
         if (stageManager == null)
         {
             return;
@@ -638,8 +762,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         _fsm?.ForceDead();
         StopMove();
-
-        ClearDamageReduction();
 
         // 목표 이벤트 구독 해제 후 부모 Die 호출 (Despawn)
         if (_currentTarget != null)

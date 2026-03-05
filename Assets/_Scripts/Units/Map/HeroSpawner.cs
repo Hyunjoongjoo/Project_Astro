@@ -13,7 +13,7 @@ public class HeroSpawner : NetworkBehaviour
     [SerializeField] private float _maxDeployDistance = 15f;
 
     // 플레이어,영웅 프리팹 기준으로 소환 쿨다운을 분리 관리
-    private readonly Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer> _summonTimers
+    private readonly Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer> _respawnTimers
     = new Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer>();
 
     public override void Spawned()
@@ -25,7 +25,7 @@ public class HeroSpawner : NetworkBehaviour
     {
         var key = (player, prefab);
 
-        if (!_summonTimers.TryGetValue(key, out TickTimer timer))
+        if (!_respawnTimers.TryGetValue(key, out TickTimer timer))
         {
             return true;
         }
@@ -77,7 +77,7 @@ public class HeroSpawner : NetworkBehaviour
     private void StartSummonCooldown(PlayerRef player, NetworkPrefabRef prefab, float cooldown)
     {
         var key = (player, prefab);
-        _summonTimers[key] = TickTimer.CreateFromSeconds(Runner, cooldown);
+        _respawnTimers[key] = TickTimer.CreateFromSeconds(Runner, cooldown);
     }
 
     //UI에서 사용할수있도록 메서드로 지정한 플레이어와 프리팹에 대한 남은 소환 쿨타임을 반환
@@ -91,7 +91,7 @@ public class HeroSpawner : NetworkBehaviour
 
         var key = (player, prefab);
 
-        if (!_summonTimers.TryGetValue(key, out TickTimer timer))
+        if (!_respawnTimers.TryGetValue(key, out TickTimer timer))
         {
             return 0f;
         }
@@ -140,7 +140,7 @@ public class HeroSpawner : NetworkBehaviour
                 hero.Setup(team);
                 //배치 및 지연 처리는 컨트롤러가 수행
                 hero.BeginDeploy(spawnPos, deployDelay);
-                StartSummonCooldown(caller, prefab, hero.SummonCooldown);
+                StartSummonCooldown(caller, prefab, hero.RespawnTime);
             });
 
         Debug.Log($"영웅 소환 완료!");
