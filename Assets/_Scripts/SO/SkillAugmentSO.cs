@@ -15,12 +15,18 @@ public class SkillAugmentSO : ScriptableObject
     [Tooltip("이 스킬 증강을 받을 수 있는 영웅 테이블 ID")] //현재 영웅 csv에 각 영웅의 스킬명 데이터가 없어서 여기서 연결하면 될 듯
     public string TargetHeroID;
 
-    [Header("UI 기본 정보")]
-    public string Title;
+    [Header("UI 텍스트 연동 (String.csv)")]
+    [Tooltip("증강 이름 스트링 ID, ex) augment1_name_hero_corsair")]
+    public string TitleStringID;
+
+    //구조체로 이관
+    //[Tooltip("증강 설명 스트링 ID, ex) augment1_desc_hero_corsair")]
+    //public string DescStringID;
+
+    [Header("스킬 증강 아이콘")]
     public Sprite Icon;
 
     [Header("티어별 UI 설명 => 0: 기본, 1: config N회 달성 후 강화")]
-    [TextArea]
     public SkillAugmentTier[] Tiers = new SkillAugmentTier[2];
 }
 
@@ -28,9 +34,8 @@ public class SkillAugmentSO : ScriptableObject
 [System.Serializable]
 public struct SkillAugmentTier
 {
-    [TextArea]
-    [Tooltip("설명")]
-    public string Description;
+    [Tooltip("설명 스트링 ID (String.csv의 id 컬럼 참조, ex) augment1_desc_hero_corsair)")]
+    public string DescStringID;
 
     [Tooltip("증강 선택 시, 영웅에게 실제로 꽂아줄 스킬 전투 데이터")]
     //SO 클래스 참조
