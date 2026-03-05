@@ -17,9 +17,9 @@ public class AugmentCardUI : MonoBehaviour
     public void Setup(AugmentData data)
     {
         _data = data;
-        _nameTxt.text = _data.name;
+        _nameTxt.text = _data.titleName;
         _descTxt.text = _data.description;
-        _iconImg.sprite = _data.icon;
+        _iconImg.sprite = _data.mainIcon;
 
         _isClicked = false;
         _selectBtn.interactable = true;
