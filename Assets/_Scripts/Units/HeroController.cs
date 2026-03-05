@@ -50,6 +50,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float AttackSpeed => _unitStat.AttackSpeed.Value;
     public float HealPower => _unitStat.HealPower.Value;
     public UnitStat UnitStat => _unitStat;
+    public HeroDataSO HeroData => _heroData;
     public LayerMask AllyLayer
     {
         get
@@ -134,15 +135,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = moveSpeed;
 
-        // 비트 마스킹 처리
-        StageManager stageManager = FindFirstObjectByType<StageManager>();
-
-        if (stageManager != null)
-        {
-            stageManager.MarkHeroUsed(Object.InputAuthority, _heroData.HeroID);
-        }
-
-        //스킬
         EquipSkill(_heroData.NormalSkill);
         ApplySkillAugments();
         if (agent != null)

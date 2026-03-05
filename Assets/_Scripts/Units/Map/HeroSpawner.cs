@@ -133,7 +133,7 @@ public class HeroSpawner : NetworkBehaviour
         Vector3 forwardDir = team == Team.Blue ? Vector3.forward : Vector3.back;
         Quaternion spawnRot = Quaternion.LookRotation(forwardDir);
 
-        Runner.Spawn(prefab, spawnPos, spawnRot,
+        Runner.Spawn(prefab, spawnPos, spawnRot, inputAuthority: caller,
             onBeforeSpawned: (Runner, obj) =>
             {
                 HeroController hero = obj.GetComponent<HeroController>();
@@ -141,6 +141,14 @@ public class HeroSpawner : NetworkBehaviour
                 //배치 및 지연 처리는 컨트롤러가 수행
                 hero.BeginDeploy(spawnPos, deployDelay);
                 StartSummonCooldown(caller, prefab, hero.RespawnTime);
+
+                StageManager stageManager = FindFirstObjectByType<StageManager>();
+                if (stageManager != null && hero.HeroData != null)
+                {
+                    // 소환을 요청한 클라이언트의 비트에 해당 영웅 ID 기록
+                    stageManager.MarkHeroUsed(caller, hero.HeroData.HeroID);
+                    Debug.Log($"[Masking] Player {caller}가 사용한 영웅 : {hero.HeroData.HeroID}");
+                }
             });
 
         Debug.Log($"영웅 소환 완료!");

@@ -527,9 +527,10 @@ public class StageManager : NetworkBehaviour
     public void MarkHeroUsed(PlayerRef unitOwner, string heroId)
     {
         if (!Object.HasStateAuthority) return;
-
+        Debug.Log("Object.HasStateAuthority가 true다.");
         if (PlayerDataMap.TryGet(unitOwner, out var data))
         {
+            Debug.Log("[Masking] 트라이 겟 성공해서 들어옴");
             int index = TableManager.Instance.HeroTable.GetAll().FindIndex(h => h.id == heroId);
 
             if (index >= 0 && index < 32)
