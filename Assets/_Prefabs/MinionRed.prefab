@@ -187,18 +187,19 @@ MonoBehaviour:
   maxHealth: 50
   deffense: 0
   team: 0
+  _networkedTeam: 0
   _CurrentHealth: 0
   _CurrentState: 0
   agent: {fileID: 8596131259578450949}
   moveSpeed: 6
-  unitSize: 1
+  moveType: 1
   searchRange: 4
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
-  _attackPower: 10
-  _attackSpeed: 1
+  _unitId: unit_minion
+  _unitStat: {fileID: 7786030501378965668}
   _attackRange: 3
   _attackType: 1
   _projectilePrefab: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}

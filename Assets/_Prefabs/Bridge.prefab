@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 7586776718950516128}
   - component: {fileID: 5021871959371261879}
   - component: {fileID: 114180171266941205}
+  - component: {fileID: 2419086661067105468}
   - component: {fileID: 834048530255958114}
   - component: {fileID: 1143006095204272091}
   m_Layer: 30
@@ -147,6 +148,18 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2419086661067105468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4342040058819189114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e06afd8dba25da47828c557178535da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitStat
 --- !u!114 &834048530255958114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,16 +175,17 @@ MonoBehaviour:
   maxHealth: 150
   deffense: 0
   team: 0
+  _networkedTeam: 0
   _CurrentHealth: 0
   _CurrentState: 0
-  _attackPower: 0
-  _attackSpeed: 1
-  _projectilePrefab: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  _unitId: unit_bridge
+  _unitStat: {fileID: 2419086661067105468}
+  _attackRange: 5
+  _projectilePrefab: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
   _firePoint: {fileID: 2974836632590487990}
-  _detectRange: 5
   _targetLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   _scanInterval: 0.5
 --- !u!114 &1143006095204272091
 MonoBehaviour:

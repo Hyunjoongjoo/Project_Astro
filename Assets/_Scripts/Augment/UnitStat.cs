@@ -78,6 +78,40 @@ public class UnitStat : MonoBehaviour
 
     }
 
+    public void Init(UnitData data)//03-06 오버로딩
+    {
+        MaxHp = new Stat(StatCalcMode.Standard, data.baseHp);
+        Attack = new Stat(StatCalcMode.Standard, data.baseAttackPower);
+        HealPower = new Stat(StatCalcMode.Standard, data.baseHealingPower);
+
+        AttackSpeed = new Stat(StatCalcMode.Delay, data.attackSpeed);
+        RespawnTime = new Stat(StatCalcMode.Delay, 0f);
+
+        MoveSpeed = new Stat(StatCalcMode.Speed, data.moveSpeed);
+        DetectRange = new Stat(StatCalcMode.Speed, data.detectionRange);
+
+        DamageReduction = new Stat(StatCalcMode.Additive, data.damageReduce);
+        CooldownReduction = new Stat(StatCalcMode.Additive, 0f);
+
+        MapStat(EffectType.IncreaseMaxHp, MaxHp);
+        MapStat(EffectType.DecreaseMaxHp, MaxHp);
+
+        MapStat(EffectType.IncreaseAttackPower, Attack);
+        MapStat(EffectType.IncreaseHealPower, HealPower);
+
+        MapStat(EffectType.IncreaseMoveSpeed, MoveSpeed);
+        MapStat(EffectType.DecreaseMoveSpeed, MoveSpeed);
+        MapStat(EffectType.IncreaseDetectionRange, DetectRange);
+
+        MapStat(EffectType.DecreaseDamageTaken, DamageReduction);
+        MapStat(EffectType.IncreaseDamageTaken, DamageReduction);
+
+        MapStat(EffectType.IncreaseAttackSpeed, AttackSpeed);
+        MapStat(EffectType.DecreaseAttackSpeed, AttackSpeed);
+        MapStat(EffectType.DecreaseCooldown, CooldownReduction);
+        MapStat(EffectType.DecreaseRespawnTime, RespawnTime);
+    }
+
     //딕셔너리에 매핑을 추가하는 헬퍼 함수
     private void MapStat(EffectType type, Stat statObj)
     {
