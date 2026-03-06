@@ -138,14 +138,14 @@ public class StageUI : MonoBehaviour
             AugmentManager.Instance.HideAugmentToggleBtn();
     }
 
-    public void ShowResultPanel(bool isVictory, List<HeroResultData> heroes, int gold)
+    public void ShowResultPanel(bool isVictory, List<HeroResultData> heroes, int goldAmount)
     {
         _victoryPanel.SetActive(isVictory);
         _defeatPanel.SetActive(!isVictory);
 
         // 골드 텍스트 설정
         if (_resultGoldText != null)
-            _resultGoldText.text = gold.ToString("N0");
+            _resultGoldText.text = goldAmount.ToString("N0");
 
         // 기존에 생성되어 있던 프리팹 삭제
         foreach (Transform child in _heroListPanel)

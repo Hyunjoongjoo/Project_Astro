@@ -17,7 +17,7 @@ public class HeroResult : MonoBehaviour
     public void Setup(HeroResultData data)
     {
         _heroIcon.sprite   = _heroIconDataSo.GetIcon(data.HeroId);
-        _heroNameText.text = TableManager.Instance.GetString(data.HeroId);
+        _heroNameText.text = TableManager.Instance.GetString(data.HeroName);
         _levelText.text    = $"LV {data.Level}";
 
         // 만약 직접 할당 안 했다면 코드에서 찾기
@@ -31,6 +31,8 @@ public class HeroResult : MonoBehaviour
         float finalTargetValue = Mathf.Min(endValue, 1f);
 
         _expSlider.value = startValue;
+
+        Debug.Log(startValue + " / " + endValue);
 
         // 애니메이션 시작
         _expSlider.DOValue(finalTargetValue, 1.5f)

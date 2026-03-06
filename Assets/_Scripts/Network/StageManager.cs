@@ -25,6 +25,7 @@ public struct RewardData
 public struct HeroResultData
 {
     public string HeroId;        
+    public string HeroName;        
     public int    Level;          
     public int    CurrentExp;     
     public int    AddedExp;       
@@ -479,6 +480,8 @@ public class StageManager : NetworkBehaviour
             _ = _userDataManager.UpdateRecord(isWin ? 1 : 0, isWin ? 0 : 1);
         }
 
+        int totalGold = _userDataManager.WalletModel.gold;
+
         List<HeroResultData> resultHeroes = new List<HeroResultData>();
         var allHeroTable = TableManager.Instance.HeroTable.GetAll();
 
@@ -498,12 +501,13 @@ public class StageManager : NetworkBehaviour
                     if (heroModel != null)
                     {
                         // 테이블에서 해당 레벨의 최대 경험치 정보 가져오기 (예시 테이블 참조)
-                        var levelData = TableManager.Instance.HeroLevelTable.Get(heroId);
+                        var levelData = TableManager.Instance.HeroLevelTable.Get(heroModel.level.ToString());
                         int maxExp = (levelData != null) ? levelData.expRequirement : 10000;
 
                         resultHeroes.Add(new HeroResultData
                         {
-                            HeroId     = tableData.heroName,
+                            HeroId     = tableData.id,
+                            HeroName   = tableData.heroName,
                             Level      = heroModel.level,
                             CurrentExp = heroModel.exp,
                             AddedExp   = reward.HeroExp,
