@@ -446,7 +446,6 @@ GameObject:
   - component: {fileID: 9158771151194973300}
   - component: {fileID: -7269745521372557208}
   - component: {fileID: -2192352356554374425}
-  - component: {fileID: 6531981757756036440}
   m_Layer: 6
   m_Name: hero_tank
   m_TagString: Untagged
@@ -577,16 +576,15 @@ MonoBehaviour:
   searchInterval: 0.3
   _heroId: hero_tank
   _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
+  _normalSkill: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
   _attackRange: 2
   _firePoint: {fileID: 128638915413792048}
-  _unitStat: {fileID: 707048002635603553}
-  _skillData: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
-  _normalSkill: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
-  _skillComponent: {fileID: 4569985432753418785}
-  _rpc: {fileID: 6531981757756036440}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
+  _unitStat: {fileID: 707048002635603553}
+  _skillData: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
+  _skillComponent: {fileID: 4569985432753418785}
 --- !u!114 &707048002635603553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -631,7 +629,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1134780754710619926}
   - {fileID: -2192352356554374425}
-  - {fileID: 6531981757756036440}
   ForceRemoteRenderTimeframe: 0
 --- !u!136 &-7269745521372557208
 CapsuleCollider:
@@ -673,20 +670,6 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
---- !u!114 &6531981757756036440
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1ae073cd1c89c24f968f9bf93bee56a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HeroEffectRPC
-  _normalProjectile: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
-  _skillProjectile: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
 --- !u!1 &1541514002332503806
 GameObject:
   m_ObjectHideFlags: 0

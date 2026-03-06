@@ -1,10 +1,11 @@
-using Fusion;
+﻿using Fusion;
 
 //5칸 영웅/스킬 보관함 전용 구조체
 public struct SlotData_5 : INetworkStruct
 {
     public const int Length = 5;//기획서대로
     public NetworkString<_32> Slot0, Slot1, Slot2, Slot3, Slot4;
+    public int Count => Length;
     public string Get(int i)
     {
         switch (i)

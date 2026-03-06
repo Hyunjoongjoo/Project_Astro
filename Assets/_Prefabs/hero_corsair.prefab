@@ -369,7 +369,6 @@ GameObject:
   - component: {fileID: 1679591168465454536}
   - component: {fileID: 479350263834020189}
   - component: {fileID: -3041197003229238917}
-  - component: {fileID: -18271709044422068}
   m_Layer: 6
   m_Name: hero_corsair
   m_TagString: Untagged
@@ -500,16 +499,15 @@ MonoBehaviour:
   searchInterval: 0.3
   _heroId: hero_corsair
   _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
+  _normalSkill: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
   _attackRange: 3
   _firePoint: {fileID: 533690703149539074}
-  _unitStat: {fileID: 250558184794622207}
-  _skillData: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
-  _normalSkill: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
-  _skillComponent: {fileID: 5510236954846484131}
-  _rpc: {fileID: -18271709044422068}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
+  _unitStat: {fileID: 250558184794622207}
+  _skillData: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
+  _skillComponent: {fileID: 5510236954846484131}
 --- !u!114 &250558184794622207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -554,7 +552,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6144675461439888625}
   - {fileID: 479350263834020189}
-  - {fileID: -18271709044422068}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &479350263834020189
 MonoBehaviour:
@@ -596,20 +593,6 @@ CapsuleCollider:
   m_Height: 3.201604
   m_Direction: 1
   m_Center: {x: 0, y: -0.026866077, z: 0.000004768371}
---- !u!114 &-18271709044422068
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1619433986598075239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1ae073cd1c89c24f968f9bf93bee56a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HeroEffectRPC
-  _normalProjectile: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
-  _skillProjectile: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
 --- !u!1 &1629638022262376932
 GameObject:
   m_ObjectHideFlags: 0

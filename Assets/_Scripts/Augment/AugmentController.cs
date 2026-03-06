@@ -180,6 +180,9 @@ public class AugmentController : NetworkBehaviour
         {
             AugmentExecutor.ApplyAugment(_stageManager, player, type, targetId);
 
+            //나를 포함한 모든 유저에게 갱신 알림을 보냄
+            RPC_NotifyTeammateRefresh(player);
+
             //호스트만 처리하도록 안으로 이동
             if (_stageManager.PlayerDataMap.TryGet(player, out PlayerNetworkData data))
             {
@@ -211,6 +214,19 @@ public class AugmentController : NetworkBehaviour
             if (_stageManager.CurrentState == StageState.AugmentSelection)
             {
                 _stageManager.RPC_ReportAugmentComplete(player);
+            }
+        }
+    }
+
+    //UI갱신 신호 쏘기
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_NotifyTeammateRefresh(PlayerRef ownerPlayer)
+    {
+        if (Runner.LocalPlayer != ownerPlayer)
+        {
+            if (_stageManager.PlayerDataMap.TryGet(ownerPlayer, out var latestData))
+            {
+                _stageManager.UpdateTeammateUI(ownerPlayer, latestData.OwnedHeroes);
             }
         }
     }
