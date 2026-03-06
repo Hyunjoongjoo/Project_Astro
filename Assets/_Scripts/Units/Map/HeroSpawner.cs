@@ -127,10 +127,7 @@ public class HeroSpawner : NetworkBehaviour
 
         Transform origin = GetDeployOrigin(team);
         float distance = Vector3.Distance(origin.position, spawnPos);
-
         float deployDelay = GetDeployDelay(distance);
-
-        float failSafeTime = deployDelay + 1.5f;
 
         //영웅 초기 방향 결정
         Vector3 forwardDir = team == Team.Blue ? Vector3.forward : Vector3.back;
@@ -141,7 +138,8 @@ public class HeroSpawner : NetworkBehaviour
             {
                 HeroController hero = obj.GetComponent<HeroController>();
                 hero.Setup(team);
-                hero.BeginDeploy(spawnPos, failSafeTime);//배치 시작
+                //배치 및 지연 처리는 컨트롤러가 수행
+                hero.BeginDeploy(spawnPos, deployDelay);
                 StartSummonCooldown(caller, prefab, hero.RespawnTime);
             });
 
