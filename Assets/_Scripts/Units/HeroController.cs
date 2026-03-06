@@ -556,6 +556,7 @@ public class HeroController : MobilityUnit, IBasicAttack
             amount *= (1f - reduction);
         }
         base.TakeDamage(amount);
+        Debug.Log($"[영웅체력] {name} : {CurrentHealth} / {MaxHealth}");
     }
 
     public void HealUnit(UnitBase target, float healAmount)
