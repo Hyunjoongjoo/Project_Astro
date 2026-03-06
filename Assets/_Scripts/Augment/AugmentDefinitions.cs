@@ -12,32 +12,6 @@ public enum AugmentType
     Item    //아이템 장착
 }
 
-//임시
-//영웅의 기본 스탯 + 각 유저의 성장치를 합친 결과물
-//파이어베이스에서 캡슐화하여 받을 예정
-[System.Serializable]
-public class HeroGrowthData
-{
-    public string nickname; //유저 닉네임 혹은 viewID
-    public int heroID; //테이블 참조
-
-    //방어 관련
-    public float health;            //체력
-    public float shield;            //쉴드
-    public float damageReduction;   //피감
-
-    //공격 관련
-    public float attack;
-    public float healPower;
-    public float attackSpeed;
-
-    //유틸 관련
-    public float moveSpeed;         //이속
-    public float respawnTime;       //리스폰
-    public float cooldownReduction; //쿨다운
-    public float detectRange;       //탐지범위
-}
-
 //스탯 연산 로직용 Enum
 
 

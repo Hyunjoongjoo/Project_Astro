@@ -713,7 +713,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
-  _heroData: {fileID: 11400000, guid: 60b56c67d9fd3a343839cf67611e871b, type: 2}
+  _heroId: hero_heavyrain
+  _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
+  _normalSkill: {fileID: 11400000, guid: 2858029cad763fe4e81a7364d1dd7fd8, type: 2}
+  _attackRange: 5
   _firePoint: {fileID: 4892445714994426902}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
@@ -721,7 +724,6 @@ MonoBehaviour:
   _unitStat: {fileID: 288590522490992711}
   _skillData: {fileID: 11400000, guid: 2858029cad763fe4e81a7364d1dd7fd8, type: 2}
   _skillComponent: {fileID: -2787799764655628976}
-  _projectile: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
 --- !u!114 &288590522490992711
 MonoBehaviour:
   m_ObjectHideFlags: 0

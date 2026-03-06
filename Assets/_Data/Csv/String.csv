@@ -75,6 +75,8 @@ ui_augment_hero_des,영웅 {0}을/를 사용할 수 있습니다,{0}에는 Hero 
 ui_augment_hero_respawn,재소환 대기시간 : {0}초,{0}에는 HeroStat 테이블의 respawnCooldown 참조
 ui_augment_hero_skill_name,스킬 [{0}],{0}에는 영웅이 가진 기본 스킬의 이름 스트링 id 참조
 ui_augment_hero_skill_cooldown,쿨타임: {0}초,{0}에는 영웅이 가진 기본 스킬의 쿨타임 값 참조
+ui_augment_skill_des,영웅 {0}의 스킬을 강화합니다,{0}에는 해당 증강 스킬을 보유한 영웅의 heroName 참조 (여현구 작성)
+ui_augment_skill_name_format,스킬 [{0}] 업그레이드,{0}에는 해당 증강 스킬을 보유한 영웅이 가진 기본 스킬의 이름 참조  (여현구 작성)
 ui_toast_team_change_success,팀이 교체되었습니다.,팀 교체 완료 시 출력될 토스트 메시지
 ui_toast_team_change_failed,팀 교체 신청이 거절되었습니다.,팀 교체 요청 거절될 시 출력될 토스트 메시지
 ui_toast_team_change_unable,{N}초 후 팀 교체 신청 가능,{N} = 팀 교체 신청 가능하기까지 남은 시간 (단위: 초)

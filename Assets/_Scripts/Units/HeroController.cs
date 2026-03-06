@@ -1,30 +1,26 @@
-﻿using DG.Tweening;
+﻿using System.Collections.Generic;
+using DG.Tweening;
 using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
 
-
-public enum UnitSize
-{
-    Small, Medium, Large
-}
-
 public class HeroController : MobilityUnit, IBasicAttack
 {
 
-    [SerializeField] private HeroDataSO _heroData;
+    [SerializeField] private string _heroId;
+    [SerializeField] private NormalAttackDataSO _normalAttack;
+    [SerializeField] private float _attackRange;
     [SerializeField] private Transform _firePoint;
+    [SerializeField] private UnitStat _unitStat;
+    [SerializeField] private SkillDataSO _skillData;
+    [SerializeField] private SkillDataSO _normalSkill;
+    [SerializeField] private MonoBehaviour _skillComponent;
 
     [Header("타워 레퍼런스")]
     [SerializeField] private UnitBase _enemyTowerA;
     [SerializeField] private UnitBase _enemyTowerB;
     [SerializeField] private UnitBase _enemyBridge;
 
-    [SerializeField] private UnitStat _unitStat;
-    [SerializeField] private SkillDataSO _skillData;
-    [SerializeField] private MonoBehaviour _skillComponent;
-
-    private float _attackRange;
     private float _respawnTime;
     private AttackType _attackType;
     private GameObject _projectile;
@@ -40,6 +36,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     private bool _isDeploying;
     private Vector3 _deployTarget;
     private TickTimer _deployDelayTimer;
+    private TickTimer _deployFailSafeTimer;
 
     private IHeroSkill _currentSkill;
 
@@ -50,7 +47,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float AttackSpeed => _unitStat.AttackSpeed.Value;
     public float HealPower => _unitStat.HealPower.Value;
     public UnitStat UnitStat => _unitStat;
-    public HeroDataSO HeroData => _heroData;
+    public NavMeshAgent Agent => agent;
     public LayerMask AllyLayer
     {
         get
@@ -74,7 +71,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     }
 
     //스포너에서 전달받은 위치와 지연 시간을 기준으로 배치 시작
-    //배치완료전 까지는 전투,FSM로직 동작x
+    //배치완료전 까지는 전투,FSM로직x
     public void BeginDeploy(Vector3 targetPos, float deployDelay)
     {
         if (!Object.HasStateAuthority)
@@ -84,7 +81,10 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         _deployTarget = targetPos;
         _deployDelayTimer = TickTimer.CreateFromSeconds(Runner, deployDelay);
+        float failSafeTime = deployDelay + 1.5f;
+        _deployFailSafeTimer = TickTimer.CreateFromSeconds(Runner, failSafeTime);
         _isDeploying = true;
+        MoveTo(_deployTarget);
     }
 
     private void FinishDeploy()//배치완료
@@ -94,6 +94,7 @@ public class HeroController : MobilityUnit, IBasicAttack
         //배치 직후 바로 타겟 탐색 가능하도록 초기화
         agent.ResetPath();
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _fsm?.ForceDetect();
     }
 
     public override void Spawned()
@@ -109,9 +110,8 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         unitType = UnitType.Hero;
 
-        _attackRange = _heroData.AttackRange;
-        _attackType = _heroData.NormalAttack.AttackType;
-        _projectile = _heroData.NormalAttack.EffectPrefab;
+        _attackType = _normalAttack.AttackType;
+        _projectile = _normalAttack.EffectPrefab;
 
         if (!Object.HasStateAuthority)
         {
@@ -123,7 +123,22 @@ public class HeroController : MobilityUnit, IBasicAttack
             _unitStat = GetComponent<UnitStat>();
         }
 
-        HeroStatData statData = HeroManager.Instance.GetStatus(_heroData.HeroID);
+        HeroStatData statData = HeroManager.Instance.GetStatus(_heroId);
+
+        Debug.Log(
+ $"[받아온 스텟]\n" +
+ $"HeroID: {_heroId}\n" +
+ $"BaseHp: {statData.BaseHp}\n" +
+ $"ipLvHp: {statData.ipLvHp}\n" +
+ $"baseAttackPower: {statData.baseAttackPower}\n" +
+ $"ipLvAttackPower: {statData.ipLvAttackPower}\n" +
+ $"baseHealingPower: {statData.baseHealingPower}\n" +
+ $"ipLvHealingPower: {statData.ipLvHealingPower}\n" +
+ $"attackSpeed: {statData.attackSpeed}\n" +
+ $"spawnCooldown: {statData.spawnCooldown}\n" +
+ $"moveSpeed: {statData.moveSpeed}\n" +
+ $"detectionRange: {statData.detectionRange}\n"
+ );
 
         //UnitStat 초기화
         _unitStat.Init(statData);
@@ -135,8 +150,24 @@ public class HeroController : MobilityUnit, IBasicAttack
         _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = moveSpeed;
 
-        EquipSkill(_heroData.NormalSkill);
+        Debug.Log(
+$"[적용된 스텟]\n" +
+$"MaxHp: {_unitStat.MaxHp.Value}\n" +
+$"Attack: {_unitStat.Attack.Value}\n" +
+$"HealPower: {_unitStat.HealPower.Value}\n" +
+$"AttackSpeed: {_unitStat.AttackSpeed.Value}\n" +
+$"RespawnTime: {_unitStat.RespawnTime.Value}\n" +
+$"MoveSpeed: {_unitStat.MoveSpeed.Value}\n" +
+$"DetectRange: {_unitStat.DetectRange.Value}\n" +
+$"DamageReduction: {_unitStat.DamageReduction.Value}\n" +
+$"CooldownReduction: {_unitStat.CooldownReduction.Value}"
+);
+
+        //스킬
+        EquipSkill(_normalSkill);
+
         ApplySkillAugments();
+
         if (agent != null)
         {
             agent.enabled = false;
@@ -196,7 +227,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         // StateAuthority가 없는 클라이언트는 서버 상태를 그대로 반영만 함
         if (!Object.HasStateAuthority) return;
 
-        _currentSkill?.TickSkill(Runner);
 
         // 사망 상태면 행동 중단
         if (CurrentState == UnitState.Dead) return;
@@ -206,7 +236,6 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        _fsm.TickSkill(Runner);
 
         if (_isDeploying)
         {
@@ -216,13 +245,36 @@ public class HeroController : MobilityUnit, IBasicAttack
                 return;
             }
 
-            MoveTo(_deployTarget);
+            if (!agent.hasPath)
+            {
+                MoveTo(_deployTarget);
+            }
 
-            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            //네비 도착 or 실제 거리 도착 둘중 하나면 탈출(고장 방지)
+            float dist = Vector3.Distance(transform.position, _deployTarget);
+            //콜라이더 크기에 따라 수치 수정해야 될수 있음
+            if ((!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance) || dist < 0.5f)
             {
                 FinishDeploy();
+                return;
             }
+            //충돌로 배치가 너무 오래 걸리는 경우 배치 강제 종료
+            if (_deployFailSafeTimer.Expired(Runner))
+            {
+                FinishDeploy();
+                return;
+            }
+
             return;
+        }
+        _currentSkill?.TickSkill(Runner);
+        _fsm.TickSkill(Runner);
+
+        //타겟이 죽었는데 아직 참조 남아있는 경우 즉시 재탐색
+        if (_currentTarget == null || _currentTarget.IsDead)
+        {
+            _currentTarget = null;
+            _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         }
 
         //탐지 상태일 때만 타겟 재탐색
@@ -444,30 +496,49 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private UnitBase GetClosestTower()
     {
-        // 함교도 없으면 타겟 없음 (사실상 게임 종료)
-        if (_enemyBridge == null) return null;
-
-        // 두 타워가 모두 없으면 함교
-        if (_enemyTowerA == null && _enemyTowerB == null) return _enemyBridge;
-
-        // 타워가 하나만 남은 경우 타워나 함교 중 가까운 쪽
-        if (_enemyTowerA == null)
+        //두 타워 다 없으면 null
+        if (_enemyTowerA == null && _enemyTowerB == null)
         {
-            float distTower = Vector3.Distance(transform.position, _enemyTowerB.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _enemyBridge.transform.position);
-            return distBridge < distTower ? _enemyBridge : _enemyTowerB;
+            return null;
         }
 
-        if (_enemyTowerB == null)
+        //둘 중 하나만 남았는데
+        //내가 공격하던 타워가 아니라면
+        //함교로 이동
+        if (_enemyTowerA != null && _enemyTowerB == null)
         {
-            float distTower = Vector3.Distance(transform.position, _enemyTowerA.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _enemyBridge.transform.position);
-            return distBridge < distTower ? _enemyBridge : _enemyTowerA;
+            if (_currentTarget == _enemyTowerA)
+            {
+                return _enemyTowerA;
+            }
+
+            return null;
         }
 
-        // 두 타워가 모두 살아있다면 둘 중 가까운 넘
-        float distA = Vector3.Distance(transform.position, _enemyTowerA.transform.position);
-        float distB = Vector3.Distance(transform.position, _enemyTowerB.transform.position);
+        if (_enemyTowerA == null && _enemyTowerB != null)
+        {
+            if (_currentTarget == _enemyTowerB)
+            {
+                return _enemyTowerB;
+            }
+
+            return null;
+        }
+
+        //둘 다 살아있으면 처음 선택한 타워 유지
+        if (_currentTarget == _enemyTowerA)
+        {
+            return _enemyTowerA;
+        }
+
+        if (_currentTarget == _enemyTowerB)
+        {
+            return _enemyTowerB;
+        }
+
+        float distA = (transform.position - _enemyTowerA.transform.position).sqrMagnitude;
+        float distB = (transform.position - _enemyTowerB.transform.position).sqrMagnitude;
+
         return distA <= distB ? _enemyTowerA : _enemyTowerB;
     }
 
@@ -616,7 +687,6 @@ public class HeroController : MobilityUnit, IBasicAttack
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)
     {
-        Debug.Log("RPC_PlaySkillEffect 실행됨");
         if (_skillData == null)
         {
             return;
@@ -629,14 +699,19 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        Transform parent = null;
+        GameObject fx;
 
+        //캐스터에 붙는 이펙트
         if (_skillData.AttachType == EffectAttachType.Caster)
         {
-            parent = transform;
+            fx = Instantiate(prefab, transform);
+            fx.transform.localPosition = Vector3.zero;
+            fx.transform.localRotation = Quaternion.identity;
         }
-
-        GameObject fx = Instantiate(prefab, pos, rot, parent);
+        else//월드 좌표 기준 이펙트
+        {
+            fx = Instantiate(prefab, pos, rot);
+        }
 
         fx.transform.localScale = Vector3.one * _skillData.EffectScale;
 
@@ -699,11 +774,6 @@ public class HeroController : MobilityUnit, IBasicAttack
             return;
         }
 
-        if (_heroData == null)
-        {
-            return;
-        }
-
         //3.3 여현구
         //배열에서 구조체로 바뀌어서 여기 수정했습니다.
         for (int i = 0; i < SlotData_5.Length; i++)
@@ -721,7 +791,7 @@ public class HeroController : MobilityUnit, IBasicAttack
                 continue;
             }
 
-            if (so.TargetHeroID != _heroData.HeroID)
+            if (so.TargetHeroID != _heroId)
             {
                 continue;
             }
@@ -756,6 +826,7 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         // 타이머를 즉시 만료시켜 다음 틱에 바로 재탐색
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _fsm?.ForceDetect();
     }
 
     public override void Die()

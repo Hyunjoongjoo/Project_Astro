@@ -21,6 +21,9 @@ public class UIManager : Singleton<UIManager>
     //팝업형이랑 그외에 UI가 들어갈 컨테이너들
     private Transform _windowContainer;
     private Transform _popupContainer;
+    private Transform _topContainer;
+
+    public Transform TopContainer => _topContainer; //탑컨테이너 참조가능하게 프로퍼티로
 
     protected override void OnSingletonAwake()
     {
@@ -33,14 +36,12 @@ public class UIManager : Singleton<UIManager>
     {
         if (_uiRoot != null) return;
 
-        //기존 씬에 Canvas가 있는지 먼저 확인
-        Canvas existingCanvas = Object.FindFirstObjectByType<Canvas>();
-        GameObject rootObj;
+        GameObject rootObj = GameObject.FindWithTag("MainCanvas"); //태그로 메인캔버스찾기
 
-        if (existingCanvas != null)
+        if (rootObj != null)
         {
             // 씬에 이미 캔버스가 있다면 그걸 루트로 사용
-            rootObj = existingCanvas.gameObject;
+            Canvas canvas = rootObj.GetOrAddComponent<Canvas>();
             rootObj.name = "@UI_Root";
         }
         else
@@ -58,6 +59,7 @@ public class UIManager : Singleton<UIManager>
         //컨테이너 생성 (이미 있으면 찾고, 없으면 생성)
         _windowContainer = FindOrCreateContainer("Windows", _uiRoot);
         _popupContainer = FindOrCreateContainer("Popups", _uiRoot);
+        _topContainer = FindOrCreateContainer("TopLayer", _uiRoot);
     }
     private Transform FindOrCreateContainer(string name, Transform parent)
     {

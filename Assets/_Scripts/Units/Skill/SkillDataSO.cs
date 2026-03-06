@@ -1,18 +1,6 @@
 ﻿using UnityEngine;
 
-public enum SkillType
-{
-    normal_attack,
-    normal_skill,
-    augment_skill,
-    augment_skill_enhance
-}
-public enum EffectAttachType
-{
-    World,      // 그냥 월드에 생성
-    Caster,     // 시전자에 붙음
-    Target      // 타겟에 붙음
-}
+
 
 public abstract class SkillDataSO : ScriptableObject
 {

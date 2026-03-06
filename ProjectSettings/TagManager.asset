@@ -6,6 +6,7 @@ TagManager:
   tags:
   - RedMain
   - BlueMain
+  - MainCanvas
   layers:
   - Default
   - TransparentFX
