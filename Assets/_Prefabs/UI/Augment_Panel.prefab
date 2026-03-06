@@ -887,8 +887,10 @@ MonoBehaviour:
   _uiName: 
   _fadeDuration: 0.25
   _scaleDuration: 0.25
-  _cardPrefab: {fileID: 292972939330173462, guid: 95ac4e4c00ef68d44b557204cf24d474, type: 3}
   _cardContainer: {fileID: 3034164171325656085}
+  _heroCardPrefab: {fileID: 292972939330173462, guid: d7faa26f584ca864a86b5934dfa421f3, type: 3}
+  _skillCardPrefab: {fileID: 292972939330173462, guid: cd14326beac87254ca51af185e3ab8ff, type: 3}
+  _itemCardPrefab: {fileID: 0}
 --- !u!114 &994041081531647372
 MonoBehaviour:
   m_ObjectHideFlags: 0
