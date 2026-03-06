@@ -13,11 +13,6 @@ public enum UnitState
     Idle, Move, Attack, Dead, Skill 
 }
 
-public enum UnitSize
-{
-    Small, Medium, Large
-}
-
 public enum AttackType
 {
     Melee, Range

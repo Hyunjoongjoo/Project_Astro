@@ -162,16 +162,17 @@ MonoBehaviour:
   maxHealth: 150
   deffense: 0
   team: 0
+  _networkedTeam: 0
   _CurrentHealth: 0
   _CurrentState: 0
   _attackPower: 0
   _attackSpeed: 1
-  _projectilePrefab: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  _projectilePrefab: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
   _firePoint: {fileID: 2974836632590487990}
   _detectRange: 5
   _targetLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   _scanInterval: 0.5
 --- !u!114 &1143006095204272091
 MonoBehaviour:

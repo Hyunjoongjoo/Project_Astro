@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class MinionController : MobilityUnit, IBasicAttack
 {
-    [Header("공격 스테이터스")]
-    [SerializeField] private float _attackPower = 10f;
-    [SerializeField] private float _attackSpeed = 1f;
-    [SerializeField] private float _attackRange = 2f;
+    [Header("유닛스탯")]
+    [SerializeField] private string _unitId;
+    [SerializeField] private UnitStat _unitStat;
+    [SerializeField] private float _attackRange;
 
     [Header("타입")]
     [SerializeField] private AttackType _attackType;
@@ -27,8 +27,8 @@ public class MinionController : MobilityUnit, IBasicAttack
     private TickTimer _attackTimer;
     private UnitFSM _fsm;
 
-    public float AttackPower => _attackPower;
-    public float AttackSpeed => _attackSpeed;
+    public float AttackPower => _unitStat.Attack.Value;
+    public float AttackSpeed => _unitStat.AttackSpeed.Value;
     public float AttackRange => _attackRange;
 
     public void Setup(Team myTeam)
@@ -57,6 +57,23 @@ public class MinionController : MobilityUnit, IBasicAttack
         unitType = UnitType.Minion;
 
         if (!Object.HasStateAuthority) return;
+
+        if (_unitStat == null)
+        {
+            _unitStat = GetComponent<UnitStat>();
+        }
+
+        UnitData data = TableManager.Instance.UnitTable.Get(_unitId);
+
+        _unitStat.Init(data);
+
+        maxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = maxHealth;
+
+        moveSpeed = _unitStat.MoveSpeed.Value;
+        searchRange = _unitStat.DetectRange.Value;
+
+        agent.speed = moveSpeed;
 
         _fsm = new UnitFSM();
 
@@ -159,8 +176,7 @@ public class MinionController : MobilityUnit, IBasicAttack
             AttackRanged(_currentTarget.transform.position);
         }
 
-        // 다음 공격 가능 시간 설정 (AttackSpeed = 초당 공격 횟수)
-        float cooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
+        float cooldown = 1f / Mathf.Max(AttackSpeed, 0.01f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
     }
 

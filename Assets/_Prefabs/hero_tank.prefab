@@ -569,7 +569,7 @@ MonoBehaviour:
   _CurrentState: 0
   agent: {fileID: 7299576946842487594}
   moveSpeed: 7
-  unitSize: 2
+  moveType: 1
   searchRange: 5
   targetLayer:
     serializedVersion: 2
