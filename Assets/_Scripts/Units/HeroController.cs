@@ -49,10 +49,12 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float HealPower => _unitStat.HealPower.Value;
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
+
     public SkillDataSO SkillData => _skillData;
     public GameObject Projectile => _projectile;
     public Transform FirePoint => _firePoint;
     public HeroEffectRPC EffectRPC => _rpc;
+    public string HeroId => _heroId;
     public LayerMask AllyLayer
     {
         get
