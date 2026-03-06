@@ -36,9 +36,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     //배치
     private bool _isDeploying;
     private Vector3 _deployTarget;
-    private TickTimer _deployDelayTimer;
     private TickTimer _deployFailSafeTimer;
-
     private IHeroSkill _currentSkill;
 
     public float AttackRange => _attackRange;
@@ -77,16 +75,13 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     //스포너에서 전달받은 위치와 지연 시간을 기준으로 배치 시작
     //배치완료전 까지는 전투,FSM로직x
-    public void BeginDeploy(Vector3 targetPos, float deployDelay)
+    public void BeginDeploy(Vector3 targetPos, float failSafeTime)
     {
         if (!Object.HasStateAuthority)
         {
             return;
         }
-
         _deployTarget = targetPos;
-        _deployDelayTimer = TickTimer.CreateFromSeconds(Runner, deployDelay);
-        float failSafeTime = deployDelay + 1.5f;
         _deployFailSafeTimer = TickTimer.CreateFromSeconds(Runner, failSafeTime);
         _isDeploying = true;
         MoveTo(_deployTarget);
@@ -94,10 +89,8 @@ public class HeroController : MobilityUnit, IBasicAttack
 
     private void FinishDeploy()//배치완료
     {
-        _isDeploying = false;
-        _deployDelayTimer = default;
-        //배치 직후 바로 타겟 탐색 가능하도록 초기화
-        agent.ResetPath();
+        _isDeploying = false;     
+        agent.ResetPath();//배치 직후 바로 타겟 탐색 가능하도록 초기화
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _fsm?.ForceDetect();
     }
@@ -213,14 +206,6 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         if (_isDeploying)
         {
-            //배치중 일때는
-            if (!_deployDelayTimer.Expired(Runner)) { return; }
-
-            if (!agent.hasPath)
-            {
-                MoveTo(_deployTarget);
-            }
-
             //네비 도착 or 실제 거리 도착 둘중 하나면 탈출(고장 방지)
             float dist = Vector3.Distance(transform.position, _deployTarget);
             //콜라이더 크기에 따라 수치 수정해야 될수 있음
