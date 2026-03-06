@@ -65,9 +65,6 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
         _remainingShots = runtime.ShotCount;
         _isFiring = true;
 
-        //첫 발 즉시 발사
-        //FireOnce(runtime);
-
         if (_remainingShots > 0)
         {
             _shotTimer = TickTimer.CreateFromSeconds(caster.Runner, runtime.ShotInterval);
@@ -114,7 +111,6 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
             return;
         }
 
-
         FireOnce(_runtime);
 
         _shotTimer = TickTimer.CreateFromSeconds(runner, _runtime.ShotInterval);
@@ -130,7 +126,6 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 
     private void FireOnce(SkillRuntimeData runtime)
     {
-        Debug.Log($"HeavyRain Fire : {Time.time}");
         if (_caster == null || _target == null)
         {
             StopFiring();
