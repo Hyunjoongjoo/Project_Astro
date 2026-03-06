@@ -102,10 +102,9 @@ public class StageUI : MonoBehaviour
         Debug.Log("매칭된 플레이어 정보를 보여줌");
     }
 
-    public TeamCardSlotUI CreateTeammateSlot(string nickname)
+    public TeamCardSlotUI GetTeammateSlot(string nickname)
     {
-        var go = Instantiate(_teamMemberSlot, _teammateContainer);
-        var ui = go.GetComponent<TeamCardSlotUI>();
+        var ui = _teamMemberSlot.GetComponent<TeamCardSlotUI>();
         ui.Initialize(nickname);
         return ui; // 생성된 UI 컴포넌트를 반환하여 StageManager에게 전달
     }

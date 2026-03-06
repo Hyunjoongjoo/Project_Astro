@@ -245,7 +245,7 @@ public class StageManager : NetworkBehaviour
             {
                 data[2] = player.Value;
                 //팀원이면 UI 생성 및 등록
-                var ui = _stageUI.CreateTeammateSlot(player.Value.PlayerName.ToString());
+                var ui = _stageUI.GetTeammateSlot(player.Value.PlayerName.ToString());
                 RegisterTeammateUI(player.Key, ui);
             }
             else // 나도 아니고 같은 팀도 아님 -> 적이라는 뜻

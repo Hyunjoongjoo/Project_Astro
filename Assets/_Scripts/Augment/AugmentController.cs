@@ -180,10 +180,8 @@ public class AugmentController : NetworkBehaviour
         {
             AugmentExecutor.ApplyAugment(_stageManager, player, type, targetId);
 
-            // 변경된 데이터 가져오기
-            var newData = _stageManager.PlayerDataMap.Get(player).OwnedHeroes;
             //나를 포함한 모든 유저에게 갱신 알림을 보냄
-            RPC_NotifyTeammateRefresh(player, newData);
+            RPC_NotifyTeammateRefresh(player);
 
             //호스트만 처리하도록 안으로 이동
             if (_stageManager.PlayerDataMap.TryGet(player, out PlayerNetworkData data))
@@ -222,11 +220,14 @@ public class AugmentController : NetworkBehaviour
 
     //UI갱신 신호 쏘기
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_NotifyTeammateRefresh(PlayerRef ownerPlayer, SlotData_5 newData)
+    public void RPC_NotifyTeammateRefresh(PlayerRef ownerPlayer)
     {
         if (Runner.LocalPlayer != ownerPlayer)
         {
-            _stageManager.UpdateTeammateUI(ownerPlayer, newData);
+            if (_stageManager.PlayerDataMap.TryGet(ownerPlayer, out var latestData))
+            {
+                _stageManager.UpdateTeammateUI(ownerPlayer, latestData.OwnedHeroes);
+            }
         }
     }
 
