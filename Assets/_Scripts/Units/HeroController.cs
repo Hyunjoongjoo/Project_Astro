@@ -96,9 +96,8 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         _isDeploying = false;
         _deployDelayTimer = default;
-        //배치 직후 바로 타겟 탐색 가능하도록 초기화
-        agent.ResetPath();
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillData.InitCooldown);
         _fsm?.ForceDetect();
     }
 
@@ -191,13 +190,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         }
 
         _currentSkill.ChangeSkillData(_skillData);
-
-        if (_skillTimer.IsRunning)
-        {
-            return;
-        }
-
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillData.InitCooldown);
     }
 
 
@@ -213,18 +205,15 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         if (_isDeploying)
         {
-            //배치중 일때는
-            if (!_deployDelayTimer.Expired(Runner)) { return; }
-
-            if (!agent.hasPath)
+            if (!agent.pathPending)
             {
                 MoveTo(_deployTarget);
             }
 
-            //네비 도착 or 실제 거리 도착 둘중 하나면 탈출(고장 방지)
-            float dist = Vector3.Distance(transform.position, _deployTarget);
-            //콜라이더 크기에 따라 수치 수정해야 될수 있음
-            if ((!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance) || dist < 0.5f)
+            bool reached = !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance;
+
+            //DeployDelay는 최소 이동 시간
+            if (reached && _deployDelayTimer.ExpiredOrNotRunning(Runner))
             {
                 FinishDeploy();
                 return;
