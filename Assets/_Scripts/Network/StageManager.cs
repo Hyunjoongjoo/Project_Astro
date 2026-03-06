@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -50,6 +51,9 @@ public class StageManager : NetworkBehaviour
     private readonly float COUNTDOWN_INTERVAL = 1f;
 
     private PlayerNetworkData _localPlayerMap = default;
+
+    //팀원 UI관리용 딕셔너리
+    private Dictionary<PlayerRef, TeamCardSlotUI> _teammateUIList = new Dictionary<PlayerRef, TeamCardSlotUI>(); 
 
     private void Awake()
     {
@@ -210,7 +214,12 @@ public class StageManager : NetworkBehaviour
             if (player.Key == Runner.LocalPlayer) // 나.
                 data[0] = player.Value;
             else if (player.Value.Team == myTeam) // 나는 아닌데 같은 팀 -> 2:2라는 뜻
+            {
                 data[2] = player.Value;
+                //팀원이면 UI 생성 및 등록
+                var ui = _stageUI.CreateTeammateSlot(player.Value.PlayerName.ToString());
+                RegisterTeammateUI(player.Key, ui);
+            }
             else // 나도 아니고 같은 팀도 아님 -> 적이라는 뜻
             {
                 data[index] = player.Value;
@@ -465,4 +474,22 @@ public class StageManager : NetworkBehaviour
 
         SceneManager.LoadScene("Lobby");
     }
+    //---------------------UI 로직 --------------
+
+    // UI 생성 시점에 이 메서드를 호출하여 리스트에 등록해둠
+    public void RegisterTeammateUI(PlayerRef playerRef, TeamCardSlotUI ui)
+    {
+        if (!_teammateUIList.ContainsKey(playerRef))
+            _teammateUIList.Add(playerRef, ui);
+    }
+
+    // 외부에서 RPC를 통해 호출할 메서드
+    public void UpdateTeammateUI(PlayerRef ownerPlayer, SlotData_5 newData)
+    {
+        if (_teammateUIList.TryGetValue(ownerPlayer, out var ui))
+        {
+            ui.Refresh(newData); // TeamCardSlotUI의 Refresh 실행
+        }
+    }
+
 }
