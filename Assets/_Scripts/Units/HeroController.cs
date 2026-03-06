@@ -555,7 +555,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         {
             amount *= (1f - reduction);
         }
-
         base.TakeDamage(amount);
     }
 

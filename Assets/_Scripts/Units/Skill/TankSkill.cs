@@ -32,11 +32,18 @@ public class TankSkill : MonoBehaviour, IHeroSkill
 
         _caster = caster;
 
-        _isActive = true;
-        _timer = TickTimer.CreateFromSeconds(caster.Runner, runtime.Duration);
+        //남아있는 modifier 제거
+        if (_damageReductionModifier != null)
+        {
+            _caster.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);
+        }
+
         _damageReductionModifier = new StatModifier(runtime.DamageReductionRate, StatModType.Flat, this);
 
         _caster.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, _damageReductionModifier);
+
+        _isActive = true;
+        _timer = TickTimer.CreateFromSeconds(caster.Runner, runtime.Duration);
 
         _caster.EffectRPC.RPC_PlaySkillEffect(
         caster.transform.position,
@@ -76,9 +83,14 @@ public class TankSkill : MonoBehaviour, IHeroSkill
     {
         _isActive = false;
 
-        if (_caster != null)
+        if (_caster != null && _damageReductionModifier != null)
         {
-            _caster.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, _damageReductionModifier);
+            _caster.UnitStat.RemoveModifier(
+                EffectType.DecreaseDamageTaken,
+                this
+            );
+
+            _damageReductionModifier = null;
             _caster = null;
         }
     }
