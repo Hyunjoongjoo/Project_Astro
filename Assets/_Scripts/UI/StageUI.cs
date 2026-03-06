@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using DG.Tweening;
+﻿using DG.Tweening;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 // Stage 씬 인게임 시퀀스에 쓰이는 UI들을 제어하는 클래스
 public class StageUI : MonoBehaviour
@@ -10,14 +11,20 @@ public class StageUI : MonoBehaviour
     [SerializeField] private GameObject[] _rotationPanel;
     [SerializeField] private TextMeshProUGUI[] _introNameLabel;
     [SerializeField] private TextMeshProUGUI[] _ingameEnemyNameLabel;
-    [SerializeField] private GameObject _resultPanel;
-    [SerializeField] private GameObject _victoryPanel;
-    [SerializeField] private GameObject _defeatPanel;
     [SerializeField] private TextMeshProUGUI _countdownIndicator;
     [SerializeField] private TextMeshProUGUI _gameTimer;
     [SerializeField] private GameObject _teamMemberSlot;
     [SerializeField] private Transform _teammateContainer;
     [SerializeField] private Slider _augmentGauge;
+
+    [Header("Result")]
+    [SerializeField] private GameObject _resultPanel;
+    [SerializeField] private GameObject _victoryPanel;
+    [SerializeField] private GameObject _defeatPanel;
+    [SerializeField] private GameObject _heroResultPrefab;
+    [SerializeField] private Transform _heroListPanel;
+    [SerializeField] private TextMeshProUGUI _resultGoldText;
+
     public Button goLobbyBtn;
 
     private void Awake()
@@ -139,11 +146,32 @@ public class StageUI : MonoBehaviour
             AugmentManager.Instance.HideAugmentToggleBtn();
     }
 
-    public void ShowResultPanel(bool isVictory)
+    public void ShowResultPanel(bool isVictory, List<HeroResultData> heroes, int goldAmount)
     {
-        GameObject result = isVictory ? _victoryPanel : _defeatPanel;
-        result.SetActive(true);
-        _resultPanel.SetActive(true);
+        _victoryPanel.SetActive(isVictory);
+        _defeatPanel.SetActive(!isVictory);
 
+        // 골드 텍스트 설정
+        if (_resultGoldText != null)
+            _resultGoldText.text = goldAmount.ToString("N0");
+
+        // 기존에 생성되어 있던 프리팹 삭제
+        foreach (Transform child in _heroListPanel)
+            Destroy(child.gameObject);
+
+        Debug.Log(heroes.Count);
+
+        // 사용한 영웅들만 프리팹 생성 및 데이터 주입
+        foreach (var data in heroes)
+        {
+            Debug.Log(data.HeroId);
+            GameObject listObj = Instantiate(_heroResultPrefab, _heroListPanel);
+            if (listObj.TryGetComponent<HeroResult>(out var list))
+            {
+                list.Setup(data);
+            }
+        }
+
+        _resultPanel.SetActive(true);
     }
 }

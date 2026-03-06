@@ -64,10 +64,7 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
             }
 
             caster.HealUnit(target, runtime.HealAmount);
-            caster.EffectRPC.RPC_PlayHealEffect(
-                target.Object.Id,
-                caster.SkillData.EffectScale,
-                caster.SkillData.EffectLifeTime);
+            caster.RPC_PlayHealEffect(target.Object.Id);
         }
         else
         {
@@ -104,12 +101,7 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
                 //}
 
                 caster.HealUnit(unit, runtime.HealAmount);
-                caster.EffectRPC.RPC_PlayHealEffect(
-                    unit.Object.Id,
-                    caster.SkillData.EffectScale,
-                    caster.SkillData.EffectLifeTime
-                );
-
+                caster.RPC_PlayHealEffect(unit.Object.Id);
                 healedAnyone = true;
             }
 
@@ -150,7 +142,7 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
                 continue;
             }
 
-            //if (unit == caster) //현재는 스킬 사용 확인을 위해 본인 포함
+            //if (unit == caster)
             //{
             //    continue;
             //}
