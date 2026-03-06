@@ -48,6 +48,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float HealPower => _unitStat.HealPower.Value;
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
+    public string HeroId => _heroId;
     public LayerMask AllyLayer
     {
         get
