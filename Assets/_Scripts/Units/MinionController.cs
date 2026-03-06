@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MinionController : MobilityUnit, IBasicAttack
 {
-    [Header("유닛스탯")]
+    [Header("유닛 스테이터스")]
     [SerializeField] private string _unitId;
     [SerializeField] private UnitStat _unitStat;
     [SerializeField] private float _attackRange;
@@ -74,6 +74,16 @@ public class MinionController : MobilityUnit, IBasicAttack
         searchRange = _unitStat.DetectRange.Value;
 
         agent.speed = moveSpeed;
+
+        Debug.Log(
+$"[적용된 미니언 스텟]\n" +
+$"ID : {_unitId}\n" +
+$"HP : {maxHealth}\n" +
+$"Attack : {AttackPower}\n" +
+$"AttackSpeed : {AttackSpeed}\n" +
+$"MoveSpeed : {moveSpeed}\n" +
+$"DetectRange : {searchRange}"
+);
 
         _fsm = new UnitFSM();
 
