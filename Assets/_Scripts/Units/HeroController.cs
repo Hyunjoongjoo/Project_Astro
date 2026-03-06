@@ -15,6 +15,7 @@ public class HeroController : MobilityUnit, IBasicAttack
     [SerializeField] private SkillDataSO _skillData;
     [SerializeField] private SkillDataSO _normalSkill;
     [SerializeField] private MonoBehaviour _skillComponent;
+    [SerializeField] private HeroEffectRPC _rpc;
 
     [Header("타워 레퍼런스")]
     [SerializeField] private UnitBase _enemyTowerA;
@@ -48,7 +49,10 @@ public class HeroController : MobilityUnit, IBasicAttack
     public float HealPower => _unitStat.HealPower.Value;
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
-    public string HeroId => _heroId;
+    public SkillDataSO SkillData => _skillData;
+    public GameObject Projectile => _projectile;
+    public Transform FirePoint => _firePoint;
+    public HeroEffectRPC EffectRPC => _rpc;
     public LayerMask AllyLayer
     {
         get
@@ -92,15 +96,16 @@ public class HeroController : MobilityUnit, IBasicAttack
     {
         _isDeploying = false;
         _deployDelayTimer = default;
-        //배치 직후 바로 타겟 탐색 가능하도록 초기화
-        agent.ResetPath();
         _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
+        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillData.InitCooldown);
         _fsm?.ForceDetect();
     }
 
     public override void Spawned()
     {
         base.Spawned();
+
+        if (_rpc == null) { _rpc = GetComponent<HeroEffectRPC>(); }
 
         if (Object.HasStateAuthority)
         {
@@ -126,21 +131,6 @@ public class HeroController : MobilityUnit, IBasicAttack
 
         HeroStatData statData = HeroManager.Instance.GetStatus(_heroId);
 
-        Debug.Log(
- $"[받아온 스텟]\n" +
- $"HeroID: {_heroId}\n" +
- $"BaseHp: {statData.BaseHp}\n" +
- $"ipLvHp: {statData.ipLvHp}\n" +
- $"baseAttackPower: {statData.baseAttackPower}\n" +
- $"ipLvAttackPower: {statData.ipLvAttackPower}\n" +
- $"baseHealingPower: {statData.baseHealingPower}\n" +
- $"ipLvHealingPower: {statData.ipLvHealingPower}\n" +
- $"attackSpeed: {statData.attackSpeed}\n" +
- $"spawnCooldown: {statData.spawnCooldown}\n" +
- $"moveSpeed: {statData.moveSpeed}\n" +
- $"detectionRange: {statData.detectionRange}\n"
- );
-
         //UnitStat 초기화
         _unitStat.Init(statData);
         //Stat 기반 값 적용
@@ -150,19 +140,6 @@ public class HeroController : MobilityUnit, IBasicAttack
         searchRange = _unitStat.DetectRange.Value;
         _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = moveSpeed;
-
-        Debug.Log(
-$"[적용된 스텟]\n" +
-$"MaxHp: {_unitStat.MaxHp.Value}\n" +
-$"Attack: {_unitStat.Attack.Value}\n" +
-$"HealPower: {_unitStat.HealPower.Value}\n" +
-$"AttackSpeed: {_unitStat.AttackSpeed.Value}\n" +
-$"RespawnTime: {_unitStat.RespawnTime.Value}\n" +
-$"MoveSpeed: {_unitStat.MoveSpeed.Value}\n" +
-$"DetectRange: {_unitStat.DetectRange.Value}\n" +
-$"DamageReduction: {_unitStat.DamageReduction.Value}\n" +
-$"CooldownReduction: {_unitStat.CooldownReduction.Value}"
-);
 
         //스킬
         EquipSkill(_normalSkill);
@@ -213,13 +190,6 @@ $"CooldownReduction: {_unitStat.CooldownReduction.Value}"
         }
 
         _currentSkill.ChangeSkillData(_skillData);
-
-        if (_skillTimer.IsRunning)
-        {
-            return;
-        }
-
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillData.InitCooldown);
     }
 
 
@@ -228,33 +198,22 @@ $"CooldownReduction: {_unitStat.CooldownReduction.Value}"
         // StateAuthority가 없는 클라이언트는 서버 상태를 그대로 반영만 함
         if (!Object.HasStateAuthority) return;
 
-
         // 사망 상태면 행동 중단
         if (CurrentState == UnitState.Dead) return;
 
-        if (_fsm == null)
-        {
-            return;
-        }
-
+        if (_fsm == null) { return; }
 
         if (_isDeploying)
         {
-            //배치중 일때는
-            if (!_deployDelayTimer.Expired(Runner))
-            {
-                return;
-            }
-
-            if (!agent.hasPath)
+            if (!agent.pathPending)
             {
                 MoveTo(_deployTarget);
             }
 
-            //네비 도착 or 실제 거리 도착 둘중 하나면 탈출(고장 방지)
-            float dist = Vector3.Distance(transform.position, _deployTarget);
-            //콜라이더 크기에 따라 수치 수정해야 될수 있음
-            if ((!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance) || dist < 0.5f)
+            bool reached = !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance;
+
+            //DeployDelay는 최소 이동 시간
+            if (reached && _deployDelayTimer.ExpiredOrNotRunning(Runner))
             {
                 FinishDeploy();
                 return;
@@ -365,10 +324,7 @@ $"CooldownReduction: {_unitStat.CooldownReduction.Value}"
 
     private void HandleCombat()
     {
-        if (TryUseSkill())
-        {
-            return;
-        }
+        if (TryUseSkill()) { return; }
 
         //스킬 사용 불가시에 기본 공격
         TryAttack();
@@ -555,8 +511,10 @@ $"CooldownReduction: {_unitStat.CooldownReduction.Value}"
         {
             return;
         }
+        Vector3 start = _firePoint.position;
+        Vector3 end = _currentTarget.transform.position;
 
-        RPC_FireProjectile(Object.Id, _currentTarget.Object.Id, team, false);
+        EffectRPC.RPC_FireProjectile(start, end, ProjectileType.Normal, team);
 
         ApplyBasicAttackDamage(_currentTarget);
     }
@@ -585,8 +543,8 @@ $"CooldownReduction: {_unitStat.CooldownReduction.Value}"
         {
             amount *= (1f - reduction);
         }
-
         base.TakeDamage(amount);
+        Debug.Log($"[영웅체력] {name} : {CurrentHealth} / {MaxHealth}");
     }
 
     public void HealUnit(UnitBase target, float healAmount)
@@ -626,134 +584,7 @@ $"CooldownReduction: {_unitStat.CooldownReduction.Value}"
         target.TakeDamage(finalDamage);
     }
 
-    //기본 공격
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team, bool isSkill)
-    {
-        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
-        {
-            return;
-        }
-
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
-        {
-            return;
-        }
-
-        HeroController hero = casterObj.GetComponent<HeroController>();
-        if (hero == null)
-        {
-            return;
-        }
-
-        GameObject projectilePrefab = null;
-
-        if (isSkill)
-        {
-            if (hero._skillData == null)
-            {
-                return;
-            }
-
-            projectilePrefab = hero._skillData.EffectPrefab;
-        }
-        else
-        {
-            projectilePrefab = hero._projectile;
-        }
-
-        if (projectilePrefab == null)
-        {
-            return;
-        }
-
-        if (hero._firePoint == null)
-        {
-            return;
-        }
-
-        Vector3 start = hero._firePoint.position;
-        Vector3 end = targetObj.transform.position;
-
-        GameObject projectileObj = Instantiate(projectilePrefab, start, Quaternion.identity);
-
-        Projectile projectile = projectileObj.GetComponent<Projectile>();
-
-        if (projectile != null)
-        {
-            projectile.Fire(end, team);
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)
-    {
-        if (_skillData == null)
-        {
-            return;
-        }
-
-        GameObject prefab = _skillData.EffectPrefab;
-
-        if (prefab == null)
-        {
-            return;
-        }
-
-        GameObject fx;
-
-        //캐스터에 붙는 이펙트
-        if (_skillData.AttachType == EffectAttachType.Caster)
-        {
-            fx = Instantiate(prefab, transform);
-            fx.transform.localPosition = Vector3.zero;
-            fx.transform.localRotation = Quaternion.identity;
-        }
-        else//월드 좌표 기준 이펙트
-        {
-            fx = Instantiate(prefab, pos, rot);
-        }
-
-        fx.transform.localScale = Vector3.one * _skillData.EffectScale;
-
-        Destroy(fx, _skillData.EffectLifeTime);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_PlayHealEffect(NetworkId targetId)
-    {
-        if (_skillData == null)
-        {
-            return;
-        }
-
-        Debug.Log("RPC_PlayHealEffect 실행됨");
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
-        {
-            return;
-        }
-
-        GameObject prefab = _skillData.EffectPrefab;
-
-        if (prefab == null)
-        {
-            return;
-        }
-
-        Transform parent = null;
-
-        if (_skillData.AttachType == EffectAttachType.Target)
-        {
-            parent = targetObj.transform;
-        }
-
-        GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, parent);
-
-        effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(_skillData.EffectScale, 0.5f).SetEase(Ease.OutBack);
-
-        Destroy(effects, _skillData.EffectLifeTime);
-    }
+    
 
     //스킬증강에 사용될 메서드
     private void ApplySkillAugments()

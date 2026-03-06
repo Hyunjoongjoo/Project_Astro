@@ -37,3 +37,9 @@ public enum EffectAttachType
     Caster,     // 시전자에 붙음
     Target      // 타겟에 붙음
 }
+
+public enum ProjectileType
+{
+    Normal,
+    Skill
+}

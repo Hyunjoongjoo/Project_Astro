@@ -65,9 +65,6 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
         _remainingShots = runtime.ShotCount;
         _isFiring = true;
 
-        //첫 발 즉시 발사
-        FireOnce(runtime);
-
         if (_remainingShots > 0)
         {
             _shotTimer = TickTimer.CreateFromSeconds(caster.Runner, runtime.ShotInterval);
@@ -114,7 +111,6 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
             return;
         }
 
-
         FireOnce(_runtime);
 
         _shotTimer = TickTimer.CreateFromSeconds(runner, _runtime.ShotInterval);
@@ -135,7 +131,7 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
             StopFiring();
             return;
         }
-
+        UnitBase hitTarget = _target;
         if (_target.IsDead || _target.Object == null)
         {
             StopFiring();
@@ -144,17 +140,25 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 
         _remainingShots--;
 
-        //모든 클라이언트에 발사 연출
-        _caster.RPC_FireProjectile(_caster.Object.Id, _target.Object.Id, _caster.team, true);
+        Vector3 start = _caster.FirePoint.position;
+        Vector3 end = hitTarget.transform.position;
+
+        _caster.EffectRPC.RPC_FireProjectile(
+            start,
+            end,
+            ProjectileType.Skill,
+            _caster.team
+        );
+
 
         //서버에서 데미지 적용
-        _caster.ApplyBarrageSkillDamage(_target, runtime.DamageMultiplier);
+        _caster.ApplyBarrageSkillDamage(hitTarget, runtime.DamageMultiplier);
 
     }
 
     private void StopFiring()
     {
-        _shotTimer = TickTimer.None;
+        _shotTimer = default;
         _remainingShots = 0;
         _target = null;
         _caster = null;

@@ -20,7 +20,6 @@ public class TankSkill : MonoBehaviour, IHeroSkill
 
     public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
-        Debug.Log($"[Skill Execute] {caster.name} skill 실행 | EffectPrefab: {runtime.EffectPrefab}");
         if (!caster.Object.HasStateAuthority)
         {
             return false;
@@ -33,13 +32,27 @@ public class TankSkill : MonoBehaviour, IHeroSkill
 
         _caster = caster;
 
-        _isActive = true;
-        _timer = TickTimer.CreateFromSeconds(caster.Runner, runtime.Duration);
+        //남아있는 modifier 제거
+        if (_damageReductionModifier != null)
+        {
+            _caster.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);
+        }
+
         _damageReductionModifier = new StatModifier(runtime.DamageReductionRate, StatModType.Flat, this);
 
         _caster.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, _damageReductionModifier);
 
-        _caster.RPC_PlaySkillEffect(caster.transform.position, caster.transform.rotation);
+        _isActive = true;
+        _timer = TickTimer.CreateFromSeconds(caster.Runner, runtime.Duration);
+
+        _caster.EffectRPC.RPC_PlaySkillEffect(
+        caster.transform.position,
+        caster.transform.rotation,
+        caster.SkillData.EffectScale,
+        caster.SkillData.EffectLifeTime,
+        true,
+        caster.Object.Id
+    );
 
         return true;
     }
@@ -52,7 +65,37 @@ public class TankSkill : MonoBehaviour, IHeroSkill
         }
     }
 
-    private void Update()
+    //private void Update()
+    //{
+    //    if (!_isActive)
+    //    {
+    //        return;
+    //    }
+
+    //    if (_timer.Expired(_caster.Runner))
+    //    {
+    //        DeactivateDefense();
+    //    }
+    //}
+
+       
+    private void DeactivateDefense()
+    {
+        _isActive = false;
+
+        if (_caster != null && _damageReductionModifier != null)
+        {
+            _caster.UnitStat.RemoveModifier(
+                EffectType.DecreaseDamageTaken,
+                this
+            );
+
+            _damageReductionModifier = null;
+            _caster = null;
+        }
+    }
+
+    public void TickSkill(NetworkRunner runner)
     {
         if (!_isActive)
         {
@@ -64,17 +107,5 @@ public class TankSkill : MonoBehaviour, IHeroSkill
             DeactivateDefense();
         }
     }
-
-    private void DeactivateDefense()
-    {
-        _isActive = false;
-
-        if (_caster != null)
-        {
-            _caster.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);
-            _caster = null;
-        }
-    }
-
-    public void TickSkill(NetworkRunner runner){}
 }
+
