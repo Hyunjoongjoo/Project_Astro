@@ -1,4 +1,5 @@
-﻿using Fusion;
+﻿using DG.Tweening;
+using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,7 +11,7 @@ public class NewHeroController : UnitBase
     public float searchRange;
     public LayerMask targetLayer;
     public float searchInterval = 0.3f;
-    [SerializeField] protected UnitSize unitSize;
+    [SerializeField] protected MoveType moveType;
 
     [Header("전투 관련")]
     public float attackPower;
@@ -28,7 +29,6 @@ public class NewHeroController : UnitBase
     [SerializeField] private SkillDataSO _skillData;
     [SerializeField] private SkillDataSO _normalSkill;
     [SerializeField] private MonoBehaviour _skillComponent;
-    [SerializeField] private HeroEffectRPC _rpc;
     private float _respawnTime;
 
     [Header("타워 레퍼런스")]
@@ -59,7 +59,6 @@ public class NewHeroController : UnitBase
     public SkillDataSO SkillData => _skillData;
     public GameObject Projectile => _projectile;
     public Transform FirePoint => _firePoint;
-    public HeroEffectRPC EffectRPC => _rpc;
     public LayerMask TargetLayer => targetLayer;
 
     public LayerMask AllyLayer
@@ -72,9 +71,6 @@ public class NewHeroController : UnitBase
     public override void Spawned()
     {
         base.Spawned();
-
-        if (_rpc == null) 
-            _rpc = GetComponent<HeroEffectRPC>();
 
         unitType = UnitType.Hero;
 
@@ -195,14 +191,14 @@ public class NewHeroController : UnitBase
 
         int meteorArea = NavMesh.GetAreaFromName("MeteorZone");
 
-        switch (unitSize)
+        switch (moveType)
         {
-            case UnitSize.Small:
+            case MoveType.Small:
                 //Small은 통과
                 agent.areaMask = NavMesh.AllAreas;
                 break;
 
-            case UnitSize.Large:
+            case MoveType.Large:
                 //MeteorZone 차단
                 agent.areaMask = NavMesh.AllAreas & ~(1 << meteorArea);
                 break;
@@ -323,20 +319,13 @@ public class NewHeroController : UnitBase
     //Projectile 연출 및 기본 공격 데미지 적용
     public void AttackRanged(Vector3 targetPos)
     {
-        if (_projectile == null || _firePoint == null)
-        {
-            return;
-        }
-
-        if (currentTarget == null)
-        {
-            return;
-        }
+        if (_projectile == null || _firePoint == null) return;
+        if (currentTarget == null) return;
 
         Vector3 start = _firePoint.position;
         Vector3 end = currentTarget.transform.position;
 
-        _rpc.RPC_FireProjectile(start, end, ProjectileType.Normal, team);
+        RPC_FireProjectile(Object.Id, currentTarget.Object.Id, team, false);
 
         ApplyBasicAttackDamage(currentTarget);
     }
@@ -397,5 +386,134 @@ public class NewHeroController : UnitBase
     public void ForceStopMoveForSkill()//외부에서 StopMove를 사용가능하도록
     {
         StopMove();
+    }
+
+    //기본 공격
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team, bool isSkill)
+    {
+        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
+        {
+            return;
+        }
+
+        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
+        {
+            return;
+        }
+
+        NewHeroController hero = casterObj.GetComponent<NewHeroController>();
+        if (hero == null)
+        {
+            return;
+        }
+
+        GameObject projectilePrefab = null;
+
+        if (isSkill)
+        {
+            if (hero._skillData == null)
+            {
+                return;
+            }
+
+            projectilePrefab = hero._skillData.EffectPrefab;
+        }
+        else
+        {
+            projectilePrefab = hero._projectile;
+        }
+
+        if (projectilePrefab == null)
+        {
+            return;
+        }
+
+        if (hero._firePoint == null)
+        {
+            return;
+        }
+
+        Vector3 start = hero._firePoint.position;
+        Vector3 end = targetObj.transform.position;
+
+        GameObject projectileObj = Instantiate(projectilePrefab, start, Quaternion.identity);
+
+        Projectile projectile = projectileObj.GetComponent<Projectile>();
+
+        if (projectile != null)
+        {
+            projectile.Fire(end, team);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)
+    {
+        if (_skillData == null)
+        {
+            return;
+        }
+
+        GameObject prefab = _skillData.EffectPrefab;
+
+        if (prefab == null)
+        {
+            return;
+        }
+
+        GameObject fx;
+
+        //캐스터에 붙는 이펙트
+        if (_skillData.AttachType == EffectAttachType.Caster)
+        {
+            fx = Instantiate(prefab, transform);
+            fx.transform.localPosition = Vector3.zero;
+            fx.transform.localRotation = Quaternion.identity;
+        }
+        else//월드 좌표 기준 이펙트
+        {
+            fx = Instantiate(prefab, pos, rot);
+        }
+
+        fx.transform.localScale = Vector3.one * _skillData.EffectScale;
+
+        Destroy(fx, _skillData.EffectLifeTime);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayHealEffect(NetworkId targetId)
+    {
+        if (_skillData == null)
+        {
+            return;
+        }
+
+        Debug.Log("RPC_PlayHealEffect 실행됨");
+        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
+        {
+            return;
+        }
+
+        GameObject prefab = _skillData.EffectPrefab;
+
+        if (prefab == null)
+        {
+            return;
+        }
+
+        Transform parent = null;
+
+        if (_skillData.AttachType == EffectAttachType.Target)
+        {
+            parent = targetObj.transform;
+        }
+
+        GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, parent);
+
+        effects.transform.localScale = Vector3.zero;
+        effects.transform.DOScale(_skillData.EffectScale, 0.5f).SetEase(Ease.OutBack);
+
+        Destroy(effects, _skillData.EffectLifeTime);
     }
 }
