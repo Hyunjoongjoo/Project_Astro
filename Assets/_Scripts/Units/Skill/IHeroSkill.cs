@@ -38,7 +38,7 @@ public interface ISkill
         PostDelay();
     }
 
-    bool UsingConditionCheck(HeroController caster);
+    bool UsingConditionCheck();
 
     void ChangeData(BaseSkillSO newData);
 }

@@ -17,16 +17,15 @@ public class HeroController : UnitBase
     public float attackPower;
     public float attackRange;
     public float attackSpeed;
-    public UnitBase currentTarget; // 현재 타겟
+    [HideInInspector] public UnitBase currentTarget; // 현재 타겟
 
     [Header("스탯 관련")]
     [SerializeField] private string _heroId;
     [SerializeField] private float _attackRange;
-    [SerializeField] private Transform _firePoint;
-    [SerializeField] private UnitStat _unitStat;
     [SerializeField] private BaseSkillSO _skillData;
     [SerializeField] private BaseSkillSO _normalSkill;
-    [SerializeField] private MonoBehaviour _skillComponent;
+    public Transform firePoint;
+    private UnitStat _unitStat;
 
     [Header("스킬 데이터")]
     [Header("평타 공격")]
@@ -72,7 +71,6 @@ public class HeroController : UnitBase
     public NavMeshAgent Agent => agent;
     public BaseSkillSO SkillData => _skillData;
     public GameObject Projectile => _projectile;
-    public Transform FirePoint => _firePoint;
     public LayerMask TargetLayer => targetLayer;
     public string HeroId => _heroId;
 
@@ -89,8 +87,8 @@ public class HeroController : UnitBase
 
         unitType = UnitType.Hero;
 
-        normalAttack = _normalAttackData.CreateInstance();
-        curUniqueSkill = _standardSkillData.CreateInstance();
+        normalAttack = _normalAttackData.CreateInstance(this);
+        curUniqueSkill = _standardSkillData.CreateInstance(this);
 
         if (!Object.HasStateAuthority) return;
         
@@ -118,15 +116,11 @@ public class HeroController : UnitBase
         _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = moveSpeed;
 
-        //스킬
-        EquipSkill(_normalSkill);
-        ApplySkillAugments();
-
         if (agent != null)
         {
             agent.enabled = false;
 
-            //// 스폰 위치가 네비 밖이거나 겹쳐있을 경우 보정
+            // 스폰 위치가 네비 밖이거나 겹쳐있을 경우 보정
             if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
             {
                 transform.position = hit.position;
@@ -148,7 +142,7 @@ public class HeroController : UnitBase
         // 기본 스킬의 시전은 어느 상태든 상관없이 조건만 만족하면 바로 전환한다.
         if (StateMachine.CurrentState != DeployState && StateMachine.CurrentState != CastState)
         {
-            if (curUniqueSkill.UsingConditionCheck(this))
+            if (curUniqueSkill.UsingConditionCheck())
             {
                 StateMachine.SavePreviousState();
                 StateMachine.ChangeState(CastState);
@@ -167,6 +161,7 @@ public class HeroController : UnitBase
         team = myTeam;
         _targetPos = targetPos;
         _deployDelay = deployDelay;
+        agent = GetComponent<NavMeshAgent>();
 
         ConfigureAreaMask();
 
@@ -232,12 +227,13 @@ public class HeroController : UnitBase
         }
     }
 
-    public void EquipSkill(BaseSkillSO newSkillData)
+    // 스킬 증강 시 스킬 교체
+    public void ChangeSkill(BaseSkillSO newSkillData)
     {
         if (curUniqueSkill != null && newSkillData.GetType() == curUniqueSkill.GetType())
             curUniqueSkill.ChangeData(newSkillData);
         else
-            curUniqueSkill = newSkillData.CreateInstance();
+            curUniqueSkill = newSkillData.CreateInstance(this);
     }
 
     //스킬증강에 사용될 메서드
@@ -344,39 +340,6 @@ public class HeroController : UnitBase
         return distA <= distB ? _enemyTowerA : _enemyTowerB;
     }
 
-    // 근접 공격이면 바로 데미지 적용인데 시각 효과가 아무것도 없어서
-    // 공격하는지도 모르겠음. 그래서 일단 근접도 레이저 쏘도록 함.
-    public void BaseAttack(UnitBase target)
-    {
-        AttackRanged(target.transform.position);
-    }
-
-    //Projectile 연출 및 기본 공격 데미지 적용
-    public void AttackRanged(Vector3 targetPos)
-    {
-        if (_projectile == null || _firePoint == null) return;
-        if (currentTarget == null) return;
-
-        Vector3 start = _firePoint.position;
-        Vector3 end = currentTarget.transform.position;
-
-        RPC_FireProjectile(Object.Id, currentTarget.Object.Id, team, false);
-
-        ApplyBasicAttackDamage(currentTarget);
-    }
-
-    //모든 기본 공격은 이 메서드를 통해 TakeDamage로 진입
-    private void ApplyBasicAttackDamage(UnitBase target)
-    {
-        if (!Object.HasStateAuthority)
-            return;
-
-        if (target == null || target.IsDead)
-            return;
-
-        target.TakeDamage(attackPower);
-    }
-
     public void HealUnit(UnitBase target, float healAmount)
     {
         if (!Object.HasStateAuthority)
@@ -406,64 +369,12 @@ public class HeroController : UnitBase
         target.TakeDamage(finalDamage);
     }
 
-    //기본 공격
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team, bool isSkill)
+    public GameObject InstantiateObject(GameObject obj, Vector3 pos, Quaternion dir)
     {
-        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
-        {
-            return;
-        }
-
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
-        {
-            return;
-        }
-
-        HeroController hero = casterObj.GetComponent<HeroController>();
-        if (hero == null)
-        {
-            return;
-        }
-
-        GameObject projectilePrefab = null;
-
-        if (isSkill)
-        {
-            if (hero._skillData == null)
-            {
-                return;
-            }
-
-            // projectilePrefab = hero._skillData.EffectPrefab;
-        }
-        else
-        {
-            projectilePrefab = hero._projectile;
-        }
-
-        if (projectilePrefab == null)
-        {
-            return;
-        }
-
-        if (hero._firePoint == null)
-        {
-            return;
-        }
-
-        Vector3 start = hero._firePoint.position;
-        Vector3 end = targetObj.transform.position;
-
-        GameObject projectileObj = Instantiate(projectilePrefab, start, Quaternion.identity);
-
-        Projectile projectile = projectileObj.GetComponent<Projectile>();
-
-        if (projectile != null)
-        {
-            projectile.Fire(end, team);
-        }
+        return Instantiate(obj, pos, dir);
     }
+
+
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)

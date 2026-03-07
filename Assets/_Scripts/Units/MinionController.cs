@@ -306,7 +306,7 @@ $"DetectRange : {searchRange}"
 
         GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
 
-        projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
+        projectile.GetComponent<Projectile>()?.Fire(_currentTarget.gameObject);
     }
 
     private void OnTargetDied(UnitBase deadUnit)

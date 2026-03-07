@@ -1,17 +1,20 @@
-﻿using UnityEngine;
+﻿using Fusion;
+using UnityEngine;
 
 public class ProjectileSkill : ISkill
 {
     private ProjectileSkillSO _data;
     private bool _isCasting;
 
-    public BaseSkillSO Data => _data;
+    private HeroController _cachedHero;
 
+    public BaseSkillSO Data => _data;
     public bool IsCasting => _isCasting;
 
-    public ProjectileSkill(ProjectileSkillSO data)
+    public ProjectileSkill(ProjectileSkillSO data, HeroController hero)
     {
         _data = data;
+        _cachedHero = hero;
     }
 
     public void ChangeData(BaseSkillSO newData)
@@ -22,16 +25,36 @@ public class ProjectileSkill : ISkill
             Debug.LogWarning($"[ShieldSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
     }
 
-    public bool UsingConditionCheck(HeroController caster)
+    public bool UsingConditionCheck()
     {
         return false;
     }
+
     public void PreDelay() { _isCasting = true; }
 
     public void PostDelay() { _isCasting = false; }
 
     public void Casting()
     {
-        
+        if (_data.projectileVFX == null || _cachedHero.firePoint == null) return;
+        if (_cachedHero.currentTarget == null) return;
+
+        Vector3 end = _cachedHero.transform.position;
+
+        RPC_FireProjectile(_cachedHero.team);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_FireProjectile(Team team)
+    {
+        GameObject projectileObj = _cachedHero.InstantiateObject(_data.projectileVFX, _cachedHero.firePoint.position, Quaternion.identity);
+
+        Projectile projectile = projectileObj.GetComponent<Projectile>();
+
+        if (projectile != null)
+        {
+            projectile.Initialize(_data, team);
+            projectile.Fire(_cachedHero.currentTarget.gameObject);
+        }
     }
 }

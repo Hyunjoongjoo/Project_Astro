@@ -8,7 +8,7 @@ public class ShieldSkill : ISkill
     public BaseSkillSO Data => _data;
     public bool IsCasting => _isCasting;
 
-    public ShieldSkill(ShieldSkillSO data)
+    public ShieldSkill(ShieldSkillSO data, HeroController hero)
     {
         _data = data;
     }
@@ -21,7 +21,7 @@ public class ShieldSkill : ISkill
             Debug.LogWarning($"[ShieldSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
     }
 
-    public bool UsingConditionCheck(HeroController caster)
+    public bool UsingConditionCheck()
     {
         return false;
     }

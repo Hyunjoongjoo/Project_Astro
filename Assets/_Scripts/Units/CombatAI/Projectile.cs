@@ -4,22 +4,46 @@ using DG.Tweening;
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private Renderer _targetRenderer;
+    [SerializeField] private float _projectileSpeed;
 
-    public void Fire(Vector3 targetPos, Team team)
+    ProjectileSkillSO _data;
+    Team _team;
+
+    public void Initialize(ProjectileSkillSO data, Team team)
     {
+        _data = data;
+        _team = team;
         ApplyTeamColor(team);
+    }
 
-        Vector3 dir = (targetPos - transform.position).normalized;
-        transform.up = dir;
-
-        transform.DOMove(targetPos, 0.18f).SetEase(Ease.Linear).OnComplete(OnHit);
+    public void Fire(GameObject targetPos)
+    {
+        transform.LookAt(targetPos.transform);
 
         if (AudioManager.Instance != null)
-        {
             AudioManager.Instance.PlaySfx(SfxList.ShotLaserSound);
+
+        Destroy(gameObject, 3f);
+    }
+
+    private void FixedUpdate()
+    {
+        transform.Translate(Vector3.forward * _projectileSpeed * Time.deltaTime);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if ( other.gameObject.TryGetComponent(out UnitBase target) )
+        {
+            if (target.team != _team)
+            {
+                target.TakeDamage(10f);
+                Destroy(gameObject);
+            }
         }
     }
 
+    // 팀 색에 맞춰 투사체에도 색상 적용
     private void ApplyTeamColor(Team team)
     {
         if (_targetRenderer == null)
@@ -40,14 +64,4 @@ public class Projectile : MonoBehaviour
             mat.SetColor("_Color02", new Color(1f, 0.6f, 0.2f));
         }
     }
-
-    private void OnHit()
-    {
-        Destroy(gameObject);
-    }
-
-    //private void OnDisable()//풀링으로 교체시
-    //{
-    //    DOTween.Kill(transform);
-    //}
 }

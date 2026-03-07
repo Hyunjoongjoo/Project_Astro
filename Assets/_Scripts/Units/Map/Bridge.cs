@@ -154,8 +154,13 @@ $"DetectRange : {SearchRange}"
             return;
         }
 
-        var projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
-        projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
+        var projectileObj = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
+        var projectile = projectileObj.GetComponent<Projectile>();
+        if (projectile != null)
+        {
+            projectile.Initialize(null, team);
+            projectile.Fire(_currentTarget.gameObject);
+        }
     }
 
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기
