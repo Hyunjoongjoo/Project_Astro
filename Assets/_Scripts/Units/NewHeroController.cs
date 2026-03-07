@@ -1,5 +1,4 @@
 ﻿using Fusion;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -37,6 +36,10 @@ public class NewHeroController : UnitBase
     private UnitBase _enemyTowerB;
     private UnitBase _enemyBridge;
 
+    private GameObject _projectile;
+    private IHeroSkill _currentSkill;
+    private AttackType _attackType;
+
     // 상태 기계 및 상태 인스턴스들
     public StateMachine StateMachine { get; private set; }
     public DeployState DeployState { get; private set; }
@@ -45,10 +48,27 @@ public class NewHeroController : UnitBase
     public AttackState AttackState { get; private set; }
     public DieState DieState { get; private set; }
 
-    private GameObject _projectile;
-    private IHeroSkill _currentSkill;
-    private AttackType _attackType;
+    public float AttackRange => _attackRange;
+    public UnitBase CurrentTarget => currentTarget;
+    public float RespawnTime => _respawnTime;
+    public float AttackPower => _unitStat.Attack.Value;
+    public float AttackSpeed => _unitStat.AttackSpeed.Value;
+    public float HealPower => _unitStat.HealPower.Value;
+    public UnitStat UnitStat => _unitStat;
+    public NavMeshAgent Agent => agent;
+    public SkillDataSO SkillData => _skillData;
+    public GameObject Projectile => _projectile;
+    public Transform FirePoint => _firePoint;
+    public HeroEffectRPC EffectRPC => _rpc;
+    public LayerMask TargetLayer => targetLayer;
 
+    public LayerMask AllyLayer
+    {
+        get
+        {
+            return team == Team.Blue ? LayerMask.GetMask("BlueTeam") : LayerMask.GetMask("RedTeam");
+        }
+    }
     public override void Spawned()
     {
         base.Spawned();
@@ -335,5 +355,47 @@ public class NewHeroController : UnitBase
         }
 
         target.TakeDamage(attackPower);
+    }
+
+    public void HealUnit(UnitBase target, float healAmount)
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        if (target == null || target.IsDead)
+        {
+            return;
+        }
+
+        target.CurrentHealth = Mathf.Min(
+            target.CurrentHealth + healAmount,
+            target.MaxHealth
+        );
+    }
+
+    //포격형 전용 데미지 진입점
+    public void ApplyBarrageSkillDamage(UnitBase target, float damageRatio)
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
+        if (target == null || target.IsDead)
+        {
+            return;
+        }
+
+        float baseDamage = AttackPower;
+        float finalDamage = baseDamage * damageRatio;
+
+        target.TakeDamage(finalDamage);
+    }
+
+    public void ForceStopMoveForSkill()//외부에서 StopMove를 사용가능하도록
+    {
+        StopMove();
     }
 }
