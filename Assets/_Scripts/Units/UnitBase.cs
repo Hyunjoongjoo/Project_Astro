@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using System;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 // 이동하는 유닛과 건물 모두에게 공통된 속성 정의
 public abstract class UnitBase : NetworkBehaviour
@@ -46,18 +47,20 @@ public abstract class UnitBase : NetworkBehaviour
     public virtual void TakeDamage(float amount)
     {
         if (!Object.HasStateAuthority) return;
+        if (IsDead) return;
 
-        if (IsDead)
-        {
-            return;
-        }
-
-        CurrentHealth -= amount;
+        CurrentHealth = Mathf.Max(CurrentHealth - amount, 0); ;
 
         if (CurrentHealth < 1)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
-        {
             Die();
-        }
+    }
+
+    public virtual void TakeHeal(float amount)
+    {
+        if (!Object.HasStateAuthority) return;
+        if (IsDead) return;
+
+        CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
     }
 
     

@@ -51,7 +51,7 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
         Vector3 center = target.transform.position - dir * 1.2f;
         center.y = caster.transform.position.y; //지면 보정
 
-        caster.ForceStopMoveForSkill();
+        caster.StopMove();
 
         //워프
         if (caster.Agent != null)

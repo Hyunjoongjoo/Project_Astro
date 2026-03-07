@@ -31,7 +31,6 @@ public class NewHeroController : UnitBase
     [SerializeField] private MonoBehaviour _skillComponent;
     private float _respawnTime;
 
-    [Header("타워 레퍼런스")]
     private UnitBase _enemyTowerA;
     private UnitBase _enemyTowerB;
     private UnitBase _enemyBridge;
@@ -41,6 +40,8 @@ public class NewHeroController : UnitBase
     private AttackType _attackType;
     private Vector3 _targetPos;
     private float _deployDelay;
+
+    private IHeroSkill _curSkill;
 
     // 상태 기계 및 상태 인스턴스들
     public StateMachine StateMachine { get; private set; }
@@ -356,14 +357,10 @@ public class NewHeroController : UnitBase
     private void ApplyBasicAttackDamage(UnitBase target)
     {
         if (!Object.HasStateAuthority)
-        {
             return;
-        }
 
         if (target == null || target.IsDead)
-        {
             return;
-        }
 
         target.TakeDamage(attackPower);
     }
@@ -371,14 +368,10 @@ public class NewHeroController : UnitBase
     public void HealUnit(UnitBase target, float healAmount)
     {
         if (!Object.HasStateAuthority)
-        {
             return;
-        }
 
         if (target == null || target.IsDead)
-        {
             return;
-        }
 
         target.CurrentHealth = Mathf.Min(
             target.CurrentHealth + healAmount,
@@ -390,24 +383,15 @@ public class NewHeroController : UnitBase
     public void ApplyBarrageSkillDamage(UnitBase target, float damageRatio)
     {
         if (!Object.HasStateAuthority)
-        {
             return;
-        }
 
         if (target == null || target.IsDead)
-        {
             return;
-        }
 
         float baseDamage = AttackPower;
         float finalDamage = baseDamage * damageRatio;
 
         target.TakeDamage(finalDamage);
-    }
-
-    public void ForceStopMoveForSkill()//외부에서 StopMove를 사용가능하도록
-    {
-        StopMove();
     }
 
     //기본 공격
