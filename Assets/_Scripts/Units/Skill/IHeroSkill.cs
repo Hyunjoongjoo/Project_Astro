@@ -10,3 +10,16 @@ public interface IHeroSkill
     void ChangeSkillData(SkillDataSO newData);
 
 }
+
+public interface ISkill
+{
+    void PostDelay();
+    void Casting();
+    void PreDelay();
+    void Execute()
+    {
+        PreDelay();
+        Casting();
+        PostDelay();
+    }
+}
