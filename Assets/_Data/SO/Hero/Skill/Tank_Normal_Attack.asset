@@ -16,4 +16,13 @@ MonoBehaviour:
   _skillDescription: 
   _note: 
   _initCooldown: 0
-  _cooldown: 0
+  _cooldown: 1
+  damageRatio: 1
+  range: 3
+  projectileSpeed: 0
+  isHoming: 0
+  oneShotProjectileNum: 1
+  spreadAngle: 0
+  repeatingFire: 1
+  interval: 0
+  projectileVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}

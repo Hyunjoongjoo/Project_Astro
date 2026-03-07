@@ -1,18 +1,21 @@
-﻿using UnityEngine;
-using DG.Tweening;
+﻿using Fusion;
+using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private Renderer _targetRenderer;
-    [SerializeField] private float _projectileSpeed;
+    private float _finalPower;
 
     ProjectileSkillSO _data;
+    private NetworkRunner _runner;
     Team _team;
 
-    public void Initialize(ProjectileSkillSO data, Team team)
+    public void Initialize(ProjectileSkillSO data, Team team, float power, NetworkRunner runner)
     {
         _data = data;
         _team = team;
+        _runner = runner;
+        _finalPower = power * _data.damageRatio;
         ApplyTeamColor(team);
     }
 
@@ -28,7 +31,7 @@ public class Projectile : MonoBehaviour
 
     private void FixedUpdate()
     {
-        transform.Translate(Vector3.forward * _projectileSpeed * Time.deltaTime);
+        transform.Translate(Vector3.forward * _data.projectileSpeed * Time.deltaTime);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -37,7 +40,8 @@ public class Projectile : MonoBehaviour
         {
             if (target.team != _team)
             {
-                target.TakeDamage(10f);
+                if (_runner.IsSharedModeMasterClient)
+                    target.TakeDamage(_finalPower);
                 Destroy(gameObject);
             }
         }

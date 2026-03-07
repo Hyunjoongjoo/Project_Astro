@@ -158,7 +158,7 @@ $"DetectRange : {SearchRange}"
         var projectile = projectileObj.GetComponent<Projectile>();
         if (projectile != null)
         {
-            projectile.Initialize(null, team);
+            projectile.Initialize(null, team, AttackPower, Runner);
             projectile.Fire(_currentTarget.gameObject);
         }
     }

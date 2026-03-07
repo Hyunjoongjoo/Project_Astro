@@ -27,6 +27,12 @@ public class ProjectileSkill : ISkill
 
     public bool UsingConditionCheck()
     {
+        if (_data.projectileVFX == null || _cachedHero.firePoint == null) return false;
+        if (_cachedHero.currentTarget == null) return false;
+
+        if ( Vector3.Distance(_cachedHero.transform.position, _cachedHero.currentTarget.transform.position) <= _data.range)
+            return true;
+
         return false;
     }
 
@@ -53,7 +59,7 @@ public class ProjectileSkill : ISkill
 
         if (projectile != null)
         {
-            projectile.Initialize(_data, team);
+            projectile.Initialize(_data, team, _cachedHero.attackPower, _cachedHero.Runner);
             projectile.Fire(_cachedHero.currentTarget.gameObject);
         }
     }

@@ -374,8 +374,6 @@ public class HeroController : UnitBase
         return Instantiate(obj, pos, dir);
     }
 
-
-
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)
     {
