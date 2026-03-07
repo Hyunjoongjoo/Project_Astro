@@ -1,9 +1,9 @@
 ﻿
 public class CastingState : IState
 {
-    private NewHeroController _hero;
+    private HeroController _hero;
 
-    public CastingState(NewHeroController hero)
+    public CastingState(HeroController hero)
     {
         _hero = hero;
     }

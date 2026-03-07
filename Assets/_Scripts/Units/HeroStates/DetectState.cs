@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class DetectState : IState
 {
-    private NewHeroController _hero;
+    private HeroController _hero;
     private TickTimer _searchTimer;
 
-    public DetectState(NewHeroController hero)
+    public DetectState(HeroController hero)
     {
         _hero = hero;
     }

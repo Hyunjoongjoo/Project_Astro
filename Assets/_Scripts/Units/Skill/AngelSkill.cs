@@ -9,7 +9,7 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
 
     public SkillDataSO Data => _data;
 
-    public bool CanUse(NewHeroController caster, SkillRuntimeData runtime)
+    public bool CanUse(HeroController caster, SkillRuntimeData runtime)
     {
         if (!runtime.IsAreaSkill)
         {
@@ -47,7 +47,7 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
         }
     }
 
-    public bool Execute(NewHeroController caster, SkillRuntimeData runtime)
+    public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
         if (!caster.Object.HasStateAuthority)
         {
@@ -122,7 +122,7 @@ public class AngelSkill : MonoBehaviour, IHeroSkill
         }
     }
 
-    private UnitBase FindHealTarget(NewHeroController caster, SkillRuntimeData runtime)
+    private UnitBase FindHealTarget(HeroController caster, SkillRuntimeData runtime)
     {
         Collider[] hits = Physics.OverlapSphere(caster.transform.position, runtime.SkillRange, caster.AllyLayer);
 

@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class DeployState : IState
 {
-    private NewHeroController _hero;
+    private HeroController _hero;
 
     private Vector3 _deployTarget;
     private TickTimer _deployDelayTimer;
     private TickTimer _deployFailSafeTimer;
 
-    public DeployState(NewHeroController hero)
+    public DeployState(HeroController hero)
     {
         _hero = hero;
     }

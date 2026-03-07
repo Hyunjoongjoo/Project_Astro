@@ -2,9 +2,9 @@
 
 public class ChaseState : IState
 {
-    private NewHeroController _hero;
+    private HeroController _hero;
 
-    public ChaseState(NewHeroController hero)
+    public ChaseState(HeroController hero)
     {
         _hero = hero;
     }

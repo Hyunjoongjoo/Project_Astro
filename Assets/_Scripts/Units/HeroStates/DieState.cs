@@ -1,9 +1,9 @@
 ﻿
 public class DieState : IState
 {
-    private NewHeroController _hero;
+    private HeroController _hero;
 
-    public DieState(NewHeroController hero)
+    public DieState(HeroController hero)
     {
         _hero = hero;
     }

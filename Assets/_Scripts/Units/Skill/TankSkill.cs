@@ -9,16 +9,16 @@ public class TankSkill : MonoBehaviour, IHeroSkill
     private StatModifier _damageReductionModifier;
     private TickTimer _timer;
     private bool _isActive;
-    private NewHeroController _caster;
+    private HeroController _caster;
 
     public SkillDataSO Data => _data;
 
-    public bool CanUse(NewHeroController caster, SkillRuntimeData runtime)
+    public bool CanUse(HeroController caster, SkillRuntimeData runtime)
     {
         return !_isActive;
     }
 
-    public bool Execute(NewHeroController caster, SkillRuntimeData runtime)
+    public bool Execute(HeroController caster, SkillRuntimeData runtime)
     {
         Debug.Log($"[Skill Execute] {caster.name} skill 실행 | EffectPrefab: {runtime.EffectPrefab}");
         if (!caster.Object.HasStateAuthority)

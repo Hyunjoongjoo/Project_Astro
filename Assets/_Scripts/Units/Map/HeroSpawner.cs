@@ -136,7 +136,7 @@ public class HeroSpawner : NetworkBehaviour
         Runner.Spawn(prefab, origin.position, spawnRot,
             onBeforeSpawned: (Runner, obj) =>
             {
-                NewHeroController hero = obj.GetComponent<NewHeroController>();
+                HeroController hero = obj.GetComponent<HeroController>();
                 hero.Setup(team, spawnPos, deployDelay);
                 //배치 및 지연 처리는 컨트롤러가 수행
                 StartSummonCooldown(caller, prefab, hero.RespawnTime);
