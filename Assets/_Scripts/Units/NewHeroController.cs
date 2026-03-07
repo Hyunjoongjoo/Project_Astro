@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,6 +11,7 @@ public class NewHeroController : UnitBase
     public float searchRange;
     public LayerMask targetLayer;
     public float searchInterval = 0.3f;
+    [SerializeField] protected UnitSize unitSize;
 
     [Header("전투 관련")]
     public float attackPower;
@@ -17,7 +19,23 @@ public class NewHeroController : UnitBase
     public float attackSpeed;
     public UnitBase currentTarget; // 현재 타겟
     public AttackType attackType;
+
+    [Header("스탯 관련")]
+    [SerializeField] private string _heroId;
+    [SerializeField] private NormalAttackDataSO _normalAttack;
+    [SerializeField] private float _attackRange;
     [SerializeField] private Transform _firePoint;
+    [SerializeField] private UnitStat _unitStat;
+    [SerializeField] private SkillDataSO _skillData;
+    [SerializeField] private SkillDataSO _normalSkill;
+    [SerializeField] private MonoBehaviour _skillComponent;
+    [SerializeField] private HeroEffectRPC _rpc;
+    private float _respawnTime;
+
+    [Header("타워 레퍼런스")]
+    private UnitBase _enemyTowerA;
+    private UnitBase _enemyTowerB;
+    private UnitBase _enemyBridge;
 
     // 상태 기계 및 상태 인스턴스들
     public StateMachine StateMachine { get; private set; }
@@ -28,24 +46,68 @@ public class NewHeroController : UnitBase
     public DieState DieState { get; private set; }
 
     private GameObject _projectile;
-
+    private IHeroSkill _currentSkill;
+    private AttackType _attackType;
 
     public override void Spawned()
     {
         base.Spawned();
 
-        if (Object.HasStateAuthority)
-        {
-            // 상태 인스턴스 생성
-            StateMachine = new StateMachine();
-            DeployState = new DeployState(this);
-            DetectState = new DetectState(this);
-            ChaseState = new ChaseState(this);
-            AttackState = new AttackState(this);
-            DieState = new DieState(this);
+        if (_rpc == null) 
+            _rpc = GetComponent<HeroEffectRPC>();
 
-            StateMachine.ChangeState(DeployState);
+        unitType = UnitType.Hero;
+
+        _currentSkill = _skillComponent as IHeroSkill;
+        _attackType = _normalAttack.AttackType;
+        _projectile = _normalAttack.EffectPrefab;
+
+        if (!Object.HasStateAuthority) return;
+        
+        // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
+        // 상태 인스턴스 생성
+        StateMachine = new StateMachine();
+        DeployState = new DeployState(this);
+        DetectState = new DetectState(this);
+        ChaseState = new ChaseState(this);
+        AttackState = new AttackState(this);
+        DieState = new DieState(this);
+
+
+        _unitStat = GetComponent<UnitStat>();
+
+        HeroStatData statData = HeroManager.Instance.GetStatus(_heroId);
+
+        //UnitStat 초기화
+        _unitStat.Init(statData);
+        //Stat 기반 값 적용
+        maxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = maxHealth;
+        moveSpeed = _unitStat.MoveSpeed.Value;
+        searchRange = _unitStat.DetectRange.Value;
+        _respawnTime = _unitStat.RespawnTime.Value;
+        agent.speed = moveSpeed;
+
+        //스킬
+        EquipSkill(_normalSkill);
+        ApplySkillAugments();
+
+        if (agent != null)
+        {
+            agent.enabled = false;
+
+            //// 스폰 위치가 네비 밖이거나 겹쳐있을 경우 보정
+            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+            {
+                transform.position = hit.position;
+            }
+
+
+            agent.enabled = true;
+            agent.ResetPath();
         }
+
+        StateMachine.ChangeState(DeployState);
     }
 
     public override void FixedUpdateNetwork()
@@ -54,6 +116,136 @@ public class NewHeroController : UnitBase
         if (IsDead) return; // 사망 시 중단 (혹은 DieState에서 처리)
 
         StateMachine.Update();
+    }
+
+    // --- 생성시 초기화 관련 메서드 ---
+
+    public void Setup(Team myTeam)
+    {
+        team = myTeam;
+        agent.speed = moveSpeed;
+
+        ConfigureAreaMask();
+
+        int myLayer;
+        int enemyLayer;
+
+        if (team == Team.Blue)
+        {
+            myLayer = LayerMask.NameToLayer("BlueTeam");
+            enemyLayer = LayerMask.NameToLayer("RedTeam");
+        }
+        else if (team == Team.Red)
+        {
+            myLayer = LayerMask.NameToLayer("RedTeam");
+            enemyLayer = LayerMask.NameToLayer("BlueTeam");
+        }
+        else
+        {
+            Debug.Log("중립 오브젝트입니다.");
+            return;
+        }
+
+        //팀레이어 적용
+        SetLayer(gameObject, myLayer);
+        //탐지 단계에서는 적 팀 레이어만 대상으로
+        targetLayer = 1 << enemyLayer;
+
+        UnitBase[] targetStructure = team == Team.Blue ?
+            ObjectContainer.Instance.redSideStructure :
+            ObjectContainer.Instance.blueSideStructure;
+
+        _enemyTowerA = targetStructure[0];
+        _enemyTowerB = targetStructure[1];
+        _enemyBridge = targetStructure[2];
+    }
+
+    private void SetLayer(GameObject root, int layer)//UnitBase가 붙은 오브젝트만 대상으로 레이어를 설정
+    {
+        if (root.GetComponent<UnitBase>() != null)
+            root.layer = layer;
+
+        foreach (Transform child in root.transform)
+            SetLayer(child.gameObject, layer);
+    }
+
+    private void ConfigureAreaMask()
+    {
+        if (agent == null) return;
+
+        int meteorArea = NavMesh.GetAreaFromName("MeteorZone");
+
+        switch (unitSize)
+        {
+            case UnitSize.Small:
+                //Small은 통과
+                agent.areaMask = NavMesh.AllAreas;
+                break;
+
+            case UnitSize.Large:
+                //MeteorZone 차단
+                agent.areaMask = NavMesh.AllAreas & ~(1 << meteorArea);
+                break;
+        }
+    }
+
+    public void EquipSkill(SkillDataSO newSkillData)
+    {
+        if (newSkillData == null)
+            return;
+
+        _skillData = newSkillData;
+
+        if (_skillComponent == null)
+            return;
+
+        _currentSkill = _skillComponent as IHeroSkill;
+
+        if (_currentSkill == null)
+            return;
+
+        _currentSkill.ChangeSkillData(_skillData);
+    }
+
+    //스킬증강에 사용될 메서드
+    private void ApplySkillAugments()
+    {
+        StageManager stageManager = FindFirstObjectByType<StageManager>();
+
+        if (stageManager == null)
+            return;
+
+        if (!stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out PlayerNetworkData data))
+            return;
+
+        //3.3 여현구
+        //배열에서 구조체로 바뀌어서 여기 수정했습니다.
+        for (int i = 0; i < SlotData_5.Length; i++)
+        {
+            string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+
+            if (string.IsNullOrEmpty(augmentId))
+                continue;
+
+            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
+            if (so == null)
+                continue;
+
+            if (so.TargetHeroID != _heroId)
+                continue;
+
+            int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
+
+            if (tierIndex >= so.Tiers.Length)
+                continue;
+
+            SkillDataSO newSkill = so.Tiers[tierIndex].CombatSkillData;
+
+            if (newSkill == null)
+                continue;
+
+            EquipSkill(newSkill);
+        }
     }
 
     // --- 유틸리티 메서드 (상태 클래스들에서 호출해서 사용) ---
@@ -121,7 +313,10 @@ public class NewHeroController : UnitBase
             return;
         }
 
-        RPC_FireProjectile(Object.Id, currentTarget.Object.Id, team, false);
+        Vector3 start = _firePoint.position;
+        Vector3 end = currentTarget.transform.position;
+
+        _rpc.RPC_FireProjectile(start, end, ProjectileType.Normal, team);
 
         ApplyBasicAttackDamage(currentTarget);
     }
@@ -140,12 +335,5 @@ public class NewHeroController : UnitBase
         }
 
         target.TakeDamage(attackPower);
-    }
-
-    //기본 공격
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team, bool isSkill)
-    {
-
     }
 }
