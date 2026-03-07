@@ -580,13 +580,18 @@ MonoBehaviour:
   currentTarget: {fileID: 0}
   attackType: 0
   _heroId: 
-  _normalAttack: {fileID: 0}
   _attackRange: 0
   _firePoint: {fileID: 0}
   _unitStat: {fileID: 0}
   _skillData: {fileID: 0}
   _normalSkill: {fileID: 0}
   _skillComponent: {fileID: 0}
+  _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}
+  _standardSkillData: {fileID: 11400000, guid: b0fad8a3236bb7e4597f6d58c11cc918, type: 2}
+  _typeASkillData: {fileID: 11400000, guid: 1fa882fa5cd54be48bd4e31b912e7b0b, type: 2}
+  _typeAEnhanceSkillData: {fileID: 0}
+  _typeBSkillData: {fileID: 0}
+  _typeBEnhanceSkillData: {fileID: 0}
 --- !u!114 &707048002635603553
 MonoBehaviour:
   m_ObjectHideFlags: 0

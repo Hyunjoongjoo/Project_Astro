@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6fee6d32a3785654b821b9fd26d31449, type: 3}
-  m_Name: Tank_Skill_Normal
+  m_Name: Tank_Skill_Standard
   m_EditorClassIdentifier: Assembly-CSharp::ShieldSkillSO
   damageReduction: 0.3
   duration: 5

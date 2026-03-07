@@ -10,16 +10,17 @@ public class CastingState : IState
 
     public void Enter()
     {
+        _hero.curUniqueSkill.Execute();
+    }
 
+    public void Update()
+    {
+        if (_hero.curUniqueSkill.IsCasting == false)
+            _hero.StateMachine.ChangePreviousState();
     }
 
     public void Exit()
     {
 
     }
-
-    public void Update()
-    {
-
-    }    
 }

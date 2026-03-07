@@ -69,10 +69,6 @@ public class AttackState : IState
 
     private void PerformAttack()
     {
-        if (_hero.attackType == AttackType.Melee) // HeroController에 attackType 변수 노출 필요
-            _hero.BaseAttack(_hero.currentTarget);
-
-        else
-            _hero.AttackRanged(_hero.currentTarget.transform.position); // 이 메서드는 public이어야 함
+        _hero.normalAttack.Execute();
     }
 }

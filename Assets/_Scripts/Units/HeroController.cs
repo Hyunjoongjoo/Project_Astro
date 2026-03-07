@@ -18,17 +18,29 @@ public class HeroController : UnitBase
     public float attackRange;
     public float attackSpeed;
     public UnitBase currentTarget; // 현재 타겟
-    public AttackType attackType;
 
     [Header("스탯 관련")]
     [SerializeField] private string _heroId;
-    [SerializeField] private NormalAttackDataSO _normalAttack;
     [SerializeField] private float _attackRange;
     [SerializeField] private Transform _firePoint;
     [SerializeField] private UnitStat _unitStat;
-    [SerializeField] private SkillDataSO _skillData;
-    [SerializeField] private SkillDataSO _normalSkill;
+    [SerializeField] private BaseSkillSO _skillData;
+    [SerializeField] private BaseSkillSO _normalSkill;
     [SerializeField] private MonoBehaviour _skillComponent;
+
+    [Header("스킬 데이터")]
+    [Header("평타 공격")]
+    [SerializeField] private BaseSkillSO _normalAttackData;
+    [Header("기본 스킬 (증강 미적용)")]
+    [SerializeField] private BaseSkillSO _standardSkillData;
+    [Header("증강 A타입, 강화형")]
+    [SerializeField] private BaseSkillSO _typeASkillData;
+    [SerializeField] private BaseSkillSO _typeAEnhanceSkillData;
+    [Header("증강 B타입, 강화형")]
+    [SerializeField] private BaseSkillSO _typeBSkillData;
+    [SerializeField] private BaseSkillSO _typeBEnhanceSkillData;
+
+
     private float _respawnTime;
 
     private UnitBase _enemyTowerA;
@@ -36,19 +48,18 @@ public class HeroController : UnitBase
     private UnitBase _enemyBridge;
 
     private GameObject _projectile;
-    private IHeroSkill _currentSkill;
-    private AttackType _attackType;
+    public ISkill normalAttack;
+    public ISkill curUniqueSkill;
     private Vector3 _targetPos;
     private float _deployDelay;
 
-    private IHeroSkill _curSkill;
-
-    // 상태 기계 및 상태 인스턴스들
+    // 상태 머신과 상태 인스턴스들
     public StateMachine StateMachine { get; private set; }
     public DeployState DeployState { get; private set; }
     public DetectState DetectState { get; private set; }
     public ChaseState ChaseState { get; private set; }
     public AttackState AttackState { get; private set; }
+    public CastingState CastState { get; private set; }
     public DieState DieState { get; private set; }
 
     public float AttackRange => _attackRange;
@@ -59,7 +70,7 @@ public class HeroController : UnitBase
     public float HealPower => _unitStat.HealPower.Value;
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
-    public SkillDataSO SkillData => _skillData;
+    public BaseSkillSO SkillData => _skillData;
     public GameObject Projectile => _projectile;
     public Transform FirePoint => _firePoint;
     public LayerMask TargetLayer => targetLayer;
@@ -78,9 +89,8 @@ public class HeroController : UnitBase
 
         unitType = UnitType.Hero;
 
-        _currentSkill = _skillComponent as IHeroSkill;
-        _attackType = _normalAttack.AttackType;
-        _projectile = _normalAttack.EffectPrefab;
+        normalAttack = _normalAttackData.CreateInstance();
+        curUniqueSkill = _standardSkillData.CreateInstance();
 
         if (!Object.HasStateAuthority) return;
         
@@ -91,6 +101,7 @@ public class HeroController : UnitBase
         DetectState = new DetectState(this);
         ChaseState = new ChaseState(this);
         AttackState = new AttackState(this);
+        CastState = new CastingState(this);
         DieState = new DieState(this);
 
         _unitStat = GetComponent<UnitStat>();
@@ -133,6 +144,17 @@ public class HeroController : UnitBase
     {
         if (!Object.HasStateAuthority) return;
         if (IsDead) return; // 사망 시 중단 (혹은 DieState에서 처리)
+
+        // 기본 스킬의 시전은 어느 상태든 상관없이 조건만 만족하면 바로 전환한다.
+        if (StateMachine.CurrentState != DeployState && StateMachine.CurrentState != CastState)
+        {
+            if (curUniqueSkill.UsingConditionCheck(this))
+            {
+                StateMachine.SavePreviousState();
+                StateMachine.ChangeState(CastState);
+                return;
+            }
+        }
 
         StateMachine.Update();
     }
@@ -210,22 +232,12 @@ public class HeroController : UnitBase
         }
     }
 
-    public void EquipSkill(SkillDataSO newSkillData)
+    public void EquipSkill(BaseSkillSO newSkillData)
     {
-        if (newSkillData == null)
-            return;
-
-        _skillData = newSkillData;
-
-        if (_skillComponent == null)
-            return;
-
-        _currentSkill = _skillComponent as IHeroSkill;
-
-        if (_currentSkill == null)
-            return;
-
-        _currentSkill.ChangeSkillData(_skillData);
+        if (curUniqueSkill != null && newSkillData.GetType() == curUniqueSkill.GetType())
+            curUniqueSkill.ChangeData(newSkillData);
+        else
+            curUniqueSkill = newSkillData.CreateInstance();
     }
 
     //스킬증강에 사용될 메서드
@@ -265,7 +277,7 @@ public class HeroController : UnitBase
             if (newSkill == null)
                 continue;
 
-            EquipSkill(newSkill);
+            // EquipSkill(newSkill);
         }
     }
 
@@ -423,7 +435,7 @@ public class HeroController : UnitBase
                 return;
             }
 
-            projectilePrefab = hero._skillData.EffectPrefab;
+            // projectilePrefab = hero._skillData.EffectPrefab;
         }
         else
         {
@@ -461,30 +473,30 @@ public class HeroController : UnitBase
             return;
         }
 
-        GameObject prefab = _skillData.EffectPrefab;
+        // GameObject prefab = _skillData.EffectPrefab;
 
-        if (prefab == null)
-        {
-            return;
-        }
+        //if (prefab == null)
+        //{
+        //    return;
+        //}
 
-        GameObject fx;
+        //GameObject fx;
 
-        //캐스터에 붙는 이펙트
-        if (_skillData.AttachType == EffectAttachType.Caster)
-        {
-            fx = Instantiate(prefab, transform);
-            fx.transform.localPosition = Vector3.zero;
-            fx.transform.localRotation = Quaternion.identity;
-        }
-        else//월드 좌표 기준 이펙트
-        {
-            fx = Instantiate(prefab, pos, rot);
-        }
+        ////캐스터에 붙는 이펙트
+        //if (_skillData.AttachType == EffectAttachType.Caster)
+        //{
+        //    fx = Instantiate(prefab, transform);
+        //    fx.transform.localPosition = Vector3.zero;
+        //    fx.transform.localRotation = Quaternion.identity;
+        //}
+        //else//월드 좌표 기준 이펙트
+        //{
+        //    fx = Instantiate(prefab, pos, rot);
+        //}
 
-        fx.transform.localScale = Vector3.one * _skillData.EffectScale;
+        //fx.transform.localScale = Vector3.one * _skillData.EffectScale;
 
-        Destroy(fx, _skillData.EffectLifeTime);
+        //Destroy(fx, _skillData.EffectLifeTime);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -501,25 +513,25 @@ public class HeroController : UnitBase
             return;
         }
 
-        GameObject prefab = _skillData.EffectPrefab;
+        //GameObject prefab = _skillData.EffectPrefab;
 
-        if (prefab == null)
-        {
-            return;
-        }
+        //if (prefab == null)
+        //{
+        //    return;
+        //}
 
-        Transform parent = null;
+        //Transform parent = null;
 
-        if (_skillData.AttachType == EffectAttachType.Target)
-        {
-            parent = targetObj.transform;
-        }
+        //if (_skillData.AttachType == EffectAttachType.Target)
+        //{
+        //    parent = targetObj.transform;
+        //}
 
-        GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, parent);
+        //GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, parent);
 
-        effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(_skillData.EffectScale, 0.5f).SetEase(Ease.OutBack);
+        //effects.transform.localScale = Vector3.zero;
+        //effects.transform.DOScale(_skillData.EffectScale, 0.5f).SetEase(Ease.OutBack);
 
-        Destroy(effects, _skillData.EffectLifeTime);
+        //Destroy(effects, _skillData.EffectLifeTime);
     }
 }
