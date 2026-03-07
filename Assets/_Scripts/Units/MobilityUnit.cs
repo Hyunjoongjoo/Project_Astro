@@ -83,7 +83,6 @@ public class MobilityUnit : UnitBase, ITargetFinder
                 agent.areaMask = NavMesh.AllAreas;
                 break;
 
-            case UnitSize.Medium:
             case UnitSize.Large:
                 //MeteorZone 차단
                 agent.areaMask = NavMesh.AllAreas & ~(1 << meteorArea);

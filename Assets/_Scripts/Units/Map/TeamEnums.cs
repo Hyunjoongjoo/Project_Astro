@@ -15,7 +15,7 @@ public enum UnitState
 
 public enum UnitSize
 {
-    Small, Medium, Large
+    Small, Large
 }
 
 public enum AttackType
