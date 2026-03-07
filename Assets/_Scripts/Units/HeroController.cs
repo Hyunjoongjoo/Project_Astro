@@ -365,10 +365,7 @@ $"CooldownReduction: {_unitStat.CooldownReduction.Value}"
 
     private void HandleCombat()
     {
-        if (TryUseSkill())
-        {
-            return;
-        }
+        //if (TryUseSkill()) return;
 
         //스킬 사용 불가시에 기본 공격
         TryAttack();
@@ -394,40 +391,40 @@ $"CooldownReduction: {_unitStat.CooldownReduction.Value}"
         transform.rotation = targetRotation;
     }
 
-    private bool TryUseSkill()//스킬 쿨타임/조건 체크 후 스킬 실행 시도
-    {
-        if (_currentSkill == null)
-        {
-            return false;
-        }
+    //private bool TryUseSkill()//스킬 쿨타임/조건 체크 후 스킬 실행 시도
+    //{
+    //    if (_currentSkill == null)
+    //    {
+    //        return false;
+    //    }
 
-        if (!_skillTimer.ExpiredOrNotRunning(Runner))
-        {
+    //    if (!_skillTimer.ExpiredOrNotRunning(Runner))
+    //    {
 
-            return false;
-        }
+    //        return false;
+    //    }
 
-        SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
+    //    SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
 
-        if (!_currentSkill.CanUse(this, runtime))
-        {
-            return false;
-        }
+    //    if (!_currentSkill.CanUse(this, runtime))
+    //    {
+    //        return false;
+    //    }
 
-        bool success = _currentSkill.Execute(this, runtime);
-        if (!success)
-        {
-            return false;
-        }
-        _fsm.EnterSkill(Runner, 0.15f);
+    //    bool success = _currentSkill.Execute(this, runtime);
+    //    if (!success)
+    //    {
+    //        return false;
+    //    }
+    //    _fsm.EnterSkill(Runner, 0.15f);
 
-        float cooldownReduction = Mathf.Clamp(_unitStat?.CooldownReduction?.Value ?? 0f, 0f, 0.9f);
-        float finalCooldown = Mathf.Max(0.1f, runtime.Cooldown * (1f - cooldownReduction));
+    //    float cooldownReduction = Mathf.Clamp(_unitStat?.CooldownReduction?.Value ?? 0f, 0f, 0.9f);
+    //    float finalCooldown = Mathf.Max(0.1f, runtime.Cooldown * (1f - cooldownReduction));
 
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, finalCooldown);
+    //    _skillTimer = TickTimer.CreateFromSeconds(Runner, finalCooldown);
 
-        return success;
-    }
+    //    return success;
+    //}
 
     private void TryAttack()
     {

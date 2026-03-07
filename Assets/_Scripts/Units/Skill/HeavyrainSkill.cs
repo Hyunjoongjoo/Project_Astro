@@ -7,14 +7,14 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
 
     private TickTimer _shotTimer;
     private int _remainingShots;
-    private HeroController _caster;
+    private NewHeroController _caster;
     private UnitBase _target;
     private bool _isFiring;
     private SkillRuntimeData _runtime;
 
     public SkillDataSO Data => _data;
 
-    public bool CanUse(HeroController caster, SkillRuntimeData runtime)
+    public bool CanUse(NewHeroController caster, SkillRuntimeData runtime)
     {
         if (caster == null)
         {
@@ -43,7 +43,7 @@ public class HeavyrainSkill : MonoBehaviour, IHeroSkill
         return dist <= runtime.SkillRange;
     }
 
-    public bool Execute(HeroController caster, SkillRuntimeData runtime)
+    public bool Execute(NewHeroController caster, SkillRuntimeData runtime)
     {
         if (!CanUse(caster, runtime))
         {

@@ -39,6 +39,8 @@ public class NewHeroController : UnitBase
     private GameObject _projectile;
     private IHeroSkill _currentSkill;
     private AttackType _attackType;
+    private Vector3 _targetPos;
+    private float _deployDelay;
 
     // 상태 기계 및 상태 인스턴스들
     public StateMachine StateMachine { get; private set; }
@@ -60,6 +62,7 @@ public class NewHeroController : UnitBase
     public GameObject Projectile => _projectile;
     public Transform FirePoint => _firePoint;
     public LayerMask TargetLayer => targetLayer;
+    public string HeroId => _heroId;
 
     public LayerMask AllyLayer
     {
@@ -88,7 +91,6 @@ public class NewHeroController : UnitBase
         ChaseState = new ChaseState(this);
         AttackState = new AttackState(this);
         DieState = new DieState(this);
-
 
         _unitStat = GetComponent<UnitStat>();
 
@@ -122,7 +124,7 @@ public class NewHeroController : UnitBase
             agent.enabled = true;
             agent.ResetPath();
         }
-
+        DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
     }
 
@@ -136,10 +138,12 @@ public class NewHeroController : UnitBase
 
     // --- 생성시 초기화 관련 메서드 ---
 
-    public void Setup(Team myTeam)
+    // 스폰 전에 실행되는 메서드
+    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay)
     {
         team = myTeam;
-        agent.speed = moveSpeed;
+        _targetPos = targetPos;
+        _deployDelay = deployDelay;
 
         ConfigureAreaMask();
 
@@ -266,14 +270,6 @@ public class NewHeroController : UnitBase
 
     // --- 유틸리티 메서드 (상태 클래스들에서 호출해서 사용) ---
 
-    public void BeginDeploy(Vector3 targetPos, float deployDelay)
-    {
-        if (!Object.HasStateAuthority) return;
-
-        DeployState.SetDeployData(targetPos, deployDelay);
-        StateMachine.ChangeState(DeployState);
-    }
-
     public void MoveTo(Vector3 destination)
     {
         if (agent != null && agent.enabled)
@@ -314,6 +310,32 @@ public class NewHeroController : UnitBase
             }
         }
         return closest;
+    }
+
+    public UnitBase GetClosestTower()
+    {
+        //두 타워 다 없으면 함교
+        if (_enemyTowerA == null && _enemyTowerB == null)
+            return _enemyBridge;
+
+        //둘 중 하나만 남았다면 그 포탑으로
+        if (_enemyTowerA == null)
+            return _enemyTowerB;
+
+        if (_enemyTowerB == null)
+            return _enemyTowerA;
+
+        float distA = (transform.position - _enemyTowerA.transform.position).sqrMagnitude;
+        float distB = (transform.position - _enemyTowerB.transform.position).sqrMagnitude;
+
+        return distA <= distB ? _enemyTowerA : _enemyTowerB;
+    }
+
+    // 근접 공격이면 바로 데미지 적용인데 시각 효과가 아무것도 없어서
+    // 공격하는지도 모르겠음. 그래서 일단 근접도 레이저 쏘도록 함.
+    public void BaseAttack(UnitBase target)
+    {
+        AttackRanged(target.transform.position);
     }
 
     //Projectile 연출 및 기본 공격 데미지 적용

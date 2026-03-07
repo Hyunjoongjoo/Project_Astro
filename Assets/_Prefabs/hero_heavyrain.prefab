@@ -579,7 +579,7 @@ GameObject:
   - component: {fileID: 5516983228772367154}
   - component: {fileID: 2488489115102682498}
   - component: {fileID: 3123802997670338100}
-  - component: {fileID: 9043486588942551580}
+  - component: {fileID: 2358444832805527505}
   - component: {fileID: 288590522490992711}
   - component: {fileID: -2787799764655628976}
   - component: {fileID: 6970888073266845989}
@@ -687,7 +687,7 @@ NavMeshAgent:
   m_BaseOffset: 2.119083
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &9043486588942551580
+--- !u!114 &2358444832805527505
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -696,9 +696,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 3852116074081476708}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8b2f4a5a7e52254ca4ac142269bc711, type: 3}
+  m_Script: {fileID: 11500000, guid: 767a49c5c5fce834ba3b896fdb4bfebb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HeroController
+  m_EditorClassIdentifier: Assembly-CSharp::NewHeroController
   maxHealth: 80
   deffense: 0
   team: 0
@@ -707,22 +707,24 @@ MonoBehaviour:
   _CurrentState: 0
   agent: {fileID: 3123802997670338100}
   moveSpeed: 6
-  unitSize: 0
   searchRange: 9
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
+  moveType: 0
+  attackPower: 10
+  attackRange: 5
+  attackSpeed: 0.8
+  currentTarget: {fileID: 0}
+  attackType: 0
   _heroId: hero_heavyrain
   _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
-  _normalSkill: {fileID: 11400000, guid: 2858029cad763fe4e81a7364d1dd7fd8, type: 2}
   _attackRange: 5
   _firePoint: {fileID: 4892445714994426902}
-  _enemyTowerA: {fileID: 0}
-  _enemyTowerB: {fileID: 0}
-  _enemyBridge: {fileID: 0}
   _unitStat: {fileID: 288590522490992711}
   _skillData: {fileID: 11400000, guid: 2858029cad763fe4e81a7364d1dd7fd8, type: 2}
+  _normalSkill: {fileID: 11400000, guid: 2858029cad763fe4e81a7364d1dd7fd8, type: 2}
   _skillComponent: {fileID: -2787799764655628976}
 --- !u!114 &288590522490992711
 MonoBehaviour:
@@ -766,7 +768,7 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 9043486588942551580}
+  - {fileID: 2358444832805527505}
   - {fileID: 7704040667658692594}
   ForceRemoteRenderTimeframe: 0
 --- !u!136 &-3351744654108456150

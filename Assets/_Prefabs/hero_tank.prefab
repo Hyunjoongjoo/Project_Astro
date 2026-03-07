@@ -440,7 +440,7 @@ GameObject:
   - component: {fileID: 5169243024188867454}
   - component: {fileID: 3024502998042256592}
   - component: {fileID: 7299576946842487594}
-  - component: {fileID: 1134780754710619926}
+  - component: {fileID: 7260822434054927323}
   - component: {fileID: 707048002635603553}
   - component: {fileID: 4569985432753418785}
   - component: {fileID: 9158771151194973300}
@@ -548,7 +548,7 @@ NavMeshAgent:
   m_BaseOffset: 1.403314
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &1134780754710619926
+--- !u!114 &7260822434054927323
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -557,9 +557,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1324447883655620717}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8b2f4a5a7e52254ca4ac142269bc711, type: 3}
+  m_Script: {fileID: 11500000, guid: 767a49c5c5fce834ba3b896fdb4bfebb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HeroController
+  m_EditorClassIdentifier: Assembly-CSharp::NewHeroController
   maxHealth: 150
   deffense: 0
   team: 0
@@ -568,22 +568,24 @@ MonoBehaviour:
   _CurrentState: 0
   agent: {fileID: 7299576946842487594}
   moveSpeed: 7
-  moveType: 1
   searchRange: 5
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
+  moveType: 1
+  attackPower: 10
+  attackRange: 2
+  attackSpeed: 1.5
+  currentTarget: {fileID: 0}
+  attackType: 0
   _heroId: hero_tank
   _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
-  _normalSkill: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
   _attackRange: 2
   _firePoint: {fileID: 128638915413792048}
-  _enemyTowerA: {fileID: 0}
-  _enemyTowerB: {fileID: 0}
-  _enemyBridge: {fileID: 0}
   _unitStat: {fileID: 707048002635603553}
   _skillData: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
+  _normalSkill: {fileID: 11400000, guid: 18c093c8db4875940aa55a9322ab9643, type: 2}
   _skillComponent: {fileID: 4569985432753418785}
 --- !u!114 &707048002635603553
 MonoBehaviour:
@@ -627,7 +629,7 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 1134780754710619926}
+  - {fileID: 7260822434054927323}
   - {fileID: -2192352356554374425}
   ForceRemoteRenderTimeframe: 0
 --- !u!136 &-7269745521372557208

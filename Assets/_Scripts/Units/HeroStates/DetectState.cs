@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using UnityEngine;
 
 public class DetectState : IState
 {
@@ -12,6 +13,7 @@ public class DetectState : IState
 
     public void Enter()
     {
+        Debug.Log("Detect 상태 진입");
         _hero.StopMove();
         // 진입 시 바로 탐색할 수 있도록 타이머 초기화
         _searchTimer = TickTimer.CreateFromSeconds(_hero.Runner, 0f);
@@ -31,13 +33,14 @@ public class DetectState : IState
                 return;
             }
 
-            // 타겟이 없다면 다시 타이머 세팅
+            // 타겟이 없다면 가까운 포탑으로 이동하며 타이머 다시 세팅
+            _hero.MoveTo(_hero.GetClosestTower().transform.position);
             _searchTimer = TickTimer.CreateFromSeconds(_hero.Runner, _hero.searchInterval);
         }
     }
 
     public void Exit()
     {
-
+        _hero.StopMove();
     }
 }

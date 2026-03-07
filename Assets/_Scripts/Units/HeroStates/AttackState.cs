@@ -13,6 +13,7 @@ public class AttackState : IState
 
     public void Enter()
     {
+        Debug.Log("Attack 상태 진입");
         // 공격 상태 진입 시 이동 멈추고
         _hero.StopMove();
 
@@ -54,7 +55,7 @@ public class AttackState : IState
 
     public void Exit()
     {
-
+        
     }
 
     private void RotateToTarget(Vector3 direction)
@@ -68,14 +69,10 @@ public class AttackState : IState
 
     private void PerformAttack()
     {
-        // HeroController가 가진 IBasicAttack 인터페이스와 RPC 로직을 활용합니다.
         if (_hero.attackType == AttackType.Melee) // HeroController에 attackType 변수 노출 필요
-        {
-            ((IBasicAttack)_hero).BaseAttack(_hero.currentTarget);
-        }
+            _hero.BaseAttack(_hero.currentTarget);
+
         else
-        {
             _hero.AttackRanged(_hero.currentTarget.transform.position); // 이 메서드는 public이어야 함
-        }
     }
 }

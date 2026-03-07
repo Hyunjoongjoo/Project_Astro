@@ -9,7 +9,7 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
 
     public SkillDataSO Data => _data;
 
-    public bool CanUse(HeroController caster, SkillRuntimeData runtime)
+    public bool CanUse(NewHeroController caster, SkillRuntimeData runtime)
     {
         if (caster.CurrentTarget == null)
         {
@@ -22,7 +22,7 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
 
     }
 
-    public bool Execute(HeroController caster, SkillRuntimeData runtime)
+    public bool Execute(NewHeroController caster, SkillRuntimeData runtime)
     {
         if (!caster.Object.HasStateAuthority)
         {
@@ -96,7 +96,7 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
         }
     }
 
-    private UnitBase GetAssaultBaseTarget(HeroController caster)
+    private UnitBase GetAssaultBaseTarget(NewHeroController caster)
     {
         //현재 전투 타겟 우선
         if (caster.CurrentTarget != null && !caster.CurrentTarget.IsDead)

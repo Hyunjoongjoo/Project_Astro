@@ -363,7 +363,7 @@ GameObject:
   - component: {fileID: 5369316081649875699}
   - component: {fileID: 4670447818620898379}
   - component: {fileID: 1555341712732983471}
-  - component: {fileID: 6144675461439888625}
+  - component: {fileID: 3768366567915542154}
   - component: {fileID: 250558184794622207}
   - component: {fileID: 5510236954846484131}
   - component: {fileID: 1679591168465454536}
@@ -471,7 +471,7 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &6144675461439888625
+--- !u!114 &3768366567915542154
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -480,9 +480,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1619433986598075239}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8b2f4a5a7e52254ca4ac142269bc711, type: 3}
+  m_Script: {fileID: 11500000, guid: 767a49c5c5fce834ba3b896fdb4bfebb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HeroController
+  m_EditorClassIdentifier: Assembly-CSharp::NewHeroController
   maxHealth: 80
   deffense: 0
   team: 0
@@ -491,22 +491,24 @@ MonoBehaviour:
   _CurrentState: 0
   agent: {fileID: 1555341712732983471}
   moveSpeed: 8
-  unitSize: 0
   searchRange: 6
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
+  moveType: 0
+  attackPower: 10
+  attackRange: 2
+  attackSpeed: 1.2
+  currentTarget: {fileID: 0}
+  attackType: 0
   _heroId: hero_corsair
   _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
-  _normalSkill: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
-  _attackRange: 3
+  _attackRange: 2
   _firePoint: {fileID: 533690703149539074}
-  _enemyTowerA: {fileID: 0}
-  _enemyTowerB: {fileID: 0}
-  _enemyBridge: {fileID: 0}
   _unitStat: {fileID: 250558184794622207}
   _skillData: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
+  _normalSkill: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
   _skillComponent: {fileID: 5510236954846484131}
 --- !u!114 &250558184794622207
 MonoBehaviour:
@@ -550,7 +552,7 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 6144675461439888625}
+  - {fileID: 3768366567915542154}
   - {fileID: 479350263834020189}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &479350263834020189

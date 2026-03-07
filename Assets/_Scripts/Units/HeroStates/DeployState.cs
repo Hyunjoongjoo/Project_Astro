@@ -16,6 +16,7 @@ public class DeployState : IState
 
     public void SetDeployData(Vector3 targetPos, float deployDelay)
     {
+        Debug.Log($"SetDeployData 메서드 안, deployDelay : {deployDelay} ");
         _deployTarget = targetPos;
         _deployDelayTimer = TickTimer.CreateFromSeconds(_hero.Runner, deployDelay);
         _deployFailSafeTimer = TickTimer.CreateFromSeconds(_hero.Runner, deployDelay + 1.5f);
@@ -23,6 +24,7 @@ public class DeployState : IState
 
     public void Enter()
     {
+        Debug.Log("Deploy 상태 진입");
         _hero.MoveTo(_deployTarget);
     }
 
