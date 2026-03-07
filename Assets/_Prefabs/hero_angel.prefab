@@ -505,7 +505,6 @@ GameObject:
   - component: {fileID: 2564167791635826302}
   - component: {fileID: -6791266335917339417}
   - component: {fileID: -5489522264367414398}
-  - component: {fileID: -7570881975778386625}
   m_Layer: 6
   m_Name: hero_angel
   m_TagString: Untagged
@@ -636,16 +635,15 @@ MonoBehaviour:
   searchInterval: 0.3
   _heroId: hero_angel
   _normalAttack: {fileID: 11400000, guid: 13e2a167b4c8ac04980bc7610074a415, type: 2}
+  _normalSkill: {fileID: 11400000, guid: 6772757a4f7e87844aab3f0e0e51521e, type: 2}
   _attackRange: 3
   _firePoint: {fileID: 4179351352739521411}
-  _unitStat: {fileID: 5106166068817242912}
-  _skillData: {fileID: 11400000, guid: 6772757a4f7e87844aab3f0e0e51521e, type: 2}
-  _normalSkill: {fileID: 11400000, guid: 6772757a4f7e87844aab3f0e0e51521e, type: 2}
-  _skillComponent: {fileID: 8345162342218717666}
-  _rpc: {fileID: -7570881975778386625}
   _enemyTowerA: {fileID: 0}
   _enemyTowerB: {fileID: 0}
   _enemyBridge: {fileID: 0}
+  _unitStat: {fileID: 5106166068817242912}
+  _skillData: {fileID: 11400000, guid: 6772757a4f7e87844aab3f0e0e51521e, type: 2}
+  _skillComponent: {fileID: 8345162342218717666}
 --- !u!114 &5106166068817242912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -690,7 +688,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1286710755949793987}
   - {fileID: -5489522264367414398}
-  - {fileID: -7570881975778386625}
   ForceRemoteRenderTimeframe: 0
 --- !u!136 &-6791266335917339417
 CapsuleCollider:
@@ -732,20 +729,6 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
---- !u!114 &-7570881975778386625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2207229902267668355}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1ae073cd1c89c24f968f9bf93bee56a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HeroEffectRPC
-  _normalProjectile: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
-  _skillProjectile: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
 --- !u!1 &2317570049132111243
 GameObject:
   m_ObjectHideFlags: 0

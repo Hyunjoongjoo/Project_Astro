@@ -13,11 +13,6 @@ public enum UnitState
     Idle, Move, Attack, Dead, Skill 
 }
 
-public enum UnitSize
-{
-    Small, Large
-}
-
 public enum AttackType
 {
     Melee, Range
@@ -36,10 +31,4 @@ public enum EffectAttachType
     World,      // 그냥 월드에 생성
     Caster,     // 시전자에 붙음
     Target      // 타겟에 붙음
-}
-
-public enum ProjectileType
-{
-    Normal,
-    Skill
 }

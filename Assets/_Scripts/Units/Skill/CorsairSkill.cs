@@ -81,14 +81,9 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
 
             unit.TakeDamage(damage);
         }
-        bool attachToCaster = caster.SkillData != null && caster.SkillData.AttachType == EffectAttachType.Caster;
+
         //이펙트
-        caster.EffectRPC.RPC_PlaySkillEffect(center,
-        Quaternion.identity,
-        caster.SkillData != null ? caster.SkillData.EffectScale : 1f,
-        caster.SkillData != null ? caster.SkillData.EffectLifeTime : 0.6f,
-        attachToCaster,
-        caster.Object.Id);
+        caster.RPC_PlaySkillEffect(center, Quaternion.identity);
 
         return true;
     }

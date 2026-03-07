@@ -10,14 +10,13 @@ public class MobilityUnit : UnitBase, ITargetFinder
 
     [Header("이동 관련 스테이터스")]
     [SerializeField] protected float moveSpeed;
-    [SerializeField] protected UnitSize unitSize;
+    [SerializeField] protected MoveType moveType;
 
     [Header("탐지 관련 스테이터스")]
     [SerializeField] protected float searchRange;
     [SerializeField] protected LayerMask targetLayer;
     [SerializeField] protected float searchInterval = 0.3f;
 
-    public float MoveSpeed => moveSpeed;
     public float SearchRange => searchRange;
     public LayerMask TargetLayer => targetLayer;
     public float SearchInterval => searchInterval;
@@ -76,14 +75,14 @@ public class MobilityUnit : UnitBase, ITargetFinder
 
         int meteorArea = NavMesh.GetAreaFromName("MeteorZone");
 
-        switch (unitSize)
+        switch (moveType)
         {
-            case UnitSize.Small:
+            case MoveType.Small:
                 //Small은 통과
                 agent.areaMask = NavMesh.AllAreas;
                 break;
 
-            case UnitSize.Large:
+            case MoveType.Large:
                 //MeteorZone 차단
                 agent.areaMask = NavMesh.AllAreas & ~(1 << meteorArea);
                 break;

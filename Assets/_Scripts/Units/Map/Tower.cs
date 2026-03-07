@@ -8,12 +8,14 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
 {
     public static List<Structure> AliveTowers = new List<Structure>();
 
-    [SerializeField] private float _attackPower;
-    [SerializeField] private float _attackSpeed = 1f;
+    [Header("타워 스테이터스")]
+    [SerializeField] private string _unitId;
+    [SerializeField] private UnitStat _unitStat;
+    [SerializeField] private float _attackRange;
+
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform _firePoint;
 
-    [SerializeField] private float _detectRange;
     [SerializeField] private LayerMask _targetLayer;
     [SerializeField] private float _scanInterval = 0.5f;
 
@@ -23,14 +25,13 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
     private TickTimer _attackTimer;
     private UnitFSM _fsm;
 
-    public float AttackPower { get => _attackPower; }
-    public float AttackSpeed { get => _attackSpeed; }
-    public float AttackRange { get => _detectRange; }
-    public float SearchRange { get => _detectRange; }
-    public LayerMask TargetLayer { get => _targetLayer; }
-    public float SearchInterval { get => _scanInterval; }
+    public float AttackPower => _unitStat.Attack.Value;
+    public float AttackSpeed => _unitStat.AttackSpeed.Value;
+    public float SearchRange => _unitStat.DetectRange.Value;
+    public float AttackRange => _attackRange;
+    public LayerMask TargetLayer => _targetLayer;
+    public float SearchInterval => _scanInterval;
 
-    //[Networked] public TickTimer AttackInterval { get; set; }
 
     public override void Spawned()
     {
@@ -43,22 +44,34 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
             return;
         }
 
+        if (_unitStat == null)
+        {
+            _unitStat = GetComponent<UnitStat>();
+        }
+
+        UnitData data = TableManager.Instance.UnitTable.Get(_unitId);
+
+        _unitStat.Init(data);
+
+        maxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = maxHealth;
+
+        Debug.Log(
+    $"[적용된 타워 스텟]\n" +
+    $"ID : {_unitId}\n" +
+    $"HP : {maxHealth}\n" +
+    $"Attack : {AttackPower}\n" +
+    $"AttackSpeed : {AttackSpeed}\n" +
+    $"DetectRange : {SearchRange}"
+    );
+
         _fsm = new UnitFSM();
 
         CurrentState = UnitState.Idle;
 
         _scanTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-        //if (team == Team.Blue)
-        //{
-        //    gameObject.layer = LayerMask.NameToLayer("BlueTeam");
-        //    _targetLayer = 1 << LayerMask.NameToLayer("RedTeam");
-        //}
-        //else
-        //{
-        //    gameObject.layer = LayerMask.NameToLayer("RedTeam");
-        //    _targetLayer = 1 << LayerMask.NameToLayer("BlueTeam");
-        //}
+  
     }
 
     private void OnEnable()
@@ -150,7 +163,7 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
         {
             return;
         }
-        _currentTarget.TakeDamage(_attackPower);
+        _currentTarget.TakeDamage(AttackPower);
 
         RPC_PlayAttackEffect(_currentTarget.transform.position);
 
@@ -183,7 +196,7 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
 
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, _detectRange, _targetLayer);
+        Collider[] hits = Physics.OverlapSphere(transform.position, SearchRange, _targetLayer);
 
         if (hits.Length == 0)
         {
@@ -226,7 +239,7 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
     private void OnDrawGizmosSelected()//탐지 범위 시각화
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, _detectRange);
+        Gizmos.DrawWireSphere(transform.position, SearchRange);
     }
 #endif
 }
