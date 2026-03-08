@@ -1,11 +1,11 @@
 ﻿
 public class DieState : IState
 {
-    private HeroController _hero;
+    private MinionController _unit;
 
-    public DieState(HeroController hero)
+    public DieState(MinionController unit)
     {
-        _hero = hero;
+        _unit = unit;
     }
 
     public void Enter()

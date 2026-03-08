@@ -8,5 +8,5 @@ public abstract class BaseSkillSO : ScriptableObject
     public float _initCooldown;
     public float _cooldown;
 
-    public abstract ISkill CreateInstance(HeroController hero);
+    public abstract ISkill CreateInstance(MinionController unit);
 }

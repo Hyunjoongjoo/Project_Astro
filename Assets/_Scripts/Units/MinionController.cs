@@ -1,40 +1,132 @@
-﻿using Fusion;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.AI;
 
 
-public class MinionController : MobilityUnit, IBasicAttack
+public class MinionController : UnitBase
 {
-    [Header("유닛 스테이터스")]
-    [SerializeField] private string _unitId;
-    [SerializeField] private UnitStat _unitStat;
-    [SerializeField] private float _attackRange;
+    [Header("내비게이션 및 탐지")]
+    public NavMeshAgent agent;
+    public float moveSpeed;
+    public float searchRange;
+    public LayerMask targetLayer;
+    public float searchInterval = 0.3f;
+    [SerializeField] protected MoveType moveType;
 
-    [Header("타입")]
-    [SerializeField] private AttackType _attackType;
+    [Header("스탯 관련")]
+    public float attackRange = 5;
+    [SerializeField] protected string _unitId;
+    public Transform firePoint;
+    protected UnitStat _unitStat;
 
-    [Header("원거리")]
-    [SerializeField] private GameObject _projectilePrefab;
-    [SerializeField] private Transform _firePoint;
+    [HideInInspector] public UnitBase currentTarget;
 
-    [Header("타워 레퍼런스")]
-    [SerializeField] private UnitBase _towerA;
-    [SerializeField] private UnitBase _towerB;
-    [SerializeField] private UnitBase _bridge;
+    protected UnitBase _towerA;
+    protected UnitBase _towerB;
+    protected UnitBase _bridge;
 
-    private UnitBase _currentTarget;
+    public ISkill normalAttack;
 
-    private TickTimer _searchTimer;
-    private TickTimer _attackTimer;
-    private UnitFSM _fsm;
+    // 상태 머신과 상태 인스턴스들
+    public StateMachine StateMachine { get; protected set; }
+    public DetectState DetectState { get; protected set; }
+    public ChaseState ChaseState { get; protected set; }
+    public AttackState AttackState { get; protected set; }
+    public DieState DieState { get; protected set; }
 
+    [Header("스킬 데이터")]
+    [Header("평타 공격")]
+    [SerializeField] protected BaseSkillSO _normalAttackData;
+
+    public UnitBase CurrentTarget => currentTarget;
     public float AttackPower => _unitStat.Attack.Value;
     public float AttackSpeed => _unitStat.AttackSpeed.Value;
-    public float AttackRange => _attackRange;
+    public UnitStat UnitStat => _unitStat;
+    public NavMeshAgent Agent => agent;
+    public LayerMask TargetLayer => targetLayer;
+    public string HeroId => _unitId;
+    public LayerMask AllyLayer
+    {
+        get
+        {
+            return team == Team.Blue ? LayerMask.GetMask("BlueTeam") : LayerMask.GetMask("RedTeam");
+        }
+    }
+    public override void Spawned()
+    {
+        base.Spawned();
+
+        unitType = UnitType.Minion;
+
+        normalAttack = _normalAttackData.CreateInstance(this);
+
+        if (!Object.HasStateAuthority) return;
+
+        // 상태 인스턴스 생성
+        StateMachine = new StateMachine();
+        DetectState = new DetectState(this);
+        ChaseState = new ChaseState(this);
+        AttackState = new AttackState(this);
+        DieState = new DieState(this);
+
+        _unitStat = GetComponent<UnitStat>();
+
+        UnitData data = TableManager.Instance.UnitTable.Get(_unitId);
+
+        //UnitStat 초기화
+        _unitStat.Init(data);
+
+        //Stat 기반 값 적용
+        maxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = maxHealth;
+        moveSpeed = _unitStat.MoveSpeed.Value;
+        searchRange = _unitStat.DetectRange.Value;
+        agent.speed = moveSpeed;
+
+        StateMachine.ChangeState(DetectState);
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority) return;
+        if (IsDead) return; // 사망 시 중단 (혹은 DieState에서 처리)
+
+        StateMachine.Update();
+    }
+
+    // --- 생성시 초기화 관련 메서드 ---
+
+    // 스폰 전에 실행되는 메서드
 
     public void Setup(Team myTeam)
     {
         team = myTeam;
-        base.Setup();
+        agent = GetComponent<NavMeshAgent>();
+
+        ConfigureAreaMask();
+
+        int myLayer;
+        int enemyLayer;
+
+        if (team == Team.Blue)
+        {
+            myLayer = LayerMask.NameToLayer("BlueTeam");
+            enemyLayer = LayerMask.NameToLayer("RedTeam");
+        }
+        else if (team == Team.Red)
+        {
+            myLayer = LayerMask.NameToLayer("RedTeam");
+            enemyLayer = LayerMask.NameToLayer("BlueTeam");
+        }
+        else
+        {
+            Debug.Log("중립 오브젝트입니다.");
+            return;
+        }
+
+        //팀레이어 적용
+        SetLayer(gameObject, myLayer);
+        //탐지 단계에서는 적 팀 레이어만 대상으로
+        targetLayer = 1 << enemyLayer;
 
         UnitBase[] targetStructure = team == Team.Blue ?
             ObjectContainer.Instance.redSideStructure :
@@ -45,309 +137,100 @@ public class MinionController : MobilityUnit, IBasicAttack
         _bridge = targetStructure[2];
     }
 
-    public void SetAttackType(AttackType attackType)
+    protected void SetLayer(GameObject root, int layer)//UnitBase가 붙은 오브젝트만 대상으로 레이어를 설정
     {
-        _attackType = attackType;
+        if (root.GetComponent<UnitBase>() != null)
+            root.layer = layer;
+
+        foreach (Transform child in root.transform)
+            SetLayer(child.gameObject, layer);
     }
 
-    public override void Spawned()
+    protected void ConfigureAreaMask()
     {
-        base.Spawned();
+        if (agent == null) return;
 
-        unitType = UnitType.Minion;
+        int meteorArea = NavMesh.GetAreaFromName("MeteorZone");
 
-        if (!Object.HasStateAuthority) return;
-
-        if (_unitStat == null)
+        switch (moveType)
         {
-            _unitStat = GetComponent<UnitStat>();
-        }
-
-        UnitData data = TableManager.Instance.UnitTable.Get(_unitId);
-
-        _unitStat.Init(data);
-
-        maxHealth = _unitStat.MaxHp.Value;
-        CurrentHealth = maxHealth;
-
-        moveSpeed = _unitStat.MoveSpeed.Value;
-        searchRange = _unitStat.DetectRange.Value;
-
-        agent.speed = moveSpeed;
-
-        Debug.Log(
-$"[적용된 미니언 스텟]\n" +
-$"ID : {_unitId}\n" +
-$"HP : {maxHealth}\n" +
-$"Attack : {AttackPower}\n" +
-$"AttackSpeed : {AttackSpeed}\n" +
-$"MoveSpeed : {moveSpeed}\n" +
-$"DetectRange : {searchRange}"
-);
-
-        _fsm = new UnitFSM();
-
-        //타이머를 즉시 만료 상태로 초기화 -> 첫 틱에 곧바로 탐색 실행
-        _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-        _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-
-        CurrentState = UnitState.Move;
-    }
-
-    public override void FixedUpdateNetwork()
-    {
-        // StateAuthority가 없는 클라이언트는 서버 상태를 그대로 반영만 함
-        if (!Object.HasStateAuthority) return;
-
-        // 사망 상태면 행동 중단
-        if (CurrentState == UnitState.Dead) return;
-
-        // 주기적 탐색
-        if (_fsm.State == UnitAIState.Detect && _searchTimer.ExpiredOrNotRunning(Runner))
-        {
-            RefreshTarget();
-            _searchTimer = TickTimer.CreateFromSeconds(Runner, SearchInterval);
-        }
-
-        bool hasTarget = _currentTarget != null && !_currentTarget.IsDead;
-        bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
-        bool isDead = CurrentState == UnitState.Dead;//FSM에도 사망 여부를 전달(의도치 않은 상태 전이 방지)
-
-        //FSM에 상태 전이 판단 위임
-        _fsm.DecideState(isDead: isDead, hasTarget: hasTarget, inRange: inRange);
-
-        //FSM 결과에 따라 행동 처리
-        ApplyState(_fsm.State);
-    }
-
-    // FSM 판단 결과를 실제 유닛 행동으로 적용
-    private void ApplyState(UnitAIState state)
-    {
-        switch (state)
-        {
-            case UnitAIState.Detect:
-                HandleDetect();
+            case MoveType.Small:
+                //Small은 통과
+                agent.areaMask = NavMesh.AllAreas;
                 break;
 
-            case UnitAIState.Attack:
-                HandleAttack();
-                break;
-
-            case UnitAIState.Dead:
+            case MoveType.Large:
+                //MeteorZone 차단
+                agent.areaMask = NavMesh.AllAreas & ~(1 << meteorArea);
                 break;
         }
     }
 
-    private void HandleDetect()
+    // --- 유틸리티 메서드 (상태 클래스들에서 호출해서 사용) ---
+
+    public void MoveTo(Vector3 destination)
     {
-        // 전투 타겟이 없는 경우
-        if (_currentTarget == null)
+        if (agent != null && agent.enabled)
         {
-            //함교가 존재하면 계속 전진
-            if (_bridge != null)
+            agent.isStopped = false;
+            agent.SetDestination(destination);
+        }
+    }
+
+    public void StopMove()
+    {
+        if (agent != null && agent.enabled)
+        {
+            agent.isStopped = true;
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+        }
+    }
+
+    public UnitBase FindTarget()
+    {
+        // 기존 MobilityUnit의 OverlapSphere 탐색 로직
+        Collider[] hits = Physics.OverlapSphere(transform.position, searchRange, targetLayer);
+        float minDistance = float.MaxValue;
+        UnitBase closest = null;
+
+        foreach (var hit in hits)
+        {
+            UnitBase unit = hit.GetComponent<UnitBase>();
+            if (unit != null && unit != this && !unit.IsDead && unit.team != this.team)
             {
-                CurrentState = UnitState.Move;
-                MoveTo(_bridge.transform.position);
+                float dist = Vector3.Distance(transform.position, unit.transform.position);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    closest = unit;
+                }
             }
-            else
-            {
-                CurrentState = UnitState.Idle;
-                StopMove();
-            }
-
-            return;
         }
-
-        //타겟이 있는 경우 → 해당 타겟을 향해 이동
-        CurrentState = UnitState.Move;
-        MoveTo(_currentTarget.transform.position);
+        return closest;
     }
 
-    private void HandleAttack()
+    public UnitBase GetClosestTower()
     {
-        CurrentState = UnitState.Attack;
-        StopMove();
-        RotateToTarget();
-        TryAttack();
-    }
+        //두 타워 다 없으면 함교
+        if (_towerA == null && _towerB == null)
+            return _bridge;
 
-    private void TryAttack()
-    {
-        if (!_attackTimer.ExpiredOrNotRunning(Runner)) return;
-        if (_currentTarget == null) return;
-
-        // IBasicAttack 인터페이스 기본 구현 호출 (target.TakeDamage(AttackPower))
-        if (_attackType == AttackType.Melee)
-        {
-            ((IBasicAttack)this).BaseAttack(_currentTarget);
-        }
-        else
-        {
-            AttackRanged(_currentTarget.transform.position);
-        }
-
-        float cooldown = 1f / Mathf.Max(AttackSpeed, 0.01f);
-        _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
-    }
-
-    private void RotateToTarget()
-    {
-        if (_currentTarget == null)
-        {
-            return;
-        }
-
-        Vector3 dir = _currentTarget.transform.position - transform.position;
-        dir.y = 0f; //수평 회전
-
-        if (dir.sqrMagnitude < 0.001f)
-        {
-            return;
-        }
-
-        Quaternion targetRotation = Quaternion.LookRotation(dir);
-
-        transform.rotation = targetRotation;
-    }
-
-    private void RefreshTarget()
-    {
-        UnitBase enemy = FindTarget(); // MobilityUnit의 ITargetFinder 구현
-
-        if (enemy != null)
-        {
-            SetTarget(enemy);
-            return;
-        }
-
-        // 적 없으면 가까운 타워 선택
-        UnitBase closestTower = GetClosestTower();
-        if (closestTower != null)
-        {
-            SetTarget(closestTower);
-        }
-    }
-
-    private void SetTarget(UnitBase target)
-    {
-        if (_currentTarget == target)
-        {
-            return;
-        }
-
-        // 새 목표로 교체할 때 기존 사망 이벤트 구독 해제
-        if (_currentTarget != null)
-        {
-            _currentTarget.OnDeath -= OnTargetDied;
-        }
-
-        _currentTarget = target;
-
-        if (_currentTarget != null)
-        {
-            _currentTarget.OnDeath += OnTargetDied;
-        }
-    }
-
-    private UnitBase GetClosestTower()
-    {
-        // 함교도 없으면 타겟 없음 (사실상 게임 종료)
-        if (_bridge == null) return null;
-
-        // 두 타워가 모두 없으면 함교
-        if (_towerA == null && _towerB == null) return _bridge;
-
-        // 타워가 하나만 남은 경우 타워나 함교 중 가까운 쪽
+        //둘 중 하나만 남았다면 그 포탑으로
         if (_towerA == null)
-        {
-            float distTower = Vector3.Distance(transform.position, _towerB.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _bridge.transform.position);
-            return distBridge < distTower ? _bridge : _towerB;
-        }
+            return _towerB;
 
         if (_towerB == null)
-        {
-            float distTower = Vector3.Distance(transform.position, _towerA.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _bridge.transform.position);
-            return distBridge < distTower ? _bridge : _towerA;
-        }
+            return _towerA;
 
-        // 두 타워가 모두 살아있다면 둘 중 가까운 넘
-        float distA = Vector3.Distance(transform.position, _towerA.transform.position);
-        float distB = Vector3.Distance(transform.position, _towerB.transform.position);
+        float distA = (transform.position - _towerA.transform.position).sqrMagnitude;
+        float distB = (transform.position - _towerB.transform.position).sqrMagnitude;
+
         return distA <= distB ? _towerA : _towerB;
     }
 
-    private void AttackRanged(Vector3 targetPos)
+    public GameObject InstantiateObject(GameObject obj, Vector3 pos, Quaternion dir)
     {
-        if (_projectilePrefab == null || _firePoint == null)
-        {
-            return;
-        }
-
-        if (_currentTarget == null)
-        {
-            return;
-        }
-
-        _currentTarget.TakeDamage(AttackPower);
-
-        RPC_FireProjectile(targetPos);
+        return Instantiate(obj, pos, dir);
     }
-
-    //투사체(현재는 이펙트만)
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_FireProjectile(Vector3 targetPos)
-    {
-        if (_projectilePrefab == null || _firePoint == null)
-        {
-            return;
-        }
-
-        GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
-
-        projectile.GetComponent<Projectile>()?.Fire(_currentTarget.gameObject);
-    }
-
-    private void OnTargetDied(UnitBase deadUnit)
-    {
-        deadUnit.OnDeath -= OnTargetDied;
-        _currentTarget = null;
-
-        // 타이머를 즉시 만료시켜 다음 틱에 바로 재탐색
-        _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-    }
-
-    public override void Die()
-    {
-        _fsm?.ForceDead();
-        StopMove();
-
-        // 목표 이벤트 구독 해제 후 부모 Die 호출 (Despawn)
-        if (_currentTarget != null)
-        {
-            _currentTarget.OnDeath -= OnTargetDied;
-            _currentTarget = null;
-        }
-
-        base.Die();
-    }
-
-#if UNITY_EDITOR
-    protected override void OnDrawGizmosSelected()
-    {
-        base.OnDrawGizmosSelected(); // 탐지 범위 (노란 원)
-
-        // 공격 범위 (빨간 원)
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, _attackRange);
-
-        // 현재 목표 → 미니언 연결선
-        if (_currentTarget != null)
-        {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawLine(transform.position, _currentTarget.transform.position);
-        }
-    }
-#endif
 }

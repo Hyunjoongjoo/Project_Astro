@@ -8,8 +8,8 @@ public class ShieldSkillSO : BaseSkillSO
     public float duration;
     public GameObject shieldVFX;
 
-    public override ISkill CreateInstance(HeroController hero)
+    public override ISkill CreateInstance(MinionController unit)
     {
-        return new ShieldSkill(this, hero);
+        return new ShieldSkill(this, unit);
     }
 }

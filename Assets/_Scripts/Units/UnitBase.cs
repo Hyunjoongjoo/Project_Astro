@@ -33,6 +33,11 @@ public abstract class UnitBase : NetworkBehaviour
 
     public override void Spawned()
     {
+        BaseUnitInit();
+    }
+
+    protected virtual void BaseUnitInit()
+    {
         if (Object.HasStateAuthority)
         {
             selfNetworkObj = GetComponent<NetworkObject>();
