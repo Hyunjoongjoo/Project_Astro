@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fee6d32a3785654b821b9fd26d31449, type: 3}
   m_Name: Tank_Skill_Type_A
   m_EditorClassIdentifier: Assembly-CSharp::ShieldSkillSO
-  _skillName: augment1_name_hero_tank
-  _skillDescription: augment1_desc_hero_tank
-  _note: 
-  _initCooldown: 4
-  _cooldown: 8
+  skillName: 
+  skillDescription: 
+  note: 
+  initCooldown: 5
+  cooldown: 12
   damageReduction: 0.5
   duration: 5
   shieldVFX: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}

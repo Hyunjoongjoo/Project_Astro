@@ -83,7 +83,7 @@ public class CorsairSkill : MonoBehaviour, IHeroSkill
         }
 
         //이펙트
-        caster.RPC_PlaySkillEffect(center, Quaternion.identity);
+        //caster.RPC_PlaySkillEffect(center, Quaternion.identity);
 
         return true;
     }

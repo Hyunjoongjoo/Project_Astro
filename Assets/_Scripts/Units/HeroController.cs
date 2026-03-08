@@ -191,39 +191,7 @@ public class HeroController : UnitController
         target.TakeDamage(finalDamage);
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)
-    {
-        //if (_skillData == null)
-        //{
-        //    return;
-        //}
-
-        // GameObject prefab = _skillData.EffectPrefab;
-
-        //if (prefab == null)
-        //{
-        //    return;
-        //}
-
-        //GameObject fx;
-
-        ////캐스터에 붙는 이펙트
-        //if (_skillData.AttachType == EffectAttachType.Caster)
-        //{
-        //    fx = Instantiate(prefab, transform);
-        //    fx.transform.localPosition = Vector3.zero;
-        //    fx.transform.localRotation = Quaternion.identity;
-        //}
-        //else//월드 좌표 기준 이펙트
-        //{
-        //    fx = Instantiate(prefab, pos, rot);
-        //}
-
-        //fx.transform.localScale = Vector3.one * _skillData.EffectScale;
-
-        //Destroy(fx, _skillData.EffectLifeTime);
-    }
+    
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlayHealEffect(NetworkId targetId)

@@ -144,9 +144,9 @@ MonoBehaviour:
     m_Bits: 0
   searchInterval: 0.3
   moveType: 0
-  attackRange: 0
-  _unitId: 
-  firePoint: {fileID: 0}
+  attackRange: 7
+  _unitId: hero_angel
+  firePoint: {fileID: 4179351352739521411}
   currentTarget: {fileID: 0}
   _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}
   _standardSkillData: {fileID: 0}

@@ -233,4 +233,11 @@ public class UnitController : UnitBase
     {
         return Instantiate(obj, pos, dir);
     }
+    public void DestroyObject(GameObject obj, float delay = 0f)
+    {
+        if (delay == 0f) 
+            Destroy(obj);
+        else
+            Destroy(obj, delay);
+    }
 }

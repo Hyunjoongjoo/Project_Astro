@@ -45,5 +45,19 @@ public class ShieldSkill : ISkill
     public void Casting()
     {
         Debug.Log("실드 스킬 실행됨");
+        var _damageReductionModifier = new StatModifier(_data.damageReduction, StatModType.Flat, _cachedUnit);
+        _cachedUnit.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, _damageReductionModifier, _data.duration);
+        RPC_PlaySkillEffect();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlaySkillEffect()
+    {
+        var obj = _cachedUnit.InstantiateObject(_data.shieldVFX, _cachedUnit.transform.position, Quaternion.identity);
+        var trf = obj.GetComponent<Transform>();
+        trf.SetParent(_cachedUnit.transform, false);
+        trf.localPosition = Vector3.zero;
+
+        _cachedUnit.DestroyObject(obj, _data.duration);
     }
 }
