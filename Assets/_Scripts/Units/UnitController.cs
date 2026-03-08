@@ -16,7 +16,6 @@ public class UnitController : UnitBase
     public float attackRange = 5;
     [SerializeField] protected string _unitId;
     public Transform firePoint;
-    protected UnitStat _unitStat;
 
     [HideInInspector] public UnitBase currentTarget;
 

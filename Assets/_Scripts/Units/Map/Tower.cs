@@ -1,16 +1,13 @@
 ﻿using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
-
-public class Tower : Structure, IBasicAttack, ITargetFinder
+public class Tower : Structure
 {
     public static List<Structure> AliveTowers = new List<Structure>();
 
     [Header("타워 스테이터스")]
     [SerializeField] private string _unitId;
-    [SerializeField] private UnitStat _unitStat;
     [SerializeField] private float _attackRange;
 
     [SerializeField] private GameObject _projectilePrefab;

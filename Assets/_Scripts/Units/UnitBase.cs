@@ -7,8 +7,10 @@ using static UnityEngine.GraphicsBuffer;
 public abstract class UnitBase : NetworkBehaviour
 {
     [Header("체력과 방어력 설정")]
-    [SerializeField] protected float maxHealth;
-    [SerializeField] protected float deffense;
+    protected float maxHealth;
+    protected float deffense;
+
+    protected UnitStat _unitStat;
 
     //protected float currentHealth;
 
@@ -54,7 +56,16 @@ public abstract class UnitBase : NetworkBehaviour
         if (!Object.HasStateAuthority) return;
         if (IsDead) return;
 
-        CurrentHealth = Mathf.Max(CurrentHealth - amount, 0); ;
+        // 매개변수 값은 아무 계산도 안한 순수 데미지 초기값
+        // 여기서 최종 받는 데미지를 계산한다.
+        float finalTakenDamage = amount;
+
+        if (_unitStat != null)
+        {
+            finalTakenDamage *= (1 - _unitStat.DamageReduction.Value);
+        }
+
+        CurrentHealth = Mathf.Max(CurrentHealth - finalTakenDamage, 0); ;
 
         if (CurrentHealth < 1)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
             Die();

@@ -1,12 +1,10 @@
-﻿using System;
-using Fusion;
+﻿using Fusion;
 using UnityEngine;
 
 public class Bridge : Structure, IBasicAttack, ITargetFinder
 {
     [Header("함교 스테이터스")]
     [SerializeField] private string _unitId;
-    [SerializeField] private UnitStat _unitStat;
     [SerializeField] private float _attackRange;
 
     [SerializeField] private GameObject _projectilePrefab;
