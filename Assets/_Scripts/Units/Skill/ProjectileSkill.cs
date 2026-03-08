@@ -21,10 +21,10 @@ public class ProjectileSkill : ISkill
 
     public void ChangeData(BaseSkillSO newData)
     {
-        if (newData is ProjectileSkillSO shieldData)
-            _data = shieldData;
+        if (newData is ProjectileSkillSO projectileData)
+            _data = projectileData;
         else
-            Debug.LogWarning($"[ShieldSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
+            Debug.LogWarning($"[ProjectileSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
     }
 
     public bool UsingConditionCheck()

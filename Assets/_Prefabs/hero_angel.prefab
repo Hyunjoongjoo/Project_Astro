@@ -130,8 +130,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0807c2c902d934c971569602ccad0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewHeroController
-  maxHealth: 0
-  deffense: 0
   team: 0
   _networkedTeam: 0
   _CurrentHealth: 0
@@ -149,8 +147,8 @@ MonoBehaviour:
   firePoint: {fileID: 4179351352739521411}
   currentTarget: {fileID: 0}
   _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}
-  _standardSkillData: {fileID: 0}
-  _typeASkillData: {fileID: 0}
+  _standardSkillData: {fileID: 11400000, guid: d6dd206c7bea98c44acb6c53c617a268, type: 2}
+  _typeASkillData: {fileID: 11400000, guid: c58705a6061f3204db40e9abc3b16054, type: 2}
   _typeAEnhanceSkillData: {fileID: 0}
   _typeBSkillData: {fileID: 0}
   _typeBEnhanceSkillData: {fileID: 0}

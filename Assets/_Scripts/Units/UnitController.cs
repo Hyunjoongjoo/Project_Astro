@@ -234,6 +234,7 @@ public class UnitController : UnitBase
     public void RPC_PlayChildSkillEffect(
         NetworkId id,
         SkillType type,
+        bool setChild,
         float duration = 0f
         )
     {
@@ -253,10 +254,17 @@ public class UnitController : UnitBase
 
             if (prefab == null) return;
 
-            var obj = Instantiate(prefab, transform.position, Quaternion.identity);
-            var trf = obj.GetComponent<Transform>();
-            trf.SetParent(transform, false);
-            trf.localPosition = Vector3.zero;
+            GameObject obj;
+
+            if (setChild)
+            {
+                obj = Instantiate(prefab, transform);
+                obj.transform.localPosition = Vector3.zero;
+            }
+            else
+            {
+                obj = Instantiate(prefab, unit.transform.position, Quaternion.identity);
+            }
 
             Destroy(obj, duration);
         }
