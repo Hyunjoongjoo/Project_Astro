@@ -1,4 +1,5 @@
-﻿
+﻿using UnityEngine;
+
 public class CastingState : IState
 {
     private HeroController _hero;
@@ -10,6 +11,7 @@ public class CastingState : IState
 
     public void Enter()
     {
+        Debug.Log("Casting 상태 진입");
         _hero.curUniqueSkill.Execute();
     }
 
@@ -21,6 +23,6 @@ public class CastingState : IState
 
     public void Exit()
     {
-
+        Debug.Log("Casting 상태 탈출");
     }
 }

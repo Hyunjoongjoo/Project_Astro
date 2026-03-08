@@ -11,7 +11,6 @@ public class ChaseState : IState
 
     public void Enter()
     {
-        Debug.Log("Chase 상태 진입");
     }
 
     public void Update()

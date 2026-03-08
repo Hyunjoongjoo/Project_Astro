@@ -13,7 +13,6 @@ public class AttackState : IState
 
     public void Enter()
     {
-        Debug.Log("Attack 상태 진입");
         // 공격 상태 진입 시 이동 멈추고
         _unit.StopMove();
 

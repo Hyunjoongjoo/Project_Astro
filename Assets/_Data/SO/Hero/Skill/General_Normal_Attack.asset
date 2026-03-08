@@ -19,7 +19,7 @@ MonoBehaviour:
   _cooldown: 1
   damageRatio: 1
   range: 3
-  projectileSpeed: 0
+  projectileSpeed: 10
   isHoming: 0
   oneShotProjectileNum: 1
   spreadAngle: 0

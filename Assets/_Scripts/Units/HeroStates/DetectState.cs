@@ -13,7 +13,6 @@ public class DetectState : IState
 
     public void Enter()
     {
-        Debug.Log("Detect 상태 진입");
         _unit.StopMove();
         // 진입 시 바로 탐색할 수 있도록 타이머 초기화
         _searchTimer = TickTimer.CreateFromSeconds(_unit.Runner, 0f);
