@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class DetectState : IState
 {
-    private MinionController _unit;
+    private UnitController _unit;
     private TickTimer _searchTimer;
 
-    public DetectState(MinionController unit)
+    public DetectState(UnitController unit)
     {
         _unit = unit;
     }

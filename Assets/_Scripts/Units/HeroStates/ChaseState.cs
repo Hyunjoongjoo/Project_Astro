@@ -2,9 +2,9 @@
 
 public class ChaseState : IState
 {
-    private MinionController _unit;
+    private UnitController _unit;
 
-    public ChaseState(MinionController unit)
+    public ChaseState(UnitController unit)
     {
         _unit = unit;
     }

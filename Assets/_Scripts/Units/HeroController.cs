@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class HeroController : MinionController
+public class HeroController : UnitController
 {
     // === 미니언 속성에 추가로 영웅만이 가지는 필드 ===
 

@@ -6,12 +6,12 @@ public class ProjectileSkill : ISkill
     private ProjectileSkillSO _data;
     private bool _isCasting;
 
-    private MinionController _cachedUnit;
+    private UnitController _cachedUnit;
 
     public BaseSkillSO Data => _data;
     public bool IsCasting => _isCasting;
 
-    public ProjectileSkill(ProjectileSkillSO data, MinionController unit)
+    public ProjectileSkill(ProjectileSkillSO data, UnitController unit)
     {
         _data = data;
         _cachedUnit = unit;

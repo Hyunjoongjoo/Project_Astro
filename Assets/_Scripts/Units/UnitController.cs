@@ -2,7 +2,7 @@
 using UnityEngine.AI;
 
 
-public class MinionController : UnitBase
+public class UnitController : UnitBase
 {
     [Header("내비게이션 및 탐지")]
     public NavMeshAgent agent;

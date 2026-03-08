@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class AttackState : IState
 {
-    private MinionController _unit;
+    private UnitController _unit;
     private TickTimer _attackTimer;
 
-    public AttackState(MinionController unit)
+    public AttackState(UnitController unit)
     {
         _unit = unit;
     }

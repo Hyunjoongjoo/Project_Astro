@@ -17,7 +17,7 @@ public class ProjectileSkillSO : BaseSkillSO
     // 만약 한 번에 3발씩 나가고 연발 수가 3이라면
     // 스킬 시전 한 번에 3발씩 3번, 총 9개의 투사체를 발사한다.
 
-    public override ISkill CreateInstance(MinionController unit)
+    public override ISkill CreateInstance(UnitController unit)
     {
         return new ProjectileSkill(this, unit);
     }

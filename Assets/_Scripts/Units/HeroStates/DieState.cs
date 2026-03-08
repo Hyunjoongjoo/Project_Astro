@@ -1,9 +1,9 @@
 ﻿
 public class DieState : IState
 {
-    private MinionController _unit;
+    private UnitController _unit;
 
-    public DieState(MinionController unit)
+    public DieState(UnitController unit)
     {
         _unit = unit;
     }

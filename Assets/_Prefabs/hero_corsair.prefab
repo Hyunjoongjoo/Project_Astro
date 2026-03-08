@@ -45,7 +45,6 @@ GameObject:
   - component: {fileID: 1555341712732983471}
   - component: {fileID: 193874278230624522}
   - component: {fileID: 250558184794622207}
-  - component: {fileID: 5510236954846484131}
   - component: {fileID: 1679591168465454536}
   - component: {fileID: 479350263834020189}
   - component: {fileID: -3041197003229238917}
@@ -198,19 +197,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e06afd8dba25da47828c557178535da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitStat
---- !u!114 &5510236954846484131
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1619433986598075239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19492d2d6ff5ba146b7506991db6a319, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AssaultSkill
-  _data: {fileID: 11400000, guid: c5833436a573a44468969846f05814e5, type: 2}
 --- !u!114 &1679591168465454536
 MonoBehaviour:
   m_ObjectHideFlags: 0

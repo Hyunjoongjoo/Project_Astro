@@ -45,7 +45,6 @@ GameObject:
   - component: {fileID: 3123802997670338100}
   - component: {fileID: 2645616085867178823}
   - component: {fileID: 288590522490992711}
-  - component: {fileID: -2787799764655628976}
   - component: {fileID: 6970888073266845989}
   - component: {fileID: -3351744654108456150}
   - component: {fileID: 7704040667658692594}
@@ -198,19 +197,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e06afd8dba25da47828c557178535da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitStat
---- !u!114 &-2787799764655628976
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3852116074081476708}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f412337cf51d4b64eb67b637c5ab606f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BarrageSkill
-  _data: {fileID: 11400000, guid: 2858029cad763fe4e81a7364d1dd7fd8, type: 2}
 --- !u!114 &6970888073266845989
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -8,7 +8,7 @@ public class ShieldSkill : ISkill
     public BaseSkillSO Data => _data;
     public bool IsCasting => _isCasting;
 
-    public ShieldSkill(ShieldSkillSO data, MinionController unit)
+    public ShieldSkill(ShieldSkillSO data, UnitController unit)
     {
         _data = data;
     }
