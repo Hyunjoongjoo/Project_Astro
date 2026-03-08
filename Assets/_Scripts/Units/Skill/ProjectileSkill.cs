@@ -45,13 +45,11 @@ public class ProjectileSkill : ISkill
         if (_data.projectileVFX == null || _cachedUnit.firePoint == null) return;
         if (_cachedUnit.currentTarget == null) return;
 
-        Vector3 end = _cachedUnit.transform.position;
-
-        RPC_FireProjectile(_cachedUnit.team);
+        RPC_FireProjectile();
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_FireProjectile(Team team)
+    public void RPC_FireProjectile()
     {
         GameObject projectileObj = _cachedUnit.InstantiateObject(_data.projectileVFX, _cachedUnit.firePoint.position, Quaternion.identity);
 
@@ -59,7 +57,7 @@ public class ProjectileSkill : ISkill
 
         if (projectile != null)
         {
-            projectile.Initialize(_data, team, _cachedUnit.AttackPower, _cachedUnit.Runner);
+            projectile.Initialize(_data, _cachedUnit.team, _cachedUnit.AttackPower, _cachedUnit.Runner);
             projectile.Fire(_cachedUnit.currentTarget.gameObject);
         }
     }

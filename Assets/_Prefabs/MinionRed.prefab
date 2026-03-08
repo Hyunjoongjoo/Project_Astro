@@ -200,7 +200,7 @@ MonoBehaviour:
   moveType: 1
   attackRange: 5
   _unitId: unit_minion
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 7239607078526745090}
   currentTarget: {fileID: 0}
   _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}
 --- !u!114 &7786030501378965668
