@@ -145,16 +145,11 @@ MonoBehaviour:
     m_Bits: 0
   searchInterval: 0.3
   moveType: 0
-  attackPower: 0
   attackRange: 0
-  attackSpeed: 0
-  currentTarget: {fileID: 0}
-  _heroId: 
-  _attackRange: 0
-  _skillData: {fileID: 0}
-  _normalSkill: {fileID: 0}
+  _unitId: 
   firePoint: {fileID: 0}
-  _normalAttackData: {fileID: 0}
+  currentTarget: {fileID: 0}
+  _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}
   _standardSkillData: {fileID: 0}
   _typeASkillData: {fileID: 0}
   _typeAEnhanceSkillData: {fileID: 0}

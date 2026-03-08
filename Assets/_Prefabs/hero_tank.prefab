@@ -149,7 +149,7 @@ MonoBehaviour:
   attackRange: 0
   attackSpeed: 0
   currentTarget: {fileID: 0}
-  _heroId: 
+  _heroId: stat_hero_tank
   _attackRange: 0
   _skillData: {fileID: 0}
   _normalSkill: {fileID: 0}

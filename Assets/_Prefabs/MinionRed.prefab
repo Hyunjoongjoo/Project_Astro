@@ -192,21 +192,17 @@ MonoBehaviour:
   _CurrentState: 0
   agent: {fileID: 8596131259578450949}
   moveSpeed: 6
-  moveType: 1
   searchRange: 4
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
+  moveType: 1
+  attackRange: 5
   _unitId: unit_minion
-  _unitStat: {fileID: 7786030501378965668}
-  _attackRange: 3
-  _attackType: 1
-  _projectilePrefab: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
-  _firePoint: {fileID: 7239607078526745090}
-  _towerA: {fileID: 0}
-  _towerB: {fileID: 0}
-  _bridge: {fileID: 0}
+  firePoint: {fileID: 0}
+  currentTarget: {fileID: 0}
+  _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}
 --- !u!114 &7786030501378965668
 MonoBehaviour:
   m_ObjectHideFlags: 0
