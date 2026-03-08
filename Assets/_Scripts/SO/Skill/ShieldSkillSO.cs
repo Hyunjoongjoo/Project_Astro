@@ -6,7 +6,6 @@ public class ShieldSkillSO : BaseSkillSO
     [Header("실드형 스킬의 속성")]
     public float damageReduction;
     public float duration;
-    public GameObject shieldVFX;
 
     public override ISkill CreateInstance(UnitController unit)
     {

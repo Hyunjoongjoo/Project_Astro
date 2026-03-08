@@ -4,11 +4,16 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private Renderer _targetRenderer;
+    private bool isInitialized = false;
+    
     private float _finalPower;
 
     ProjectileSkillSO _data;
     private NetworkRunner _runner;
     Team _team;
+
+    private Vector3 _target;
+    private float _homingRotationSpeed = 10f; // 유도탄의 궤적 꺾임 속도 (유도탄 테스트를 위한 임시 값)
 
     public void Initialize(ProjectileSkillSO data, Team team, float power, NetworkRunner runner)
     {
@@ -17,28 +22,44 @@ public class Projectile : MonoBehaviour
         _runner = runner;
         _finalPower = power * _data.damageRatio;
         ApplyTeamColor(team);
+        isInitialized = true;
     }
 
-    public void Fire(GameObject targetPos)
+    public void Fire(Vector3 targetPos)
     {
-        transform.LookAt(targetPos.transform);
+        _target = targetPos;
 
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlaySfx(SfxList.ShotLaserSound);
 
-        Destroy(gameObject, 3f);
+        Destroy(gameObject, 3f); // TODO : 오브젝트 풀링 해야하는 부분
     }
 
     private void FixedUpdate()
     {
-        transform.Translate(Vector3.forward * _data.projectileSpeed * Time.deltaTime);
+        if (isInitialized)
+        {
+            // 유도성(isHoming)이 켜져 있을 경우
+            if (_data.isHoming)
+            {
+                Vector3 directionToTarget = (_target - transform.position).normalized;
+                Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
+
+                // 현재 방향에서 타겟 방향으로 부드럽게 회전 (보간)
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _homingRotationSpeed * Time.deltaTime);
+            }
+
+            transform.Translate(Vector3.forward * _data.projectileSpeed * Time.deltaTime);
+        }
+        else
+            Debug.LogError("[projectile] 초기화가 되지 않았음!!");
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if ( other.gameObject.TryGetComponent(out UnitBase target) )
         {
-            if (target.team != _team)
+            if (target.networkedTeam != _team)
             {
                 if (_runner.IsSharedModeMasterClient)
                     target.TakeDamage(_finalPower);

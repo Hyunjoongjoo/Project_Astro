@@ -22,6 +22,7 @@ public class HeroController : UnitController
 
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
+    public ISkill CurUniqueSkill => curUniqueSkill;
 
     public float RespawnTime => _respawnTime;
     public float HealPower => _unitStat.HealPower.Value;

@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 33bf744b4e39dc04999fede7c64beeea, type: 3}
-  m_Name: General_Normal_Attack
+  m_Name: Heavyrain_Skill_Type_A
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
   skillName: 
   skillDescription: 
   note: 
   skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
-  skillType: 0
-  initCooldown: 0
-  cooldown: 1
+  skillType: 2
+  initCooldown: 4
+  cooldown: 8
   damageRatio: 1
-  range: 3
+  range: 5
   projectileSpeed: 10
-  isHoming: 0
+  isHoming: 1
   oneShotProjectileNum: 1
   spreadAngle: 0
-  repeatingFire: 1
-  interval: 0
+  repeatingFire: 5
+  interval: 0.2

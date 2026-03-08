@@ -20,10 +20,12 @@ public enum AttackType
 
 public enum SkillType
 {
-    normal_attack,
-    normal_skill,
-    augment_skill,
-    augment_skill_enhance
+    Normal,
+    Standard,
+    A_Type,
+    A_Type_Enhanced,
+    B_Type,
+    B_Type_Enhanced
 }
 
 public enum EffectAttachType

@@ -26,7 +26,10 @@ public abstract class UnitBase : NetworkBehaviour
     public float MaxHealth => maxHealth;
     public UnitType UnitType => unitType;
     public bool IsDead { get; private set; }
-    [Networked, HideInInspector, OnChangedRender(nameof(OnHealthChanged))] public float CurrentHealth { get; set; }
+
+    [Networked, HideInInspector, OnChangedRender(nameof(OnHealthChanged))] 
+    public float CurrentHealth { get; set; }
+
     [Networked, HideInInspector] public UnitState CurrentState { get; set; }
 
     // 죽었을 때 이벤트를 알리며 자신의 타입을 알림

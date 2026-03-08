@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using Fusion;
+using UnityEngine;
 using UnityEngine.AI;
-
 
 public class UnitController : UnitBase
 {
@@ -228,15 +228,94 @@ public class UnitController : UnitBase
         return distA <= distB ? _towerA : _towerB;
     }
 
-    public GameObject InstantiateObject(GameObject obj, Vector3 pos, Quaternion dir)
+    // === RPC 메서드들 모음 ===
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayChildSkillEffect(
+        NetworkId id,
+        SkillType type,
+        float duration = 0f
+        )
     {
-        return Instantiate(obj, pos, dir);
+        Debug.Log("본인 중심 이펙트 출력 RPC 수신 확인");
+
+        if (Runner.TryFindObject(id, out NetworkObject casterObj))
+        {
+            UnitController unit = casterObj.GetComponent<UnitController>();
+            GameObject prefab = null;
+
+            // 평타 공격인가 스킬인가
+            if (type == SkillType.Normal)
+                prefab = _normalAttackData.skillVFX;
+            else
+                if (unit is HeroController)
+                    prefab = (unit as HeroController).CurUniqueSkill.Data.skillVFX;
+
+            if (prefab == null) return;
+
+            var obj = Instantiate(prefab, transform.position, Quaternion.identity);
+            var trf = obj.GetComponent<Transform>();
+            trf.SetParent(transform, false);
+            trf.localPosition = Vector3.zero;
+
+            Destroy(obj, duration);
+        }
     }
-    public void DestroyObject(GameObject obj, float delay = 0f)
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_FireProjectile(
+        NetworkId id,
+        SkillType type,
+        Vector3 targetPos,
+        float power
+        )
     {
-        if (delay == 0f) 
-            Destroy(obj);
-        else
-            Destroy(obj, delay);
+
+        if (Runner.TryFindObject(id, out NetworkObject casterObj))
+        {
+            UnitController unit = casterObj.GetComponent<UnitController>();
+            GameObject prefab = null;
+            // 투사체형 이니까 투사체 SO가 반드시 있어야 함.
+            ProjectileSkillSO projectileSO = null;
+
+            // 평타 공격인가 스킬인가
+            if (type == SkillType.Normal)
+                projectileSO = unit._normalAttackData as ProjectileSkillSO;
+
+            else
+            {
+                if (unit is HeroController)
+                    projectileSO = ((unit as HeroController).CurUniqueSkill.Data) as ProjectileSkillSO;
+            }
+
+            if (projectileSO == null)
+                return;
+
+            prefab = projectileSO.skillVFX;
+
+            int oneShotProjectileNum = projectileSO.oneShotProjectileNum;
+            float spreadAngle = projectileSO.spreadAngle;
+            int projectileCount = oneShotProjectileNum > 0 ? oneShotProjectileNum : 1;
+
+            // 방사각 계산 (탄환이 2개 이상일 때만 각도 분할)
+            float startAngle = projectileCount > 1 ? -spreadAngle / 2f : 0f;
+            float angleStep = projectileCount > 1 ? spreadAngle / (projectileCount - 1) : 0f;
+
+            // 타겟을 향하는 기본 방향
+            Vector3 directionToTarget = (targetPos - firePoint.position).normalized;
+            Quaternion baseRotation = Quaternion.LookRotation(directionToTarget);
+
+            for (int i = 0; i < projectileCount; i++)
+            {
+                // Y축(좌우) 기준으로 각도를 더해 최종 회전값 계산
+                Quaternion spreadRotation = baseRotation * Quaternion.Euler(0, startAngle + (angleStep * i), 0);
+
+                GameObject projectileObj = Instantiate(prefab, firePoint.position, spreadRotation);
+                Projectile projectile = projectileObj.GetComponent<Projectile>();
+
+                projectile.Initialize(projectileSO, networkedTeam, power, Runner);
+                projectile.Fire(targetPos);
+            }
+        } 
     }
 }

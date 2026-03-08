@@ -15,8 +15,9 @@ MonoBehaviour:
   skillName: 
   skillDescription: 
   note: 
+  skillVFX: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}
+  skillType: 1
   initCooldown: 4
   cooldown: 8
   damageReduction: 0.3
   duration: 5
-  shieldVFX: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}

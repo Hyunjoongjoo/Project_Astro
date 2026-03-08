@@ -12,7 +12,6 @@ public class ProjectileSkillSO : BaseSkillSO
     public float spreadAngle; // 탄이 퍼지는 각도, 0이면 직선
     public int repeatingFire; // 스킬 시전 한번에 연발 횟수
     public float interval; // 연속 발사 시 간격
-    public GameObject projectileVFX; // 투사체 비주얼
 
     // 만약 한 번에 3발씩 나가고 연발 수가 3이라면
     // 스킬 시전 한 번에 3발씩 3번, 총 9개의 투사체를 발사한다.
