@@ -157,76 +157,7 @@ public class HeroController : UnitController
             if (newSkill == null)
                 continue;
 
-            // EquipSkill(newSkill);
+            // ChangeSkill(newSkill);
         }
-    }
-
-    // --- 유틸리티 메서드 (상태 클래스들에서 호출해서 사용) ---
-
-    public void HealUnit(UnitBase target, float healAmount)
-    {
-        if (!Object.HasStateAuthority)
-            return;
-
-        if (target == null || target.IsDead)
-            return;
-
-        target.CurrentHealth = Mathf.Min(
-            target.CurrentHealth + healAmount,
-            target.MaxHealth
-        );
-    }
-
-    //포격형 전용 데미지 진입점
-    public void ApplyBarrageSkillDamage(UnitBase target, float damageRatio)
-    {
-        if (!Object.HasStateAuthority)
-            return;
-
-        if (target == null || target.IsDead)
-            return;
-
-        float baseDamage = AttackPower;
-        float finalDamage = baseDamage * damageRatio;
-
-        target.TakeDamage(finalDamage);
-    }
-
-    
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_PlayHealEffect(NetworkId targetId)
-    {
-        //if (_skillData == null)
-        //{
-        //    return;
-        //}
-
-        Debug.Log("RPC_PlayHealEffect 실행됨");
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
-        {
-            return;
-        }
-
-        //GameObject prefab = _skillData.EffectPrefab;
-
-        //if (prefab == null)
-        //{
-        //    return;
-        //}
-
-        //Transform parent = null;
-
-        //if (_skillData.AttachType == EffectAttachType.Target)
-        //{
-        //    parent = targetObj.transform;
-        //}
-
-        //GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, parent);
-
-        //effects.transform.localScale = Vector3.zero;
-        //effects.transform.DOScale(_skillData.EffectScale, 0.5f).SetEase(Ease.OutBack);
-
-        //Destroy(effects, _skillData.EffectLifeTime);
     }
 }

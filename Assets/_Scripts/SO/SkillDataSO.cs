@@ -19,22 +19,6 @@ public abstract class SkillDataSO : ScriptableObject
     [SerializeField] private float _effectLifeTime;
     [SerializeField] private EffectAttachType _attachType;
 
-    public virtual SkillRuntimeData CreateRuntimeData()
-    {
-        return new SkillRuntimeData
-        {
-            Cooldown = _cooldown,
-            SkillRange = _skillRange,
-            EffectPrefab = _effectPrefab,
-            EffectLifeTime = _effectLifeTime,
-            IsAreaSkill = false,
-            ShotCount = 1,
-            DamageMultiplier = 1f,
-            DamageReductionRate = 0f,
-            Duration = 0f,
-            HealAmount = 0f
-        };
-    }
     public string SkillId => _skillId;
     public string HeroId => _heroId;
     public SkillType SkillType => _skillType;
