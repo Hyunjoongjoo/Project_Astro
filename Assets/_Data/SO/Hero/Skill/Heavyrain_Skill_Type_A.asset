@@ -22,8 +22,8 @@ MonoBehaviour:
   damageRatio: 1
   range: 5
   projectileSpeed: 10
-  isHoming: 1
+  isHoming: 0
   oneShotProjectileNum: 1
   spreadAngle: 0
   repeatingFire: 5
-  interval: 0.2
+  interval: 0.3

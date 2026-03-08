@@ -24,6 +24,6 @@ MonoBehaviour:
   projectileSpeed: 10
   isHoming: 0
   oneShotProjectileNum: 3
-  spreadAngle: 30
-  repeatingFire: 3
+  spreadAngle: 0
+  repeatingFire: 1
   interval: 0.3
