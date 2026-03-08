@@ -1,7 +1,6 @@
 ﻿using Fusion;
 using System;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 // 이동하는 유닛과 건물 모두에게 공통된 속성 정의
 public abstract class UnitBase : NetworkBehaviour
@@ -51,15 +50,19 @@ public abstract class UnitBase : NetworkBehaviour
 
     public override void FixedUpdateNetwork() { }
 
+    // 매개변수 값은 아무 계산도 안한 순수 데미지 초기값
+    // 여기서 최종 받는 데미지를 계산한다.
     public virtual void TakeDamage(float amount)
     {
         if (!Object.HasStateAuthority) return;
         if (IsDead) return;
 
-        // 매개변수 값은 아무 계산도 안한 순수 데미지 초기값
-        // 여기서 최종 받는 데미지를 계산한다.
         float finalTakenDamage = amount;
 
+        // 받피감이 1을 넘어가면 체력이 오히려 찰 것.
+        // Config 테이블에서 상한 값 확인해봤는데 뭔가 이상함.
+        // TODO: 상한 값 검사 및 조정 로직 필요.
+        // TableManager.Instance.ConfigTable.Get("min_hero_damage_reduce");
         if (_unitStat != null)
         {
             finalTakenDamage *= (1 - _unitStat.DamageReduction.Value);
