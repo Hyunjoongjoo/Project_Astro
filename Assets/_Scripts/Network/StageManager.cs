@@ -147,6 +147,11 @@ public class StageManager : NetworkBehaviour
                 UpdatePlayerInfoTimer();
                 break;
 
+                //3.9 추가(증강 선택 타이머용)
+            case StageState.AugmentSelection: 
+                UpdateAugmentSelectionTimer(); 
+                break;
+
             case StageState.Countdown:
                 UpdateCountdown();
                 break;
@@ -258,6 +263,18 @@ public class StageManager : NetworkBehaviour
         _stageUI.ShowPlayerInfo(data);
     }
 
+    //타이머 깎는 함수 추가
+    private void UpdateAugmentSelectionTimer()
+    {
+        StateTimer -= Runner.DeltaTime;
+        if (StateTimer <= 0)
+        {
+            //시간 종료 시모든 클라이언트에게 강제로 픽하라고 명령
+            RPC_ForceAugmentTimeout();
+            StateTimer = 9999f; //RPC가 중복 호출 방지 9999
+        }
+    }
+
     private void UpdatePlayerInfoTimer()
     {
         StateTimer -= Runner.DeltaTime;
@@ -281,10 +298,25 @@ public class StageManager : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
+            //3.9 ConfigTable 기준 15초 세팅
+            float selectTime = 15f; //기본값
+            var config = TableManager.Instance.ConfigTable.Get("augment_select_time");
+            if (config != null) selectTime = float.Parse(config.configValue);
+
+            StateTimer = selectTime; //타이머 시작
             // 모든 클라이언트에게 증강 UI를 띄우라고 알림
             RPC_RequestAugmentSelection();
         }
     }
+
+    //타임아웃  RPC
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ForceAugmentTimeout()
+    {
+        Debug.Log("증강 제한 시간 종료되어 랜덤 픽 실행");
+        AugmentManager.Instance.ForceRandomPick();
+    }
+
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_RequestAugmentSelection()

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 //3.5 리팩토링
@@ -6,7 +7,11 @@ using UnityEngine;
 public class AugmentWindowUI : BaseUI
 {
     [SerializeField] Transform _cardContainer; // 카드 배치시킬 위치
-    //[SerializeField] private GameObject _cardPrefab; //AugmentCardUI 붙은애
+
+    [Header("Timer")]
+    [SerializeField] private TMP_Text _timerTxt; //타이머
+    private StageManager _stageManager;
+    private List<AugmentData> _currentDatas; //뽑은 3장 기억용
 
     //프리팹 3종
     [Header("UI Prefabs")]
@@ -19,6 +24,9 @@ public class AugmentWindowUI : BaseUI
 
     public void SetupAndOpen(List<AugmentData> datas)
     {
+        _currentDatas = datas;
+        _stageManager = FindFirstObjectByType<StageManager>();
+
         ClearCards();
 
         //새 카드 생성
@@ -62,6 +70,37 @@ public class AugmentWindowUI : BaseUI
         }
 
         base.Open();
+    }
+
+    //매 프레임 남은 시간 UI 갱신
+    private void Update()
+    {
+        if (_stageManager != null && _stageManager.CurrentState == StageState.AugmentSelection)
+        {
+            if (_timerTxt != null)
+            {
+                //소수점 올림
+                int timeLeft = Mathf.Max(0, Mathf.CeilToInt(_stageManager.StateTimer));
+                _timerTxt.text = $"제한 시간: {timeLeft}초";
+            }
+        }
+    }
+
+    //타임아웃 시
+    public void ForceRandomPick()
+    {
+        if (_currentDatas != null && _currentDatas.Count > 0)
+        {
+            //0~2 중 하나 무작위 추첨
+            int randIndex = Random.Range(0, _currentDatas.Count);
+            AugmentData pickedData = _currentDatas[randIndex];
+
+            Debug.Log($"타임아웃으로인해 자동 선택: {pickedData.titleName}");
+
+            //유저가 직접 클릭한 것과 같은 로직
+            AugmentManager.Instance.SelectAugment(pickedData);
+            Close();
+        }
     }
 
     //화면에 띄워진 카드 삭제
