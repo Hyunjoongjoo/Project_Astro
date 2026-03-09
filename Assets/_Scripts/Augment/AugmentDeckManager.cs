@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -172,7 +172,7 @@ public class AugmentDeckManager
                     {
                         bSkill = _allBaseSkills.FirstOrDefault(s =>
                             s.HeroId == refId &&
-                            s.SkillType == SkillType.normal_skill);
+                            s.SkillType == SkillType.Standard);
                     }
                 }
                 else return null; //뽑을 영웅이 없으면 null
@@ -243,7 +243,7 @@ public class AugmentDeckManager
 
                     if (_allBaseSkills != null)
                     {
-                        var baseSkill = _allBaseSkills.FirstOrDefault(s => s.HeroId == pickedSkill.TargetHeroID && s.SkillType == SkillType.normal_skill);
+                        var baseSkill = _allBaseSkills.FirstOrDefault(s => s.HeroId == pickedSkill.TargetHeroID && s.SkillType == SkillType.Standard);
                         if (baseSkill != null) bSkillName = baseSkill.SkillName;
                     }
                 }
