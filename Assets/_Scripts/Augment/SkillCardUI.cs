@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -52,7 +52,7 @@ public class SkillCardUI : MonoBehaviour, IAugmentUI
         if (data.skillData != null && _skillCoolTxt != null)
         {
             string skillCoolFormat = TableManager.Instance.GetString("ui_augment_hero_skill_cooldown");
-            _skillCoolTxt.text = string.Format(skillCoolFormat, data.skillData.Cooldown);
+            _skillCoolTxt.text = string.Format(skillCoolFormat, data.skillData.cooldown);
         }
 
         //버튼 클릭 이벤트 세팅
