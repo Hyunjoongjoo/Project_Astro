@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33bf744b4e39dc04999fede7c64beeea, type: 3}
   m_Name: Tower_Projectile
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
+  skillId: 
+  heroId: 
   skillName: 
   skillDescription: 
   note: 
@@ -21,7 +23,7 @@ MonoBehaviour:
   cooldown: 2
   damageRatio: 1
   range: 5
-  projectileSpeed: 5
+  projectileSpeed: 50
   isHoming: 1
   oneShotProjectileNum: 1
   spreadAngle: 0

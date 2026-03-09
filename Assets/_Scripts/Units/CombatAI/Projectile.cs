@@ -48,6 +48,8 @@ public class Projectile : MonoBehaviour
 
                 // 현재 방향에서 타겟 방향으로 부드럽게 회전 (보간)
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _homingRotationSpeed * Time.deltaTime);
+                if (Vector3.Distance(transform.position, _target) < 0.5f)
+                    Destroy(gameObject);
             }
 
             transform.Translate(Vector3.forward * _data.projectileSpeed * Time.deltaTime);
