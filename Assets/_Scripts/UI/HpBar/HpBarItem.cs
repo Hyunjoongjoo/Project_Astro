@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class HpBarItem : MonoBehaviour
 {
     [SerializeField] private Image _fillImg;
+    [SerializeField] private GameObject _heroMark;
     [SerializeField] private Sprite _blueTeamSpr;
     [SerializeField] private Sprite _redTeamSpr;
     [SerializeField] private float _showDuration = 2f;
