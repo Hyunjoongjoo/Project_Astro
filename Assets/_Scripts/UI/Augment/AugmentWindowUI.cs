@@ -39,6 +39,11 @@ public class AugmentWindowUI : BaseUI
         _selectedData = null;
         _selectedCardUI = null;
 
+        if (_stageManager != null && _stageManager.CurrentState == StageState.Playing)
+        {
+            AugmentController.Instance.RPC_StartInGameAugmentTimer(_stageManager.Runner.LocalPlayer);
+        }
+
         //확정버튼초기화
         if (_confirmBtn != null)
         {
@@ -95,13 +100,29 @@ public class AugmentWindowUI : BaseUI
     //매 프레임 남은 시간 UI 갱신
     private void Update()
     {
-        if (_stageManager != null && _stageManager.CurrentState == StageState.AugmentSelection)
+        if (_stageManager != null && _timerTxt != null && !_isForcePicked)
         {
-            if (_timerTxt != null)
+            //상태(시작 전, 진행중) 에 따라 알맞은 곳에서 타이머 정보
+            float timeLeft = 0f;
+
+            if (_stageManager.CurrentState == StageState.PreGameAugment)
             {
-                //소수점 올림
-                int timeLeft = Mathf.Max(0, Mathf.CeilToInt(_stageManager.StateTimer));
-                _timerTxt.text = $"제한 시간: {timeLeft}초";
+                //시작 전 2연속 증강은 StageManager의 글로벌 시계 참조
+                timeLeft = _stageManager.StateTimer;
+            }
+            else if (_stageManager.CurrentState == StageState.Playing)
+            {
+                //인게임 증강은 AugmentController의 개별 유저 시계 참조
+                if (AugmentController.Instance.PlayerAugmentTimers.TryGet(_stageManager.Runner.LocalPlayer, out float time))
+                {
+                    timeLeft = time;
+                }
+            }
+            //소수점 올림
+            if (timeLeft > 0 || _stageManager.CurrentState == StageState.PreGameAugment)
+            {
+                int displayTime = Mathf.Max(0, Mathf.CeilToInt(timeLeft));
+                _timerTxt.text = $"제한 시간: {displayTime}초";
             }
         }
     }
