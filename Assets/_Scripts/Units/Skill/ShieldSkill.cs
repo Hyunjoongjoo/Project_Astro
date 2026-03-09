@@ -48,6 +48,6 @@ public class ShieldSkill : ISkill
         _cachedUnit.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);//중복방지
         var modifier = new StatModifier(_data.damageReduction, StatModType.Flat, this);
         _cachedUnit.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, modifier, _data.duration);
-        _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, default, _data.skillType, true, _data.duration);
+        _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, _cachedUnit.Object.Id, _data.skillType, true, _data.duration);
     }
 }

@@ -270,17 +270,14 @@ public class UnitController : UnitBase
         Vector3 spawnPos = unit.transform.position;
         Transform parent = null;
 
-        // Angel 힐 스킬일 경우 target 위치 사용
-        if (hero != null && hero.HeroId == "hero_angel")
+        // targetId가 존재하면 타겟 기준으로 처리
+        if (Runner.TryFindObject(targetId, out NetworkObject targetObj))
         {
-            if (Runner.TryFindObject(targetId, out NetworkObject targetObj))
-            {
-                spawnPos = targetObj.transform.position;
+            spawnPos = targetObj.transform.position;
 
-                if (setChild)
-                {
-                    parent = targetObj.transform;
-                }
+            if (setChild)
+            {
+                parent = targetObj.transform;
             }
         }
 
