@@ -27,5 +27,5 @@ public class AugmentData
     public string targetHeroName;      //"~커세어~의 스킬을 강화합니다" 에 들어갈 영웅 이름
     public Sprite targetHeroIcon;      //카드 구석에 띄울 원본 영웅 얼굴 아이콘
     public string baseSkillName;       //"~코로나 폭발~ 업그레이드" 에 들어갈 원본 스킬 이름
-    public SkillDataSO skillData;
+    public BaseSkillSO skillData;
 }
