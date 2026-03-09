@@ -16,12 +16,12 @@ public class AugmentDeckManager
     private List<SkillAugmentSO> _allSkillAugments;
 
     //영웅 기본 스킬을 찾기 위한 모든 스킬 데이터 모음
-    private List<SkillDataSO> _allBaseSkills;
+    private List<BaseSkillSO> _allBaseSkills;
 
     //아이콘, 프리팹 가져올 SO
     private HeroIconDataSO _heroIconSO;
 
-    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO, List<SkillDataSO> loadedBaseSkills)
+    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO, List<BaseSkillSO> loadedBaseSkills)
     {
         _allSkillAugments = loadedSkillAugments;
         _heroIconSO = heroIconSO;
@@ -120,7 +120,7 @@ public class AugmentDeckManager
         HeroType hType = default;
         HeroRole hRole = default;
         MoveType mType = default;
-        SkillDataSO bSkill = null;
+        BaseSkillSO bSkill = null;
 
         string tHeroName = "";
         Sprite tHeroIcon = null;
@@ -171,8 +171,8 @@ public class AugmentDeckManager
                     if (_allBaseSkills != null)
                     {
                         bSkill = _allBaseSkills.FirstOrDefault(s =>
-                            s.HeroId == refId &&
-                            s.SkillType == SkillType.Standard);
+                            s.heroId == refId &&
+                            s.skillType == SkillType.Standard);
                     }
                 }
                 else return null; //뽑을 영웅이 없으면 null
@@ -243,8 +243,8 @@ public class AugmentDeckManager
 
                     if (_allBaseSkills != null)
                     {
-                        var baseSkill = _allBaseSkills.FirstOrDefault(s => s.HeroId == pickedSkill.TargetHeroID && s.SkillType == SkillType.Standard);
-                        if (baseSkill != null) bSkillName = baseSkill.SkillName;
+                        var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == pickedSkill.TargetHeroID && s.skillType == SkillType.Standard);
+                        if (baseSkill != null) bSkillName = baseSkill.skillName;
                     }
                 }
                 else return null;

@@ -46,8 +46,6 @@ public class LoginController : MonoBehaviour
             // 2단계: Firestore에서 유저 데이터 조회
             var userData = await _userDataStore.GetUserDataAsync(user.UserId);
             var userHeroData = await _userDataStore.GetUserHeroDataAsync(user.UserId);
-            var userRecordData = await _userDataStore.GetUserRecordDataAsync(user.UserId);
-            var userWalletData = await _userDataStore.GetUserWalletDataAsync(user.UserId);
 
             Debug.Log("파이어베이스 유저 데이터 조회");
             if (userData == null)
@@ -58,12 +56,12 @@ public class LoginController : MonoBehaviour
             }
 
             // 3단계: 로그인 성공
-            _loginView.ShowWelcomeMessage(userData.nickName);
-            _onLoginSuccess?.Invoke(userData.nickName);
+            _loginView.ShowWelcomeMessage(userData.profile.nickName);
+            _onLoginSuccess?.Invoke(userData.profile.nickName);
             Debug.Log("로그인 성공");
 
             // 4단계: DB 데이터 캐싱
-            UserDataManager.Instance.SetAllUserData(userData, userRecordData, userWalletData, userHeroData);
+            UserDataManager.Instance.SetAllUserData(userData.profile, userData.record, userData.wallet, userHeroData);
             Debug.Log("DB 캐싱 성공");
             
             await UserDataManager.Instance.SyncHeroDataAsync();
@@ -101,8 +99,6 @@ public class LoginController : MonoBehaviour
             // 2단계: Firestore에서 유저 데이터 조회
             var userData = await _userDataStore.GetUserDataAsync(user.UserId);
             var userHeroData = await _userDataStore.GetUserHeroDataAsync(user.UserId);
-            var userRecordData = await _userDataStore.GetUserRecordDataAsync(user.UserId);
-            var userWalletData = await _userDataStore.GetUserWalletDataAsync(user.UserId);
 
             Debug.Log("파이어베이스 유저 데이터 조회");
             if (userData == null)
@@ -115,12 +111,12 @@ public class LoginController : MonoBehaviour
             }
 
             // 3단계: 로그인 성공
-            _loginView.ShowWelcomeMessage(userData.nickName);
-            _onLoginSuccess?.Invoke(userData.nickName);
+            _loginView.ShowWelcomeMessage(userData.profile.nickName);
+            _onLoginSuccess?.Invoke(userData.profile.nickName);
             Debug.Log("로그인 성공");
 
             // 4단계: DB 데이터 캐싱
-            UserDataManager.Instance.SetAllUserData(userData, userRecordData, userWalletData, userHeroData);
+            UserDataManager.Instance.SetAllUserData(userData.profile, userData.record, userData.wallet, userHeroData);
             Debug.Log("DB 캐싱 성공");
 
             await UserDataManager.Instance.SyncHeroDataAsync();
