@@ -10,7 +10,8 @@ public class HeroIconDataSO : ScriptableObject
     public struct HeroIconInfo
     {
         public string heroId; //테이블 매칭용
-        public Sprite iconSprite;
+        public Sprite iconSprite; // 영웅 초상화 아이콘
+        public List<Sprite> skillIcons; //스킬 아이콘 리스트
         public NetworkPrefabRef heroPrefab; //소환용 네트워크 프리팹 추가
     }
 
@@ -18,6 +19,7 @@ public class HeroIconDataSO : ScriptableObject
 
     // 빠른 검색을 위한 딕셔너리 캐싱
     private Dictionary<string, Sprite> _iconCache;
+    private Dictionary<string, List<Sprite>> _skillIconCache;
 
     //3.3 여현구 프리팹캐싱
     private Dictionary<string, NetworkPrefabRef> _prefabCache;
@@ -38,6 +40,28 @@ public class HeroIconDataSO : ScriptableObject
         return null;
     }
 
+    /// <summary>
+    /// 해당 영웅의 모든 스킬 아이콘 리스트를 반환
+    /// </summary>
+    public List<Sprite> GetSkillIcons(string id)
+    {
+        if (_skillIconCache == null) CacheData();
+        return _skillIconCache.TryGetValue(id, out List<Sprite> icons) ? icons : null;
+    }
+
+    /// <summary>
+    /// 해당 영웅의 특정 인덱스 스킬 아이콘을 반환
+    /// </summary>
+    public Sprite GetSkillIconByIndex(string id, int index)
+    {
+        var icons = GetSkillIcons(id);
+        if (icons != null && index >= 0 && index < icons.Count)
+        {
+            return icons[index];
+        }
+        return null;
+    }
+
     //3.3 여현구 프리팹받아오는 메서드
     public NetworkPrefabRef GetPrefab(string id)
     {
@@ -54,6 +78,7 @@ public class HeroIconDataSO : ScriptableObject
     {
         _iconCache = new Dictionary<string, Sprite>();
         _prefabCache = new Dictionary<string, NetworkPrefabRef>();
+        _skillIconCache = new Dictionary<string, List<Sprite>>();
 
         foreach (var info in _iconList)
         {
@@ -64,6 +89,9 @@ public class HeroIconDataSO : ScriptableObject
 
             if (!_prefabCache.ContainsKey(info.heroId))
                 _prefabCache.Add(info.heroId, info.heroPrefab);
+
+            if (!_skillIconCache.ContainsKey(info.heroId))
+                _skillIconCache.Add(info.heroId, info.skillIcons);
         }
     }
 

@@ -15,17 +15,29 @@ MonoBehaviour:
   _iconList:
   - heroId: hero_corsair
     iconSprite: {fileID: 21300000, guid: 2d13039d5ad7ef84198d41909fb3ae1b, type: 3}
+    skillIcons:
+    - {fileID: 21300000, guid: f25903605e76a8843b34ba694aab7df0, type: 3}
+    - {fileID: 21300000, guid: 5442c288a8b011e4f89da303f3074636, type: 3}
     heroPrefab:
       RawGuidValue: 44e070ac9eccb1a4f9838f1cb2cb4b46
   - heroId: hero_heavyrain
     iconSprite: {fileID: 21300000, guid: 42a13969511bc024892b5481ae4305fd, type: 3}
+    skillIcons:
+    - {fileID: 21300000, guid: c2e7dcd4ad0b2594b8721213700328f3, type: 3}
+    - {fileID: 21300000, guid: a8ee57c91fe02b24595b398f9b398ee3, type: 3}
     heroPrefab:
       RawGuidValue: 0eb4bbba84c6e6e44a600eab7ff5e833
   - heroId: hero_tank
     iconSprite: {fileID: 21300000, guid: d2158142f3d96b248be324fc2f90e7c9, type: 3}
+    skillIcons:
+    - {fileID: 21300000, guid: 9f91f49446dc49b47adbaf0718bd228a, type: 3}
+    - {fileID: 21300000, guid: 602741b566380d14aa899bc7bd2c3fe3, type: 3}
     heroPrefab:
       RawGuidValue: 1c6d38f465d89a149ac6941541862ec0
   - heroId: hero_angel
     iconSprite: {fileID: 21300000, guid: 84b20f48c8a41ea45ba3dfc32dce6047, type: 3}
+    skillIcons:
+    - {fileID: 21300000, guid: bc36dfcdcc5cc3f408c4ae563bc9dba4, type: 3}
+    - {fileID: 21300000, guid: 352e5599f1a382f4e846b45c28329951, type: 3}
     heroPrefab:
       RawGuidValue: d09a2cf10307a4c40a977b56313018db
