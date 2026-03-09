@@ -465,8 +465,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 2125, y: -481.98416}
-  m_SizeDelta: {x: 850, y: 963.9683}
+  m_AnchoredPosition: {x: 2125, y: -507.73904}
+  m_SizeDelta: {x: 850, y: 1012.478}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3154871236222086175
 CanvasRenderer:
@@ -1176,8 +1176,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 425, y: -481.98416}
-  m_SizeDelta: {x: 850, y: 963.9683}
+  m_AnchoredPosition: {x: 425, y: -507.73904}
+  m_SizeDelta: {x: 850, y: 1012.478}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2527835631390331805
 CanvasRenderer:
@@ -2833,7 +2833,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -3}
   m_SizeDelta: {x: 200, y: 100}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &6232668934902398515
@@ -3285,7 +3285,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 860}
+  m_SizeDelta: {x: 0, y: 912.48}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &2339800428745038545
 CanvasRenderer:
@@ -3460,8 +3460,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 2975, y: -481.98416}
-  m_SizeDelta: {x: 850, y: 963.9683}
+  m_AnchoredPosition: {x: 2975, y: -507.73904}
+  m_SizeDelta: {x: 850, y: 1012.478}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5194705667832336315
 CanvasRenderer:
@@ -3649,10 +3649,10 @@ MonoBehaviour:
   _heroLevelTxt: {fileID: 3567271933220862308}
   _heroExpTxt: {fileID: 5333513762182259653}
   _heroExpBar: {fileID: 8696189806550193612}
-  _skillDesContainer: {fileID: 0}
-  _augmentDesContainer: {fileID: 0}
-  _levelRewardDesContainer: {fileID: 0}
-  _desPanelPrefab: {fileID: 0}
+  _skillDesContainer: {fileID: 8824964905931049037}
+  _augmentDesContainer: {fileID: 1255648650891643045}
+  _levelRewardDesContainer: {fileID: 5118364995609616671}
+  _desPanelPrefab: {fileID: 7692701966302501289, guid: b87765d86d24d164ab77d1b1ae483d11, type: 3}
   _statContainer: {fileID: 2323891492917923050}
   _statPanelPrefab: {fileID: 3287407771323433971, guid: 32cf3c1672a8b4944aecf9ab640c783b, type: 3}
   _upgradeBtn: {fileID: 4900040001319930337}
@@ -3932,8 +3932,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -2.6676, y: -94}
-  m_SizeDelta: {x: 850, y: 960.9683}
+  m_AnchoredPosition: {x: -2.6676, y: -119.75488}
+  m_SizeDelta: {x: 850, y: 1012.4781}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4497097784937230209
 MonoBehaviour:
@@ -4136,8 +4136,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1275, y: -481.98416}
-  m_SizeDelta: {x: 850, y: 963.9683}
+  m_AnchoredPosition: {x: 1275, y: -507.73904}
+  m_SizeDelta: {x: 850, y: 1012.478}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8307514871510284899
 CanvasRenderer:

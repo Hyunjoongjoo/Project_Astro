@@ -1,25 +1,85 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+//3.5 리팩토링
+//덱 매니저가 뽑아준 카드 타입 보고 지정된 프리팹 생산 및 데이터 주입하도록 변경
 public class AugmentWindowUI : BaseUI
 {
-    [SerializeField] private GameObject _cardPrefab; //AugmentCardUI 붙은애
     [SerializeField] Transform _cardContainer; // 카드 배치시킬 위치
+    //[SerializeField] private GameObject _cardPrefab; //AugmentCardUI 붙은애
+
+    //프리팹 3종
+    [Header("UI Prefabs")]
+    [SerializeField] private GameObject _heroCardPrefab;
+    [SerializeField] private GameObject _skillCardPrefab;
+    [SerializeField] private GameObject _itemCardPrefab;
+
+    //생성된 카드 추적용 리스트
+    private List<GameObject> _spawnedCards = new List<GameObject>();
 
     public void SetupAndOpen(List<AugmentData> datas)
     {
-        foreach(Transform child in _cardContainer) Destroy(child.gameObject); //기존 카드 제거
+        ClearCards();
 
         //새 카드 생성
-        foreach(var data in datas)
+        foreach (var data in datas)
         {
-            var go = Instantiate(_cardPrefab,_cardContainer);
-            if (go.TryGetComponent(out AugmentCardUI cardUI))
+            GameObject prefabToSpawn = null;
+
+            //타입에 따라 알맞은 프리팹 선택
+            switch (data.type)
             {
-                cardUI.Setup(data);
+                case AugmentType.Hero:
+                    prefabToSpawn = _heroCardPrefab;
+                    break;
+                case AugmentType.Skill:
+                    prefabToSpawn = _skillCardPrefab;
+                    break;
+                case AugmentType.Item:
+                    prefabToSpawn = _itemCardPrefab;
+                    //아이템 프리팹이 비어있다면 에러 방지용 임시 할당
+                    if (prefabToSpawn == null) prefabToSpawn = _heroCardPrefab;
+                    break;
+            }
+
+            if (prefabToSpawn != null)
+            {
+                //프리팹 생성 및 리스트에 추가
+                GameObject cardObj = Instantiate(prefabToSpawn, _cardContainer);
+                _spawnedCards.Add(cardObj);
+
+                //IAugmentUI 인터페이스를 통해 데이터 주입
+                //영웅이든 스킬이든 상관없이 Setup 함수를 호출
+                if (cardObj.TryGetComponent(out IAugmentUI augmentUI))
+                {
+                    augmentUI.Setup(data);
+                }
+                else
+                {
+                    Debug.LogError($"{prefabToSpawn.name} 프리팹에 IAugmentUI를 상속받은 스크립트가 없음");
+                }
             }
         }
 
         base.Open();
+    }
+
+    //화면에 띄워진 카드 삭제
+    private void ClearCards()
+    {
+        foreach (var card in _spawnedCards)
+        {
+            if (card != null) Destroy(card);
+        }
+        _spawnedCards.Clear();
+    }
+
+    //BaseUI 오버라이드
+    public override void Close()
+    {
+        //생성했던 카드 처리
+        ClearCards();
+
+        base.Close();
     }
 }

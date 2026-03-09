@@ -14,6 +14,7 @@ public class StageUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _countdownIndicator;
     [SerializeField] private TextMeshProUGUI _gameTimer;
     [SerializeField] private GameObject _teamMemberSlot;
+    [SerializeField] private Transform _teammateContainer;
     [SerializeField] private Slider _augmentGauge;
 
     [Header("Result")]
@@ -99,6 +100,13 @@ public class StageUI : MonoBehaviour
 
         _vsPanel.SetActive(true);
         Debug.Log("매칭된 플레이어 정보를 보여줌");
+    }
+
+    public TeamCardSlotUI GetTeammateSlot(string nickname)
+    {
+        var ui = _teamMemberSlot.GetComponent<TeamCardSlotUI>();
+        ui.Initialize(nickname);
+        return ui; // 생성된 UI 컴포넌트를 반환하여 StageManager에게 전달
     }
 
     public void HidePlayerInfo()
