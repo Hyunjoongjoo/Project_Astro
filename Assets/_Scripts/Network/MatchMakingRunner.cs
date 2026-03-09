@@ -48,6 +48,8 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
         {
             Debug.Log($"플레이어 {count}명 입장! 매칭 완료");
 
+            _networkRunner.SessionInfo.IsOpen = false;
+
             int index = UnityEngine.SceneManagement.SceneUtility.
                 GetBuildIndexByScenePath("Assets/_Scenes/Stage.unity");
 
