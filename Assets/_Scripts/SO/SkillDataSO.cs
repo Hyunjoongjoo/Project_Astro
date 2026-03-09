@@ -17,7 +17,6 @@ public abstract class SkillDataSO : ScriptableObject
     [SerializeField] private GameObject _effectPrefab;
     [SerializeField] private float _effectScale;
     [SerializeField] private float _effectLifeTime;
-    [SerializeField] private EffectAttachType _attachType;
 
     public string SkillId => _skillId;
     public string HeroId => _heroId;
@@ -31,5 +30,4 @@ public abstract class SkillDataSO : ScriptableObject
     public GameObject EffectPrefab => _effectPrefab;
     public float EffectScale => _effectScale;
     public float EffectLifeTime => _effectLifeTime;
-    public EffectAttachType AttachType => _attachType;
 }
