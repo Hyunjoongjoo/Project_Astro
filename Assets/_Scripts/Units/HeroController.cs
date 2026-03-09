@@ -50,7 +50,7 @@ public class HeroController : UnitController
 
         _unitStat = GetComponent<UnitStat>();
 
-        HeroStatData statData = HeroManager.Instance.GetStatus(_unitId);
+        HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
 
         //UnitStat 초기화
         _unitStat.Init(statData);
@@ -144,7 +144,7 @@ public class HeroController : UnitController
             if (so == null)
                 continue;
 
-            if (so.TargetHeroID != _unitId)
+            if (so.TargetHeroID != unitId)
                 continue;
 
             int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;

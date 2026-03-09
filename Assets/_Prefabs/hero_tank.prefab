@@ -130,12 +130,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0807c2c902d934c971569602ccad0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewHeroController
-  maxHealth: 0
-  deffense: 0
   team: 0
   _networkedTeam: 0
   _CurrentHealth: 0
-  _CurrentState: 0
   agent: {fileID: 0}
   moveSpeed: 0
   searchRange: 0
@@ -145,7 +142,7 @@ MonoBehaviour:
   searchInterval: 0.3
   moveType: 0
   attackRange: 3
-  _unitId: hero_tank
+  unitId: hero_tank
   firePoint: {fileID: 128638915413792048}
   currentTarget: {fileID: 0}
   _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}

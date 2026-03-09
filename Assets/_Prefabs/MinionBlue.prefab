@@ -184,12 +184,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d380522b2ad33e4db63a2aa1f2bd383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinionController
-  maxHealth: 50
-  deffense: 0
   team: 0
   _networkedTeam: 0
   _CurrentHealth: 0
-  _CurrentState: 0
   agent: {fileID: 8596131259578450949}
   moveSpeed: 6
   searchRange: 4
@@ -199,7 +196,7 @@ MonoBehaviour:
   searchInterval: 0.3
   moveType: 1
   attackRange: 5
-  _unitId: unit_minion
+  unitId: unit_minion
   firePoint: {fileID: 7239607078526745090}
   currentTarget: {fileID: 0}
   _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}

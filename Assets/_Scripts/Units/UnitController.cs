@@ -14,7 +14,7 @@ public class UnitController : UnitBase
 
     [Header("스탯 관련")]
     public float attackRange = 5;
-    [SerializeField] protected string _unitId;
+    [SerializeField] protected string unitId;
     public Transform firePoint;
 
     [HideInInspector] public UnitBase currentTarget;
@@ -42,7 +42,7 @@ public class UnitController : UnitBase
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
     public LayerMask TargetLayer => targetLayer;
-    public string HeroId => _unitId;
+    public string HeroId => unitId;
     public LayerMask AllyLayer
     {
         get
@@ -69,7 +69,7 @@ public class UnitController : UnitBase
 
         _unitStat = GetComponent<UnitStat>();
 
-        UnitData data = TableManager.Instance.UnitTable.Get(_unitId);
+        UnitData data = TableManager.Instance.UnitTable.Get(unitId);
 
         //UnitStat 초기화
         _unitStat.Init(data);
@@ -326,4 +326,11 @@ public class UnitController : UnitBase
             }
         } 
     }
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()//탐지 범위 시각화
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, searchRange);
+    }
+#endif
 }
