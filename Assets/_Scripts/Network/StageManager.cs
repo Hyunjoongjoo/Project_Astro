@@ -9,7 +9,7 @@ public enum StageState
     WaitingForPlayers,    // 플레이어 대기 중
     AssigningTeams,       // 팀 배정 중
     ShowingPlayerInfo,    // 플레이어 정보 표시
-    AugmentSelection,     // 증강 선택 단계
+    PreGameAugment,       // 게임 시작 전 2연속 증강
     Countdown,            // 카운트다운
     Playing,              // 게임 진행 중
     GameOver              // 게임 종료
@@ -78,6 +78,11 @@ public class StageManager : NetworkBehaviour
     //팀원 UI관리용 딕셔너리
     private Dictionary<PlayerRef, TeamCardSlotUI> _teammateUIList = new Dictionary<PlayerRef, TeamCardSlotUI>();
 
+
+    //게임 시작 전 증강 g 추적 (1라운드, 2라운드)
+    [Networked, HideInInspector] public int PreGameAugmentRound { get; set; }
+
+
     private void Awake()
     {
         _mainCamera = Camera.main;
@@ -145,6 +150,11 @@ public class StageManager : NetworkBehaviour
 
             case StageState.ShowingPlayerInfo:
                 UpdatePlayerInfoTimer();
+                break;
+
+                //3.9 추가(증강 선택 타이머용)
+            case StageState.PreGameAugment: 
+                UpdateAugmentSelectionTimer(); 
                 break;
 
             case StageState.Countdown:
@@ -258,6 +268,18 @@ public class StageManager : NetworkBehaviour
         _stageUI.ShowPlayerInfo(data);
     }
 
+    //타이머 깎는 함수 추가
+    private void UpdateAugmentSelectionTimer()
+    {
+        StateTimer -= Runner.DeltaTime;
+        if (StateTimer <= 0)
+        {
+            //시간 종료 시모든 클라이언트에게 강제로 픽하라고 명령
+            RPC_ForceAugmentTimeout();
+            StateTimer = 9999f; //RPC가 중복 호출 방지 9999
+        }
+    }
+
     private void UpdatePlayerInfoTimer()
     {
         StateTimer -= Runner.DeltaTime;
@@ -266,8 +288,8 @@ public class StageManager : NetworkBehaviour
         {
             // 플레이어 정보 숨기고 증강 선택 시작
             RPC_HidePlayerInfo();
-            CurrentState = StageState.AugmentSelection;
-            EnterAugmentSelection();
+            CurrentState = StageState.PreGameAugment;
+            EnterPreGameAugment();
         }
     }
 
@@ -277,41 +299,84 @@ public class StageManager : NetworkBehaviour
         _stageUI.HidePlayerInfo();
     }
 
-    private void EnterAugmentSelection()
+    //2연 증강 로직
+    private void EnterPreGameAugment()
     {
         if (Object.HasStateAuthority)
         {
-            // 모든 클라이언트에게 증강 UI를 띄우라고 알림
-            RPC_RequestAugmentSelection();
+            PreGameAugmentRound = 1; //1라운드 시작
+            StartPreGameAugmentRound();
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_RequestAugmentSelection()
+    private void StartPreGameAugmentRound()
     {
-        // 3장의 랜덤 카드를 뽑아 UI를 띄움
-        AugmentController.Instance.OpenAugmentWindow();
+        if (Object.HasStateAuthority)
+        {
+            //3.9 ConfigTable 기준 15초 세팅
+            float selectTime = 15f; //기본값
+            var config = TableManager.Instance.ConfigTable.Get("augment_select_time");
+            if (config != null) selectTime = float.Parse(config.configValue);
 
-        Debug.Log("증강 선택 시작!");
+            StateTimer = selectTime; //타이머 시작
+            _playerAugmentReady.Clear(); //레디 초기화
+            RPC_RequestPreGameAugment(PreGameAugmentRound);
+        }
+    }
+
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_RequestPreGameAugment(int round)
+    {
+        AugmentController.Instance.OpenAugmentWindow();
+        Debug.Log("게임 시작 전 증강 선택 시작!");
+    }
+
+    //타임아웃  RPC
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ForceAugmentTimeout()
+    {
+        Debug.Log("증강 제한 시간 종료되어 랜덤 픽 실행");
+        AugmentManager.Instance.ForceRandomPick();
+    }
+
+    //UI에서 본인의 남은 시간을 가져다 쓸 수 있게 해주는 헬퍼 함수
+    public float GetMyAugmentTimeLeft()
+    {
+        //인게임 로직은 분리
+        if (CurrentState == StageState.PreGameAugment)
+            return StateTimer;
+
+        return 0f;
     }
 
     // 플레이어들이 증강을 선택하면 마스터에게 알림.
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_ReportAugmentComplete(PlayerRef player)
     {
-        if (!_playerAugmentReady.ContainsKey(player))
+        if (CurrentState == StageState.PreGameAugment)
         {
-            _playerAugmentReady.Add(player, true);
-        }
+            if (!_playerAugmentReady.ContainsKey(player))
+            {
+                _playerAugmentReady.Add(player, true);
+            }
 
-        // 모든 플레이어가 선택을 완료했는지 확인
-        if (_playerAugmentReady.Count == Runner.ActivePlayers.Count())
-        {
-            Debug.Log("모든 플레이어 증강 선택 완료. 게임을 시작합니다.");
-
-            CurrentState = StageState.Countdown;
-            CountdownValue = 4;
-            StateTimer = COUNTDOWN_INTERVAL;
+            //모두가 현재 라운드 픽을 마쳤다면
+            if (_playerAugmentReady.Count == Runner.ActivePlayers.Count())
+            {
+                if (PreGameAugmentRound == 1)
+                {
+                    PreGameAugmentRound = 2; //2번째선택
+                    StartPreGameAugmentRound();
+                }
+                else
+                {
+                    Debug.Log("모든 플레이어 2회 증강 선택 완료. 게임을 시작합니다.");
+                    CurrentState = StageState.Countdown;
+                    CountdownValue = 4;
+                    StateTimer = COUNTDOWN_INTERVAL;
+                }
+            }
         }
     }
 

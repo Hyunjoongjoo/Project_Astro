@@ -19,14 +19,15 @@ public class SkillCardUI : MonoBehaviour, IAugmentUI
 
     [Header("Button")]
     [SerializeField] private Button _selectBtn;
+    [SerializeField] private GameObject _highlightObj;
 
     private AugmentData _data;
-    private bool _isClicked = false;
+    //private bool _isClicked = false;
 
     public void Setup(AugmentData data)
     {
         _data = data;
-        _isClicked = false;
+        //_isClicked = false;
         _selectBtn.interactable = true;
 
         //1 & 2. 아이콘 세팅
@@ -60,14 +61,20 @@ public class SkillCardUI : MonoBehaviour, IAugmentUI
         _selectBtn.onClick.AddListener(OnSelectClicked);
     }
 
+    public void ToggleHighlight(bool isOn)
+    {
+        if (_highlightObj != null) _highlightObj.SetActive(isOn);
+    }
+
     //나중엔 닫기 대신 확정 버튼 활성화로 로직 변경할 예정
     private void OnSelectClicked()
     {
-        if (_isClicked) return;
-        _isClicked = true;
-        _selectBtn.interactable = false;
+        GetComponentInParent<AugmentWindowUI>().OnCardSelected(this, _data);
+        //if (_isClicked) return;
+        //_isClicked = true;
+        //_selectBtn.interactable = false;
 
-        AugmentManager.Instance.SelectAugment(_data);
-        GetComponentInParent<AugmentWindowUI>().Close();
+        //AugmentManager.Instance.SelectAugment(_data);
+        //GetComponentInParent<AugmentWindowUI>().Close();
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 public abstract class UnitBase : NetworkBehaviour
 {
     [Header("체력과 방어력 설정")]
-    protected float maxHealth;
+    [Networked] public float MaxHealth { get; set; }
     protected float deffense;
 
     protected UnitStat _unitStat;
@@ -23,7 +23,6 @@ public abstract class UnitBase : NetworkBehaviour
     public Team team;
     [Networked] public Team networkedTeam {  get;  set; }
 
-    public float MaxHealth => maxHealth;
     public UnitType UnitType => unitType;
     public bool IsDead { get; private set; }
 
@@ -43,7 +42,7 @@ public abstract class UnitBase : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             selfNetworkObj = GetComponent<NetworkObject>();
-            CurrentHealth = maxHealth;
+            CurrentHealth = MaxHealth;
             IsDead = false;
             networkedTeam = team;
         }
@@ -79,32 +78,10 @@ public abstract class UnitBase : NetworkBehaviour
     {
         if (!Object.HasStateAuthority) return;
         if (IsDead) return;
-
+        
         CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
     }
 
-    
-    public virtual float GetAttackDistanceTo(UnitBase target)
-    {
-        if (target == null)//타겟이 없는 경우 항상 사거리 밖으로 판정되도록 처리
-        {
-            return float.MaxValue;
-        }
-
-        //자신과 타겟의 콜라이더를 기준으로 실제 전투 거리 계산
-        Collider myCollider = GetComponentInChildren<Collider>();
-        Collider targetCollider = target.GetComponentInChildren<Collider>();
-
-        if (myCollider == null || targetCollider == null)//콜라이더가 없는 경우 중심점 거리 계산으로
-        {
-            return Vector3.Distance(transform.position, target.transform.position);
-        }
-
-        Vector3 myPoint = myCollider.ClosestPoint(target.transform.position);
-        Vector3 targetPoint = targetCollider.ClosestPoint(transform.position);
-
-        return Vector3.Distance(myPoint, targetPoint);
-    }
 
     public virtual void Die()
     {
@@ -131,7 +108,7 @@ public abstract class UnitBase : NetworkBehaviour
         // 모든 클라이언트의 화면에서 HP바 매니저 호출
         if (HpBarManager.Instance != null)
         {
-            HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, maxHealth);
+            HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, MaxHealth, unitType);
         }
     }
 }

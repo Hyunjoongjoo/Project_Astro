@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fee6d32a3785654b821b9fd26d31449, type: 3}
   m_Name: Tank_Skill_Standard
   m_EditorClassIdentifier: Assembly-CSharp::ShieldSkillSO
-  skillName: 
+  heroId: hero_tank
+  skillName: normalSkill_tank
   skillDescription: 
   note: 
   skillVFX: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}

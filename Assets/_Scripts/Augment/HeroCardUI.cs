@@ -24,14 +24,15 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI
 
     [Header("Button")]
     [SerializeField] private Button _selectBtn;
+    [SerializeField] private GameObject _highlightObj;
 
     private AugmentData _data;
-    private bool _isClicked = false;
+    //private bool _isClicked = false;
 
     public void Setup(AugmentData data)
     {
         _data = data;
-        _isClicked = false;
+        //_isClicked = false;
         _selectBtn.interactable = true;
 
 
@@ -74,13 +75,20 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI
         _selectBtn.onClick.RemoveAllListeners();
         _selectBtn.onClick.AddListener(OnSelectClicked);
     }
+
+    public void ToggleHighlight(bool isOn)
+    {
+        if (_highlightObj != null) _highlightObj.SetActive(isOn);
+    }
+
     private void OnSelectClicked()
     {
-        if (_isClicked) return;
-        _isClicked = true;
-        _selectBtn.interactable = false;
+        GetComponentInParent<AugmentWindowUI>().OnCardSelected(this, _data);
+        //if (_isClicked) return;
+        //_isClicked = true;
+        //_selectBtn.interactable = false;
 
-        AugmentManager.Instance.SelectAugment(_data);
-        GetComponentInParent<AugmentWindowUI>().Close();
+        //AugmentManager.Instance.SelectAugment(_data);
+        //GetComponentInParent<AugmentWindowUI>().Close();
     }
 }

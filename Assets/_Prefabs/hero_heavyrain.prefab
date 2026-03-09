@@ -164,7 +164,6 @@ MonoBehaviour:
   team: 0
   _networkedTeam: 0
   _CurrentHealth: 0
-  _CurrentState: 0
   agent: {fileID: 0}
   moveSpeed: 0
   searchRange: 0
@@ -174,7 +173,7 @@ MonoBehaviour:
   searchInterval: 0.3
   moveType: 0
   attackRange: 5
-  _unitId: hero_heavyrain
+  unitId: hero_heavyrain
   firePoint: {fileID: 4892445714994426902}
   currentTarget: {fileID: 0}
   _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}

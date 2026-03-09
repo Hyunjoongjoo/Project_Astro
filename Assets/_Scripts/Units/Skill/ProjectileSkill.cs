@@ -9,14 +9,17 @@ public class ProjectileSkill : ISkill
 
     private UnitController _cachedUnit;
     private Coroutine _fireCoroutine;
+    private TickTimer _skillCooldown;
 
     public BaseSkillSO Data => _data;
     public bool IsCasting => _isCasting;
 
     public ProjectileSkill(ProjectileSkillSO data, UnitController unit)
     {
+        string heroId = unit.HeroId;
         _data = data;
         _cachedUnit = unit;
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
     }
 
     public void ChangeData(BaseSkillSO newData)
@@ -29,13 +32,14 @@ public class ProjectileSkill : ISkill
 
     public bool UsingConditionCheck()
     {
+        if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return false;
         if (_cachedUnit.currentTarget == null) return false;
 
-        if ( Vector3.Distance(_cachedUnit.transform.position, _cachedUnit.currentTarget.transform.position) <= _data.range)
-            return true;
-
-        return false;
+        if ( Vector3.Distance(_cachedUnit.transform.position, _cachedUnit.currentTarget.transform.position) > _data.range)
+            return false;
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
+        return true;
     }
 
     public void PreDelay() { _isCasting = true; }

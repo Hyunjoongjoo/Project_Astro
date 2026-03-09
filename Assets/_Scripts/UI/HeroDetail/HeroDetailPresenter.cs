@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class HeroDetailPresenter : MonoBehaviour
 {
@@ -194,15 +195,37 @@ public class HeroDetailPresenter : MonoBehaviour
     private void UpdateSkillDesPage()
     {
         _view.ClearDescription(DescriptionType.Skill);
+        _view.ClearIcons(DescriptionType.Skill);
 
+        if (_heroIcons != null)
+        {
+            Sprite skillIcons = _heroIcons.GetSkillIconByIndex(_heroData.id,0);
+
+            if (skillIcons != null)
+            {
+                _view.AddSkillIcon(DescriptionType.Skill, skillIcons);              
+            }
+        }
     } 
     private void UpdateAugmentDesPage()
     {
         _view.ClearDescription(DescriptionType.Augment);
+        _view.ClearIcons(DescriptionType.Augment);
+
+        if (_heroIcons != null)
+        {
+            Sprite skillIcons = _heroIcons.GetSkillIconByIndex(_heroData.id, 1);
+
+            if (skillIcons != null)
+            {
+                _view.AddSkillIcon(DescriptionType.Augment, skillIcons);
+            }
+        }
     }
     private void UpdateLevelRewardDesPage()
     {
         _view.ClearDescription(DescriptionType.LevelReward);
+        _view.ClearIcons(DescriptionType.LevelReward);
     }
 
     //스텟 페이지 갱신
@@ -222,7 +245,7 @@ public class HeroDetailPresenter : MonoBehaviour
 
         _view.AddStatItem("공격 속도", status.attackSpeed.ToString("F2"), _statIcons.GetIcon(StatType.AttackSpeed));
         _view.AddStatItem("이동 속도", status.moveSpeed.ToString("F1"), _statIcons.GetIcon(StatType.MoveSpeed));
-        _view.AddStatItem("탐지 범위", status.detectionRange.ToString("F1"), _statIcons.GetIcon(StatType.DetectionRange));
+        _view.AddStatItem("감지 범위", status.detectionRange.ToString("F1"), _statIcons.GetIcon(StatType.DetectionRange));
         _view.AddStatItem("재소환 시간", status.spawnCooldown.ToString("F1"), _statIcons.GetIcon(StatType.RespawnTime));
         _view.AddStatItem("쿨타임 증감", status.cooltimeReduce.ToString("F1"), _statIcons.GetIcon(StatType.SkillCooldown));
         _view.AddStatItem("피해 감소량", status.damageReduce.ToString("F1"), _statIcons.GetIcon(StatType.DamageReduction));

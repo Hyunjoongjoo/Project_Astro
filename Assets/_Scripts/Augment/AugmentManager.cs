@@ -7,11 +7,6 @@ using UnityEngine.UI;
 
 public class AugmentManager : Singleton<AugmentManager>
 {
-    //3.3 구버전 데이터SO및 Deck 컨트롤러가 담당
-    //[Header("증강 SO")]
-    //[SerializeField] private AugmentDataSO _masterSO;
-    //private AugmentDeck _deck;
-
     [Header("증강선택 UI")]
     [SerializeField] private GameObject _augmentWindowPrefab;
     [SerializeField] private Button _toggleBtn;
@@ -21,6 +16,9 @@ public class AugmentManager : Singleton<AugmentManager>
     [SerializeField] Transform _slotContainer;
 
     private StageManager _cachedStageManager;
+
+    //3.9 열려있는 윈도우 캐싱용 변수 추가
+    private AugmentWindowUI _currentWindow;
 
     private void Start()
     {
@@ -43,7 +41,7 @@ public class AugmentManager : Singleton<AugmentManager>
                 HideAugmentToggleBtn();
             });
             _toggleBtn.gameObject.SetActive(true);
-        }  
+        }
     }
 
     public void HideAugmentToggleBtn()
@@ -55,18 +53,18 @@ public class AugmentManager : Singleton<AugmentManager>
     public void ShowAugmentWindow(List<AugmentData> datas)
     {
         //UIManager를 통해 팝업 형식으로 띄움
-        var window = UIManager.Instance.ShowUI<AugmentWindowUI>(_augmentWindowPrefab, true);
+        _currentWindow = UIManager.Instance.ShowUI<AugmentWindowUI>(_augmentWindowPrefab, true);
         _toggleBtn.gameObject.SetActive(true);
-        if (window != null)
+        if (_currentWindow != null)
         {
-            window.SetupAndOpen(datas);
+            _currentWindow.SetupAndOpen(datas);
 
             _toggleBtn.onClick.RemoveAllListeners();
             _toggleBtn.onClick.AddListener(() =>
             {
-                if (window != null)
+                if (_currentWindow != null)
                 {
-                    window.Toggle();
+                    _currentWindow.Toggle();
                 }
                 else
                 {
@@ -94,6 +92,16 @@ public class AugmentManager : Singleton<AugmentManager>
         if (go.TryGetComponent(out HeroHandCardUI card))
         {
             card.Setup(data);
+        }
+    }
+
+    //3.9 타임아웃 시 실행될 강제 픽 함수 추가
+    public void ForceRandomPick()
+    {
+        //창이 아직 열려있다면 (유저가 아직 카드를 안 골랐다면)
+        if (_currentWindow != null && _currentWindow.gameObject.activeInHierarchy)
+        {
+            _currentWindow.ForceRandomPick();
         }
     }
 }

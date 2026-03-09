@@ -14,7 +14,7 @@ public class UnitController : UnitBase
 
     [Header("스탯 관련")]
     public float attackRange = 5;
-    [SerializeField] protected string _unitId;
+    [SerializeField] protected string unitId;
     public Transform firePoint;
 
     [HideInInspector] public UnitBase currentTarget;
@@ -42,7 +42,7 @@ public class UnitController : UnitBase
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
     public LayerMask TargetLayer => targetLayer;
-    public string HeroId => _unitId;
+    public string HeroId => unitId;
     public LayerMask AllyLayer
     {
         get
@@ -69,14 +69,14 @@ public class UnitController : UnitBase
 
         _unitStat = GetComponent<UnitStat>();
 
-        UnitData data = TableManager.Instance.UnitTable.Get(_unitId);
+        UnitData data = TableManager.Instance.UnitTable.Get(unitId);
 
         //UnitStat 초기화
         _unitStat.Init(data);
 
         //Stat 기반 값 적용
-        maxHealth = _unitStat.MaxHp.Value;
-        CurrentHealth = maxHealth;
+        MaxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = MaxHealth;
         moveSpeed = _unitStat.MoveSpeed.Value;
         searchRange = _unitStat.DetectRange.Value;
         agent.speed = moveSpeed;
@@ -211,6 +211,10 @@ public class UnitController : UnitBase
 
     public UnitBase GetClosestTower()
     {
+        // 함교가 없다면 게임이 끝난 상태니 행동 중지
+        if (_bridge == null)
+            return null;
+
         //두 타워 다 없으면 함교
         if (_towerA == null && _towerB == null)
             return _bridge;
@@ -232,43 +236,70 @@ public class UnitController : UnitBase
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlayChildSkillEffect(
-        NetworkId id,
+        NetworkId casterId,
+        NetworkId targetId,
         SkillType type,
         bool setChild,
         float duration = 0f
         )
     {
-        Debug.Log("본인 중심 이펙트 출력 RPC 수신 확인");
+        Debug.Log("스킬 이펙트 RPC 수신");
 
-        if (Runner.TryFindObject(id, out NetworkObject casterObj))
+        // caster 찾기
+        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
         {
-            UnitController unit = casterObj.GetComponent<UnitController>();
-            GameObject prefab = null;
+            return;
+        }
 
-            // 평타 공격인가 스킬인가
-            if (type == SkillType.Normal)
-                prefab = _normalAttackData.skillVFX;
-            else
-                if (unit is HeroController)
-                    prefab = (unit as HeroController).CurUniqueSkill.Data.skillVFX;
+        UnitController unit = casterObj.GetComponent<UnitController>();
+        HeroController hero = unit as HeroController;
 
-            if (prefab == null) return;
+        GameObject prefab = null;
 
-            GameObject obj;
+        // 평타 공격인가 스킬인가
+        if (type == SkillType.Normal)
+        {
+            prefab = unit._normalAttackData.skillVFX;
+        }
+        else if (hero != null)
+        {
+            prefab = hero.GetSkillVFX(type);
+        }
+
+        if (prefab == null)
+        {
+            return;
+        }
+
+        Vector3 spawnPos = unit.transform.position;
+        Transform parent = null;
+
+        // targetId가 존재하면 타겟 기준으로 처리
+        if (Runner.TryFindObject(targetId, out NetworkObject targetObj))
+        {
+            spawnPos = targetObj.transform.position;
 
             if (setChild)
             {
-                obj = Instantiate(prefab, transform);
-                obj.transform.localPosition = Vector3.zero;
+                parent = targetObj.transform;
             }
-            else
-            {
-                obj = Instantiate(prefab, unit.transform.position, Quaternion.identity);
-            }
-
-            Destroy(obj, duration);
         }
+
+        GameObject obj;
+
+        if (parent != null)
+        {
+            obj = Instantiate(prefab, parent);
+            obj.transform.localPosition = Vector3.zero;
+        }
+        else
+        {
+            obj = Instantiate(prefab, spawnPos, Quaternion.identity);
+        }
+
+        Destroy(obj, duration);
     }
+
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_FireProjectile(
@@ -324,6 +355,13 @@ public class UnitController : UnitBase
                 projectile.Initialize(projectileSO, networkedTeam, power, Runner);
                 projectile.Fire(targetPos);
             }
-        } 
+        }
     }
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()//탐지 범위 시각화
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, searchRange);
+    }
+#endif
 }
