@@ -29,9 +29,9 @@ public class Bridge : UnitBase
         base.Spawned();
 
         unitType = UnitType.Bridge;
-        if (_unitStat == null) _unitStat = GetComponent<UnitStat>();
 
         if (!Object.HasStateAuthority) return;
+        if (_unitStat == null) _unitStat = GetComponent<UnitStat>();
 
         UnitData data = TableManager.Instance.UnitTable.Get(_unitId);
 
