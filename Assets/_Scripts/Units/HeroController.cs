@@ -152,7 +152,7 @@ public class HeroController : UnitController
             if (tierIndex >= so.Tiers.Length)
                 continue;
 
-            SkillDataSO newSkill = so.Tiers[tierIndex].CombatSkillData;
+            BaseSkillSO newSkill = so.Tiers[tierIndex].CombatSkillData;
 
             if (newSkill == null)
                 continue;

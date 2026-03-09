@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -63,11 +63,11 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI
         if (data.skillData != null)
         {
             string skillNameFormat = TableManager.Instance.GetString("ui_augment_hero_skill_name");
-            if (_skillNameTxt != null) _skillNameTxt.text = string.Format(skillNameFormat, TableManager.Instance.GetString(data.skillData.SkillName));
-            if (_skillDescTxt != null) _skillDescTxt.text = TableManager.Instance.GetString(data.skillData.SkillDescription);
+            if (_skillNameTxt != null) _skillNameTxt.text = string.Format(skillNameFormat, TableManager.Instance.GetString(data.skillData.skillName));
+            if (_skillDescTxt != null) _skillDescTxt.text = TableManager.Instance.GetString(data.skillData.skillDescription);
 
             string skillCoolFormat = TableManager.Instance.GetString("ui_augment_hero_skill_cooldown");
-            if (_skillCoolTxt != null) _skillCoolTxt.text = string.Format(skillCoolFormat, data.skillData.Cooldown);
+            if (_skillCoolTxt != null) _skillCoolTxt.text = string.Format(skillCoolFormat, data.skillData.cooldown);
         }
 
         //버튼 클릭 이벤트 세팅
