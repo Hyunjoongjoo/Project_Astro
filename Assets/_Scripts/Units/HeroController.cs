@@ -37,7 +37,7 @@ public class HeroController : UnitController
         curUniqueSkill = _standardSkillData.CreateInstance(this);
 
         if (!Object.HasStateAuthority) return;
-        
+        ApplySkillAugments();
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
         // 상태 인스턴스 생성
         StateMachine = new StateMachine();
@@ -111,8 +111,20 @@ public class HeroController : UnitController
         Setup(myTeam);
     }
 
+    // 스킬 타입에 맞는 VFX 프리팹 반환
+    public GameObject GetSkillVFX(SkillType type)
+    {
+        if (curUniqueSkill != null && curUniqueSkill.Data.skillType == type)
+            return curUniqueSkill.Data.skillVFX;
+
+        if (_standardSkillData != null && _standardSkillData.skillType == type)
+            return _standardSkillData.skillVFX;
+
+        return null;
+    }
+
     // 스킬 증강 시 스킬 교체
-    public void ChangeSkill(BaseSkillSO newSkillData)
+    private void ChangeSkill(BaseSkillSO newSkillData)
     {
         if (curUniqueSkill != null && newSkillData.GetType() == curUniqueSkill.GetType())
             curUniqueSkill.ChangeData(newSkillData);
@@ -120,7 +132,7 @@ public class HeroController : UnitController
             curUniqueSkill = newSkillData.CreateInstance(this);
     }
 
-    //스킬증강에 사용될 메서드
+    //스킬증강에 사용될 메서드 (스폰에 적용시 이미 배치된 영웅은 적용이 안될것인데....)
     private void ApplySkillAugments()
     {
         StageManager stageManager = FindFirstObjectByType<StageManager>();
@@ -157,7 +169,20 @@ public class HeroController : UnitController
             if (newSkill == null)
                 continue;
 
-            // ChangeSkill(newSkill);
+             ChangeSkill(newSkill);
         }
+
     }
+
+    //외부에서 증강을 갱신할 것이라면...
+    //public void RefreshAugments()
+    //{
+    //    if (!Object.HasStateAuthority)
+    //    {
+    //        return;
+    //    }
+
+    //    ApplySkillAugments();
+    //}
 }
+

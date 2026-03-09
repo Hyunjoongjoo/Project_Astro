@@ -79,7 +79,7 @@ public abstract class UnitBase : NetworkBehaviour
     {
         if (!Object.HasStateAuthority) return;
         if (IsDead) return;
-
+        
         CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
     }
 
