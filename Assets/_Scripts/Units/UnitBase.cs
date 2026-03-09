@@ -131,7 +131,7 @@ public abstract class UnitBase : NetworkBehaviour
         // 모든 클라이언트의 화면에서 HP바 매니저 호출
         if (HpBarManager.Instance != null)
         {
-            HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, maxHealth);
+            HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, maxHealth, unitType);
         }
     }
 }

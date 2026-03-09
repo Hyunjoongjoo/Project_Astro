@@ -15,13 +15,17 @@ public class HpBarItem : MonoBehaviour
     private float _timer;
     private string _poolTag;
 
-    public void Setup(Transform target,Team team,float hpRatio,string poolTag)
+    public void Setup(Transform target,Team team,float hpRatio,string poolTag,bool isHero)
     {
         _target = target;
         _mainCam = Camera.main;
         _poolTag = poolTag;
 
         _fillImg.sprite = (team == Team.Blue) ? _blueTeamSpr : _redTeamSpr;
+        if (_heroMark != null)
+        {
+            _heroMark.SetActive(isHero); //영웅이면 영웅아이콘 활성화
+        }
         UpdateHp(hpRatio);
 
         _timer = _showDuration;
