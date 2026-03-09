@@ -8,12 +8,12 @@ public class UserDataManager : Singleton<UserDataManager>
     //옵저버 패턴용 이벤트
     public event Action<int> OnGoldChanged;
 
-    private UserDbModel _profileModel;
+    private ProfileDbModel _profileModel;
     private RecordModel _recordModel;
     private WalletModel _walletModel;
     private List<HeroDbModel> _heroesModel = new List<HeroDbModel>();
 
-    public void SetAllUserData(UserDbModel profile, RecordModel record, WalletModel wallet, List<HeroDbModel> heroes)
+    public void SetAllUserData(ProfileDbModel profile, RecordModel record, WalletModel wallet, List<HeroDbModel> heroes)
     {
         _profileModel = profile;
         _recordModel = record;
@@ -25,15 +25,20 @@ public class UserDataManager : Singleton<UserDataManager>
         Debug.Log($"[UserDataManager] 캐싱 완료: {profile.nickName}님 환영합니다.");
     }
 
-    public UserDbModel ProfileModel => _profileModel;
+    public ProfileDbModel ProfileModel => _profileModel;
     public RecordModel RecordModel => _recordModel;
     public WalletModel WalletModel => _walletModel;
     public List<HeroDbModel> HeroesModel => _heroesModel;
 
+    // 골드 갱신
     public async Task UpdateWallet(int amount)
     {
+        var updates = new Dictionary<string, object> 
+        {
+            { "Wallet.gold", _walletModel.gold + amount }
+        };
         // DB 업데이트 하기
-        await UserDataStore.Instance.UpdateWalletAsync(_profileModel.uuid, amount);
+        await UserDataStore.Instance.UpdateUserDataAsync(_profileModel.uuid, updates);
 
         // 성공하면 로컬 캐싱 데이터 갱신
         _walletModel.gold += amount;
@@ -44,6 +49,7 @@ public class UserDataManager : Singleton<UserDataManager>
         OnGoldChanged?.Invoke(_walletModel.gold);
     }
 
+    // 영웅 갱신
     public async Task UpdateHero(string heroId, int level, int exp, bool unlock)
     {
         // DB 업데이트
@@ -62,13 +68,14 @@ public class UserDataManager : Singleton<UserDataManager>
         HeroManager.Instance.UpdateHeroRuntimeStatus(heroId, level);
     }
 
+    // 프로파일 갱신
     public async Task UpdateUserDb(int expDelta, int levelDelta = 0) 
     {
         // 변경될 데이터 딕셔너리
         var updates = new Dictionary<string, object>
         {
-            { "userLevel", _profileModel.userLevel + levelDelta },
-            { "userExp", _profileModel.userExp + expDelta }
+            { "Profile.userLevel", _profileModel.userLevel + levelDelta },
+            { "Profile.userExp", _profileModel.userExp + expDelta }
         };
 
         try
@@ -88,12 +95,19 @@ public class UserDataManager : Singleton<UserDataManager>
         }
     }
 
+    // 전적 갱신
     public async Task UpdateRecord(int winDelta, int loseDelta) 
     {
+        var updates = new Dictionary<string, object>
+        {
+            { "Record.win", _recordModel.win + winDelta },
+            { "Record.lose", _recordModel.lose + loseDelta }
+        };
+
         try
         {
             // DB 업데이트
-            await UserDataStore.Instance.UpdateRecordAsync(_profileModel.uuid, winDelta, loseDelta);
+            await UserDataStore.Instance.UpdateUserDataAsync(_profileModel.uuid, updates);
 
             // 성공 로컬 갱신
             _recordModel.win += winDelta;
