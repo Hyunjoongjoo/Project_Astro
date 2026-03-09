@@ -211,6 +211,10 @@ public class UnitController : UnitBase
 
     public UnitBase GetClosestTower()
     {
+        // 함교가 없다면 게임이 끝난 상태니 행동 중지
+        if (_bridge == null)
+            return null;
+
         //두 타워 다 없으면 함교
         if (_towerA == null && _towerB == null)
             return _bridge;
