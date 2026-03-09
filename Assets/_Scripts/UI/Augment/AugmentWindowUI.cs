@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 //3.5 리팩토링
 //덱 매니저가 뽑아준 카드 타입 보고 지정된 프리팹 생산 및 데이터 주입하도록 변경
@@ -8,16 +9,24 @@ public class AugmentWindowUI : BaseUI
 {
     [SerializeField] Transform _cardContainer; // 카드 배치시킬 위치
 
-    [Header("Timer")]
+    [Header("UI")]
     [SerializeField] private TMP_Text _timerTxt; //타이머
-    private StageManager _stageManager;
-    private List<AugmentData> _currentDatas; //뽑은 3장 기억용
+    [SerializeField] private Button _confirmBtn;
+
 
     //프리팹 3종
     [Header("UI Prefabs")]
     [SerializeField] private GameObject _heroCardPrefab;
     [SerializeField] private GameObject _skillCardPrefab;
     [SerializeField] private GameObject _itemCardPrefab;
+
+    //현재 유저가 클릭해둔 카드 데이터 추적용
+    private AugmentData _selectedData;
+    private IAugmentUI _selectedCardUI;
+
+    private StageManager _stageManager;
+    private List<AugmentData> _currentDatas; //뽑은 3장 기억용
+    private bool _isForcePicked = false;
 
     //생성된 카드 추적용 리스트
     private List<GameObject> _spawnedCards = new List<GameObject>();
@@ -26,6 +35,17 @@ public class AugmentWindowUI : BaseUI
     {
         _currentDatas = datas;
         _stageManager = FindFirstObjectByType<StageManager>();
+        _isForcePicked = false;
+        _selectedData = null;
+        _selectedCardUI = null;
+
+        //확정버튼초기화
+        if (_confirmBtn != null)
+        {
+            _confirmBtn.interactable = false;
+            _confirmBtn.onClick.RemoveAllListeners();
+            _confirmBtn.onClick.AddListener(OnConfirmClicked);
+        }
 
         ClearCards();
 
@@ -84,6 +104,36 @@ public class AugmentWindowUI : BaseUI
                 _timerTxt.text = $"제한 시간: {timeLeft}초";
             }
         }
+    }
+
+    //카드들이 자신을 터치했을 때 호출하는 함수
+    public void OnCardSelected(IAugmentUI cardUI, AugmentData data)
+    {
+        //이미선택한거있으면false
+        if (_selectedCardUI != null)
+        {
+            _selectedCardUI.ToggleHighlight(false);
+        }
+
+        //새로운 카드를 기억 & 하이라이트
+        _selectedCardUI = cardUI;
+        _selectedData = data;
+        _selectedCardUI.ToggleHighlight(true);
+
+        //확정 버튼 활성화
+        if (_confirmBtn != null) _confirmBtn.interactable = true;
+    }
+
+    //확정 버튼을 눌렀을 때 발동
+    private void OnConfirmClicked()
+    {
+        if (_selectedData == null || _isForcePicked) return;
+
+        _isForcePicked = true;
+        _confirmBtn.interactable = false;
+
+        AugmentManager.Instance.SelectAugment(_selectedData);
+        Close();
     }
 
     //타임아웃 시
