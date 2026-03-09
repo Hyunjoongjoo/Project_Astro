@@ -2,7 +2,6 @@
 
 public abstract class BaseSkillSO : ScriptableObject
 {
-    public string skillId;
     public string heroId;
     public string skillName;
     public string skillDescription;
