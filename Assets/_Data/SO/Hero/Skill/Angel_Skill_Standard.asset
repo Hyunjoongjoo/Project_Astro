@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1f9d6b0d47c40d488c9ed19547416d7, type: 3}
   m_Name: Angel_Skill_Standard
   m_EditorClassIdentifier: Assembly-CSharp::HealSkillSO
-  skillName: 
+  heroId: hero_angel
+  skillName: normalSkill_angel
   skillDescription: 
   note: 
   skillVFX: {fileID: 7343538280686139031, guid: 921bfdf400594b2459b6504da1d4e296, type: 3}

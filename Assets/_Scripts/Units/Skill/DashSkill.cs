@@ -19,7 +19,7 @@ public class DashSkill : ISkill
         _data = data;
         _cachedUnit = unit;
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
-
+        Debug.Log($"[스킬명] {_data.skillName} 초기쿨 = {_data.initCooldown} 기본쿨 = {_data.cooldown}");
         // 광역화 옵션 켜져있다면 배열 미리 할당
         if (data.areaOfEffect)
             _hitColliders = new Collider[20];
