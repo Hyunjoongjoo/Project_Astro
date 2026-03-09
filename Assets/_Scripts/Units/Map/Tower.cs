@@ -33,10 +33,9 @@ public class Tower : UnitBase
         base.Spawned();
 
         unitType = UnitType.Tower;
-
+        if (_unitStat == null) _unitStat = GetComponent<UnitStat>();
 
         if (!Object.HasStateAuthority) return;
-        if (_unitStat == null) _unitStat = GetComponent<UnitStat>();
 
         UnitData data = TableManager.Instance.UnitTable.Get(_unitId);
 
