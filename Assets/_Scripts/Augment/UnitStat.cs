@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 //현재 스탯을 계산하여 유닛에게 달아줄 관리자
 //외부 요인의 효과 적용을 알맞은 Stat 객체로 분배
@@ -137,6 +138,26 @@ public class UnitStat : MonoBehaviour
         {
             Debug.LogWarning($"UnitStat에서 연결되지 않은 효과 타입: {type}");
         }
+    }
+
+    // 오버로드 : 스탯 변동이 일시적인 경우 지속시간 값을 받고
+    // 지속 시간이 다되면 자동으로 제거 메서드 실행
+    public void AddModifier(EffectType type, StatModifier modifier, float duration)
+    {
+        StartCoroutine(TemporaryEffect(type, modifier, duration));
+    }
+
+    private IEnumerator TemporaryEffect(EffectType type, StatModifier modifier, float duration)
+    {
+        float elapsedTime = 0f;
+
+        AddModifier(type, modifier);
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        RemoveModifier(type, modifier);
     }
 
     //기존 스탯 변동을 제거(Source 기반 역추적)
