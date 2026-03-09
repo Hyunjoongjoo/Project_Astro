@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 //스킬 증강 데이터
 
@@ -39,5 +39,5 @@ public struct SkillAugmentTier
 
     [Tooltip("증강 선택 시, 영웅에게 실제로 꽂아줄 스킬 전투 데이터")]
     //SO 클래스 참조
-    public SkillDataSO CombatSkillData;
+    public BaseSkillSO CombatSkillData;
 }

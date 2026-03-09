@@ -21,7 +21,7 @@ public class AugmentController : NetworkBehaviour
 
     //영웅들의 기본 스킬 SO들을 담아둘 리스트 추가
     [Header("기본 스킬 데이터베이스 (영웅 카드용)")]
-    [SerializeField] private List<SkillDataSO> _allBaseSkills;
+    [SerializeField] private List<BaseSkillSO> _allBaseSkills;
 
     //캐싱용
     private AugmentData _localSelectedData;
