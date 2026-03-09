@@ -14,6 +14,7 @@ public class Projectile : MonoBehaviour
 
     private Vector3 _target;
     private float _homingRotationSpeed = 10f; // 유도탄의 궤적 꺾임 속도 (유도탄 테스트를 위한 임시 값)
+    private bool errorMsg = false;
 
     public void Initialize(ProjectileSkillSO data, Team team, float power, NetworkRunner runner)
     {
@@ -47,12 +48,20 @@ public class Projectile : MonoBehaviour
 
                 // 현재 방향에서 타겟 방향으로 부드럽게 회전 (보간)
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _homingRotationSpeed * Time.deltaTime);
+                if (Vector3.Distance(transform.position, _target) < 0.5f)
+                    Destroy(gameObject);
             }
 
             transform.Translate(Vector3.forward * _data.projectileSpeed * Time.deltaTime);
         }
         else
-            Debug.LogError("[projectile] 초기화가 되지 않았음!!");
+        {
+            if (errorMsg == false)
+            {
+                Debug.LogError($"[projectile] 이 투사체는 초기화가 되지 않았음!! {_runner.name}");
+                errorMsg = true;
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)
