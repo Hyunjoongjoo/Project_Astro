@@ -77,12 +77,12 @@ public class Bridge : UnitBase
     private void PerformAttack()
     {
         _currentTarget.TakeDamage(AttackPower);
-        RPC_PlayAttackEffect(_currentTarget.transform.position);
+        RPC_PlayAttackEffect(_currentTarget.transform.position, AttackPower);
     }
 
     //투사체(현재는 이펙트만)
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayAttackEffect(Vector3 targetPos)
+    private void RPC_PlayAttackEffect(Vector3 targetPos, float power)
     {
         if(_normalAttackData.skillVFX == null || _firePoint == null) return;
 
@@ -93,7 +93,7 @@ public class Bridge : UnitBase
         GameObject projectileObj = Instantiate(_normalAttackData.skillVFX, _firePoint.position, baseRotation);
         Projectile projectile = projectileObj.GetComponent<Projectile>();
 
-        projectile.Initialize(_normalAttackData as ProjectileSkillSO, networkedTeam, AttackPower, Runner);
+        projectile.Initialize(_normalAttackData as ProjectileSkillSO, networkedTeam, power, Runner);
         projectile.Fire(targetPos);
     }
 

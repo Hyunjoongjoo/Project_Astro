@@ -30,6 +30,7 @@ public class Tower : UnitBase
 
     public override void Spawned()
     {
+        Debug.Log("Spawned 실행됨");
         base.Spawned();
 
         unitType = UnitType.Tower;
@@ -96,13 +97,14 @@ public class Tower : UnitBase
     private void PerformAttack()
     {
         _currentTarget.TakeDamage(AttackPower);
-        RPC_PlayAttackEffect(_currentTarget.transform.position);
+        RPC_PlayAttackEffect(_currentTarget.transform.position, AttackPower);
     }
 
     //투사체(현재는 이펙트만)
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayAttackEffect(Vector3 targetPos)
+    private void RPC_PlayAttackEffect(Vector3 targetPos, float power)
     {
+        Debug.Log("RPC 수신 됨");
         if (_normalAttackData.skillVFX == null || _firePoint == null) return;
 
         // 타겟을 향하는 기본 방향
@@ -110,10 +112,15 @@ public class Tower : UnitBase
         Quaternion baseRotation = Quaternion.LookRotation(directionToTarget);
 
         GameObject projectileObj = Instantiate(_normalAttackData.skillVFX, _firePoint.position, baseRotation);
+        if (projectileObj != null) Debug.Log("projectileObj 생성 OK");
         Projectile projectile = projectileObj.GetComponent<Projectile>();
+        if (projectile != null) Debug.Log("projectile 겟 컴포넌트 OK");
 
-        projectile.Initialize(_normalAttackData as ProjectileSkillSO, networkedTeam, AttackPower, Runner);
+        if (_normalAttackData is ProjectileSkillSO) Debug.Log("평타 공격은 projectileSO인지 확인 OK");
+        projectile.Initialize(_normalAttackData as ProjectileSkillSO, networkedTeam, power, Runner);
+        Debug.Log("투사체 초기화 OK");
         projectile.Fire(targetPos);
+        Debug.Log("Fire 호출 OK");
     }
 
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기
