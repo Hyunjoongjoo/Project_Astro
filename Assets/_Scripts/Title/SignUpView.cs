@@ -18,6 +18,8 @@ public class SignUpView : MonoBehaviour
     [Header("Feedback")]
     [SerializeField] private TextMeshProUGUI _resultText;
 
+    private bool _isGoogleSign = false;
+
     private void Start()
     {
         HideResultPanel();
@@ -27,6 +29,7 @@ public class SignUpView : MonoBehaviour
     {
         return new SignUpData
         {
+            isGoogle = _isGoogleSign,
             email = _emailInput.text,
             password = _passwordInput.text,
             passwordConfirm = _passwordConfirmInput.text,
@@ -90,6 +93,7 @@ public class SignUpView : MonoBehaviour
     // 닉네임만 입력하는 모드
     public void SetNicknameOnlyMode(string email)
     {
+        _isGoogleSign = true;
         _emailInput.text = email;
         _emailInput.interactable = false;
         _passwordInput.interactable = false;
