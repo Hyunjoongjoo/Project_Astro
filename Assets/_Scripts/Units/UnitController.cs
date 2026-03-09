@@ -75,8 +75,8 @@ public class UnitController : UnitBase
         _unitStat.Init(data);
 
         //Stat 기반 값 적용
-        maxHealth = _unitStat.MaxHp.Value;
-        CurrentHealth = maxHealth;
+        MaxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = MaxHealth;
         moveSpeed = _unitStat.MoveSpeed.Value;
         searchRange = _unitStat.DetectRange.Value;
         agent.speed = moveSpeed;

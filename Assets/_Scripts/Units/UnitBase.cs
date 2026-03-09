@@ -6,7 +6,7 @@ using UnityEngine;
 public abstract class UnitBase : NetworkBehaviour
 {
     [Header("체력과 방어력 설정")]
-    protected float maxHealth;
+    [Networked] public float MaxHealth { get; set; }
     protected float deffense;
 
     protected UnitStat _unitStat;
@@ -23,7 +23,6 @@ public abstract class UnitBase : NetworkBehaviour
     public Team team;
     [Networked] public Team networkedTeam {  get;  set; }
 
-    public float MaxHealth => maxHealth;
     public UnitType UnitType => unitType;
     public bool IsDead { get; private set; }
 
@@ -43,7 +42,7 @@ public abstract class UnitBase : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             selfNetworkObj = GetComponent<NetworkObject>();
-            CurrentHealth = maxHealth;
+            CurrentHealth = MaxHealth;
             IsDead = false;
             networkedTeam = team;
         }
@@ -109,7 +108,7 @@ public abstract class UnitBase : NetworkBehaviour
         // 모든 클라이언트의 화면에서 HP바 매니저 호출
         if (HpBarManager.Instance != null)
         {
-            HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, maxHealth, unitType);
+            HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, MaxHealth, unitType);
         }
     }
 }

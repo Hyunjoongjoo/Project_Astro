@@ -56,8 +56,8 @@ public class HeroController : UnitController
         _unitStat.Init(statData);
 
         //Stat 기반 값 적용
-        maxHealth = _unitStat.MaxHp.Value;
-        CurrentHealth = maxHealth;
+        MaxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = MaxHealth;
         moveSpeed = _unitStat.MoveSpeed.Value;
         searchRange = _unitStat.DetectRange.Value;
         _respawnTime = _unitStat.RespawnTime.Value;
