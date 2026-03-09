@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 906afe7c667c0444788587ba088d1cb0, type: 3}
   m_Name: Corsair_Skill_Standard
   m_EditorClassIdentifier: Assembly-CSharp::DashSkillSO
-  skillName: 
+  heroId: hero_corsair
+  skillName: normalSkill_corsair
   skillDescription: 
   note: 
   skillVFX: {fileID: 6393617126741755569, guid: cd314f7e717ada041bb94a53b1fdff9c, type: 3}

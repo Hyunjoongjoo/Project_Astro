@@ -22,6 +22,7 @@ public class HealSkill : ISkill
         _data = data;
         _cachedUnit = unit;
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
+        Debug.Log($"[스킬명] {_data.skillName} 초기쿨 = {_data.initCooldown} 기본쿨 = {_data.cooldown}");
     }
 
     public void ChangeData(BaseSkillSO newData)
