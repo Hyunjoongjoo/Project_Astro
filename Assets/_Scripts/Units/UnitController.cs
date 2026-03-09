@@ -75,8 +75,8 @@ public class UnitController : UnitBase
         _unitStat.Init(data);
 
         //Stat 기반 값 적용
-        maxHealth = _unitStat.MaxHp.Value;
-        CurrentHealth = maxHealth;
+        MaxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = MaxHealth;
         moveSpeed = _unitStat.MoveSpeed.Value;
         searchRange = _unitStat.DetectRange.Value;
         agent.speed = moveSpeed;
@@ -211,6 +211,10 @@ public class UnitController : UnitBase
 
     public UnitBase GetClosestTower()
     {
+        // 함교가 없다면 게임이 끝난 상태니 행동 중지
+        if (_bridge == null)
+            return null;
+
         //두 타워 다 없으면 함교
         if (_towerA == null && _towerB == null)
             return _bridge;

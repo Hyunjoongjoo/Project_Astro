@@ -33,7 +33,13 @@ public class DetectState : IState
             }
 
             // 타겟이 없다면 가까운 포탑으로 이동하며 타이머 다시 세팅
-            _unit.MoveTo(_unit.GetClosestTower().transform.position);
+            UnitBase target = _unit.GetClosestTower();
+            if (target == null)
+            {
+                _unit.StateMachine.ChangeState(_unit.DieState);
+                return;
+            }
+            _unit.MoveTo(target.transform.position);
             _searchTimer = TickTimer.CreateFromSeconds(_unit.Runner, _unit.searchInterval);
         }
     }

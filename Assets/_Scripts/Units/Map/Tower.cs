@@ -42,13 +42,13 @@ public class Tower : UnitBase
 
         _unitStat.Init(data);
 
-        maxHealth = _unitStat.MaxHp.Value;
-        CurrentHealth = maxHealth;
+        MaxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = MaxHealth;
 
         Debug.Log(
             $"[적용된 타워 스텟]\n" +
             $"ID : {_unitId}\n" +
-            $"HP : {maxHealth}\n" +
+            $"HP : {MaxHealth}\n" +
             $"Attack : {AttackPower}\n" +
             $"AttackSpeed : {AttackSpeed}\n" +
             $"DetectRange : {SearchRange}"
