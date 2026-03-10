@@ -62,7 +62,6 @@ public class StageManager : NetworkBehaviour
     private StageUI _stageUI;
     private Camera _mainCamera;
 
-    private MatchType _curMatchType;
     private int _requiredPlayerCount;
 
     private readonly int GAME_DURATION = 240;
@@ -81,6 +80,8 @@ public class StageManager : NetworkBehaviour
 
     //게임 시작 전 증강 g 추적 (1라운드, 2라운드)
     [Networked, HideInInspector] public int PreGameAugmentRound { get; set; }
+    // 매치 타입 동기화
+    [Networked] private MatchType CurMatchType { get; set; }
 
     //더미 클라이언트 존재 여부
     private bool _existDummy;
@@ -99,7 +100,7 @@ public class StageManager : NetworkBehaviour
 
     public void Initialize(MatchType matchType, int requiredPlayerCount, bool existDummy)
     {
-        _curMatchType = matchType;
+        CurMatchType = matchType;
         _requiredPlayerCount = requiredPlayerCount;
         _existDummy = existDummy;
     }
@@ -228,7 +229,7 @@ public class StageManager : NetworkBehaviour
     private void ShowPlayerInfo(Team myTeam)
     {
         // 플레이어 수와 팀에 따라 각 로컬 초기화
-        _stageUI.LocalInitialize(_curMatchType, myTeam);
+        _stageUI.LocalInitialize(CurMatchType, myTeam);
 
         PlayerNetworkData[] data = new PlayerNetworkData[PlayerDataMap.Count];
 

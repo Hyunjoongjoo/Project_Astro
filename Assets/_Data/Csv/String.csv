@@ -17,22 +17,62 @@ desc_unit_minion,미니언 설명입니다,미니언 설명
 desc_unit_superminion,강화미니언 설명입니다,강화미니언 설명
 desc_unit_bridge,함교 설명입니다,함교 설명
 desc_unit_tower,포탑 설명입니다,포탑 설명
-skill_name_hero_corsair,코로나 폭발,커세어 기본 스킬 이름
-skill_name_hero_heavyrain,일점 사격,헤비레인 기본 스킬 이름
-skill_name_hero_tank,장갑 강화,탱크 기본 스킬 이름
-skill_name_hero_angel,긴급 수리,앤젤 기본 스킬 이름
-skill_desc_hero_corsair,자신 주변에 1회의 범위 대미지를 준다,커세어 기본 스킬 설명
-skill_desc_hero_heavyrain,기본 공격을 동시에 3발 발사한다,헤비레인 기본 스킬 설명
-skill_desc_hero_tank,본인의 받는 피해량이 감소한다,탱크 기본 스킬 설명
-skill_desc_hero_angel,본인을 제외한 아군 영웅 한 명의 체력을 회복시킨다,앤젤 기본 스킬 설명
-augment1_name_hero_corsair,태양의 불꽃,커세어 증강 스킬1 이름
-augment1_name_hero_heavyrain,초토화,헤비레인 증강 스킬1 이름
-augment1_name_hero_tank,성벽,탱크 증강 스킬1 이름
-augment1_name_hero_angel,나노봇 투여,앤젤 증강 스킬1 이름
-augment1_desc_hero_corsair,스킬의 범위가 증가한다,커세어 증강 스킬1 설명
-augment1_desc_hero_heavyrain,기본 공격을 동시에 5발 발사한다,헤비레인 증강 스킬1 설명
-augment1_desc_hero_tank,본인의 받는 피해량이 대폭 감소한다,탱크 증강 스킬1 설명
-augment1_desc_hero_angel,범위 내 아군을 회복시킨다,앤젤 증강 스킬1 설명
+skill_name_corsair,코로나 폭발,커세어 기본 스킬 이름
+skill_name_heavyrain,일점 사격,헤비레인 기본 스킬 이름
+skill_name_tank,장갑 강화,탱크 기본 스킬 이름
+skill_name_angel,긴급 수리,앤젤 기본 스킬 이름
+skill_desc_corsair,자신 주변에 1회의 범위 대미지를 준다,커세어 기본 스킬 설명
+skill_desc_heavyrain,기본 공격을 동시에 3발 발사한다,헤비레인 기본 스킬 설명
+skill_desc_tank,본인의 받는 피해량이 감소한다,탱크 기본 스킬 설명
+skill_desc_angel,본인을 제외한 아군 영웅 한 명의 체력을 회복시킨다,앤젤 기본 스킬 설명
+augment_name_corsair_A,태양의 불꽃,커세어 증강 스킬1 이름
+augment_name_heavyrain_A,초토화,헤비레인 증강 스킬1 이름
+augment_name_tank_A,성벽,탱크 증강 스킬1 이름
+augment_name_angel_A,나노봇 투여,앤젤 증강 스킬1 이름
+augment_desc_corsair_A,스킬의 범위가 증가한다,커세어 증강 스킬1 설명
+augment_desc_heavyrain_A,기본 공격을 동시에 5발 발사한다,헤비레인 증강 스킬1 설명
+augment_desc_tank_A,본인의 받는 피해량이 대폭 감소한다,탱크 증강 스킬1 설명
+augment_desc_angel_A,범위 내 아군을 회복시킨다,앤젤 증강 스킬1 설명
+enhance_augment_name_corsair_A,태양의 불꽃+,커세어 강화 증강 스킬1 이름
+enhance_augment_name_heavyrain_A,초토화+,헤비레인 강화 증강 스킬1 이름
+enhance_augment_name_tank_A,성벽+,탱크 강화 증강 스킬1 이름
+enhance_augment_name_angel_A,나노봇 투여+,앤젤 강화 증강 스킬1 이름
+enhance_augment_desc_corsair_A,커세어 강화 증강 스킬1 설명,커세어 강화 증강 스킬1 설명
+enhance_augment_desc_heavyrain_A,헤비레인 강화 증강 스킬1 설명,헤비레인 강화 증강 스킬1 설명
+enhance_augment_desc_tank_A,탱크 강화 증강 스킬1 설명,탱크 강화 증강 스킬1 설명
+enhance_augment_desc_angel_A,앤젤 강화 증강 스킬1 설명,앤젤 강화 증강 스킬1 설명
+augment_name_corsair_B,커세어 증강 스킬2 이름,커세어 증강 스킬2 이름
+augment_name_heavyrain_B,헤비레인 증강 스킬2 이름,헤비레인 증강 스킬2 이름
+augment_name_tank_B,탱크 증강 스킬2 이름,탱크 증강 스킬2 이름
+augment_name_angel_B,앤젤 증강 스킬2 이름,앤젤 증강 스킬2 이름
+augment_desc_corsair_B,커세어 증강 스킬2 설명,커세어 증강 스킬2 설명
+augment_desc_heavyrain_B,헤비레인 증강 스킬2 설명,헤비레인 증강 스킬2 설명
+augment_desc_tank_B,탱크 증강 스킬2 설명,탱크 증강 스킬2 설명
+augment_desc_angel_B,앤젤 증강 스킬2 설명,앤젤 증강 스킬2 설명
+enhance_augment_name_corsair_B,커세어 증강 스킬2+ 이름,커세어 강화 증강 스킬2 이름
+enhance_augment_name_heavyrain_B,헤비레인 증강 스킬2+ 이름,헤비레인 강화 증강 스킬2 이름
+enhance_augment_name_tank_B,탱크 증강 스킬2+ 이름,탱크 강화 증강 스킬2 이름
+enhance_augment_name_angel_B,앤젤 증강 스킬2+ 이름,앤젤 강화 증강 스킬2 이름
+enhance_augment_desc_corsair_B,커세어 강화 증강 스킬2 설명,커세어 강화 증강 스킬2 설명
+enhance_augment_desc_heavyrain_B,헤비레인 강화 증강 스킬2 설명,헤비레인 강화 증강 스킬2 설명
+enhance_augment_desc_tank_B,탱크 강화 증강 스킬2 설명,탱크 강화 증강 스킬2 설명
+enhance_augment_desc_angel_B,앤젤 강화 증강 스킬2 설명,앤젤 강화 증강 스킬2 설명
+passive_name_corsair_1,커세어 패시브 스킬1 이름,커세어 패시브 스킬1 이름
+passive_name_heavyrain_1,헤비레인 패시브 스킬1 이름,헤비레인 패시브 스킬1 이름
+passive_name_tank_1,탱크 패시브 스킬1 이름,탱크 패시브 스킬1 이름
+passive_name_angel_1,앤젤 패시브 스킬1 이름,앤젤 패시브 스킬1 이름
+passive_desc_corsair_1,커세어 패시브 스킬1 설명,커세어 패시브 스킬1 설명
+passive_desc_heavyrain_1,헤비레인 패시브 스킬1 설명,헤비레인 패시브 스킬1 설명
+passive_desc_tank_1,탱크 패시브 스킬1 설명,탱크 패시브 스킬1 설명
+passive_desc_angel_1,앤젤 패시브 스킬1 설명,앤젤 패시브 스킬1 설명
+passive_name_corsair_2,커세어 패시브 스킬2 이름,커세어 패시브 스킬2 이름
+passive_name_heavyrain_2,헤비레인 패시브 스킬2 이름,헤비레인 패시브 스킬2 이름
+passive_name_tank_2,탱크 패시브 스킬2 이름,탱크 패시브 스킬2 이름
+passive_name_angel_2,앤젤 패시브 스킬2 이름,앤젤 패시브 스킬2 이름
+passive_desc_corsair_2,커세어 패시브 스킬2 설명,커세어 패시브 스킬2 설명
+passive_desc_heavyrain_2,헤비레인 패시브 스킬2 설명,헤비레인 패시브 스킬2 설명
+passive_desc_tank_2,탱크 패시브 스킬2 설명,탱크 패시브 스킬2 설명
+passive_desc_angel_2,앤젤 패시브 스킬2 설명,앤젤 패시브 스킬2 설명
 hero_type_robot,전술 슈트,영웅의 heroType이 robot이면 정보창에 표시
 hero_type_spacecraft,우주 함선,영웅의 heroType이 spacecraft면 정보창에 표시
 hero_role_tank,방어형,영웅의 heroRole이 tank면 정보창에 표시

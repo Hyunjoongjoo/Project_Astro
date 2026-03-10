@@ -70,52 +70,55 @@ public class StageUI : MonoBehaviour
         int maxPlayers = _matchType == MatchType.OneVsOne ? 2 : 4;
         int teamSize = maxPlayers / 2;
 
-        List<string> blueTeamNames = new List<string>();
-        List<string> redTeamNames = new List<string>();
+        List<string> myTeamNames = new List<string>();
+        List<string> enemyTeamNames = new List<string>();
+
+        Team myTeam = Team.Blue;
 
         // 넘어온 데이터가 있다면 팀별로 안전하게 분류
         if (playersData != null)
         {
+            myTeam = playersData[0].Team;
             foreach (var player in playersData)
             {
-                if (player.Team == Team.Blue)
-                    blueTeamNames.Add(player.PlayerName.ToString());
+                if (player.Team == myTeam)
+                    myTeamNames.Add(player.PlayerName.ToString());
                 else
-                    redTeamNames.Add(player.PlayerName.ToString());
+                    enemyTeamNames.Add(player.PlayerName.ToString());
             }
         }
 
         // 배열 길이가 부족하다면(빈자리가 있다면) "Dummy"로 채워 넣기
-        while (blueTeamNames.Count < teamSize) 
-            blueTeamNames.Add("Dummy");
+        while (myTeamNames.Count < teamSize)
+            myTeamNames.Add("Dummy");
 
-        while (redTeamNames.Count < teamSize) 
-            redTeamNames.Add("Dummy");
+        while (enemyTeamNames.Count < teamSize)
+            enemyTeamNames.Add("Dummy");
 
         // 인트로 UI 적용 (0, 2번 슬롯은 Blue / 1, 3번 슬롯은 Red로 짝지어짐)
         if (_introNameLabel.Length >= 2)
         {
-            _introNameLabel[0].text = blueTeamNames[0]; // Blue 1
-            _introNameLabel[1].text = redTeamNames[0];  // Red 1
+            _introNameLabel[0].text = myTeamNames[0];
+            _introNameLabel[1].text = enemyTeamNames[0];
         }
 
         if (_matchType == MatchType.TwoVsTwo && _introNameLabel.Length >= 4)
         {
-            _introNameLabel[2].text = blueTeamNames[1]; // Blue 2
-            _introNameLabel[3].text = redTeamNames[1];  // Red 2
+            _introNameLabel[2].text = myTeamNames[1];
+            _introNameLabel[3].text = enemyTeamNames[1]; 
         }
 
         // 인게임 UI 적용 (기존 로직의 흐름을 유지하되 인덱스 에러 방지)
         if (_ingameEnemyNameLabel.Length > 0)
-            _ingameEnemyNameLabel[0].text = redTeamNames[0]; // 적 1
+            _ingameEnemyNameLabel[0].text = enemyTeamNames[0]; // 적 1
 
         if (_matchType == MatchType.TwoVsTwo)
         {
             if (_teamMemberSlot != null)
-                _teamMemberSlot.transform.GetComponentInChildren<TextMeshProUGUI>().text = blueTeamNames[1]; // 아군
+                _teamMemberSlot.transform.GetComponentInChildren<TextMeshProUGUI>().text = myTeamNames[1]; // 아군
 
             if (_ingameEnemyNameLabel.Length > 1)
-                _ingameEnemyNameLabel[1].text = redTeamNames[1]; // 적 2
+                _ingameEnemyNameLabel[1].text = enemyTeamNames[1]; // 적 2
         }
 
         _vsPanel.SetActive(true);

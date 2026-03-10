@@ -65,11 +65,11 @@ public enum UnitType
 
 public enum SkillType
 {
-    normal_attack,
-    normal_skill,
-    augment_skill,
-    augment_skill_enhance,
-    passive_skill
+    NormalAttack,
+    NormalSkill,
+    AugmentSkill,
+    AugmentSkillEnhance,
+    PassiveSkill
 }
 
 public enum ArmorType 
