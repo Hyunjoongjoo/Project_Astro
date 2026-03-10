@@ -357,11 +357,4 @@ public class UnitController : UnitBase
             }
         }
     }
-#if UNITY_EDITOR
-    private void OnDrawGizmosSelected()//탐지 범위 시각화
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, searchRange);
-    }
-#endif
 }
