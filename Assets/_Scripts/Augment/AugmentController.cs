@@ -30,6 +30,9 @@ public class AugmentController : NetworkBehaviour
 
     //캐싱용
     private AugmentData _localSelectedData;
+    //2vs2 분할 배송을 위한 클라이언트 임시 보관소
+    private List<AugmentData> _tempMyCards;
+
 
     //인스펙터 직렬화 해둘 히어로 아이콘SO
     [SerializeField] private HeroIconDataSO _heroIconSO;
@@ -221,11 +224,15 @@ public class AugmentController : NetworkBehaviour
 
                 if (teamCards != null && teamCards.Count == 3)
                 {
-                    //2vs2: 내 카드 3장 + 아군 카드 3장 + 아군 닉네임 동시 배달
-                    RPC_DeliverAugmentCards_2v2(targetPlayer,
+                    //내 카드 배송
+                    RPC_DeliverMyCards(targetPlayer,
                         myCards[0].targetId, (int)myCards[0].type,
                         myCards[1].targetId, (int)myCards[1].type,
                         myCards[2].targetId, (int)myCards[2].type,
+                        true);
+
+                    //아군 카드 후속 배송
+                    RPC_DeliverTeamCards(targetPlayer,
                         teamCards[0].targetId, (int)teamCards[0].type,
                         teamCards[1].targetId, (int)teamCards[1].type,
                         teamCards[2].targetId, (int)teamCards[2].type,
@@ -234,10 +241,11 @@ public class AugmentController : NetworkBehaviour
                 else
                 {
                     //1vs1: 내 카드 3장만 배달
-                    RPC_DeliverAugmentCards(targetPlayer,
+                    RPC_DeliverMyCards(targetPlayer,
                         myCards[0].targetId, (int)myCards[0].type,
                         myCards[1].targetId, (int)myCards[1].type,
-                        myCards[2].targetId, (int)myCards[2].type);
+                        myCards[2].targetId, (int)myCards[2].type,
+                        false);
                 }
             }
         }
@@ -247,11 +255,13 @@ public class AugmentController : NetworkBehaviour
     //카드 3장의 ID와 타입만 클라이언트에게 전달
     //받은 클라는 테이블 체크 후 재조립
 
+    //내 카드만 전달받는 RPC(512바이트 통과)
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_DeliverAugmentCards(PlayerRef target,
+    private void RPC_DeliverMyCards(PlayerRef target,
         NetworkString<_32> id0, int type0,
         NetworkString<_32> id1, int type1,
-        NetworkString<_32> id2, int type2)
+        NetworkString<_32> id2, int type2,
+        NetworkBool hasTeamCards)
     {
         if (Runner.LocalPlayer == target)
         {
@@ -260,35 +270,35 @@ public class AugmentController : NetworkBehaviour
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
             if (config != null) reinforceNum = int.Parse(config.configValue);
 
-            List<AugmentData> myCards = new List<AugmentData>();
+            // 임시 보관소에 저장
+            _tempMyCards = new List<AugmentData>();
+            var card0 = RebuildAugmentData(id0.ToString(), (AugmentType)type0, myData, reinforceNum, "MyCard_1");
+            if (card0 != null) _tempMyCards.Add(card0);
+            var card1 = RebuildAugmentData(id1.ToString(), (AugmentType)type1, myData, reinforceNum, "MyCard_2");
+            if (card1 != null) _tempMyCards.Add(card1);
+            var card2 = RebuildAugmentData(id2.ToString(), (AugmentType)type2, myData, reinforceNum, "MyCard_3");
+            if (card2 != null) _tempMyCards.Add(card2);
 
-            var card0 = RebuildAugmentData(id0.ToString(), (AugmentType)type0, myData, reinforceNum, "Card_1");
-            if (card0 != null) myCards.Add(card0);
-
-            var card1 = RebuildAugmentData(id1.ToString(), (AugmentType)type1, myData, reinforceNum, "Card_2");
-            if (card1 != null) myCards.Add(card1);
-
-            var card2 = RebuildAugmentData(id2.ToString(), (AugmentType)type2, myData, reinforceNum, "Card_3");
-            if (card2 != null) myCards.Add(card2);
-
-            if (myCards.Count > 0)
+            // 1vs1 모드라면 더 기다릴 것 없이 바로 화면에 출력!
+            if (!hasTeamCards && _tempMyCards.Count > 0)
             {
-                AugmentManager.Instance.ShowAugmentWindow(myCards);
+                AugmentManager.Instance.ShowAugmentWindow(_tempMyCards);
 
                 if (_stageManager.CurrentState == StageState.Playing)
                 {
                     RPC_StartInGameAugmentTimer(Runner.LocalPlayer);
                 }
+                _tempMyCards = null; // 사용 후 비우기
             }
         }
     }
 
-    //3.10
-    //2vs2 전용 카드 묶음 배달 함수 추가
+    //아군 카드만 전달받는 후속 RPC 패킷넘치는 거 방지용
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_DeliverAugmentCards_2v2(PlayerRef target,
-        NetworkString<_32> mId0, int mType0, NetworkString<_32> mId1, int mType1, NetworkString<_32> mId2, int mType2,
-        NetworkString<_32> tId0, int tType0, NetworkString<_32> tId1, int tType1, NetworkString<_32> tId2, int tType2,
+    private void RPC_DeliverTeamCards(PlayerRef target,
+        NetworkString<_32> id0, int type0,
+        NetworkString<_32> id1, int type1,
+        NetworkString<_32> id2, int type2,
         NetworkString<_16> teamName)
     {
         if (Runner.LocalPlayer == target)
@@ -298,33 +308,24 @@ public class AugmentController : NetworkBehaviour
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
             if (config != null) reinforceNum = int.Parse(config.configValue);
 
-            //내 카드 조립
-            List<AugmentData> myCards = new List<AugmentData>();
-            var mCard0 = RebuildAugmentData(mId0.ToString(), (AugmentType)mType0, myData, reinforceNum, "MyCard_1");
-            if (mCard0 != null) myCards.Add(mCard0);
-            var mCard1 = RebuildAugmentData(mId1.ToString(), (AugmentType)mType1, myData, reinforceNum, "MyCard_2");
-            if (mCard1 != null) myCards.Add(mCard1);
-            var mCard2 = RebuildAugmentData(mId2.ToString(), (AugmentType)mType2, myData, reinforceNum, "MyCard_3");
-            if (mCard2 != null) myCards.Add(mCard2);
-
-            //아군 카드 조립
             List<AugmentData> teamCards = new List<AugmentData>();
-            var tCard0 = RebuildAugmentData(tId0.ToString(), (AugmentType)tType0, myData, reinforceNum, "TeamCard_1");
-            if (tCard0 != null) teamCards.Add(tCard0);
-            var tCard1 = RebuildAugmentData(tId1.ToString(), (AugmentType)tType1, myData, reinforceNum, "TeamCard_2");
-            if (tCard1 != null) teamCards.Add(tCard1);
-            var tCard2 = RebuildAugmentData(tId2.ToString(), (AugmentType)tType2, myData, reinforceNum, "TeamCard_3");
-            if (tCard2 != null) teamCards.Add(tCard2);
+            var card0 = RebuildAugmentData(id0.ToString(), (AugmentType)type0, myData, reinforceNum, "TeamCard_1");
+            if (card0 != null) teamCards.Add(card0);
+            var card1 = RebuildAugmentData(id1.ToString(), (AugmentType)type1, myData, reinforceNum, "TeamCard_2");
+            if (card1 != null) teamCards.Add(card1);
+            var card2 = RebuildAugmentData(id2.ToString(), (AugmentType)type2, myData, reinforceNum, "TeamCard_3");
+            if (card2 != null) teamCards.Add(card2);
 
-            if (myCards.Count > 0)
+            //미리 도착해 있던 내 카드와 방금 도착한 아군 카드를 합쳐서 UI에 넘겨줌
+            if (_tempMyCards != null && _tempMyCards.Count > 0)
             {
-                //UI 매니저로 내 카드, 아군 카드, 아군 닉네임을 모두 전달
-                AugmentManager.Instance.ShowAugmentWindow(myCards, teamCards, teamName.ToString());
+                AugmentManager.Instance.ShowAugmentWindow(_tempMyCards, teamCards, teamName.ToString());
 
                 if (_stageManager.CurrentState == StageState.Playing)
                 {
                     RPC_StartInGameAugmentTimer(Runner.LocalPlayer);
                 }
+                _tempMyCards = null; //사용 후 비우기
             }
         }
     }
