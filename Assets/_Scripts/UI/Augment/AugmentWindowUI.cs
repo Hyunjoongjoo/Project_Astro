@@ -39,10 +39,6 @@ public class AugmentWindowUI : BaseUI
         _selectedData = null;
         _selectedCardUI = null;
 
-        if (_stageManager != null && _stageManager.CurrentState == StageState.Playing)
-        {
-            AugmentController.Instance.RPC_StartInGameAugmentTimer(_stageManager.Runner.LocalPlayer);
-        }
 
         //확정버튼초기화
         if (_confirmBtn != null)
@@ -160,6 +156,10 @@ public class AugmentWindowUI : BaseUI
     //타임아웃 시
     public void ForceRandomPick()
     {
+        //타임아웃과 클릭 확정 겹칠 때 패킷 2번 날아가는 거 방지
+        if (_isForcePicked) return;
+        _isForcePicked = true;
+
         if (_currentDatas != null && _currentDatas.Count > 0)
         {
             //0~2 중 하나 무작위 추첨

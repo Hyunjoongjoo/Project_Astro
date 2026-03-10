@@ -1,5 +1,6 @@
 ﻿using Fusion;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 //증강 시스템의 전체 흐름을 통제하는 네트워크 컨트롤러
@@ -33,7 +34,7 @@ public class AugmentController : NetworkBehaviour
     //인스펙터 직렬화 해둘 히어로 아이콘SO
     [SerializeField] private HeroIconDataSO _heroIconSO;
 
-    // 인게임 개별 타이머용 네트워크 변수 선언
+    //인게임 개별 타이머용 네트워크 변수 선언
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, float> PlayerAugmentTimers => default;
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, NetworkBool> IsPlayerAugmenting => default;
 
@@ -103,85 +104,226 @@ public class AugmentController : NetworkBehaviour
     //카드 3장 뽑아서 화면에 띄우기
     //플레이어 상태 분석해서 맞춤 카드 3장 띄우기
     //UI에서 증강선택 토글 버튼 눌렀을 때 호출
+
+    //3.9 서버가 팀원 데이터를 모아 덱 매니저 돌리고 클라로 배달
     public void OpenAugmentWindow()
     {
         if (_stageManager == null)
         {
             _stageManager = FindFirstObjectByType<StageManager>();
-            if (_stageManager == null)
-            {
-                Debug.LogError("StageManager를 찾지 못함");
-                return;
-            }
         }
+
+        //마스터만 카드를 뽑아 중복 차단
+        if (!Object.HasStateAuthority) return;
+
         Debug.Log("데이터 분석");
-        PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer);
+
 
         //Config테이블에서 강화 달성 횟수 가져오기
         int reinforceNum = 6; //파싱 실패 시 기본값
         var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
         if (config != null) reinforceNum = int.Parse(config.configValue);
 
+        //블루팀, 레드팀으로 플레이어 분류
+        Dictionary<Team, List<PlayerRef>> teamPlayers = new Dictionary<Team, List<PlayerRef>>();
+        teamPlayers[Team.Blue] = new List<PlayerRef>();
+        teamPlayers[Team.Red] = new List<PlayerRef>();
 
-        //덱매니저 넘겨주기 위해 NetworkArray를 일반 List<string>으로 변환
-        List<string> myHeroes = new List<string>();
-        for (int i = 0; i < SlotData_5.Length; i++) 
+        foreach (var kvp in _stageManager.PlayerDataMap)
         {
-            string heroId = myData.OwnedHeroes.Get(i).Replace("\0", "").Trim();
-            if (!string.IsNullOrEmpty(heroId))
+            if (kvp.Value.Team == Team.Blue || kvp.Value.Team == Team.Red)
             {
-                myHeroes.Add(heroId);
+                teamPlayers[kvp.Value.Team].Add(kvp.Key);
             }
         }
 
-        List<string> mySkills = new List<string>();
-        for (int i = 0; i < SlotData_5.Length; i++)
+
+        //팀 단위로 겹침 방지 처리하며 카드 생성
+        foreach (var team in teamPlayers.Values)
         {
-            string skillId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
-            if (!string.IsNullOrEmpty(skillId))
+            List<string> excludedSkillTargets = new List<string>();
+            List<string> teamHeroes = new List<string>();
+
+            //해당 팀의 모든 영웅 데이터 취합
+            foreach (var p in team)
             {
-                mySkills.Add(skillId);
+                var data = _stageManager.PlayerDataMap.Get(p);
+                for (int i = 0; i < SlotData_5.Length; i++)
+                {
+                    string heroId = data.OwnedHeroes.Get(i).Replace("\0", "").Trim();
+                    if (!string.IsNullOrEmpty(heroId)) teamHeroes.Add(heroId);
+                }
+            }
+
+            //유저별 카드 생성 및 배달
+            foreach (var p in team)
+            {
+                var myData = _stageManager.PlayerDataMap.Get(p);
+
+                List<string> myHeroes = new List<string>();
+                for (int i = 0; i < SlotData_5.Length; i++)
+                {
+                    string heroId = myData.OwnedHeroes.Get(i).Replace("\0", "").Trim();
+                    if (!string.IsNullOrEmpty(heroId)) myHeroes.Add(heroId);
+                }
+
+                List<string> mySkills = new List<string>();
+                for (int i = 0; i < SlotData_5.Length; i++)
+                {
+                    string skillId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+                    if (!string.IsNullOrEmpty(skillId)) mySkills.Add(skillId);
+                }
+
+                bool isItemFull = true;
+                for (int i = 0; i < SlotData_3.Length; i++)
+                {
+                    string itemId = myData.InventoryItems.Get(i).Replace("\0", "").Trim();
+                    if (string.IsNullOrEmpty(itemId)) { isItemFull = false; break; }
+                }
+
+                List<AugmentData> cards = _deckManager.GenerateCards(
+                    isFirstSelection: myData.TotalAugmentPicks == 0,
+                    ownedHeroIds: myHeroes,
+                    ownedSkillAugmentIds: mySkills,
+                    isItemFull: isItemFull,
+                    totalAugmentPicks: myData.TotalAugmentPicks,
+                    reinforceNumber: reinforceNum,
+                    teamHeroIds: teamHeroes,
+                    excludedSkillTargetIds: excludedSkillTargets //겹침 방지 리스트 전달
+                );
+
+                if (cards.Count == 3)
+                {
+                    RPC_DeliverAugmentCards(p,
+                        cards[0].targetId, (int)cards[0].type,
+                        cards[1].targetId, (int)cards[1].type,
+                        cards[2].targetId, (int)cards[2].type);
+                }
+                else
+                {
+                    Debug.LogWarning($"[서버] {p} 유저의 카드가 정상적으로 생성되지 않음.");
+                }
+
+
+            }
+        }
+    }
+
+
+    //카드 3장의 ID와 타입만 클라이언트에게 전달
+    //받은 클라는 테이블 체크 후 재조립
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_DeliverAugmentCards(PlayerRef target,
+        NetworkString<_32> id0, int type0,
+        NetworkString<_32> id1, int type1,
+        NetworkString<_32> id2, int type2)
+    {
+        if (Runner.LocalPlayer == target)
+        {
+            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer);
+            int reinforceNum = 6;
+            var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
+            if (config != null) reinforceNum = int.Parse(config.configValue);
+
+            List<AugmentData> myCards = new List<AugmentData>();
+
+            var card0 = RebuildAugmentData(id0.ToString(), (AugmentType)type0, myData, reinforceNum, "Card_1");
+            if (card0 != null) myCards.Add(card0);
+
+            var card1 = RebuildAugmentData(id1.ToString(), (AugmentType)type1, myData, reinforceNum, "Card_2");
+            if (card1 != null) myCards.Add(card1);
+
+            var card2 = RebuildAugmentData(id2.ToString(), (AugmentType)type2, myData, reinforceNum, "Card_3");
+            if (card2 != null) myCards.Add(card2);
+
+            if (myCards.Count > 0)
+            {
+                AugmentManager.Instance.ShowAugmentWindow(myCards);
+
+                if (_stageManager.CurrentState == StageState.Playing)
+                {
+                    RPC_StartInGameAugmentTimer(Runner.LocalPlayer);
+                }
+            }
+        }
+    }
+
+    private AugmentData RebuildAugmentData(string id, AugmentType type, PlayerNetworkData myData, int reinforceNum, string instanceId)
+    {
+        if (string.IsNullOrEmpty(id)) return null;
+
+        AugmentData data = new AugmentData();
+        data.instanceId = instanceId;
+        data.type = type;
+        data.targetId = id;
+
+        if (type == AugmentType.Hero)
+        {
+            var heroData = TableManager.Instance.HeroTable.Get(id);
+            if (heroData != null)
+            {
+                data.titleName = TableManager.Instance.GetString(heroData.heroName);
+                data.description = TableManager.Instance.GetString(heroData.heroDesc);
+                data.heroType = heroData.heroType;
+                data.heroRole = heroData.heroRole;
+
+                if (_heroIconSO != null)
+                {
+                    data.mainIcon = _heroIconSO.GetIcon(id);
+                    data.heroPrefab = _heroIconSO.GetPrefab(id);
+                }
+
+                var heroStat = TableManager.Instance.HeroStatTable.Get(heroData.heroStatId);
+                if (heroStat != null)
+                {
+                    data.baseSpawnCooldown = heroStat.spawnCooldown;
+                    data.currentSpawnCooldown = heroStat.spawnCooldown;
+                    data.moveType = heroStat.moveType;
+                }
+
+                if (_allBaseSkills != null)
+                {
+                    var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == id && s.skillType == SkillType.Standard);
+                    if (baseSkill != null) data.skillData = baseSkill;
+                }
+            }
+        }
+        else if (type == AugmentType.Skill)
+        {
+            var skill = GetSkillAugmentById(id);
+            if (skill != null)
+            {
+                int tierIndex = (myData.TotalAugmentPicks >= reinforceNum) ? 1 : 0;
+
+                data.titleName = TableManager.Instance.GetString(skill.TitleStringID);
+                data.description = TableManager.Instance.GetString(skill.Tiers[tierIndex].DescStringID);
+                data.mainIcon = skill.Icon;
+                data.skillData = skill.Tiers[tierIndex].CombatSkillData;
+
+                var heroData = TableManager.Instance.HeroTable.Get(skill.TargetHeroID);
+                if (heroData != null) data.targetHeroName = TableManager.Instance.GetString(heroData.heroName);
+
+                if (_heroIconSO != null) data.targetHeroIcon = _heroIconSO.GetIcon(skill.TargetHeroID);
+
+                if (_allBaseSkills != null)
+                {
+                    var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == skill.TargetHeroID && s.skillType == SkillType.Standard);
+                    if (baseSkill != null) data.baseSkillName = baseSkill.skillName;
+                }
+            }
+        }
+        else if (type == AugmentType.Item)
+        {
+            var itemData = TableManager.Instance.ItemTable.Get(id);
+            if (itemData != null)
+            {
+                data.titleName = TableManager.Instance.GetString(itemData.name);
+                data.description = "";
             }
         }
 
-        bool isItemFull = true;
-        for (int i = 0; i < SlotData_3.Length; i++)
-        {
-            string itemId = myData.InventoryItems.Get(i).Replace("\0", "").Trim();
-            if (string.IsNullOrEmpty(itemId))
-            {
-                isItemFull = false;
-                break;
-            }
-        }
-
-        //덱매니저 실행해서 카드 3장 AugmentData형태로 뽑아오기
-        List<AugmentData> cards = _deckManager.GenerateCards(
-            isFirstSelection: myData.TotalAugmentPicks == 0,
-            ownedHeroIds: myHeroes,
-            ownedSkillAugmentIds: mySkills,
-            isItemFull: isItemFull,
-            totalAugmentPicks: myData.TotalAugmentPicks,
-            reinforceNumber: reinforceNum
-        );
-
-        Debug.Log($"생성된 카드 수: {cards.Count}");
-
-        //뽑은 카드 팝업 띄우기
-        if (cards.Count > 0)
-        {
-            AugmentManager.Instance.ShowAugmentWindow(cards);
-            //게임 진행 중 열린 증강이면 서버에 내 타이머 가동을 요청
-            if (_stageManager.CurrentState == StageState.Playing)
-            {
-                RPC_StartInGameAugmentTimer(Runner.LocalPlayer);
-            }
-            else
-            {
-                Debug.LogWarning("생성된 카드 없음");
-            }
-
-        }
+        return data;
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -272,7 +414,7 @@ public class AugmentController : NetworkBehaviour
             {
                 if (_localSelectedData != null && _localSelectedData.targetId == targetId)
                 {
-                //조립된 데이터를 UI 매니저에게 넘겨서 하단 덱에 카드 슬롯을 추가
+                    //조립된 데이터를 UI 매니저에게 넘겨서 하단 덱에 카드 슬롯을 추가
                     AugmentManager.Instance.AddHeroCard(_localSelectedData);
                     _localSelectedData = null; // 다 썼으니 비워줌
                 }
@@ -309,7 +451,6 @@ public class AugmentController : NetworkBehaviour
     public void RPC_RejectAugment(PlayerRef player)
     {
         Debug.LogWarning("슬롯이 가득 차서 서버에서 장착 반려");
-        //UI 팝업으로 슬롯이 가득 찼습니다 등등
     }
 
 
