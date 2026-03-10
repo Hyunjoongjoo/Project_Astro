@@ -364,7 +364,7 @@ public class AugmentController : NetworkBehaviour
 
                 if (_allBaseSkills != null)
                 {
-                    var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == id && s.skillType == SkillType.Standard);
+                    var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == id && s.skillType == SkillType.NormalSkill);
                     if (baseSkill != null) data.skillData = baseSkill;
                 }
             }
@@ -388,7 +388,7 @@ public class AugmentController : NetworkBehaviour
 
                 if (_allBaseSkills != null)
                 {
-                    var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == skill.TargetHeroID && s.skillType == SkillType.Standard);
+                    var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == skill.TargetHeroID && s.skillType == SkillType.NormalSkill);
                     if (baseSkill != null) data.baseSkillName = baseSkill.skillName;
                 }
             }
