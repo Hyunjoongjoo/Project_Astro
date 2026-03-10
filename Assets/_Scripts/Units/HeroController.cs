@@ -67,12 +67,7 @@ public class HeroController : UnitController
 
         //UnitStat 초기화
         _unitStat.Init(statData);
-        _unitStat.Attack.AddModifier(
-        new StatModifier(10, StatModType.Flat, this)
-    );
 
-        Debug.Log("공격력베이스 : " + _unitStat.Attack.BaseValue);
-        Debug.Log("최종공격력 : " + _unitStat.Attack.Value);
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;

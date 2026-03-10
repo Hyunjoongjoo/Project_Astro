@@ -57,6 +57,10 @@ public abstract class UnitBase : NetworkBehaviour
     // 여기서 최종 받는 데미지를 계산한다.
     public virtual void TakeDamage(float amount)
     {
+        if (unitType == UnitType.Hero)
+        {
+            Debug.Log("영웅 받은 데미지 : " + amount);
+        }
         if (!Object.HasStateAuthority) return;
         if (IsDead) return;
 
@@ -70,7 +74,10 @@ public abstract class UnitBase : NetworkBehaviour
         {
             finalTakenDamage *= (1 - _unitStat.DamageReduction.Value);
         }
-
+        if (unitType == UnitType.Hero)
+        {
+            Debug.Log("받피감 적용 후 데미지 : " + finalTakenDamage);
+        }
         CurrentHealth = Mathf.Max(CurrentHealth - finalTakenDamage, 0); ;
 
         if (CurrentHealth < 1)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음

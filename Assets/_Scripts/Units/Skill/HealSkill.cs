@@ -137,7 +137,7 @@ public class HealSkill : ISkill
         {
             if (target != null)
             {
-                target.TakeHeal(_data.recoveryAmount);
+                target.TakeHeal(_data.recoveryAmount);//나중에 스탯기반으로 교체
                 Debug.Log($"힐 적용 → {target.name} / {target.CurrentHealth}");
                 // RPC로 이펙트 출력 요청 (NetworkObject의 Id를 넘겨 타겟 식별)
                 if (target.Object != null)
