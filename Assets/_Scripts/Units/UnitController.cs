@@ -6,8 +6,8 @@ public class UnitController : UnitBase
 {
     [Header("내비게이션 및 탐지")]
     public NavMeshAgent agent;
-    public float moveSpeed;
-    public float searchRange;
+    //public float moveSpeed;
+    //public float searchRange;
     public LayerMask targetLayer;
     public float searchInterval = 0.3f;
     [SerializeField] protected MoveType moveType;
@@ -36,9 +36,14 @@ public class UnitController : UnitBase
     [Header("평타 공격")]
     [SerializeField] protected BaseSkillSO _normalAttackData;
 
-    public UnitBase CurrentTarget => currentTarget;
+    //stat 실시간 참조
     public float AttackPower => _unitStat.Attack.Value;
     public float AttackSpeed => _unitStat.AttackSpeed.Value;
+    public float HealPower => _unitStat.HealPower.Value;//나중에 힐스킬에 연결
+    public float MoveSpeed => _unitStat.MoveSpeed.Value;
+    public float DetectRange => _unitStat.DetectRange.Value;
+
+    public UnitBase CurrentTarget => currentTarget;
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
     public LayerMask TargetLayer => targetLayer;
@@ -77,9 +82,9 @@ public class UnitController : UnitBase
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
-        moveSpeed = _unitStat.MoveSpeed.Value;
-        searchRange = _unitStat.DetectRange.Value;
-        agent.speed = moveSpeed;
+        //moveSpeed = _unitStat.MoveSpeed.Value;
+        //searchRange = _unitStat.DetectRange.Value;
+        agent.speed = MoveSpeed;
 
         StateMachine.ChangeState(DetectState);
     }
@@ -189,7 +194,7 @@ public class UnitController : UnitBase
     public UnitBase FindTarget()
     {
         // 기존 MobilityUnit의 OverlapSphere 탐색 로직
-        Collider[] hits = Physics.OverlapSphere(transform.position, searchRange, targetLayer);
+        Collider[] hits = Physics.OverlapSphere(transform.position, DetectRange, targetLayer);
         float minDistance = float.MaxValue;
         UnitBase closest = null;
 
@@ -207,6 +212,15 @@ public class UnitController : UnitBase
             }
         }
         return closest;
+    }
+
+    //Stat 변경 시 NavMesh 갱신용 메서드 추가(이미 배치된 유닛의 이동속도 변경 시)
+    public void RefreshStatRuntime()
+    {
+        if (agent != null)
+        {
+            agent.speed = MoveSpeed;
+        }
     }
 
     public UnitBase GetClosestTower()
