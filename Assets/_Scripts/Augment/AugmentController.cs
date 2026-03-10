@@ -303,7 +303,7 @@ public class AugmentController : NetworkBehaviour
     {
         if (Runner.LocalPlayer == target)
         {
-            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer);
+            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer); 
             int reinforceNum = 6;
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
             if (config != null) reinforceNum = int.Parse(config.configValue);
