@@ -101,13 +101,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a122320be5e7874a9156352a6137389, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
+  _testRange: 5
+  _MaxHealth: 0
   team: 0
   _networkedTeam: 0
   _CurrentHealth: 0
-  _CurrentState: 0
   _unitId: unit_tower
-  _attackRange: 5
-  _projectilePrefab: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
   _firePoint: {fileID: 1234834223447836441}
   _targetLayer:
     serializedVersion: 2

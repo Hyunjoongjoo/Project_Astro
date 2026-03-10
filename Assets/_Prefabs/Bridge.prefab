@@ -172,13 +172,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9657be50b40255a41a6e9f63d513fc39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bridge
+  _testRange: 5
+  _MaxHealth: 0
   team: 0
   _networkedTeam: 0
   _CurrentHealth: 0
-  _CurrentState: 0
   _unitId: unit_bridge
-  _attackRange: 5
-  _projectilePrefab: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
   _firePoint: {fileID: 2974836632590487990}
   _targetLayer:
     serializedVersion: 2
