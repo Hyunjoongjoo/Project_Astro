@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class HeroDetailPresenter : MonoBehaviour
@@ -197,6 +198,9 @@ public class HeroDetailPresenter : MonoBehaviour
         _view.ClearDescription(DescriptionType.Skill);
         _view.ClearIcons(DescriptionType.Skill);
 
+        var allSkills = TableManager.Instance.SkillInfoTable.GetAll();
+        var mySkills = allSkills.Find(s => s.heroId == _heroData.id && s.skillName.Contains("skill"));
+
         if (_heroIcons != null)
         {
             Sprite skillIcons = _heroIcons.GetSkillIconByIndex(_heroData.id,0);
@@ -206,11 +210,22 @@ public class HeroDetailPresenter : MonoBehaviour
                 _view.AddSkillIcon(DescriptionType.Skill, skillIcons);              
             }
         }
+        if(mySkills != null)
+        {
+            string name = TableManager.Instance.GetString(mySkills.skillName);
+            string desc = TableManager.Instance.GetString(mySkills.skillDes);
+
+            _view.AddDescriptionItem(DescriptionType.Skill, name, desc);
+        }
+                
     } 
     private void UpdateAugmentDesPage()
     {
         _view.ClearDescription(DescriptionType.Augment);
         _view.ClearIcons(DescriptionType.Augment);
+
+        var allSkills = TableManager.Instance.SkillInfoTable.GetAll();
+        var augmentSkill = allSkills.Find(s => s.heroId == _heroData.id && s.skillName.Contains("augment"));
 
         if (_heroIcons != null)
         {
@@ -220,6 +235,13 @@ public class HeroDetailPresenter : MonoBehaviour
             {
                 _view.AddSkillIcon(DescriptionType.Augment, skillIcons);
             }
+        }
+        if(augmentSkill != null)
+        {
+            string name = TableManager.Instance.GetString(augmentSkill.skillName);
+            string desc = TableManager.Instance.GetString(augmentSkill.skillDes);
+
+            _view.AddDescriptionItem(DescriptionType.Augment, name, desc);
         }
     }
     private void UpdateLevelRewardDesPage()
