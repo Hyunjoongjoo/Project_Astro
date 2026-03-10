@@ -40,8 +40,13 @@ public class HeroController : UnitController
         _stageManager = FindFirstObjectByType<StageManager>();
 
         if (!Object.HasStateAuthority) return;
-        ApplySkillAugments();
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
+
+        if (_stageManager.PlayerDataMap.TryGet(Object.InputAuthority, out PlayerNetworkData data))
+        {
+            ApplySkillAugments(data);//스킬 증강 적용
+        }
+
         // 상태 인스턴스 생성
         StateMachine = new StateMachine();
         DeployState = new DeployState(this);
@@ -126,31 +131,32 @@ public class HeroController : UnitController
         return null;
     }
 
-    // 스킬 증강 시 스킬 교체
+    // 스킬 증강 시 스킬 교체(실제 교체)
     private void ChangeSkill(BaseSkillSO newSkillData)
     {
         if (curUniqueSkill != null && newSkillData.GetType() == curUniqueSkill.GetType())
             curUniqueSkill.ChangeData(newSkillData);
         else
             curUniqueSkill = newSkillData.CreateInstance(this);
+        Debug.Log($"[영웅스킬교체] {unitId} → {newSkillData.name}");
     }
 
-    //스킬증강에 사용될 메서드 (스폰에 적용시 이미 배치된 영웅은 적용이 안될것인데....)
-    private void ApplySkillAugments()
+    //스킬 증강에 사용될 메서드 (스폰에 적용시 이미 배치된 영웅은 적용이 안될것인데....)
+    private void ApplySkillAugments(PlayerNetworkData data)
     {
-        StageManager stageManager = _stageManager;
+        //StageManager stageManager = _stageManager;
 
-        if (stageManager == null)
-            return;
+        //if (stageManager == null)
+        //    return;
 
-        Team myTeam = team; //팀기준
+        //Team myTeam = team; //팀기준
 
-        foreach (var player in stageManager.PlayerDataMap)
-        {
-            if (player.Value.Team != myTeam)
-                continue;
+        //foreach (var player in stageManager.PlayerDataMap)
+        //{
+        //    if (player.Value.Team != myTeam)
+        //        continue;
 
-            PlayerNetworkData data = player.Value;
+        //    PlayerNetworkData data = player.Value;
 
             //3.3 여현구
             //배열에서 구조체로 바뀌어서 여기 수정했습니다.
@@ -180,19 +186,22 @@ public class HeroController : UnitController
                 Debug.Log($"[스킬 증강 적용] {unitId} <- {augmentId}");
                 ChangeSkill(newSkill);
             }
-        }
+        //}
 
     }
 
-    //외부에서 증강을 갱신할 것이라면...
-    //public void RefreshAugments()
-    //{
-    //    if (!Object.HasStateAuthority)
-    //    {
-    //        return;
-    //    }
+    //외부에서 스킬 증강을 갱신할 것이라면...
+    public void RefreshAugments()
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
 
-    //    ApplySkillAugments();
-    //}
+        if (_stageManager.PlayerDataMap.TryGet(Object.InputAuthority, out PlayerNetworkData data))
+        {
+            ApplySkillAugments(data);
+        }
+    }
 }
 
