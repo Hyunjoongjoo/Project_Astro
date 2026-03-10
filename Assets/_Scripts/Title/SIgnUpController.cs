@@ -1,5 +1,4 @@
-﻿using Firebase.Firestore;
-using System;
+﻿using System;
 using UnityEngine;
 
 // 회원가입 비즈니스 로직
@@ -153,6 +152,15 @@ public class SignUpController : MonoBehaviour
 
         if (nickname.Length < _minNicknameLength || nickname.Length > _maxNicknameLength)
             return $"nickname is {_minNicknameLength}~{_maxNicknameLength} characters.";
+
+        try
+        {
+            InputValidator.ValidateOrThrow(nickname);
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
+        }
 
         return null;
     }
