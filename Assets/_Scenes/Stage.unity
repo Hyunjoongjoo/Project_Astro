@@ -47279,7 +47279,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 0}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 200
+  m_MaxValue: 240
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
@@ -59718,6 +59718,10 @@ MonoBehaviour:
   _allSkillAugments: []
   _allBaseSkills: []
   _heroIconSO: {fileID: 11400000, guid: 59f5c354744c3014e8112428c930f6a4, type: 2}
+  _PlayerAugmentTimers:
+    _items: []
+  _IsPlayerAugmenting:
+    _items: []
 --- !u!114 &1921911175
 MonoBehaviour:
   m_ObjectHideFlags: 0
