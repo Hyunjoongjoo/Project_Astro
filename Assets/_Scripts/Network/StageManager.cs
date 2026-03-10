@@ -82,6 +82,8 @@ public class StageManager : NetworkBehaviour
     //게임 시작 전 증강 g 추적 (1라운드, 2라운드)
     [Networked, HideInInspector] public int PreGameAugmentRound { get; set; }
 
+    //더미 클라이언트 존재 여부
+    private bool _existDummy;
 
     private void Awake()
     {
@@ -95,10 +97,11 @@ public class StageManager : NetworkBehaviour
             Debug.Log("UserDataManager 찾지 못함");
     }
 
-    public void Initialize(MatchType matchType, int requiredPlayerCount)
+    public void Initialize(MatchType matchType, int requiredPlayerCount, bool existDummy)
     {
         _curMatchType = matchType;
         _requiredPlayerCount = requiredPlayerCount;
+        _existDummy = existDummy;
     }
 
     public override void Spawned()
@@ -171,8 +174,10 @@ public class StageManager : NetworkBehaviour
 
     private void CheckAllPlayersReady()
     {
-        if (Runner.ActivePlayers.Count() == _requiredPlayerCount
-            && PlayerDataMap.Count == _requiredPlayerCount)
+        // 더미가 존재하면 바로 시작
+        // 플레이어가 모두 채워져있다면 준비되었는지 확인함
+        if (_existDummy || 
+            (Runner.ActivePlayers.Count() == _requiredPlayerCount && PlayerDataMap.Count == _requiredPlayerCount))
         {
             AssignTeams();
             CurrentState = StageState.ShowingPlayerInfo;
@@ -188,8 +193,6 @@ public class StageManager : NetworkBehaviour
         // 반으로 나눔 ( 2 -> 1, 4 -> 2)
         int half = players.Count / 2;
 
-        // ============== 구조체로 시도 ==============
-
         for (int i = 0; i < players.Count; i++)
         {
             Team team = i < half ? Team.Blue : Team.Red;
@@ -199,19 +202,6 @@ public class StageManager : NetworkBehaviour
             data.Team = team;
             PlayerDataMap.Set(players[i], data);
         }
-
-        // ============== 여기까지 ==============
-
-        // ============== 기존 팀 배정 ==============
-
-        // 앞 절반 블루팀, 뒤 절반 레드팀
-        //for (int i = 0; i < half; i++)
-        //    PlayerTeams.Add(players[i], Team.Blue);
-
-        //for (int i = half; i < players.Count; i++)
-        //    PlayerTeams.Add(players[i], Team.Red);
-
-        // ============== 여기까지 ==============
 
         // 팀 자원인 증강 게이지도 추가함.
         AugmentExp.Add(Team.Blue, 100);
@@ -238,10 +228,9 @@ public class StageManager : NetworkBehaviour
     private void ShowPlayerInfo(Team myTeam)
     {
         // 플레이어 수와 팀에 따라 각 로컬 초기화
-        _stageUI.LocalInitialize(PlayerDataMap.Count, myTeam);
+        _stageUI.LocalInitialize(_curMatchType, myTeam);
 
         PlayerNetworkData[] data = new PlayerNetworkData[PlayerDataMap.Count];
-
 
         // 배열에 플레이어 정보를 채울건데
         // [나, 적1, 팀원, 적2] 순으로 채워짐.
