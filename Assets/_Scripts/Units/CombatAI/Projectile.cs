@@ -68,6 +68,9 @@ public class Projectile : MonoBehaviour
     {
         if ( other.gameObject.TryGetComponent(out UnitBase target) )
         {
+            if (target.Object == null || target.Object.IsValid == false)
+                return;
+
             if (target.networkedTeam != _team)
             {
                 if (_runner.IsSharedModeMasterClient)
