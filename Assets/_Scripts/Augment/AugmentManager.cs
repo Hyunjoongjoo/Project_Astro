@@ -50,14 +50,14 @@ public class AugmentManager : Singleton<AugmentManager>
             _toggleBtn.gameObject.SetActive(false);
     }
 
-    public void ShowAugmentWindow(List<AugmentData> datas)
+    public void ShowAugmentWindow(List<AugmentData> myDatas, List<AugmentData> teamDatas = null, string teamName = "")
     {
         //UIManager를 통해 팝업 형식으로 띄움
         _currentWindow = UIManager.Instance.ShowUI<AugmentWindowUI>(_augmentWindowPrefab, true);
         _toggleBtn.gameObject.SetActive(true);
         if (_currentWindow != null)
         {
-            _currentWindow.SetupAndOpen(datas);
+            _currentWindow.SetupAndOpen(myDatas, teamDatas, teamName);
 
             _toggleBtn.onClick.RemoveAllListeners();
             _toggleBtn.onClick.AddListener(() =>

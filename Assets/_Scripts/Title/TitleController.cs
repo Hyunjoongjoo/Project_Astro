@@ -41,6 +41,7 @@ public class TitleController : MonoBehaviour
     private void OnLoginComplete(string nickname)
     {
         Debug.Log("[TitleController] 모든 로그인 로직 완료");
+        GameManager.Instance.SetSceneState(SceneState.Lobby);
         SceneManager.LoadScene("Lobby");
     }
 }
