@@ -73,6 +73,10 @@ public class AugmentManager : Singleton<AugmentManager>
             });
 
         }
+        if (UIManager.Instance.TopContainer != null && _toggleBtn != null)
+        {
+            _toggleBtn.transform.SetParent(UIManager.Instance.TopContainer);
+        }
     }
 
     //카드 선택 시 호출
