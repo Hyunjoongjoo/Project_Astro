@@ -15,8 +15,7 @@ public class ShieldSkill : ISkill
     {
         _data = data;
         _cachedUnit = unit;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
-        Debug.Log($"[스킬명] {_data.skillName} 초기쿨 = {_data.initCooldown} 기본쿨 = {_data.cooldown}");
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);        
     }
 
     public void ChangeData(BaseSkillSO newData)
@@ -49,6 +48,6 @@ public class ShieldSkill : ISkill
         _cachedUnit.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);//중복방지
         var modifier = new StatModifier(_data.damageReduction, StatModType.Flat, this);
         _cachedUnit.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, modifier, _data.duration);
-        _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, _data.skillType, true, _data.duration);
+        _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, _cachedUnit.Object.Id, _data.skillType, true, _data.duration);
     }
 }

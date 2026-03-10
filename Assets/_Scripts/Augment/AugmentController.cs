@@ -4,6 +4,10 @@ using UnityEngine;
 
 //증강 시스템의 전체 흐름을 통제하는 네트워크 컨트롤러
 //경험치 감지 => 덱 픽업 => 서버 검증
+
+//3.9 타이머 루프 추가 => 상태 Playing 일 시 저장된 플레이어별 증강 타이머 감소시키기
+//타이머 제어용 RPC 추가(타이머시작, 시간 끝나고 강제선택 2개)
+//증강 창이 열릴 때 타이머를 시작하고, 선택이 승인되면 타이머를 정지
 public class AugmentController : NetworkBehaviour
 {
     public static AugmentController Instance { get; private set; }
@@ -29,6 +33,10 @@ public class AugmentController : NetworkBehaviour
     //인스펙터 직렬화 해둘 히어로 아이콘SO
     [SerializeField] private HeroIconDataSO _heroIconSO;
 
+    // 인게임 개별 타이머용 네트워크 변수 선언
+    [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, float> PlayerAugmentTimers => default;
+    [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, NetworkBool> IsPlayerAugmenting => default;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -42,6 +50,34 @@ public class AugmentController : NetworkBehaviour
         _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO, _allBaseSkills);
         //현재 씬에 있는 스테이지 매니저 찾아서 캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
+    }
+
+    //3.9
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority || _stageManager == null) return;
+
+        //인게임 상태일 때만 개별 플레이어 증강 타이머 연산
+        if (_stageManager.CurrentState == StageState.Playing)
+        {
+            foreach (var kvp in IsPlayerAugmenting)
+            {
+                if (kvp.Value == true)
+                {
+                    PlayerRef pRef = kvp.Key;
+                    float timeLeft = PlayerAugmentTimers.Get(pRef) - Runner.DeltaTime;
+
+                    if (timeLeft <= 0)
+                    {
+                        timeLeft = 0;
+                        IsPlayerAugmenting.Set(pRef, false); //타이머 정지
+                        RPC_ForcePlayerAugmentTimeout(pRef); //타임아웃 명령
+                    }
+
+                    PlayerAugmentTimers.Set(pRef, timeLeft);
+                }
+            }
+        }
     }
 
     //HeroController에서 사용할 증강 SO 검색 함수26-03-03
@@ -132,9 +168,41 @@ public class AugmentController : NetworkBehaviour
         Debug.Log($"생성된 카드 수: {cards.Count}");
 
         //뽑은 카드 팝업 띄우기
-        if (cards.Count > 0) AugmentManager.Instance.ShowAugmentWindow(cards);
+        if (cards.Count > 0)
+        {
+            AugmentManager.Instance.ShowAugmentWindow(cards);
+            //게임 진행 중 열린 증강이면 서버에 내 타이머 가동을 요청
+            if (_stageManager.CurrentState == StageState.Playing)
+            {
+                RPC_StartInGameAugmentTimer(Runner.LocalPlayer);
+            }
+            else
+            {
+                Debug.LogWarning("생성된 카드 없음");
+            }
 
-        else Debug.LogWarning("생성된 카드 없음");
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_StartInGameAugmentTimer(PlayerRef player)
+    {
+        float selectTime = 15f;
+        var config = TableManager.Instance.ConfigTable.Get("augment_select_time");
+        if (config != null) selectTime = float.Parse(config.configValue);
+
+        PlayerAugmentTimers.Set(player, selectTime);
+        IsPlayerAugmenting.Set(player, true);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ForcePlayerAugmentTimeout(PlayerRef target)
+    {
+        if (Runner.LocalPlayer == target)
+        {
+            Debug.Log("증강 선택 제한 시간 종료, 자동 선택 실행");
+            AugmentManager.Instance.ForceRandomPick();
+        }
     }
 
 
@@ -186,9 +254,14 @@ public class AugmentController : NetworkBehaviour
             //호스트만 처리하도록 안으로 이동
             if (_stageManager.PlayerDataMap.TryGet(player, out PlayerNetworkData data))
             {
-
                 //서버 승인이 떨어졌으므로, 100 게이지를 차감
                 _stageManager.DecreaseAugmentGauge(data.Team, 100);
+            }
+            //선택이 확정되었으므로 인게임 타이머 정지 및 초기화
+            if (_stageManager.CurrentState == StageState.Playing)
+            {
+                IsPlayerAugmenting.Set(player, false);
+                PlayerAugmentTimers.Set(player, 0f);
             }
         }
 
@@ -211,7 +284,7 @@ public class AugmentController : NetworkBehaviour
             AugmentManager.Instance.HideAugmentToggleBtn();
 
             //전투 시작 전이면 카드 다 골랐다고 스테이지에 보고
-            if (_stageManager.CurrentState == StageState.AugmentSelection)
+            if (_stageManager.CurrentState == StageState.PreGameAugment)
             {
                 _stageManager.RPC_ReportAugmentComplete(player);
             }

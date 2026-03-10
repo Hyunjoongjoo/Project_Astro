@@ -22,7 +22,6 @@ public class HealSkill : ISkill
         _data = data;
         _cachedUnit = unit;
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
-        Debug.Log($"[스킬명] {_data.skillName} 초기쿨 = {_data.initCooldown} 기본쿨 = {_data.cooldown}");
     }
 
     public void ChangeData(BaseSkillSO newData)
@@ -55,7 +54,7 @@ public class HealSkill : ISkill
             if (_hitColliders[i].TryGetComponent(out UnitBase unit))
             {
                 // 자신은 제외하며, 체력이 100% 미만인 경우
-                if (unit != _cachedUnit && unit.CurrentHealth < unit.MaxHealth)
+                if (unit.CurrentHealth < unit.MaxHealth && unit != _cachedUnit)
                 {
                     if (_data.areaOfEffect)
                     {
@@ -64,13 +63,17 @@ public class HealSkill : ISkill
                     }
                     else
                     {
-                        // 단일 힐이라면, 체력 비율이 가장 낮은 아군을 탐색하여 _targetAlly에 캐싱
-                        float healthRatio = unit.CurrentHealth / unit.MaxHealth;
-                        if (healthRatio < minHealthRatio)
+                        // 단일 힐이라면, 체력 비율이 가장 낮은 아군영웅을 탐색하여 _targetAlly에 캐싱
+                        if (unit.UnitType == UnitType.Hero)
                         {
-                            minHealthRatio = healthRatio;
-                            _targetAlly = unit;
-                            canCast = true;
+                            float healthRatio = unit.CurrentHealth / unit.MaxHealth;
+
+                            if (healthRatio < minHealthRatio)
+                            {
+                                minHealthRatio = healthRatio;
+                                _targetAlly = unit;
+                                canCast = true;
+                            }
                         }
                     }
                 }
@@ -135,11 +138,11 @@ public class HealSkill : ISkill
             if (target != null)
             {
                 target.TakeHeal(_data.recoveryAmount);
-
+                Debug.Log($"힐 적용 → {target.name} / {target.CurrentHealth}");
                 // RPC로 이펙트 출력 요청 (NetworkObject의 Id를 넘겨 타겟 식별)
                 if (target.Object != null)
                 {
-                    _cachedUnit.RPC_PlayChildSkillEffect(target.Object.Id, _data.skillType, true, 3f);
+                    _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, target.Object.Id, _data.skillType, true, 3f);
                 }
             }
         }
@@ -164,7 +167,7 @@ public class HealSkill : ISkill
 
                     if (target.Object != null)
                     {
-                        _cachedUnit.RPC_PlayChildSkillEffect(target.Object.Id, _data.skillType, true, _data.duration);
+                        _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, target.Object.Id, _data.skillType, true, _data.duration);
                     }
                 }
             }

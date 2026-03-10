@@ -236,43 +236,70 @@ public class UnitController : UnitBase
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlayChildSkillEffect(
-        NetworkId id,
+        NetworkId casterId,
+        NetworkId targetId,
         SkillType type,
         bool setChild,
         float duration = 0f
         )
     {
-        Debug.Log("본인 중심 이펙트 출력 RPC 수신 확인");
+        Debug.Log("스킬 이펙트 RPC 수신");
 
-        if (Runner.TryFindObject(id, out NetworkObject casterObj))
+        // caster 찾기
+        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
         {
-            UnitController unit = casterObj.GetComponent<UnitController>();
-            GameObject prefab = null;
+            return;
+        }
 
-            // 평타 공격인가 스킬인가
-            if (type == SkillType.Normal)
-                prefab = _normalAttackData.skillVFX;
-            else
-                if (unit is HeroController)
-                    prefab = (unit as HeroController).CurUniqueSkill.Data.skillVFX;
+        UnitController unit = casterObj.GetComponent<UnitController>();
+        HeroController hero = unit as HeroController;
 
-            if (prefab == null) return;
+        GameObject prefab = null;
 
-            GameObject obj;
+        // 평타 공격인가 스킬인가
+        if (type == SkillType.Normal)
+        {
+            prefab = unit._normalAttackData.skillVFX;
+        }
+        else if (hero != null)
+        {
+            prefab = hero.GetSkillVFX(type);
+        }
+
+        if (prefab == null)
+        {
+            return;
+        }
+
+        Vector3 spawnPos = unit.transform.position;
+        Transform parent = null;
+
+        // targetId가 존재하면 타겟 기준으로 처리
+        if (Runner.TryFindObject(targetId, out NetworkObject targetObj))
+        {
+            spawnPos = targetObj.transform.position;
 
             if (setChild)
             {
-                obj = Instantiate(prefab, transform);
-                obj.transform.localPosition = Vector3.zero;
+                parent = targetObj.transform;
             }
-            else
-            {
-                obj = Instantiate(prefab, unit.transform.position, Quaternion.identity);
-            }
-
-            Destroy(obj, duration);
         }
+
+        GameObject obj;
+
+        if (parent != null)
+        {
+            obj = Instantiate(prefab, parent);
+            obj.transform.localPosition = Vector3.zero;
+        }
+        else
+        {
+            obj = Instantiate(prefab, spawnPos, Quaternion.identity);
+        }
+
+        Destroy(obj, duration);
     }
+
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_FireProjectile(
@@ -328,7 +355,7 @@ public class UnitController : UnitBase
                 projectile.Initialize(projectileSO, networkedTeam, power, Runner);
                 projectile.Fire(targetPos);
             }
-        } 
+        }
     }
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()//탐지 범위 시각화
