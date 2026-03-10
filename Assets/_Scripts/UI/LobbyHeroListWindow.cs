@@ -23,6 +23,16 @@ public class LobbyHeroListWindow : BaseUI
     [SerializeField] private Sprite _descendingSprite; // 내림차순용
 
 
+    private void OnEnable()
+    {
+        if (UserDataManager.Instance != null)
+        {
+            // 골드가 변하거나 영웅 데이터가 변하면 리스트 리프레시
+            UserDataManager.Instance.OnGoldChanged += HandleGoldChanged;
+            UserDataManager.Instance.OnHeroDataChanged += RefreshHeroList;
+        }
+    }
+
     private void Start()
     {
         _sortDropdown.onValueChanged.AddListener((val) => RefreshHeroList());
@@ -34,6 +44,17 @@ public class LobbyHeroListWindow : BaseUI
 
         UpdateToggleVisual(_descendingToggle.isOn);
     }
+    
+    private void OnDisable()
+    {
+        if (UserDataManager.Instance != null)
+        {
+            UserDataManager.Instance.OnGoldChanged -= HandleGoldChanged;
+            UserDataManager.Instance.OnHeroDataChanged -= RefreshHeroList;
+        }
+    }
+
+    private void HandleGoldChanged(int newGold) => RefreshHeroList();
 
     public override void Open()
     {

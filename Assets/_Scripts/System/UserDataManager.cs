@@ -7,6 +7,7 @@ public class UserDataManager : Singleton<UserDataManager>
 {
     //옵저버 패턴용 이벤트
     public event Action<int> OnGoldChanged;
+    public event Action OnHeroDataChanged;
 
     private ProfileDbModel _profileModel;
     private RecordModel _recordModel;
@@ -66,6 +67,9 @@ public class UserDataManager : Singleton<UserDataManager>
 
         // 런타임 스텟 재계산
         HeroManager.Instance.UpdateHeroRuntimeStatus(heroId, level);
+
+        //데이터 변경됬다 구독자한테 알리기
+        OnHeroDataChanged?.Invoke();
     }
 
     // 프로파일 갱신
