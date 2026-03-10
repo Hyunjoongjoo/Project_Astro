@@ -1,0 +1,35 @@
+스킬 id,히어로 id,스킬 타입,스킬 이름,스킬 설명,스킬 아이콘 이름,시작시 해금 여부,기획자용노트
+id,heroId,skillType,skillName,skillDes,skillIcon,isOpened,note
+String,String,SkillType,String,String,String,Bool,String
+normalAttack_corsair,hero_corsair,normal_attack,,,,TRUE,"평타 (스킬 이름, 설명, 아이콘 없음)"
+normalSkill_corsair,hero_corsair,normal_skill,skill_name_hero_corsair,skill_desc_hero_corsair,icon_skill_normalSkill_corsair,TRUE,
+augmentSkill_corsair_A,hero_corsair,augment_skill,augment1_name_hero_corsair,augment1_desc_hero_corsair,icon_skill_augmentSkill_corsair_A,TRUE,
+augmentSkill_corsair_B,hero_corsair,augment_skill,,,,FALSE,
+augmentSkill_corsair_A_enhance,hero_corsair,augment_skill_enhance,,,,TRUE,
+augmentSkill_corsair_B_enhance,hero_corsair,augment_skill_enhance,,,,FALSE,
+passiveSkill_corsair_1,hero_corsair,passive_skill,,,,FALSE,
+passiveSkill_corsair_2,hero_corsair,passive_skill,,,,FALSE,
+normalAttack_tank,hero_tank,normal_attack,,,,TRUE,"평타 (스킬 이름, 설명, 아이콘 없음)"
+normalSkill_tank,hero_tank,normal_skill,skill_name_hero_tank,skill_desc_hero_tank,icon_skill_normalAttack_tank,TRUE,
+augmentSkill_tank_A,hero_tank,augment_skill,augment1_name_hero_tank,augment1_desc_hero_tank,icon_skill_augmentSkill_tank_A,TRUE,
+augmentSkill_tank_A_enhance,hero_tank,augment_skill,,,,FALSE,
+augmentSkill_tank_B,hero_tank,augment_skill_enhance,,,,TRUE,
+augmentSkill_tank_B_enhance,hero_tank,augment_skill_enhance,,,,FALSE,
+passiveSkill_tank_1,hero_tank,passive_skill,,,,FALSE,
+passiveSkill_tank_2,hero_tank,passive_skill,,,,FALSE,
+normalAttack_heavyrain,hero_heavyrain,normal_attack,,,,TRUE,"평타 (스킬 이름, 설명, 아이콘 없음)"
+normalSkill_heavyrain,hero_heavyrain,normal_skill,skill_name_hero_heavyrain,skill_desc_hero_heavyrain,icon_skill_normalSkill_heavyrain,TRUE,
+augmentSkill_heavyrain_A,hero_heavyrain,augment_skill,augment1_name_hero_heavyrain,augment1_desc_hero_heavyrain,icon_skill_augmentSkill_heavyrain_A,TRUE,
+augmentSkill_heavyrain_A_enhance,hero_heavyrain,augment_skill,,,,FALSE,
+augmentSkill_heavyrain_B,hero_heavyrain,augment_skill_enhance,,,,TRUE,
+augmentSkill_heavyrain_B_enhance,hero_heavyrain,augment_skill_enhance,,,,FALSE,
+passiveSkill_tank_1,hero_heavyrain,passive_skill,,,,FALSE,
+passiveSkill_tank_2,hero_heavyrain,passive_skill,,,,FALSE,
+normalAttack_angel,hero_angel,normal_attack,,,,TRUE,"평타 (스킬 이름, 설명, 아이콘 없음)"
+normalSkill_angel,hero_angel,normal_skill,skill_name_hero_angel,skill_desc_hero_angel,icon_skill_normalSkill_angel,TRUE,
+augmentSkill_angel_A,hero_angel,augment_skill,augment1_name_hero_angel,augment1_desc_hero_angel,icon_skill_augmentSkill_angel_A,TRUE,
+augmentSkill_angel_A_enhance,hero_angel,augment_skill,,,,FALSE,
+augmentSkill_angel_B,hero_angel,augment_skill_enhance,,,,TRUE,
+augmentSkill_angel_B_enhance,hero_angel,augment_skill_enhance,,,,FALSE,
+passiveSkill_tank_1,hero_angel,passive_skill,,,,FALSE,
+passiveSkill_tank_2,hero_angel,passive_skill,,,,FALSE,

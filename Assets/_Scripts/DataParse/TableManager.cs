@@ -17,6 +17,7 @@ public class TableManager : Singleton<TableManager>
     public TableBase<ItemEffectData> ItemEffectTable = new TableBase<ItemEffectData>();
     public TableBase<StringData> StringTable = new TableBase<StringData>();
     public TableBase<UnitData> UnitTable = new TableBase<UnitData>();
+    public TableBase<SkillInfoData> SkillInfoTable = new TableBase<SkillInfoData>();
 
 
     protected override void Awake()
