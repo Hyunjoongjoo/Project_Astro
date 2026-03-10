@@ -19,7 +19,6 @@ public class DashSkill : ISkill
         _data = data;
         _cachedUnit = unit;
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
-        Debug.Log($"[스킬명] {_data.skillName} 초기쿨 = {_data.initCooldown} 기본쿨 = {_data.cooldown}");
         // 광역화 옵션 켜져있다면 배열 미리 할당
         if (data.areaOfEffect)
             _hitColliders = new Collider[20];
@@ -118,7 +117,7 @@ public class DashSkill : ISkill
             {
                 if (_hitColliders[i].TryGetComponent(out UnitBase enemy))
                 {
-                    _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, _data.skillType, false, 1.5f);
+                    _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, default, _data.skillType, false, 1.5f);
                     // 네트워크 환경: 마스터 클라이언트에서만 데미지 연산 수행
                     if (_cachedUnit.Runner.IsSharedModeMasterClient)
                         enemy.TakeDamage(finalDamage);
