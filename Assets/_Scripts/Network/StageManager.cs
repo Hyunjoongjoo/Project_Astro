@@ -65,6 +65,7 @@ public class StageManager : NetworkBehaviour
     private int _requiredPlayerCount;
 
     private readonly int GAME_DURATION = 240;
+    private readonly int AUGMENT_GAUGE_CAPACITY = 240;
     private readonly float PLAYER_INFO_DURATION = 4f;
     private readonly float COUNTDOWN_INTERVAL = 1f;
 
@@ -205,8 +206,8 @@ public class StageManager : NetworkBehaviour
         }
 
         // 팀 자원인 증강 게이지도 추가함.
-        AugmentExp.Add(Team.Blue, 240);
-        AugmentExp.Add(Team.Red, 240);
+        AugmentExp.Add(Team.Blue, 0);
+        AugmentExp.Add(Team.Red, 0);
 
         // RPC로 모든 클라이언트에 팀 배정 알림
         RPC_NotifyTeamAssignment();
@@ -466,7 +467,7 @@ public class StageManager : NetworkBehaviour
     {
         if ( AugmentExp.TryGet(team, out int curExp) )
         {
-            int value = AugmentExp.Set(team, curExp + amount);
+            int value = AugmentExp.Set(team, Mathf.Min(AUGMENT_GAUGE_CAPACITY, curExp + amount));
             RPC_UpdateAugmentGauge(team, value);
         }
 
@@ -478,7 +479,7 @@ public class StageManager : NetworkBehaviour
     {
         if (AugmentExp.TryGet(team, out int curExp))
         {
-            int value = AugmentExp.Set(team, curExp - amount);
+            int value = AugmentExp.Set(team, Mathf.Max(0, curExp - amount));
             RPC_UpdateAugmentGauge(team, value);
         }
 
