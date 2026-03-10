@@ -80,12 +80,6 @@ public class UnitController : UnitBase
         //UnitStat 초기화
         _unitStat.Init(data);
 
-        _unitStat.Attack.AddModifier(
-        new StatModifier(10, StatModType.Flat, this)
-    );
-
-        Debug.Log("Attack Base : " + _unitStat.Attack.BaseValue);
-        Debug.Log("Attack Final : " + _unitStat.Attack.Value);
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
