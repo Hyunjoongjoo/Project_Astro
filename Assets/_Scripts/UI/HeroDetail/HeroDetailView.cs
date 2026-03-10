@@ -78,7 +78,7 @@ public class HeroDetailView : BaseUI
     public void SetLevelInfo(int level, int currentExp, float maxExp)
     {
         _heroLevelTxt.text = $"Lv. {level}";
-        _heroExpBar.fillAmount = currentExp / maxExp;
+        _heroExpBar.fillAmount = (float)currentExp / maxExp;
         _heroExpTxt.text = $"{currentExp} / {maxExp}";
     }
 

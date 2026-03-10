@@ -483,7 +483,7 @@ public class AugmentController : NetworkBehaviour
             if (_stageManager.PlayerDataMap.TryGet(player, out PlayerNetworkData data))
             {
                 //서버 승인이 떨어졌으므로, 100 게이지를 차감
-                _stageManager.DecreaseAugmentGauge(data.Team, 100);
+                _stageManager.DecreaseAugmentGauge(data.Team, 120);
             }
             //선택이 확정되었으므로 인게임 타이머 정지 및 초기화
             if (_stageManager.CurrentState == StageState.Playing)
