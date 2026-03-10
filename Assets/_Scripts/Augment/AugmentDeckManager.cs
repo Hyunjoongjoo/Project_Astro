@@ -112,7 +112,7 @@ public class AugmentDeckManager
 
         for (int i = 0; i < types.Length; i++)
         {
-            if (types[i] == AugmentType.Hero && heroCount >= 5)
+            if (types[i] == AugmentType.Hero && heroCount >= SlotData_5.Length)
             {
                 types[i] = isSkillMax ? AugmentType.Item : AugmentType.Skill;
             }
