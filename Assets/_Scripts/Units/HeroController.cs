@@ -19,6 +19,7 @@ public class HeroController : UnitController
     public ISkill curUniqueSkill;
     private Vector3 _targetPos;
     private float _deployDelay;
+    private StageManager _stageManager;
 
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
@@ -35,6 +36,8 @@ public class HeroController : UnitController
 
         normalAttack = _normalAttackData.CreateInstance(this);
         curUniqueSkill = _standardSkillData.CreateInstance(this);
+
+        _stageManager = FindFirstObjectByType<StageManager>();
 
         if (!Object.HasStateAuthority) return;
         ApplySkillAugments();
@@ -135,41 +138,48 @@ public class HeroController : UnitController
     //스킬증강에 사용될 메서드 (스폰에 적용시 이미 배치된 영웅은 적용이 안될것인데....)
     private void ApplySkillAugments()
     {
-        StageManager stageManager = FindFirstObjectByType<StageManager>();
+        StageManager stageManager = _stageManager;
 
         if (stageManager == null)
             return;
 
-        if (!stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out PlayerNetworkData data))
-            return;
+        Team myTeam = team; //팀기준
 
-        //3.3 여현구
-        //배열에서 구조체로 바뀌어서 여기 수정했습니다.
-        for (int i = 0; i < SlotData_5.Length; i++)
+        foreach (var player in stageManager.PlayerDataMap)
         {
-            string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
-
-            if (string.IsNullOrEmpty(augmentId))
+            if (player.Value.Team != myTeam)
                 continue;
 
-            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
-            if (so == null)
-                continue;
+            PlayerNetworkData data = player.Value;
 
-            if (so.TargetHeroID != unitId)
-                continue;
+            //3.3 여현구
+            //배열에서 구조체로 바뀌어서 여기 수정했습니다.
+            for (int i = 0; i < SlotData_5.Length; i++)
+            {
+                string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
 
-            int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
+                if (string.IsNullOrEmpty(augmentId))
+                    continue;
 
-            if (tierIndex >= so.Tiers.Length)
-                continue;
+                SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
+                if (so == null)
+                    continue;
 
-            BaseSkillSO newSkill = so.Tiers[tierIndex].CombatSkillData;
+                if (so.TargetHeroID != unitId)
+                    continue;
 
-            if (newSkill == null)
-                continue;
+                int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
 
-             ChangeSkill(newSkill);
+                if (tierIndex >= so.Tiers.Length)
+                    continue;
+
+                BaseSkillSO newSkill = so.Tiers[tierIndex].CombatSkillData;
+
+                if (newSkill == null)
+                    continue;
+                Debug.Log($"[스킬 증강 적용] {unitId} <- {augmentId}");
+                ChangeSkill(newSkill);
+            }
         }
 
     }

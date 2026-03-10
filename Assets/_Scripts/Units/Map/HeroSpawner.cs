@@ -133,7 +133,7 @@ public class HeroSpawner : NetworkBehaviour
         Vector3 forwardDir = team == Team.Blue ? Vector3.forward : Vector3.back;
         Quaternion spawnRot = Quaternion.LookRotation(forwardDir);
 
-        Runner.Spawn(prefab, origin.position, spawnRot,
+        Runner.Spawn(prefab, origin.position, spawnRot, caller,
             onBeforeSpawned: (Runner, obj) =>
             {
                 HeroController hero = obj.GetComponent<HeroController>();

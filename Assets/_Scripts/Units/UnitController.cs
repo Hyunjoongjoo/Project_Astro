@@ -257,7 +257,7 @@ public class UnitController : UnitBase
         GameObject prefab = null;
 
         // 평타 공격인가 스킬인가
-        if (type == SkillType.Normal)
+        if (type == SkillType.normal_attack)
         {
             prefab = unit._normalAttackData.skillVFX;
         }
@@ -318,7 +318,7 @@ public class UnitController : UnitBase
             ProjectileSkillSO projectileSO = null;
 
             // 평타 공격인가 스킬인가
-            if (type == SkillType.Normal)
+            if (type == SkillType.normal_attack)
                 projectileSO = unit._normalAttackData as ProjectileSkillSO;
 
             else
