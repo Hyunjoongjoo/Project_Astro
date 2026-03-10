@@ -303,7 +303,7 @@ public class AugmentController : NetworkBehaviour
     {
         if (Runner.LocalPlayer == target)
         {
-            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer); 
+            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer);
             int reinforceNum = 6;
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
             if (config != null) reinforceNum = int.Parse(config.configValue);
@@ -365,7 +365,7 @@ public class AugmentController : NetworkBehaviour
 
                 if (_allBaseSkills != null)
                 {
-                    var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == id && s.skillType == SkillType.NormalSkill);
+                    var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == id && s.skillType == SkillType.normal_skill);
                     if (baseSkill != null) data.skillData = baseSkill;
                 }
             }
@@ -389,7 +389,7 @@ public class AugmentController : NetworkBehaviour
 
                 if (_allBaseSkills != null)
                 {
-                    var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == skill.TargetHeroID && s.skillType == SkillType.NormalSkill);
+                    var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == skill.TargetHeroID && s.skillType == SkillType.normal_skill);
                     if (baseSkill != null) data.baseSkillName = baseSkill.skillName;
                 }
             }
@@ -470,6 +470,12 @@ public class AugmentController : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             AugmentExecutor.ApplyAugment(_stageManager, player, type, targetId);
+
+            //03-10 배치된 영웅 스킬 증강 갱신
+            foreach (var hero in FindObjectsByType<HeroController>(FindObjectsSortMode.None))
+            {
+                hero.RefreshAugments();
+            }
 
             //나를 포함한 모든 유저에게 갱신 알림을 보냄
             RPC_NotifyTeammateRefresh(player);

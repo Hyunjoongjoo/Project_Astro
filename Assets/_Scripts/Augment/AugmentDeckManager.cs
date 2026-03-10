@@ -208,7 +208,7 @@ public class AugmentDeckManager
                     {
                         bSkill = _allBaseSkills.FirstOrDefault(s =>
                             s.heroId == refId &&
-                            s.skillType == SkillType.NormalSkill);
+                            s.skillType == SkillType.normal_skill);
                     }
                 }
                 else return null; //뽑을 영웅이 없으면 null
@@ -288,7 +288,7 @@ public class AugmentDeckManager
 
                     if (_allBaseSkills != null)
                     {
-                        var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == pickedSkill.TargetHeroID && s.skillType == SkillType.NormalSkill);
+                        var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == pickedSkill.TargetHeroID && s.skillType == SkillType.normal_skill);
                         if (baseSkill != null) bSkillName = baseSkill.skillName;
                     }
                 }
