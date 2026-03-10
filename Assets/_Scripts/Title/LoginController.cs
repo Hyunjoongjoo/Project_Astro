@@ -6,6 +6,7 @@ public class LoginController : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private LoginView _loginView;
+    [SerializeField] private SignUpView _signUpView;
 
     private AuthService _authService;
     private UserDataStore _userDataStore;
@@ -45,8 +46,6 @@ public class LoginController : MonoBehaviour
             // 2단계: Firestore에서 유저 데이터 조회
             var userData = await _userDataStore.GetUserDataAsync(user.UserId);
             var userHeroData = await _userDataStore.GetUserHeroDataAsync(user.UserId);
-            var userRecordData = await _userDataStore.GetUserRecordDataAsync(user.UserId);
-            var userWalletData = await _userDataStore.GetUserWalletDataAsync(user.UserId);
 
             Debug.Log("파이어베이스 유저 데이터 조회");
             if (userData == null)
@@ -57,12 +56,12 @@ public class LoginController : MonoBehaviour
             }
 
             // 3단계: 로그인 성공
-            _loginView.ShowWelcomeMessage(userData.nickName);
-            _onLoginSuccess?.Invoke(userData.nickName);
+            _loginView.ShowWelcomeMessage(userData.profile.nickName);
+            _onLoginSuccess?.Invoke(userData.profile.nickName);
             Debug.Log("로그인 성공");
 
             // 4단계: DB 데이터 캐싱
-            UserDataManager.Instance.SetAllUserData(userData, userRecordData, userWalletData, userHeroData);
+            UserDataManager.Instance.SetAllUserData(userData.profile, userData.record, userData.wallet, userHeroData);
             Debug.Log("DB 캐싱 성공");
             
             await UserDataManager.Instance.SyncHeroDataAsync();
@@ -78,6 +77,62 @@ public class LoginController : MonoBehaviour
             _loginView.SetInteractable(true);
         }
     }
+
+    public void OnClickGoogleLogIn()
+    {
+        GoogleHandleLogin();
+    }
+
+    private async void GoogleHandleLogin()
+    {
+        if (_isProcessing) return;
+
+        _isProcessing = true;
+        _loginView.SetInteractable(false);
+
+        try
+        {
+            // 1단계: Firebase Auth 로그인
+            var user = await _authService.SignInWithGoogleAsync();
+            Debug.Log("파이어베이스 Auth 로그인 ");
+
+            // 2단계: Firestore에서 유저 데이터 조회
+            var userData = await _userDataStore.GetUserDataAsync(user.UserId);
+            var userHeroData = await _userDataStore.GetUserHeroDataAsync(user.UserId);
+
+            Debug.Log("파이어베이스 유저 데이터 조회");
+            if (userData == null)
+            {
+                // 유저 데이터가 없으면 닉네임 생성 유도
+                _loginView.ShowNicknameCreationRequired(user.UserId);
+                _signUpView.SetNicknameOnlyMode(user.Email);
+                _signUpView.gameObject.SetActive(true);
+                return;
+            }
+
+            // 3단계: 로그인 성공
+            _loginView.ShowWelcomeMessage(userData.profile.nickName);
+            _onLoginSuccess?.Invoke(userData.profile.nickName);
+            Debug.Log("로그인 성공");
+
+            // 4단계: DB 데이터 캐싱
+            UserDataManager.Instance.SetAllUserData(userData.profile, userData.record, userData.wallet, userHeroData);
+            Debug.Log("DB 캐싱 성공");
+
+            await UserDataManager.Instance.SyncHeroDataAsync();
+            Debug.Log("마이그레이션 성공");
+        }
+        catch (Exception ex)
+        {
+            _loginView.ShowError(GetErrorMessage(ex));
+        }
+        finally
+        {
+            _isProcessing = false;
+            _loginView.SetInteractable(true);
+        }
+    }
+
     private bool ValidateInput(string email, string password)
     {
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))

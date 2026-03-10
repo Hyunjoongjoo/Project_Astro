@@ -24,7 +24,7 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public void Setup(AugmentData data)
     {
         _data = data;
-        _iconImg.sprite = data.icon;
+        _iconImg.sprite = data.mainIcon;
         _mainCam = Camera.main;
 
         //스테이지매니저캐싱

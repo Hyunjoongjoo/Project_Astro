@@ -26,6 +26,10 @@ public class HeroDetailView : BaseUI
     [SerializeField] private Transform _skillDesContainer;
     [SerializeField] private Transform _augmentDesContainer;
     [SerializeField] private Transform _levelRewardDesContainer;
+    [SerializeField] private Transform _skillIconContainer;
+    [SerializeField] private Transform _augmentIconContainer;
+    [SerializeField] private Transform _levelRewardIconContainer;
+    [SerializeField] private GameObject _skillIconPrefab;
     [SerializeField] private GameObject _desPanelPrefab;
 
     [Header("스텟 페이지 설정")]
@@ -42,11 +46,18 @@ public class HeroDetailView : BaseUI
     public Button UpgradeBtn => _upgradeBtn;
 
     // 타입에 맞는 컨테이너를 반환하는 헬퍼 프로퍼티/메서드
-    private Transform GetContainer(DescriptionType type) => type switch
+    private Transform GetDesContainer(DescriptionType type) => type switch
     {
         DescriptionType.Skill => _skillDesContainer,
         DescriptionType.Augment => _augmentDesContainer,
         DescriptionType.LevelReward => _levelRewardDesContainer,
+        _ => null
+    };
+    private Transform GetIconContainer(DescriptionType type) => type switch
+    {
+        DescriptionType.Skill => _skillIconContainer,
+        DescriptionType.Augment => _augmentIconContainer,
+        DescriptionType.LevelReward => _levelRewardIconContainer,
         _ => null
     };
 
@@ -67,7 +78,7 @@ public class HeroDetailView : BaseUI
     public void SetLevelInfo(int level, int currentExp, float maxExp)
     {
         _heroLevelTxt.text = $"Lv. {level}";
-        _heroExpBar.fillAmount = currentExp / maxExp;
+        _heroExpBar.fillAmount = (float)currentExp / maxExp;
         _heroExpTxt.text = $"{currentExp} / {maxExp}";
     }
 
@@ -96,11 +107,17 @@ public class HeroDetailView : BaseUI
     //상세설명 판넬 초기화
     public void ClearDescription(DescriptionType type)
     {
-        Transform container = GetContainer(type);
+        Transform container = GetDesContainer(type);
         if (container == null) return;
         foreach (Transform child in container) Destroy(child.gameObject);
     }
-
+    public void ClearIcons(DescriptionType type)
+    {
+        Transform container = GetIconContainer(type);
+        if (container == null) return;
+        foreach (Transform child in container) Destroy(child.gameObject);
+    }
+    //스텟 판넬 설정후 소환
     public void AddStatItem(string name, string value, Sprite icon)
     {
         GameObject obj = Instantiate(_statPanelPrefab, _statContainer);
@@ -110,9 +127,22 @@ public class HeroDetailView : BaseUI
         }
     }
 
+    public void AddSkillIcon(DescriptionType type, Sprite skillIcon)
+    {
+        Transform container = GetIconContainer(type);
+        if (container == null) return;
+
+        GameObject obj = Instantiate(_skillIconPrefab, container);
+
+        if (obj.TryGetComponent(out Image iconImage))
+        {
+            iconImage.sprite = skillIcon;
+        }
+    }
+
     public void AddDescriptionItem(DescriptionType type, string name, string des)
     {
-        Transform container = GetContainer(type);
+        Transform container = GetDesContainer(type);
         if (container == null) return;
 
         GameObject obj = Instantiate(_desPanelPrefab, container);

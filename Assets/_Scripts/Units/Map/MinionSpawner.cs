@@ -136,7 +136,7 @@ public class MinionSpawner : NetworkBehaviour
             onBeforeSpawned: (runner, obj) =>
             {
                 // Spawned() 호출 전 Setup 호출하여 초기화
-                if (obj.TryGetComponent<MinionController>(out var minion))
+                if (obj.TryGetComponent<UnitController>(out var minion))
                 {
                     minion.Setup(team);
                 }

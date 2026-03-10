@@ -1,6 +1,38 @@
+﻿/* 
+ * 
+3.9 리팩토링
+
+## 사유
+
+1. 아군 영웅 공유 불가: 나와 아군 영웅 슬롯에 배치된 영웅의 스킬이 선택지에 떠야 함. => 내 덱에는 없지만 아군 덱에 있는 영웅의 스킬도 내 화면에 떠야 함.
+2. 동시 출현 방지 없음: 아군이 스킬 증강의 대상으로 선택되어 있는 영웅은 스킬 증강 선택지에서 배제. => 나와 아군이 동시에 동일 영웅의 스킬 증강 카드를 받으면 안 됨(컨플릭트도 뜨면 안 됨).
+
+
+## 해결책: 서버에서 한 번에 뽑아서 전달
+
+1. AugmentDeckManager 매개변수 변경
+
+- 내정보 + 아군 정보까지 넘겨받도록
+
+2. 서버 통제형 구조
+
+- AugmentController에서 각자 로컬로 덱 매니저를 호출 X
+- 서버가 1P 카드 3장, 2P 카드 3장 순차적으로 뽑도록 수정
+
+3. RPC 통신 추가
+
+- 서버가 뽑은 카드 3장의 ID를 각 클라이언트에게 RPC로 전송.
+- 클라이언트는 받은 ID를 바탕으로 UI만 그리는 식으로 분리.
+
+ */
+
+
 using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+
+
 
 //1. 유저 현재 상태 분석
 //2. 예외처리 or 한쪽 선택시 나머지 밴
@@ -14,13 +46,17 @@ public class AugmentDeckManager
     //스킬증강 SO
     private List<SkillAugmentSO> _allSkillAugments;
 
+    //영웅 기본 스킬을 찾기 위한 모든 스킬 데이터 모음
+    private List<BaseSkillSO> _allBaseSkills;
+
     //아이콘, 프리팹 가져올 SO
     private HeroIconDataSO _heroIconSO;
 
-    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO)
+    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO, List<BaseSkillSO> loadedBaseSkills)
     {
         _allSkillAugments = loadedSkillAugments;
         _heroIconSO = heroIconSO;
+        _allBaseSkills = loadedBaseSkills;
     }
 
     public List<AugmentData> GenerateCards(
@@ -29,7 +65,10 @@ public class AugmentDeckManager
         List<string> ownedSkillAugmentIds,
         bool isItemFull,
         int totalAugmentPicks,
-        int reinforceNumber)
+        int reinforceNumber,
+        //아군의 영웅 리스트와 이미 뽑힌 타겟 영웅 배제 리스트
+        List<string> teamHeroIds,
+        List<string> excludedSkillTargetIds)
     {
         List<AugmentData> drawnCards = new List<AugmentData>();
         List<string> excludeRefIds = new List<string>();
@@ -45,13 +84,13 @@ public class AugmentDeckManager
         for (int i = 0; i < 3; i++)
         {
             AugmentType targetType = slotTypes[i];
-            AugmentData newCard = CreateCard(targetType, excludeRefIds, ownedHeroIds, ownedSkillAugmentIds, totalAugmentPicks, reinforceNumber);
-
+            //CreateCard에 새로 추가된 팀 정보, 제외할 스킬타겟아이디 추가
+            AugmentData newCard = CreateCard(targetType, excludeRefIds, ownedHeroIds, ownedSkillAugmentIds, totalAugmentPicks, reinforceNumber, teamHeroIds, excludedSkillTargetIds);
             if (newCard != null)
             {
-                drawnCards.Add(newCard); 
-                excludeRefIds.Add(newCard.targetId);  
-            } 
+                drawnCards.Add(newCard);
+                excludeRefIds.Add(newCard.targetId);
+            }
             else
             {
                 Debug.LogWarning($"{targetType} 타입 카드 생성 실패, 조건을 만족하는 풀x");
@@ -73,7 +112,7 @@ public class AugmentDeckManager
 
         for (int i = 0; i < types.Length; i++)
         {
-            if (types[i] == AugmentType.Hero && heroCount >= 5)
+            if (types[i] == AugmentType.Hero && heroCount >= SlotData_5.Length)
             {
                 types[i] = isSkillMax ? AugmentType.Item : AugmentType.Skill;
             }
@@ -96,7 +135,9 @@ public class AugmentDeckManager
     private AugmentData CreateCard(
         AugmentType type, List<string> excludeRefIds,
         List<string> ownedHeroIds, List<string> ownedSkillAugmentIds,
-        int totalPicks, int reinforceNum)
+        int totalPicks, int reinforceNum,
+        List<string> teamHeroIds, List<string> excludedSkillTargetIds
+        )
     {
         _instanceCounter++;
         string instanceId = $"Card_{_instanceCounter}";
@@ -110,6 +151,16 @@ public class AugmentDeckManager
         //쿨타임 저장용
         float baseCooldown = 0f;
         float currentCooldown = 0f;
+
+        //영웅,스킬용 변수
+        HeroType hType = default;
+        HeroRole hRole = default;
+        MoveType mType = default;
+        BaseSkillSO bSkill = null;
+
+        string tHeroName = "";
+        Sprite tHeroIcon = null;
+        string bSkillName = "";
 
         switch (type)
         {
@@ -135,6 +186,10 @@ public class AugmentDeckManager
 
                     title = GetString(pickedHero.heroName);
                     desc = GetString(pickedHero.heroDesc);
+
+                    hType = pickedHero.heroType;
+                    hRole = pickedHero.heroRole;
+
                     if (_heroIconSO != null)
                     {
                         icon = _heroIconSO.GetIcon(refId);       //ID로 아이콘
@@ -146,6 +201,14 @@ public class AugmentDeckManager
                     {
                         baseCooldown = heroStat.spawnCooldown;
                         currentCooldown = heroStat.spawnCooldown;
+                        mType = heroStat.moveType;
+                    }
+                    //해당 영웅의 기본 스킬 데이터 찾아오기
+                    if (_allBaseSkills != null)
+                    {
+                        bSkill = _allBaseSkills.FirstOrDefault(s =>
+                            s.heroId == refId &&
+                            s.skillType == SkillType.NormalSkill);
                     }
                 }
                 else return null; //뽑을 영웅이 없으면 null
@@ -187,10 +250,16 @@ public class AugmentDeckManager
                     //2. 내가이미 집은 증강인가
                     //3. 반대 트리 제외
                     //4. 동시출현 방지
-                    if (ownedHeroIds.Contains(skill.TargetHeroID) &&
+
+                    //3.9 내 영웅 or 아군 영웅인지 확인
+                    bool isTargetHeroOwned = ownedHeroIds.Contains(skill.TargetHeroID) || (teamHeroIds != null && teamHeroIds.Contains(skill.TargetHeroID));
+                    //
+                    if (isTargetHeroOwned &&
                         !ownedSkillAugmentIds.Contains(skill.AugmentID) &&
                         (string.IsNullOrEmpty(skill.ConflictID) || !ownedSkillAugmentIds.Contains(skill.ConflictID)) &&
-                        !excludeRefIds.Contains(skill.AugmentID))
+                        !excludeRefIds.Contains(skill.AugmentID) &&
+                        //팀원 간 겹침 방지: 이미 이번 턴에 뽑힌 타겟 영웅이면 배제
+                        !excludedSkillTargetIds.Contains(skill.TargetHeroID))
                     {
                         validSkills.Add(skill);
                     }
@@ -200,12 +269,28 @@ public class AugmentDeckManager
                 {
                     var pickedSkill = validSkills[Random.Range(0, validSkills.Count)];
 
+                    //뽑힌 스킬의 타겟 영웅을 배제 리스트에 등록
+                    excludedSkillTargetIds.Add(pickedSkill.TargetHeroID);
+
                     int tierIndex = (totalPicks >= reinforceNum) ? 1 : 0;
 
                     refId = pickedSkill.AugmentID;
-                    title = pickedSkill.Title;
                     icon = pickedSkill.Icon;
-                    desc = pickedSkill.Tiers[tierIndex].Description;
+
+                    title = GetString(pickedSkill.TitleStringID);
+                    desc = GetString(pickedSkill.Tiers[tierIndex].DescStringID);
+                    bSkill = pickedSkill.Tiers[tierIndex].CombatSkillData;
+                    //스킬 증강 카드일 때 영웅의 원본 정보들을 추적해서 채워줌
+                    var heroData = TableManager.Instance.HeroTable.Get(pickedSkill.TargetHeroID);
+                    if (heroData != null) tHeroName = GetString(heroData.heroName);
+
+                    if (_heroIconSO != null) tHeroIcon = _heroIconSO.GetIcon(pickedSkill.TargetHeroID);
+
+                    if (_allBaseSkills != null)
+                    {
+                        var baseSkill = _allBaseSkills.FirstOrDefault(s => s.heroId == pickedSkill.TargetHeroID && s.skillType == SkillType.NormalSkill);
+                        if (baseSkill != null) bSkillName = baseSkill.skillName;
+                    }
                 }
                 else return null;
                 break;
@@ -216,12 +301,21 @@ public class AugmentDeckManager
             instanceId = instanceId,
             type = type,
             targetId = refId,
-            name = title,
+            titleName = title,
             description = desc,
-            icon = icon,
+            mainIcon = icon,
             heroPrefab = heroPrefab,
-            baseSpawnCooldown = baseCooldown,       
-            currentSpawnCooldown = currentCooldown
+            baseSpawnCooldown = baseCooldown,
+            currentSpawnCooldown = currentCooldown,
+
+            heroType = hType,
+            heroRole = hRole,
+            moveType = mType,
+            skillData = bSkill,
+
+            targetHeroName = tHeroName,
+            targetHeroIcon = tHeroIcon,
+            baseSkillName = bSkillName
         };
     }
 
@@ -255,7 +349,7 @@ public class AugmentDeckManager
 
         if (stringData != null)
         {
-            return stringData.textKor; 
+            return stringData.textKor;
         }
 
         //데이터가 누락되었다면 키값 띄우기

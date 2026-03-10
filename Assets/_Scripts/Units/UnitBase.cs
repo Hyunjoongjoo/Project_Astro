@@ -5,9 +5,14 @@ using UnityEngine;
 // 이동하는 유닛과 건물 모두에게 공통된 속성 정의
 public abstract class UnitBase : NetworkBehaviour
 {
+    [Header("범위 체크용 빨간 원")]
+    [SerializeField] private float _testRange;
+    
     [Header("체력과 방어력 설정")]
-    [SerializeField] protected float maxHealth;
-    [SerializeField] protected float deffense;
+    [Networked] public float MaxHealth { get; set; }
+    protected float deffense;
+
+    protected UnitStat _unitStat;
 
     //protected float currentHealth;
 
@@ -21,21 +26,26 @@ public abstract class UnitBase : NetworkBehaviour
     public Team team;
     [Networked] public Team networkedTeam {  get;  set; }
 
-    public float MaxHealth => maxHealth;
     public UnitType UnitType => unitType;
     public bool IsDead { get; private set; }
-    [Networked, HideInInspector, OnChangedRender(nameof(OnHealthChanged))] public float CurrentHealth { get; set; }
-    [Networked, HideInInspector] public UnitState CurrentState { get; set; }
+
+    [Networked, HideInInspector, OnChangedRender(nameof(OnHealthChanged))] 
+    public float CurrentHealth { get; set; }
 
     // 죽었을 때 이벤트를 알리며 자신의 타입을 알림
     public event Action<UnitBase> OnDeath;
 
     public override void Spawned()
     {
+        BaseUnitInit();
+    }
+
+    protected virtual void BaseUnitInit()
+    {
         if (Object.HasStateAuthority)
         {
             selfNetworkObj = GetComponent<NetworkObject>();
-            CurrentHealth = maxHealth;
+            CurrentHealth = MaxHealth;
             IsDead = false;
             networkedTeam = team;
         }
@@ -43,45 +53,38 @@ public abstract class UnitBase : NetworkBehaviour
 
     public override void FixedUpdateNetwork() { }
 
+    // 매개변수 값은 아무 계산도 안한 순수 데미지 초기값
+    // 여기서 최종 받는 데미지를 계산한다.
     public virtual void TakeDamage(float amount)
     {
         if (!Object.HasStateAuthority) return;
+        if (IsDead) return;
 
-        if (IsDead)
+        float finalTakenDamage = amount;
+
+        // 받피감이 1을 넘어가면 체력이 오히려 찰 것.
+        // Config 테이블에서 상한 값 확인해봤는데 뭔가 이상함.
+        // TODO: 상한 값 검사 및 조정 로직 필요.
+        // TableManager.Instance.ConfigTable.Get("min_hero_damage_reduce");
+        if (_unitStat != null)
         {
-            return;
+            finalTakenDamage *= (1 - _unitStat.DamageReduction.Value);
         }
 
-        CurrentHealth -= amount;
+        CurrentHealth = Mathf.Max(CurrentHealth - finalTakenDamage, 0); ;
 
         if (CurrentHealth < 1)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
-        {
             Die();
-        }
     }
 
-    
-    public virtual float GetAttackDistanceTo(UnitBase target)
+    public virtual void TakeHeal(float amount)
     {
-        if (target == null)//타겟이 없는 경우 항상 사거리 밖으로 판정되도록 처리
-        {
-            return float.MaxValue;
-        }
-
-        //자신과 타겟의 콜라이더를 기준으로 실제 전투 거리 계산
-        Collider myCollider = GetComponentInChildren<Collider>();
-        Collider targetCollider = target.GetComponentInChildren<Collider>();
-
-        if (myCollider == null || targetCollider == null)//콜라이더가 없는 경우 중심점 거리 계산으로
-        {
-            return Vector3.Distance(transform.position, target.transform.position);
-        }
-
-        Vector3 myPoint = myCollider.ClosestPoint(target.transform.position);
-        Vector3 targetPoint = targetCollider.ClosestPoint(transform.position);
-
-        return Vector3.Distance(myPoint, targetPoint);
+        if (!Object.HasStateAuthority) return;
+        if (IsDead) return;
+        
+        CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
     }
+
 
     public virtual void Die()
     {
@@ -89,7 +92,6 @@ public abstract class UnitBase : NetworkBehaviour
 
         IsDead = true;
 
-        CurrentState = UnitState.Dead;
         OnDeath?.Invoke(this);
 
         if (AudioManager.Instance != null)
@@ -109,7 +111,20 @@ public abstract class UnitBase : NetworkBehaviour
         // 모든 클라이언트의 화면에서 HP바 매니저 호출
         if (HpBarManager.Instance != null)
         {
-            HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, maxHealth);
+            HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, MaxHealth, unitType);
         }
     }
+
+#if UNITY_EDITOR
+    protected virtual void OnDrawGizmosSelected()//탐지 범위 시각화
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, _testRange);
+        if (_unitStat != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, _unitStat.DetectRange.Value);
+        }
+    }
+#endif
 }

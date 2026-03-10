@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 //현재 스탯을 계산하여 유닛에게 달아줄 관리자
 //외부 요인의 효과 적용을 알맞은 Stat 객체로 분배
@@ -78,6 +79,40 @@ public class UnitStat : MonoBehaviour
 
     }
 
+    public void Init(UnitData data)//03-06 오버로딩
+    {
+        MaxHp = new Stat(StatCalcMode.Standard, data.baseHp);
+        Attack = new Stat(StatCalcMode.Standard, data.baseAttackPower);
+        HealPower = new Stat(StatCalcMode.Standard, data.baseHealingPower);
+
+        AttackSpeed = new Stat(StatCalcMode.Delay, data.attackSpeed);
+        RespawnTime = new Stat(StatCalcMode.Delay, 0f);
+
+        MoveSpeed = new Stat(StatCalcMode.Speed, data.moveSpeed);
+        DetectRange = new Stat(StatCalcMode.Speed, data.detectionRange);
+
+        DamageReduction = new Stat(StatCalcMode.Additive, data.damageReduce);
+        CooldownReduction = new Stat(StatCalcMode.Additive, 0f);
+
+        MapStat(EffectType.IncreaseMaxHp, MaxHp);
+        MapStat(EffectType.DecreaseMaxHp, MaxHp);
+
+        MapStat(EffectType.IncreaseAttackPower, Attack);
+        MapStat(EffectType.IncreaseHealPower, HealPower);
+
+        MapStat(EffectType.IncreaseMoveSpeed, MoveSpeed);
+        MapStat(EffectType.DecreaseMoveSpeed, MoveSpeed);
+        MapStat(EffectType.IncreaseDetectionRange, DetectRange);
+
+        MapStat(EffectType.DecreaseDamageTaken, DamageReduction);
+        MapStat(EffectType.IncreaseDamageTaken, DamageReduction);
+
+        MapStat(EffectType.IncreaseAttackSpeed, AttackSpeed);
+        MapStat(EffectType.DecreaseAttackSpeed, AttackSpeed);
+        MapStat(EffectType.DecreaseCooldown, CooldownReduction);
+        MapStat(EffectType.DecreaseRespawnTime, RespawnTime);
+    }
+
     //딕셔너리에 매핑을 추가하는 헬퍼 함수
     private void MapStat(EffectType type, Stat statObj)
     {
@@ -103,6 +138,26 @@ public class UnitStat : MonoBehaviour
         {
             Debug.LogWarning($"UnitStat에서 연결되지 않은 효과 타입: {type}");
         }
+    }
+
+    // 오버로드 : 스탯 변동이 일시적인 경우 지속시간 값을 받고
+    // 지속 시간이 다되면 자동으로 제거 메서드 실행
+    public void AddModifier(EffectType type, StatModifier modifier, float duration)
+    {
+        StartCoroutine(TemporaryEffect(type, modifier, duration));
+    }
+
+    private IEnumerator TemporaryEffect(EffectType type, StatModifier modifier, float duration)
+    {
+        float elapsedTime = 0f;
+
+        AddModifier(type, modifier);
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        RemoveModifier(type, modifier);
     }
 
     //기존 스탯 변동을 제거(Source 기반 역추적)

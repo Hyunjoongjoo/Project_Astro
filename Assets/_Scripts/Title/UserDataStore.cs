@@ -5,7 +5,17 @@ using UnityEngine;
 
 #region Firestore Datas
 [FirestoreData]
-public class UserDbModel
+public class DbModel
+{
+    [FirestoreProperty("Profile")] public ProfileDbModel profile { get; set; }
+
+    [FirestoreProperty("Record")] public RecordModel record { get; set; }
+
+    [FirestoreProperty("Wallet")] public WalletModel wallet { get; set; }
+}
+
+[FirestoreData]
+public class ProfileDbModel
 {
     [FirestoreProperty] public string uuid { get; set; }
     [FirestoreProperty] public string nickName { get; set; }
@@ -44,20 +54,13 @@ public class UserDataStore : Singleton<UserDataStore>
 {
     private FirebaseFirestore _firestore;
     private const string COLLECTION_NAME = "users";
-    private const string COLLECTION_PROFILE = "COL_Profile";
-    private const string COLLECTION_RECORD = "COL_Record";
     private const string COLLECTION_HERO = "COL_Hero";
-    private const string COLLECTION_WALLET = "COL_Wallet";
-
-    private const string DOCUMENT_PROFILE = "DOC_Profile";
-    private const string DOCUMENT_RECORD = "DOC_Record";
-    private const string DOCUMENT_WALLET = "DOC_Wallet";
 
     public void Initialize()
     {
         _firestore = FirebaseFirestore.DefaultInstance;
         _firestore.Settings.PersistenceEnabled = false;
-        Debug.Log("[Firestore] Firestore initialized");
+        Debug.Log($"[Check] Firebase Project ID: {Firebase.FirebaseApp.DefaultInstance.Options.ProjectId}");
     }
 
     #region DB Create / Delete
@@ -66,30 +69,52 @@ public class UserDataStore : Singleton<UserDataStore>
     public async Task CreateUserDataAsync(string uuid, string nickname)
     {
         DocumentReference userDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid);
+        Debug.Log($"[Step 1] CreateUserDataAsync 진입 - UUID: {uuid}");
 
         try
         {
-            // 1. 유저 기본 정보 생성
-            var profileData = new Dictionary<string, object>
-            {
-                { "uuid", uuid },
-                { "nickName", nickname },
-                { "userLevel", 1 },
-                { "userExp", 0 },
-                { "createdAt", FieldValue.ServerTimestamp }
-            };
-            await userDocRef.Collection(COLLECTION_PROFILE).Document(DOCUMENT_PROFILE).SetAsync(profileData);
+            WriteBatch batch = _firestore.StartBatch();
+            Debug.Log("[Step 2] 배치 생성 완료");
 
-            // 2. 전적 정보 생성
-            var Record = new Dictionary<string, object>
+            // 0. Hero제외 다른 데이터의 묶음 처리
+            var data = new Dictionary<string, object>
             {
-                { "win", 0 },
-                { "lose", 0 }
+                // 1. Profile Map 생성
+                { "Profile", new Dictionary<string, object>
+                    {
+                        { "uuid", uuid },
+                        { "nickName", nickname },
+                        { "userLevel", 1 },
+                        { "userExp", 0 },
+                        { "createdAt", FieldValue.ServerTimestamp }
+                    }
+                },
+                // 2. Record Map 생성
+                { "Record", new Dictionary<string, object>
+                    {
+                        { "win", 0 },
+                        { "lose", 0 }
+                    }
+                },
+                // 3. Wallet Map 생성
+                { "Wallet", new Dictionary<string, object>
+                    {
+                        { "gold", 0 }
+                    }
+                }
             };
-            await userDocRef.Collection(COLLECTION_RECORD).Document(DOCUMENT_RECORD).SetAsync(Record);
+            //await userDocRef.SetAsync(data);
+            batch.Set(userDocRef, data);
+            Debug.Log("유저데이터 배치 완료");
+
+            if (TableManager.Instance == null) { Debug.LogError("TableManager 인스턴스가 없습니다!"); return; }
+            if (TableManager.Instance.HeroTable == null) { Debug.LogError("HeroTable이 로드되지 않았습니다!"); return; }
 
             // 3. 영웅 정보 생성 (CSV파서를 통한 TableManager에서 Id값 가져옴)
             var csvHeroDatas = TableManager.Instance.HeroTable.GetAll();
+
+            Debug.Log($"[Step 4] CSV 영웅 데이터 가져옴: {csvHeroDatas?.Count ?? 0}개");
+
             if (csvHeroDatas != null && csvHeroDatas.Count > 0)
             {
                 foreach (var heroData in csvHeroDatas)
@@ -104,16 +129,12 @@ public class UserDataStore : Singleton<UserDataStore>
                     };
 
                     // 서브 컬렉션에 영웅들 정보 생성
-                    await userDocRef.Collection(COLLECTION_HERO).Document(heroId).SetAsync(initHeroDbData);
+                    //await userDocRef.Collection(COLLECTION_HERO).Document(heroId).SetAsync(initHeroDbData);
+                    batch.Set(userDocRef.Collection(COLLECTION_HERO).Document(heroId), initHeroDbData);
                 }
             }
-            // 4. 지갑(재화) 정보 생성
-            var Wallet = new Dictionary<string, object>
-            {
-                { "gold", 0 }
-            };
-            await userDocRef.Collection(COLLECTION_WALLET).Document(DOCUMENT_WALLET).SetAsync(Wallet);
-
+            Debug.Log("[Step 5] 영웅 데이터 배치 설정 완료. 이제 커밋합니다.");
+            await batch.CommitAsync();
             Debug.Log($"[Firestore] 유저 '{nickname}' 생성 및 기본 영웅 {csvHeroDatas.Count}종 생성 완료");
         }
         catch (System.Exception e)
@@ -160,13 +181,11 @@ public class UserDataStore : Singleton<UserDataStore>
 
     #region DB Search
     // 유저 데이터 조회(uuid, 닉네임,경험치, 레벨, 생성 날짜 정보 사용)
-    public async Task<UserDbModel> GetUserDataAsync(string uuid)
+    public async Task<DbModel> GetUserDataAsync(string uuid)
     {
         var snapshot = await _firestore
             .Collection(COLLECTION_NAME)
             .Document(uuid)
-            .Collection(COLLECTION_PROFILE)
-            .Document(DOCUMENT_PROFILE)
             .GetSnapshotAsync();
 
         if (!snapshot.Exists)
@@ -175,19 +194,7 @@ public class UserDataStore : Singleton<UserDataStore>
             return null;
         }
 
-        var userData = snapshot.ConvertTo<UserDbModel>();
-
-        // TODO : UserDataManager에 적용 (싱글톤 패턴 사용 시)
-        //if (UserDataManager.Instance != null)
-        //{
-        //    UserDataManager.Instance.ApplyFromFirestore(
-        //        userData.uuid,
-        //        userData.nickName,
-        //        userData.win,
-        //        userData.lose
-        //    );
-        //}
-
+        var userData = snapshot.ConvertTo<DbModel>();
         return userData;
     }
 
@@ -222,46 +229,6 @@ public class UserDataStore : Singleton<UserDataStore>
         Debug.Log($"[Firestore] 유저 {uuid}로부터 {heroList.Count}개의 영웅 정보를 로드했습니다.");
         return heroList;
     }
-
-    // 전적 정보 조회(유저 Win, Lose 정보 사용)
-    public async Task<RecordModel> GetUserRecordDataAsync(string uuid)
-    {
-        var snapshot = await _firestore
-            .Collection(COLLECTION_NAME)
-            .Document(uuid)
-            .Collection(COLLECTION_RECORD)
-            .Document(DOCUMENT_RECORD)
-            .GetSnapshotAsync();
-
-        if (!snapshot.Exists)
-        {
-            Debug.LogWarning($"[Firestore] User data not found for UUID: {uuid}");
-            return null;
-        }
-        var userData = snapshot.ConvertTo<RecordModel>();
-
-        return userData;
-    }
-
-    // 지갑 정보 조회(유저 보유 골드 등)
-    public async Task<WalletModel> GetUserWalletDataAsync(string uuid)
-    {
-        var snapshot = await _firestore
-            .Collection(COLLECTION_NAME)
-            .Document(uuid)
-            .Collection(COLLECTION_WALLET)
-            .Document(DOCUMENT_WALLET)
-            .GetSnapshotAsync();
-
-        if (!snapshot.Exists)
-        {
-            Debug.LogWarning($"[Firestore] User data not found for UUID: {uuid}");
-            return null;
-        }
-        var userData = snapshot.ConvertTo<WalletModel>();
-
-        return userData;
-    }
     #endregion
 
     #region DB Update
@@ -271,31 +238,9 @@ public class UserDataStore : Singleton<UserDataStore>
         await _firestore
             .Collection(COLLECTION_NAME)
             .Document(uuid)
-            .Collection(COLLECTION_PROFILE)
-            .Document (DOCUMENT_PROFILE)
             .UpdateAsync(updates);
 
         Debug.Log($"[Firestore] User data updated for UUID: {uuid}");
-    }
-
-    // 승패 기록 업데이트
-    public async Task UpdateRecordAsync(string uuid, int winDelta, int loseDelta)
-    {
-        var docRef = _firestore.Collection(COLLECTION_NAME).Document(uuid)
-            .Collection(COLLECTION_RECORD).Document(DOCUMENT_RECORD);
-
-        await _firestore.RunTransactionAsync(async transaction =>
-        {
-            var snapshot = await transaction.GetSnapshotAsync(docRef);
-            var currentWin = snapshot.GetValue<int>("win");
-            var currentLose = snapshot.GetValue<int>("lose");
-
-            transaction.Update(docRef, new Dictionary<string, object>
-            {
-                { "win", currentWin + winDelta },
-                { "lose", currentLose + loseDelta }
-            });
-        });
     }
 
     // 영웅의 값 업데이트
@@ -322,32 +267,15 @@ public class UserDataStore : Singleton<UserDataStore>
             Debug.LogError($"[Firestore] 영웅 업데이트 실패: {e.Message}");
         }
     }
-
-    // 지갑 업데이트
-    public async Task UpdateWalletAsync(string uuid, int gold)
-    {
-        var docRef = _firestore.Collection(COLLECTION_NAME).Document(uuid)
-            .Collection(COLLECTION_WALLET).Document(DOCUMENT_WALLET);
-
-        await _firestore.RunTransactionAsync(async transaction =>
-        {
-            var snapshot = await transaction.GetSnapshotAsync(docRef);
-            var currentGold = snapshot.GetValue<int>("gold");
-
-            transaction.Update(docRef, new Dictionary<string, object>
-            {
-                { "gold", currentGold + gold }
-            });
-        });
-    }
     #endregion
+
 
     // 닉네임 중복 체크
     public async Task<bool> IsNicknameDuplicateAsync(string nickname)
     {
         var query = await _firestore.
-            Collection(COLLECTION_PROFILE).
-            WhereEqualTo("nickName", nickname)
+            Collection(COLLECTION_NAME).
+            WhereEqualTo("Profile.nickName", nickname)
             .GetSnapshotAsync();
 
         return query.Count > 0;
