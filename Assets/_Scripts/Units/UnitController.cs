@@ -214,15 +214,6 @@ public class UnitController : UnitBase
         return closest;
     }
 
-    //Stat 변경 시 NavMesh 갱신용 메서드 추가(이미 배치된 유닛의 이동속도 변경 시)
-    public void RefreshStatRuntime()
-    {
-        if (agent != null)
-        {
-            agent.speed = MoveSpeed;
-        }
-    }
-
     public UnitBase GetClosestTower()
     {
         // 함교가 없다면 게임이 끝난 상태니 행동 중지

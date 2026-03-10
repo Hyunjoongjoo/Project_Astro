@@ -68,6 +68,8 @@ public class HeroController : UnitController
         //UnitStat 초기화
         _unitStat.Init(statData);
 
+        _unitStat.OnStatChanged += RefreshStatRuntime;//이벤트 구독
+
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
@@ -90,6 +92,14 @@ public class HeroController : UnitController
         }
         DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
+    }
+
+    private void OnDestroy()
+    {
+        if (_unitStat != null)
+        {
+            _unitStat.OnStatChanged -= RefreshStatRuntime;//이벤트 해제
+        }
     }
 
     public override void FixedUpdateNetwork()
@@ -190,6 +200,15 @@ public class HeroController : UnitController
                 continue;
 
             ApplySkillAugments(player.Value);
+        }
+    }
+
+    //Stat 변경 시 NavMesh 갱신용 메서드 추가(이미 배치된 유닛의 이동속도 변경 시)
+    public void RefreshStatRuntime()
+    {
+        if (agent != null)
+        {
+            agent.speed = MoveSpeed;
         }
     }
 }
