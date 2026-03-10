@@ -5,14 +5,22 @@ using UnityEngine.UI;
 
 //3.5 리팩토링
 //덱 매니저가 뽑아준 카드 타입 보고 지정된 프리팹 생산 및 데이터 주입하도록 변경
+
+//3.10 리팩토링
+//Augment_Panel 2:2 로직에서 아군 출력 로직 구현
 public class AugmentWindowUI : BaseUI
 {
-    [SerializeField] Transform _cardContainer; // 카드 배치시킬 위치
+    [Header("내 증강 UI")]
+    [SerializeField] private Transform _myCardContainer; //MyAugment/Panel 연결
 
-    [Header("UI")]
+    [Header("아군 증강 UI (2vs2 전용)")]
+    [SerializeField] private GameObject _teamAugmentGroup; //TeamAugment 객체 자체 연결 (1vs1 땐 끄기 위함)
+    [SerializeField] private Transform _teamCardContainer; //TeamAugment/Panel 연결
+    [SerializeField] private TMP_Text _teamNameTxt; //TeamAugment/Team_Name 연결
+
+    [Header("공통 UI")]
     [SerializeField] private TMP_Text _timerTxt; //타이머
     [SerializeField] private Button _confirmBtn;
-
 
     //프리팹 3종
     [Header("UI Prefabs")]
@@ -31,9 +39,11 @@ public class AugmentWindowUI : BaseUI
     //생성된 카드 추적용 리스트
     private List<GameObject> _spawnedCards = new List<GameObject>();
 
-    public void SetupAndOpen(List<AugmentData> datas)
+    //3.10 리팩토링
+    //아군 데이터와 이름도 받을 수 있도록 매개변수 추가 (아군 데이터는 없을 수도 있으므로 null 허용)
+    public void SetupAndOpen(List<AugmentData> myDatas, List<AugmentData> teamDatas = null, string teamName = "")
     {
-        _currentDatas = datas;
+        _currentDatas = myDatas;
         _stageManager = FindFirstObjectByType<StageManager>();
         _isForcePicked = false;
         _selectedData = null;
@@ -50,47 +60,66 @@ public class AugmentWindowUI : BaseUI
 
         ClearCards();
 
-        //새 카드 생성
+        //내 카드 생성(클릭O)
+        SpawnCards(myDatas, _myCardContainer, true);
+
+        //아군 카드 생성(데이터가 넘어왔을 경우 = 2vs2 모드)
+        if (teamDatas != null && teamDatas.Count > 0)
+        {
+            if (_teamAugmentGroup != null) _teamAugmentGroup.SetActive(true);
+            if (_teamNameTxt != null) _teamNameTxt.text = teamName;
+
+            //아군 카드는 클릭 불가능
+            SpawnCards(teamDatas, _teamCardContainer, false);
+        }
+        else
+        {
+            //1vs1 모드이거나 아군 데이터가 없으면 아군 패널 숨김
+            if (_teamAugmentGroup != null) _teamAugmentGroup.SetActive(false);
+        }
+
+        base.Open();
+    }
+
+    //3.10
+    //카드 생성하는 중복 코드를 별도의 함수로 분리
+    private void SpawnCards(List<AugmentData> datas, Transform container, bool isInteractable)
+    {
         foreach (var data in datas)
         {
             GameObject prefabToSpawn = null;
 
-            //타입에 따라 알맞은 프리팹 선택
             switch (data.type)
             {
-                case AugmentType.Hero:
-                    prefabToSpawn = _heroCardPrefab;
-                    break;
-                case AugmentType.Skill:
-                    prefabToSpawn = _skillCardPrefab;
-                    break;
+                case AugmentType.Hero: prefabToSpawn = _heroCardPrefab; break;
+                case AugmentType.Skill: prefabToSpawn = _skillCardPrefab; break;
                 case AugmentType.Item:
                     prefabToSpawn = _itemCardPrefab;
-                    //아이템 프리팹이 비어있다면 에러 방지용 임시 할당
                     if (prefabToSpawn == null) prefabToSpawn = _heroCardPrefab;
                     break;
             }
 
             if (prefabToSpawn != null)
             {
-                //프리팹 생성 및 리스트에 추가
-                GameObject cardObj = Instantiate(prefabToSpawn, _cardContainer);
+                GameObject cardObj = Instantiate(prefabToSpawn, container);
                 _spawnedCards.Add(cardObj);
 
-                //IAugmentUI 인터페이스를 통해 데이터 주입
-                //영웅이든 스킬이든 상관없이 Setup 함수를 호출
                 if (cardObj.TryGetComponent(out IAugmentUI augmentUI))
                 {
                     augmentUI.Setup(data);
                 }
                 else
                 {
-                    Debug.LogError($"{prefabToSpawn.name} 프리팹에 IAugmentUI를 상속받은 스크립트가 없음");
+                    Debug.LogError($"{prefabToSpawn.name} 프리팹에 IAugmentUI 스크립트가 없음");
+                }
+
+                //아군 카드일 경우 클릭하지 못하도록 Button 비활성화
+                if (!isInteractable)
+                {
+                    if (cardObj.TryGetComponent(out Button btn)) btn.interactable = false;
                 }
             }
         }
-
-        base.Open();
     }
 
     //매 프레임 남은 시간 UI 갱신
