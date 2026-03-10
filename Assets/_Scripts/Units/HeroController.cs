@@ -24,9 +24,8 @@ public class HeroController : UnitController
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
     public ISkill CurUniqueSkill => curUniqueSkill;
-
     public float RespawnTime => _respawnTime;
-    public float HealPower => _unitStat.HealPower.Value;
+    
 
     public override void Spawned()
     {
@@ -42,9 +41,15 @@ public class HeroController : UnitController
         if (!Object.HasStateAuthority) return;
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
 
-        if (_stageManager.PlayerDataMap.TryGet(Object.InputAuthority, out PlayerNetworkData data))
+        //스킬 증강 적용
+        foreach (var player in _stageManager.PlayerDataMap)
         {
-            ApplySkillAugments(data);//스킬 증강 적용
+            if (player.Value.Team != team)
+            {
+                continue;
+            }
+
+            ApplySkillAugments(player.Value);
         }
 
         // 상태 인스턴스 생성
@@ -62,14 +67,17 @@ public class HeroController : UnitController
 
         //UnitStat 초기화
         _unitStat.Init(statData);
+        _unitStat.Attack.AddModifier(
+        new StatModifier(10, StatModType.Flat, this)
+    );
 
+        Debug.Log("공격력베이스 : " + _unitStat.Attack.BaseValue);
+        Debug.Log("최종공격력 : " + _unitStat.Attack.Value);
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
-        moveSpeed = _unitStat.MoveSpeed.Value;
-        searchRange = _unitStat.DetectRange.Value;
         _respawnTime = _unitStat.RespawnTime.Value;
-        agent.speed = moveSpeed;
+        agent.speed = MoveSpeed;
 
         if (agent != null)
         {
@@ -144,50 +152,33 @@ public class HeroController : UnitController
     //스킬 증강에 사용될 메서드 (스폰에 적용시 이미 배치된 영웅은 적용이 안될것인데....)
     private void ApplySkillAugments(PlayerNetworkData data)
     {
-        //StageManager stageManager = _stageManager;
+        //3.3 여현구
+        //배열에서 구조체로 바뀌어서 여기 수정했습니다.
+        for (int i = 0; i < SlotData_5.Length; i++)
+        {
+            string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+            if (string.IsNullOrEmpty(augmentId))
+                continue;
 
-        //if (stageManager == null)
-        //    return;
+            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
+            if (so == null)
+                continue;
 
-        //Team myTeam = team; //팀기준
+            if (so.TargetHeroID != unitId)
+                continue;
 
-        //foreach (var player in stageManager.PlayerDataMap)
-        //{
-        //    if (player.Value.Team != myTeam)
-        //        continue;
+            int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
 
-        //    PlayerNetworkData data = player.Value;
+            if (tierIndex >= so.Tiers.Length)
+                continue;
 
-            //3.3 여현구
-            //배열에서 구조체로 바뀌어서 여기 수정했습니다.
-            for (int i = 0; i < SlotData_5.Length; i++)
-            {
-                string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+            BaseSkillSO newSkill = so.Tiers[tierIndex].CombatSkillData;
 
-                if (string.IsNullOrEmpty(augmentId))
-                    continue;
-
-                SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
-                if (so == null)
-                    continue;
-
-                if (so.TargetHeroID != unitId)
-                    continue;
-
-                int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
-
-                if (tierIndex >= so.Tiers.Length)
-                    continue;
-
-                BaseSkillSO newSkill = so.Tiers[tierIndex].CombatSkillData;
-
-                if (newSkill == null)
-                    continue;
-                Debug.Log($"[스킬 증강 적용] {unitId} <- {augmentId}");
-                ChangeSkill(newSkill);
-            }
-        //}
-
+            if (newSkill == null)
+                continue;
+            Debug.Log($"[스킬 증강 적용] {unitId} <- {augmentId}");
+            ChangeSkill(newSkill);
+        }
     }
 
     //외부에서 스킬 증강을 갱신할 것이라면...
@@ -198,9 +189,12 @@ public class HeroController : UnitController
             return;
         }
 
-        if (_stageManager.PlayerDataMap.TryGet(Object.InputAuthority, out PlayerNetworkData data))
+        foreach (var player in _stageManager.PlayerDataMap)
         {
-            ApplySkillAugments(data);
+            if (player.Value.Team != team)
+                continue;
+
+            ApplySkillAugments(player.Value);
         }
     }
 }
