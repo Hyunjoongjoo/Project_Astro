@@ -5,6 +5,9 @@ using UnityEngine;
 // 이동하는 유닛과 건물 모두에게 공통된 속성 정의
 public abstract class UnitBase : NetworkBehaviour
 {
+    [Header("범위 체크용 빨간 원")]
+    [SerializeField] private float _testRange;
+    
     [Header("체력과 방어력 설정")]
     [Networked] public float MaxHealth { get; set; }
     protected float deffense;
@@ -111,4 +114,17 @@ public abstract class UnitBase : NetworkBehaviour
             HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, MaxHealth, unitType);
         }
     }
+
+#if UNITY_EDITOR
+    protected virtual void OnDrawGizmosSelected()//탐지 범위 시각화
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, _testRange);
+        if (_unitStat != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, _unitStat.DetectRange.Value);
+        }
+    }
+#endif
 }
