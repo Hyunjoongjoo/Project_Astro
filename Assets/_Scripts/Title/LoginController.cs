@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using UnityEngine;
 
 // 로그인 관련 비즈니스 로직
@@ -8,16 +9,16 @@ public class LoginController : MonoBehaviour
     [SerializeField] private LoginView _loginView;
     [SerializeField] private SignUpView _signUpView;
 
-    private AuthService _authService;
-    private UserDataStore _userDataStore;
+    [SerializeField] private AuthService _authService;
+    [SerializeField] private UserDataStore _userDataStore;
     private Action<string> _onLoginSuccess;
     private bool _isProcessing;
 
     public void Initialize(AuthService authService, UserDataStore userDataStore, Action<string> onLoginSuccess)
     {
-        _authService = authService;
-        _userDataStore = userDataStore;
-        _onLoginSuccess = onLoginSuccess;
+        this._authService = authService;
+        this._userDataStore = userDataStore;
+        this._onLoginSuccess = onLoginSuccess;
     }
 
     public void OnClickLogin()
@@ -28,7 +29,6 @@ public class LoginController : MonoBehaviour
     private async void HandleLogin()
     {
         if (_isProcessing) return;
-
         var credentials = _loginView.GetCredentials();
 
         // 입력값 검증

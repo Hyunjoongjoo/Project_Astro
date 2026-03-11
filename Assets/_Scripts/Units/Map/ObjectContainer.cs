@@ -5,8 +5,9 @@ using UnityEngine;
 public class ObjectContainer : Singleton<ObjectContainer>
 {
     [Header("영웅 & 미니언 경험치 (100당 1회 증강 선택)")]
-    public int minionAugmentExp;
-    public int heroAugmentExp;
+    private int MINION_AUGMENT_EXP;
+    private int SUPER_MINION_AUGMENT_EXP;
+    private int HERO_AUGMENT_EXP;
 
     [Header("전역 참조가 필요한 오브젝트")]
     public UnitBase[] blueSideStructure;
@@ -19,6 +20,10 @@ public class ObjectContainer : Singleton<ObjectContainer>
     private void Start()
     {
         BridgeIndex = 2;
+
+        MINION_AUGMENT_EXP = int.Parse(TableManager.Instance.ConfigTable.Get("augment_exp_minion").configValue);
+        SUPER_MINION_AUGMENT_EXP = int.Parse(TableManager.Instance.ConfigTable.Get("augment_exp_superminion").configValue);
+        HERO_AUGMENT_EXP = int.Parse(TableManager.Instance.ConfigTable.Get("augment_exp_hero").configValue);
     }
 
     public void IncreaseAugmentGauge(Team diedUnitTeam, UnitType type)
@@ -31,7 +36,7 @@ public class ObjectContainer : Singleton<ObjectContainer>
         // 죽은 유닛이 호출하니까
         // 게이지는 반대 팀을 채워줘야 함.
         Team targetTeam = diedUnitTeam == Team.Blue ? Team.Red : Team.Blue;
-        int amount = type == UnitType.Hero ? heroAugmentExp : minionAugmentExp;
+        int amount = type == UnitType.Hero ? HERO_AUGMENT_EXP : MINION_AUGMENT_EXP;
 
         OnIncreasedAugmentGauge?.Invoke(targetTeam, amount); 
     }
