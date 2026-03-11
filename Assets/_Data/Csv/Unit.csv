@@ -1,7 +1,7 @@
 유닛 테이블 기본키,유닛 이름,유닛의 설명,유닛 유형,유닛 기본 체력 수치,유닛 기본 공격력 수치,유닛 기본 치유력,유닛 기본 공격속도,받는 피해량 증감,유닛 이동 유형,유닛 기본 이동 속도,유닛 기본 탐지 범위,유닛 모델링 리소스
 id,unitName,unitDesc,unitType,baseHp,baseAttackPower,baseHealingPower,attackSpeed,damageReduce,moveType,moveSpeed,detectionRange,modeling
 string,string,string,enum,int,int,int,float,float,enum,float,float,string
-unit_minion,name_unit_minion,desc_unit_minion,minion,300,50,0,1.5,0,large,3,2,model_unit_minion
-unit_superminion,name_unit_superminion,desc_unit_superminion,minion,1000,10,0,1.5,0,large,3,2,model_unit_minion
-unit_bridge,name_unit_bridge,desc_unit_bridge,subtower,3000,150,0,1.5,0,fixed,0,3,model_unit_bridge
-unit_tower,name_unit_tower,desc_unit_tower,maintower,3000,150,0,1.5,0,fixed,0,3,model_unit_tower
+unit_minion,name_unit_minion,desc_unit_minion,minion,300,50,0,1.5,0,large,3,6,model_unit_minion
+unit_superminion,name_unit_superminion,desc_unit_superminion,minion,1000,10,0,1.5,0,large,3,6,model_unit_minion
+unit_bridge,name_unit_bridge,desc_unit_bridge,subtower,3000,150,0,1.5,0,fixed,0,8,model_unit_bridge
+unit_tower,name_unit_tower,desc_unit_tower,maintower,3000,150,0,1.5,0,fixed,0,8,model_unit_tower
