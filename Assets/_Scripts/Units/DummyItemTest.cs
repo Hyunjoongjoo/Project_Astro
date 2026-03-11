@@ -61,7 +61,7 @@ public class DummyItemTest : NetworkBehaviour
 
             Debug.Log($"[test] 공격력 증가 적용 → 현재 공격력: {_hero.AttackPower}");
         }
-        if (Input.GetKeyDown(KeyCode.U))
+        if (Input.GetKeyDown(KeyCode.Y))
         {
             Debug.Log("더미 아이템 사용 -> 힐량증가");
 
@@ -72,8 +72,12 @@ public class DummyItemTest : NetworkBehaviour
         }
         if (Input.GetKeyDown(KeyCode.D))
         {
-            _unitStat.RemoveModifier(EffectType.IncreaseAttackPower,this);
+            _unitStat.RemoveModifier(EffectType.IncreaseMoveSpeed, this);
+            _unitStat.RemoveModifier(EffectType.IncreaseDetectionRange, this);
+            _unitStat.RemoveModifier(EffectType.IncreaseDamageTaken, this);
             _unitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);
+            _unitStat.RemoveModifier(EffectType.IncreaseAttackPower,this);
+            _unitStat.RemoveModifier(EffectType.IncreaseHealPower, this);
             Debug.Log("더미 아이템 효과 제거");
         }
     }
