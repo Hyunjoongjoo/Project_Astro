@@ -70,9 +70,6 @@ public class HeroController : UnitController
 
         _unitStat.OnStatChanged += RefreshStatRuntime;//이벤트 구독
 
-        //데미지증가 적용 확인용(추후에 제거할듯)
-        _unitStat.AddModifier(EffectType.IncreaseAttackPower, new StatModifier(10f, StatModType.Flat, this));
-
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;

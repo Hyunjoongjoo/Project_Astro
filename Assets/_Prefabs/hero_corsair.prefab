@@ -161,12 +161,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0807c2c902d934c971569602ccad0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewHeroController
+  _testRange: 0
+  _MaxHealth: 0
   team: 0
   _networkedTeam: 0
   _CurrentHealth: 0
   agent: {fileID: 0}
-  moveSpeed: 0
-  searchRange: 0
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
