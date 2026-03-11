@@ -68,7 +68,7 @@ public enum SkillType
     NormalAttack,
     NormalSkill,
     AugmentSkill,
-    AugmentSkillEnhance,
+    EnhanceAugmentSkill,
     PassiveSkill
 }
 

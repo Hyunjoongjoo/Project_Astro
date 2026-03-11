@@ -463,31 +463,57 @@ public class AugmentController : NetworkBehaviour
     }
 
     //통과
+    //3.10 무료 증강 예외처리 삭제 & 이중 차감 방지 로직 구현
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_ConfirmAugment(string targetId, AugmentType type, PlayerRef player)
     {
-        //마스터 권한인 경우엔 PlayerNetworkData 업데이트
+        //마스터 권한인 경우엔 PlayerNetworkData 업데이트 및 게이지 차감 처리
         if (Object.HasStateAuthority)
         {
-            AugmentExecutor.ApplyAugment(_stageManager, player, type, targetId);
-
-            //나를 포함한 모든 유저에게 갱신 알림을 보냄
-            RPC_NotifyTeammateRefresh(player);
-
-            //호스트만 처리하도록 안으로 이동
             if (_stageManager.PlayerDataMap.TryGet(player, out PlayerNetworkData data))
             {
-                //서버 승인이 떨어졌으므로, 100 게이지를 차감
-                _stageManager.DecreaseAugmentGauge(data.Team, 120);
-            }
-            //선택이 확정되었으므로 인게임 타이머 정지 및 초기화
-            if (_stageManager.CurrentState == StageState.Playing)
-            {
-                IsPlayerAugmenting.Set(player, false);
-                PlayerAugmentTimers.Set(player, 0f);
-            }
-        }
+                Team myTeam = data.Team;
 
+                //카드 확정 전에 우리 팀의 현재 최대 증강 횟수 파악
+                int currentTeamMaxPicks = 0;
+                foreach (var kvp in _stageManager.PlayerDataMap)
+                {
+                    if (kvp.Value.Team == myTeam && kvp.Value.TotalAugmentPicks > currentTeamMaxPicks)
+                    {
+                        currentTeamMaxPicks = kvp.Value.TotalAugmentPicks;
+                    }
+                }
+
+                //실제 데이터 적용
+                AugmentExecutor.ApplyAugment(_stageManager, player, type, targetId);
+
+                var updatedData = _stageManager.PlayerDataMap.Get(player);
+
+                //내 새로운 픽 횟수가 팀의 기존 최대 픽 횟수보다 크다면 얘가 결제
+                if (updatedData.TotalAugmentPicks > currentTeamMaxPicks)
+                {
+                    //Config 테이블에서 비용 가져오기 (기본값 120)
+                    int cost = 120;
+                    var config = TableManager.Instance.ConfigTable.Get("augment_gauge");
+                    if (config != null) cost = int.Parse(config.configValue);
+
+                    _stageManager.DecreaseAugmentGauge(myTeam, cost);
+                }
+                else
+                {
+                    Debug.Log($"[{myTeam}] 아군이 이미 게이지 소모해서 패스");
+                }
+
+                //인게임 타이머 초기화 처리
+                if (_stageManager.CurrentState == StageState.Playing)
+                {
+                    IsPlayerAugmenting.Set(player, false);
+                    PlayerAugmentTimers.Set(player, 0f);
+                }
+            }
+            //나를 포함한 모든 유저에게 갱신 알림을 보냄
+            RPC_NotifyTeammateRefresh(player);
+        }
         //카드를 산 사람이 로컬이 맞다면, UI를 갱신
         if (player == Runner.LocalPlayer)
         {
@@ -499,8 +525,6 @@ public class AugmentController : NetworkBehaviour
                     AugmentManager.Instance.AddHeroCard(_localSelectedData);
                     _localSelectedData = null; // 다 썼으니 비워줌
                 }
-
-                //HeroIconSO가 추가되면 아이콘로직 추가
             }
 
             //토글버튼 숨김

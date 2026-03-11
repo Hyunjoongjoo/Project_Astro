@@ -4445,6 +4445,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UserDataStore
   _dontDestroyOnLoad: 1
+--- !u!1 &1417593291
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1417593293}
+  - component: {fileID: 1417593292}
+  m_Layer: 0
+  m_Name: AuthService
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1417593292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417593291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8c2e5e03b082f8439ec105ae8021999, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AuthService
+  _dontDestroyOnLoad: 1
+--- !u!4 &1417593293
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417593291}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 399.53214, y: 1028.1241, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1425347252
 GameObject:
   m_ObjectHideFlags: 0
@@ -6818,7 +6863,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1782207119}
   - component: {fileID: 1782207118}
-  - component: {fileID: 1782207123}
   - component: {fileID: 1782207121}
   - component: {fileID: 1782207120}
   m_Layer: 0
@@ -6840,8 +6884,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2cf01dec4c59e46a1e24772f32d9dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleController
-  _authService: {fileID: 1782207123}
-  _userDataStore: {fileID: 1403576596}
   _loginController: {fileID: 1782207121}
   _signUpController: {fileID: 1782207120}
 --- !u!4 &1782207119
@@ -6890,18 +6932,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LoginController
   _loginView: {fileID: 447407635}
   _signUpView: {fileID: 678791463}
---- !u!114 &1782207123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1782207117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8c2e5e03b082f8439ec105ae8021999, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AuthService
 --- !u!1 &1826496591
 GameObject:
   m_ObjectHideFlags: 0
@@ -7644,3 +7674,4 @@ SceneRoots:
   - {fileID: 24780332}
   - {fileID: 1695326067}
   - {fileID: 1602770698}
+  - {fileID: 1417593293}

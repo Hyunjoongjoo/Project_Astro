@@ -157,9 +157,9 @@ public class HeroDetailPresenter : MonoBehaviour
                         HeroStatData oldStatus = HeroManager.Instance.GetStatus(_heroData.id);
 
                         int nextLevel = userHero.level + 1;
-                        // 레벨업 시 경험치를 0으로 초기화
+                        // 레벨업 시 골드,경험치 삭감
                         await UserDataManager.Instance.UpdateWallet(-costData.goldRequirement);
-                        await UserDataManager.Instance.UpdateHero(_heroData.id, nextLevel, 0, true);
+                        await UserDataManager.Instance.UpdateHero(_heroData.id, nextLevel, userHero.exp - costData.expRequirement, true);
 
                         RefreshAll();
                         ShowUpgradeResult(oldStatus);
