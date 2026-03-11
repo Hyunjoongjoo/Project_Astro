@@ -132,8 +132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NewHeroController
   _testRange: 0
   deathEffectPrefab: {fileID: 2657706564968800909, guid: d0eee260816bd1440b043ff10e023225, type: 3}
-  deathEffectLifeTime: 2
-  modelRoot: {fileID: 2207229902267668355}
+  deathEffectLifeTime: 0.5
   _MaxHealth: 0
   team: 0
   _networkedTeam: 0
