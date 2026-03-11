@@ -12,10 +12,9 @@ public class MinionSpawner : NetworkBehaviour
     [SerializeField] private Transform[] _blueLanes;
     [SerializeField] private Transform[] _redLanes;
 
-    [Header("웨이브 설정")]
-    [SerializeField] private float _waveInterval = 15f;  // 웨이브 주기 (초)
-    [SerializeField] private int _minionsPerLane = 3;    // 레인당 미니언 수
-    [SerializeField] private float _spawnDelay = 0.3f; // 미니언 간 스폰 간격 (초)
+    private float WAVE_INTERVAL;  // 웨이브 주기 (초)
+    private int MINIONS_PER_LANE;    // 레인당 미니언 수
+    private float _spawnDelay = 0.3f; // 미니언 간 스폰 간격 (초)
 
     [Networked] public int CurrentWave { get; private set; }
 
@@ -28,6 +27,11 @@ public class MinionSpawner : NetworkBehaviour
 
     private TickTimer _spawnDelayTimer;
 
+    private void Start()
+    {
+        WAVE_INTERVAL = float.Parse(TableManager.Instance.ConfigTable.Get("minion_spawn_time").configValue);
+        MINIONS_PER_LANE = int.Parse(TableManager.Instance.ConfigTable.Get("minion_spawn_count").configValue);
+    }
 
     public override void Spawned()
     {
@@ -57,7 +61,7 @@ public class MinionSpawner : NetworkBehaviour
         if (_waveTimer.ExpiredOrNotRunning(Runner))
         {
             EnqueueNextWave();
-            _waveTimer = TickTimer.CreateFromSeconds(Runner, _waveInterval);
+            _waveTimer = TickTimer.CreateFromSeconds(Runner, WAVE_INTERVAL);
         }
     }
 
@@ -77,7 +81,7 @@ public class MinionSpawner : NetworkBehaviour
         }
 
         // 큐에 순차적으로 담음
-        for (int minionIdx = 0; minionIdx < _minionsPerLane; minionIdx++)
+        for (int minionIdx = 0; minionIdx < MINIONS_PER_LANE; minionIdx++)
         {
             for (int laneIdx = 0; laneIdx < maxLanes; laneIdx++)
             {
@@ -156,11 +160,5 @@ public class MinionSpawner : NetworkBehaviour
         IsActive = false;
         _spawnQueue.Clear();
         Debug.Log($"[MinionSpawner] 스포너 중단 (함교 파괴)");
-    }
-
-    public void SetMinionsPerLane(int count)
-    {
-        if (!Object.HasInputAuthority) return;
-        _minionsPerLane = Mathf.Max(1, count);
     }
 }

@@ -64,8 +64,8 @@ public class StageManager : NetworkBehaviour
 
     private int _requiredPlayerCount;
 
-    private readonly int GAME_DURATION = 240;
-    private readonly int AUGMENT_GAUGE_CAPACITY = 240;
+    private int GAME_DURATION;
+    private int AUGMENT_GAUGE;
     private readonly float PLAYER_INFO_DURATION = 4f;
     private readonly float COUNTDOWN_INTERVAL = 1f;
 
@@ -97,6 +97,15 @@ public class StageManager : NetworkBehaviour
         _userDataManager = FindFirstObjectByType<UserDataManager>();
         if (_userDataManager == null)
             Debug.Log("UserDataManager 찾지 못함");
+    }
+
+    private void Start()
+    {
+        if (_stageUI != null)
+            _stageUI.SetMaxValueAugmentSlider(AUGMENT_GAUGE);
+
+        AUGMENT_GAUGE = int.Parse(TableManager.Instance.ConfigTable.Get("augment_gauge").configValue);
+        GAME_DURATION = int.Parse(TableManager.Instance.ConfigTable.Get("game_time_limit").configValue);
     }
 
     public void Initialize(MatchType matchType, int requiredPlayerCount, bool existDummy)
@@ -467,7 +476,7 @@ public class StageManager : NetworkBehaviour
     {
         if ( AugmentExp.TryGet(team, out int curExp) )
         {
-            int value = AugmentExp.Set(team, Mathf.Min(AUGMENT_GAUGE_CAPACITY, curExp + amount));
+            int value = AugmentExp.Set(team, curExp + amount);
             RPC_UpdateAugmentGauge(team, value);
         }
 
