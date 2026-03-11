@@ -64,6 +64,7 @@ MonoBehaviour:
   _statNameTxt: {fileID: 5777562135727986918}
   _statValueTxt: {fileID: 8899969118205833989}
   _statIcon: {fileID: 7320396874648389025}
+  _panel: {fileID: 1806147070312628317}
 --- !u!114 &1806147070312628317
 MonoBehaviour:
   m_ObjectHideFlags: 0
