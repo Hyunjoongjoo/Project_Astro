@@ -620,7 +620,7 @@ public class StageManager : NetworkBehaviour
     public async void ShutDownAndSceneChange()
     {
         await Runner.Shutdown();
-
+        GameManager.Instance.SetSceneState(SceneState.Lobby);
         SceneManager.LoadScene("Lobby");
     }
 
