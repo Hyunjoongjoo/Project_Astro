@@ -5,8 +5,7 @@ using UnityEngine.UI;
 public enum DescriptionType
 {
     Skill,
-    Augment,
-    LevelReward
+    Augment
 }
 public class HeroDetailView : BaseUI
 {
@@ -22,13 +21,11 @@ public class HeroDetailView : BaseUI
     [SerializeField] private TMP_Text _heroExpTxt;
     [SerializeField] private Image _heroExpBar;
 
-    [Header("상세 설명 설정")]
+    [Header("스킬&증강 페이지 설정")]
     [SerializeField] private Transform _skillDesContainer;
     [SerializeField] private Transform _augmentDesContainer;
-    [SerializeField] private Transform _levelRewardDesContainer;
     [SerializeField] private Transform _skillIconContainer;
     [SerializeField] private Transform _augmentIconContainer;
-    [SerializeField] private Transform _levelRewardIconContainer;
     [SerializeField] private GameObject _skillIconPrefab;
     [SerializeField] private GameObject _desPanelPrefab;
 
@@ -50,14 +47,12 @@ public class HeroDetailView : BaseUI
     {
         DescriptionType.Skill => _skillDesContainer,
         DescriptionType.Augment => _augmentDesContainer,
-        DescriptionType.LevelReward => _levelRewardDesContainer,
         _ => null
     };
     private Transform GetIconContainer(DescriptionType type) => type switch
     {
         DescriptionType.Skill => _skillIconContainer,
         DescriptionType.Augment => _augmentIconContainer,
-        DescriptionType.LevelReward => _levelRewardIconContainer,
         _ => null
     };
 
@@ -118,12 +113,12 @@ public class HeroDetailView : BaseUI
         foreach (Transform child in container) Destroy(child.gameObject);
     }
     //스텟 판넬 설정후 소환
-    public void AddStatItem(string name, string value, Sprite icon)
+    public void AddStatItem(string name, string value, Sprite icon, Color color = default)
     {
         GameObject obj = Instantiate(_statPanelPrefab, _statContainer);
         if (obj.TryGetComponent(out StatPanelUI statItem))
         {
-            statItem.SetStat(name, value, icon);
+            statItem.SetStat(name, value, icon, color);
         }
     }
 

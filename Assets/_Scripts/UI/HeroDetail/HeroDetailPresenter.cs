@@ -224,8 +224,7 @@ public class HeroDetailPresenter : MonoBehaviour
     }
     private void UpdateLevelRewardDesPage()
     {
-        _view.ClearDescription(DescriptionType.LevelReward);
-        _view.ClearIcons(DescriptionType.LevelReward);
+
     }
 
     //스텟 페이지 갱신
@@ -237,11 +236,11 @@ public class HeroDetailPresenter : MonoBehaviour
         if (status == null) return;
 
         //성장수치 보여줄 애들은 성장수치도 보여주기
-        _view.AddStatItem("체력", $"{status.BaseHp} <color=#000BFF>(+{tableBase.ipLvHp})</color>", _statIcons.GetIcon(StatType.Hp));
-        _view.AddStatItem("공격력", $"{status.baseAttackPower} <color=#000BFF>(+{tableBase.ipLvAttackPower})</color>", _statIcons.GetIcon(StatType.AttackPower));
+        _view.AddStatItem("체력", $"{status.BaseHp} <color=#FF0500>(+{tableBase.ipLvHp})</color>", _statIcons.GetIcon(StatType.Hp),Color.green);
+        _view.AddStatItem("공격력", $"{status.baseAttackPower} <color=#FF0500>(+{tableBase.ipLvAttackPower})</color>", _statIcons.GetIcon(StatType.AttackPower), Color.green);
 
         if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0)
-            _view.AddStatItem("치유력", $"{status.baseHealingPower} <color=#000BFF>(+{tableBase.ipLvHealingPower})</color>", _statIcons.GetIcon(StatType.HealingPower));
+            _view.AddStatItem("치유력", $"{status.baseHealingPower} <color=#FF0500>(+{tableBase.ipLvHealingPower})</color>", _statIcons.GetIcon(StatType.HealingPower), Color.green);
 
         _view.AddStatItem("공격 속도", status.attackSpeed.ToString("F2"), _statIcons.GetIcon(StatType.AttackSpeed));
         _view.AddStatItem("이동 속도", status.moveSpeed.ToString("F1"), _statIcons.GetIcon(StatType.MoveSpeed));

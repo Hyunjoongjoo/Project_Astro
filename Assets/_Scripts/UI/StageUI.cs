@@ -34,6 +34,11 @@ public class StageUI : MonoBehaviour
         _resultPanel.gameObject.SetActive(false);
     }
 
+    public void SetMaxValueAugmentSlider(int value)
+    {
+        _augmentGauge.maxValue = value;
+    }
+
     public void LocalInitialize(MatchType matchType, Team team)
     {
         _matchType = matchType;
@@ -162,8 +167,8 @@ public class StageUI : MonoBehaviour
 
     public void UpdateAugmentGauge(int value)
     {
-        _augmentGauge.value = value;
-        if (_augmentGauge.value >= 100f)
+        _augmentGauge.value = Mathf.Min(_augmentGauge.maxValue, value);
+        if (_augmentGauge.value >= _augmentGauge.maxValue)
             AugmentManager.Instance.ShowAugmentToggleBtn();
         else
             AugmentManager.Instance.HideAugmentToggleBtn();

@@ -79,7 +79,7 @@ public class UserDataStore : Singleton<UserDataStore>
             // 0. Hero제외 다른 데이터의 묶음 처리
             var data = new Dictionary<string, object>
             {
-                // 1. Profile Map 생성
+                // Profile Map 생성
                 { "Profile", new Dictionary<string, object>
                     {
                         { "uuid", uuid },
@@ -89,14 +89,14 @@ public class UserDataStore : Singleton<UserDataStore>
                         { "createdAt", FieldValue.ServerTimestamp }
                     }
                 },
-                // 2. Record Map 생성
+                // Record Map 생성
                 { "Record", new Dictionary<string, object>
                     {
                         { "win", 0 },
                         { "lose", 0 }
                     }
                 },
-                // 3. Wallet Map 생성
+                // Wallet Map 생성
                 { "Wallet", new Dictionary<string, object>
                     {
                         { "gold", 0 }
@@ -107,8 +107,17 @@ public class UserDataStore : Singleton<UserDataStore>
             batch.Set(userDocRef, data);
             Debug.Log("유저데이터 배치 완료");
 
-            if (TableManager.Instance == null) { Debug.LogError("TableManager 인스턴스가 없습니다!"); return; }
-            if (TableManager.Instance.HeroTable == null) { Debug.LogError("HeroTable이 로드되지 않았습니다!"); return; }
+            if (TableManager.Instance == null) 
+            {
+                Debug.LogError("TableManager 인스턴스가 없습니다!"); 
+                return; 
+            }
+
+            if (TableManager.Instance.HeroTable == null) 
+            { 
+                Debug.LogError("HeroTable이 로드되지 않았습니다!"); 
+                return; 
+            }
 
             // 3. 영웅 정보 생성 (CSV파서를 통한 TableManager에서 Id값 가져옴)
             var csvHeroDatas = TableManager.Instance.HeroTable.GetAll();
@@ -133,7 +142,8 @@ public class UserDataStore : Singleton<UserDataStore>
                     batch.Set(userDocRef.Collection(COLLECTION_HERO).Document(heroId), initHeroDbData);
                 }
             }
-            Debug.Log("[Step 5] 영웅 데이터 배치 설정 완료. 이제 커밋합니다.");
+            Debug.Log("[Step 5] 영웅 데이터 배치 설정 완료");
+            // awite Exception 관련 이슈 출력 기능 추가.
             await batch.CommitAsync();
             Debug.Log($"[Firestore] 유저 '{nickname}' 생성 및 기본 영웅 {csvHeroDatas.Count}종 생성 완료");
         }
