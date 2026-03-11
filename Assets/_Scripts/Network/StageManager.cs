@@ -101,11 +101,11 @@ public class StageManager : NetworkBehaviour
 
     private void Start()
     {
-        if (_stageUI != null)
-            _stageUI.SetMaxValueAugmentSlider(AUGMENT_GAUGE);
-
         AUGMENT_GAUGE = int.Parse(TableManager.Instance.ConfigTable.Get("augment_gauge").configValue);
         GAME_DURATION = int.Parse(TableManager.Instance.ConfigTable.Get("game_time_limit").configValue);
+
+        if (_stageUI != null)
+            _stageUI.SetMaxValueAugmentSlider(AUGMENT_GAUGE);
     }
 
     public void Initialize(MatchType matchType, int requiredPlayerCount, bool existDummy)
