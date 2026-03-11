@@ -29,7 +29,7 @@ public abstract class UnitBase : NetworkBehaviour
 
     public Team team;
     [Networked] public Team networkedTeam {  get;  set; }
-
+    [Networked] private TickTimer _despawnTimer { get; set; }
     public UnitType UnitType => unitType;
     public bool IsDead { get; private set; }
 
@@ -55,7 +55,14 @@ public abstract class UnitBase : NetworkBehaviour
         }
     }
 
-    public override void FixedUpdateNetwork() { }
+    public override void FixedUpdateNetwork() 
+    {
+        if (!Object.HasStateAuthority) return;
+        if (_despawnTimer.Expired(Runner))
+        {
+            Runner.Despawn(selfNetworkObj);
+        }
+    }
 
     // 매개변수 값은 아무 계산도 안한 순수 데미지 초기값
     // 여기서 최종 받는 데미지를 계산한다.
@@ -126,9 +133,8 @@ public abstract class UnitBase : NetworkBehaviour
             ObjectContainer.Instance.IncreaseAugmentGauge(team, unitType);
 
             RPC_PlayDeathEffect(transform.position, transform.rotation);
+            _despawnTimer = TickTimer.CreateFromSeconds(Runner, 0.1f);
         }
-
-        Runner.Despawn(selfNetworkObj);
     }
 
     // 체력이 변했을 때 모든 클라이언트에서 실행될 콜백
