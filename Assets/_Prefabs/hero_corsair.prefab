@@ -164,6 +164,7 @@ MonoBehaviour:
   _testRange: 0
   deathEffectPrefab: {fileID: 2657706564968800909, guid: d0eee260816bd1440b043ff10e023225, type: 3}
   deathEffectLifeTime: 2
+  modelRoot: {fileID: 1619433986598075239}
   _MaxHealth: 0
   team: 0
   _networkedTeam: 0

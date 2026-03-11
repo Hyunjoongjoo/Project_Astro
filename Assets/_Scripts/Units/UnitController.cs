@@ -91,7 +91,6 @@ public class UnitController : UnitBase
 
     public override void FixedUpdateNetwork()
     {
-        base.FixedUpdateNetwork();
         if (!Object.HasStateAuthority) return;
         if (IsDead) return; // 사망 시 중단 (혹은 DieState에서 처리)
 

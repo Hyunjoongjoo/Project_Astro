@@ -10,7 +10,7 @@ public abstract class UnitBase : NetworkBehaviour
 
     [Header("사망 이펙트")]
     [SerializeField] protected GameObject deathEffectPrefab;
-    [SerializeField] protected float deathEffectLifeTime = 2f;
+    [SerializeField] protected float deathEffectLifeTime = 0.5f;
 
     [Header("체력과 방어력 설정")]
     [Networked] public float MaxHealth { get; set; }
@@ -28,12 +28,11 @@ public abstract class UnitBase : NetworkBehaviour
     protected NetworkObject selfNetworkObj;
 
     public Team team;
-    [Networked] public Team networkedTeam {  get;  set; }
-    [Networked] private TickTimer _despawnTimer { get; set; }
+    [Networked] public Team networkedTeam { get; set; }
     public UnitType UnitType => unitType;
     public bool IsDead { get; private set; }
 
-    [Networked, HideInInspector, OnChangedRender(nameof(OnHealthChanged))] 
+    [Networked, HideInInspector, OnChangedRender(nameof(OnHealthChanged))]
     public float CurrentHealth { get; set; }
 
     // 죽었을 때 이벤트를 알리며 자신의 타입을 알림
@@ -55,14 +54,7 @@ public abstract class UnitBase : NetworkBehaviour
         }
     }
 
-    public override void FixedUpdateNetwork() 
-    {
-        if (!Object.HasStateAuthority) return;
-        if (_despawnTimer.Expired(Runner))
-        {
-            Runner.Despawn(selfNetworkObj);
-        }
-    }
+    public override void FixedUpdateNetwork() { }
 
     // 매개변수 값은 아무 계산도 안한 순수 데미지 초기값
     // 여기서 최종 받는 데미지를 계산한다.
@@ -112,7 +104,7 @@ public abstract class UnitBase : NetworkBehaviour
     {
         if (!Object.HasStateAuthority) return;
         if (IsDead) return;
-        
+
         CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
     }
 
@@ -132,9 +124,8 @@ public abstract class UnitBase : NetworkBehaviour
         {
             ObjectContainer.Instance.IncreaseAugmentGauge(team, unitType);
 
-            RPC_PlayDeathEffect(transform.position, transform.rotation);
-            _despawnTimer = TickTimer.CreateFromSeconds(Runner, 0.1f);
-        }
+            Runner.Despawn(Object);
+        }      
     }
 
     // 체력이 변했을 때 모든 클라이언트에서 실행될 콜백
@@ -149,16 +140,20 @@ public abstract class UnitBase : NetworkBehaviour
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    protected void RPC_PlayDeathEffect(Vector3 position, Quaternion rotation)
+    //사망 이펙트
+    public override void Despawned(NetworkRunner runner, bool hasState)
     {
-        if (deathEffectPrefab == null)
+        if (!hasState) return;
+        if (deathEffectPrefab != null)
         {
-            return;
-        }
+            GameObject deathEffectObject = Instantiate(
+                deathEffectPrefab,
+                transform.position,
+                transform.rotation
+            );
 
-        GameObject deathEffectObject = Instantiate(deathEffectPrefab, position, rotation);
-        Destroy(deathEffectObject, deathEffectLifeTime);
+            Destroy(deathEffectObject, deathEffectLifeTime);
+        }
     }
 
 #if UNITY_EDITOR
