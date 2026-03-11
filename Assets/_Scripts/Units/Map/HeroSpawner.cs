@@ -140,18 +140,7 @@ public class HeroSpawner : NetworkBehaviour
                 hero.Setup(team, spawnPos, deployDelay);
                 //배치 및 지연 처리는 컨트롤러가 수행
                 StartSummonCooldown(caller, prefab, hero.RespawnTime);
-
-                StageManager stageManager = FindFirstObjectByType<StageManager>();
-
-                if (stageManager != null && hero != null)
-                {
-                    // 소환을 요청한 클라이언트의 비트에 해당 영웅 ID 기록
-                    stageManager.MarkHeroUsed(caller, hero.HeroId);
-                    Debug.Log($"[Masking] Player {caller}가 사용한 영웅 : {hero.HeroId}");
-                }
             });
-
-
         Debug.Log($"영웅 소환 완료!");
     }
 }

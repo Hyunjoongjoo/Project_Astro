@@ -97,6 +97,18 @@ public class AugmentManager : Singleton<AugmentManager>
         {
             card.Setup(data);
         }
+
+        if (_cachedStageManager == null)
+        {
+            _cachedStageManager = FindFirstObjectByType<StageManager>();
+        }
+
+        if (_cachedStageManager != null)
+        {
+            // 증강 선택은 로컬 플레이어가 수행하므로 Runner.LocalPlayer를 사용
+            _cachedStageManager.RPC_MarkHeroUsed(_cachedStageManager.Runner.LocalPlayer, data.targetId);
+            Debug.Log($"[Masking] 증강 선택으로 영웅 기록됨: {data.targetId}");
+        }
     }
 
     //3.9 타임아웃 시 실행될 강제 픽 함수 추가
