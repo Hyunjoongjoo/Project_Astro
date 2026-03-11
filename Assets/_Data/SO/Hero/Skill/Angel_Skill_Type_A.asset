@@ -20,7 +20,7 @@ MonoBehaviour:
   skillType: 2
   initCooldown: 5
   cooldown: 10
-  recoveryAmount: 100
+  healCoefficient: 1.5
   range: 3
   duration: 0
   interval: 0

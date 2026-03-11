@@ -137,7 +137,8 @@ public class HealSkill : ISkill
         {
             if (target != null)
             {
-                target.TakeHeal(_data.recoveryAmount);//나중에 스탯기반으로 교체
+                float healAmount = _cachedUnit.HealPower * _data.healCoefficient;
+                target.TakeHeal(healAmount);//치유량 * 스킬계수
                 Debug.Log($"힐 적용 → {target.name} / {target.CurrentHealth}");
                 // RPC로 이펙트 출력 요청 (NetworkObject의 Id를 넘겨 타겟 식별)
                 if (target.Object != null)
@@ -153,7 +154,8 @@ public class HealSkill : ISkill
     {
         float elapsed = 0f;
         int tickCount = Mathf.FloorToInt(_data.duration / _data.interval);
-        float healPerTick = _data.recoveryAmount / tickCount; // 총 회복량을 틱당 회복량으로 분할
+        float totalHeal = _cachedUnit.HealPower * _data.healCoefficient;
+        float healPerTick = totalHeal / tickCount; // 총 회복량을 틱당 회복량으로 분할
         WaitForSeconds delay = new WaitForSeconds(_data.interval);
 
         while (elapsed < _data.duration)

@@ -4,7 +4,7 @@
 public class HealSkillSO : BaseSkillSO
 {
     [Header("치유형 스킬의 속성")]
-    public float recoveryAmount;
+    public float healCoefficient = 1.5f;
     public float range;
     public float duration;
     public float interval;
