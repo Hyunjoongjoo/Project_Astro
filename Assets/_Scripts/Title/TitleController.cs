@@ -5,15 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class TitleController : MonoBehaviour
 {
-    [Header("Services")]
-    [SerializeField] private AuthService _authService;
-    [SerializeField] private UserDataStore _userDataStore;
-
     [Header("Controllers")]
     [SerializeField] private LoginController _loginController;
     [SerializeField] private SignUpController _signUpController;
 
-    void Awake()
+    private UserDataStore _userDataStore;
+    private AuthService _authService;
+
+    void Start()
     {
         InitializeFirebase();
         GameManager.Instance.SetSceneState(SceneState.Title);
@@ -21,6 +20,18 @@ public class TitleController : MonoBehaviour
 
     private void InitializeFirebase()
     {
+        // 이미 Firebase가 준비되어 있고 AuthService가 살아있다면 굳이 다시 체크할 필요 없습니다.
+        if (AuthService.Instance != null && AuthService.Instance.Auth != null)
+        {
+            Debug.Log("[Title] 이미 Firebase가 초기화되어 있습니다. 참조만 재연결합니다.");
+            _authService = AuthService.Instance;
+            _userDataStore = UserDataStore.Instance;
+
+            _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
+            _signUpController.Initialize(_authService, _userDataStore);
+            return;
+        }
+
         FirebaseApp.CheckAndFixDependenciesAsync().
             ContinueWithOnMainThread(task =>
             {
@@ -29,12 +40,26 @@ public class TitleController : MonoBehaviour
                     Debug.LogError($"Firebase Depenedency Error : {task.Result}");
                     return;
                 }
+                _authService = AuthService.Instance;
+                _userDataStore = UserDataStore.Instance;
 
-                _authService.Initialize();
-                _userDataStore.Initialize();
+                if (_authService == null) _authService = FindFirstObjectByType<AuthService>();
+                if (_userDataStore == null) _userDataStore = FindFirstObjectByType<UserDataStore>();
 
-                _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
-                _signUpController.Initialize(_authService, _userDataStore);
+                if (_authService != null)
+                {
+                    _authService.Initialize();
+                    _userDataStore.Initialize();
+
+                    _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
+                    _signUpController.Initialize(_authService, _userDataStore);
+
+                    Debug.Log("[Title] Firebase 및 서비스 주입 완료");
+                }
+                else
+                {
+                    Debug.LogError("[Title] AuthService를 찾을 수 없음");
+                }
             });
     }
 
