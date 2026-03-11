@@ -5,8 +5,7 @@ using UnityEngine.UI;
 public enum DescriptionType
 {
     Skill,
-    Augment,
-    LevelReward
+    Augment
 }
 public class HeroDetailView : BaseUI
 {
@@ -22,15 +21,20 @@ public class HeroDetailView : BaseUI
     [SerializeField] private TMP_Text _heroExpTxt;
     [SerializeField] private Image _heroExpBar;
 
-    [Header("상세 설명 설정")]
+    [Header("스킬&증강 페이지 설정")]
     [SerializeField] private Transform _skillDesContainer;
     [SerializeField] private Transform _augmentDesContainer;
-    [SerializeField] private Transform _levelRewardDesContainer;
     [SerializeField] private Transform _skillIconContainer;
     [SerializeField] private Transform _augmentIconContainer;
-    [SerializeField] private Transform _levelRewardIconContainer;
     [SerializeField] private GameObject _skillIconPrefab;
     [SerializeField] private GameObject _desPanelPrefab;
+
+    [Header("레벨 보상 페이지 설정")]
+    [SerializeField] private Button[] _rewardBtns;
+    [SerializeField] private GameObject[] _lockImgs;
+    [SerializeField] private TMP_Text _rewardNameTxt;
+    [SerializeField] private TMP_Text _rewardDesTxt;
+    [SerializeField] private GameObject _lockPanel;
 
     [Header("스텟 페이지 설정")]
     [SerializeField] private Transform _statContainer;
@@ -44,20 +48,19 @@ public class HeroDetailView : BaseUI
 
     // Presenter에서 버튼 클릭 이벤트를 연결하기 위한 프로퍼티
     public Button UpgradeBtn => _upgradeBtn;
+    public Button[] RewardButtons => _rewardBtns;
 
     // 타입에 맞는 컨테이너를 반환하는 헬퍼 프로퍼티/메서드
     private Transform GetDesContainer(DescriptionType type) => type switch
     {
         DescriptionType.Skill => _skillDesContainer,
         DescriptionType.Augment => _augmentDesContainer,
-        DescriptionType.LevelReward => _levelRewardDesContainer,
         _ => null
     };
     private Transform GetIconContainer(DescriptionType type) => type switch
     {
         DescriptionType.Skill => _skillIconContainer,
         DescriptionType.Augment => _augmentIconContainer,
-        DescriptionType.LevelReward => _levelRewardIconContainer,
         _ => null
     };
 
@@ -118,12 +121,12 @@ public class HeroDetailView : BaseUI
         foreach (Transform child in container) Destroy(child.gameObject);
     }
     //스텟 판넬 설정후 소환
-    public void AddStatItem(string name, string value, Sprite icon)
+    public void AddStatItem(string name, string value, Sprite icon, Color color = default)
     {
         GameObject obj = Instantiate(_statPanelPrefab, _statContainer);
         if (obj.TryGetComponent(out StatPanelUI statItem))
         {
-            statItem.SetStat(name, value, icon);
+            statItem.SetStat(name, value, icon, color);
         }
     }
 
@@ -151,4 +154,32 @@ public class HeroDetailView : BaseUI
             desItem.SetDes(name, des);
         }
     }
+
+    public void UpdateLevelRewardUI(int currentLevel, string rewardName,string rewardDes, int selectedIndex)
+    {
+        int[] unlockLevels = { 3, 6, 6, 9 };
+
+        for(int i = 0; i < _lockImgs.Length; i++)
+        {
+            //현재 레벨이 해금레벨 보다 크거나 같으면 자물쇠 비활성화
+            _lockImgs[i].SetActive(currentLevel < unlockLevels[i]); 
+        }
+
+        bool isCurrentSelectedLocked = currentLevel < unlockLevels[selectedIndex];
+        _lockPanel.SetActive(isCurrentSelectedLocked);
+
+        _rewardNameTxt.text = rewardName;
+        _rewardDesTxt.text = rewardDes;
+    }
+
+    // 아이콘 설정 (버튼 자체의 이미지를 바꾸고 싶을 때)
+    public void SetLevelRewardIcons(Sprite[] icons)
+    {
+        for (int i = 0; i < _rewardBtns.Length; i++)
+        {
+            if (i < icons.Length)
+                _rewardBtns[i].image.sprite = icons[i];
+        }
+    }
+
 }

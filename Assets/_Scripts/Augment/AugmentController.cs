@@ -526,10 +526,6 @@ public class AugmentController : NetworkBehaviour
                     _localSelectedData = null; // 다 썼으니 비워줌
                 }
             }
-
-            //토글버튼 숨김
-            AugmentManager.Instance.HideAugmentToggleBtn();
-
             //전투 시작 전이면 카드 다 골랐다고 스테이지에 보고
             if (_stageManager.CurrentState == StageState.PreGameAugment)
             {

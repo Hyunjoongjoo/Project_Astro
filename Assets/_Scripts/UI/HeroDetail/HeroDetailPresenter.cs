@@ -222,10 +222,54 @@ public class HeroDetailPresenter : MonoBehaviour
             _view.AddDescriptionItem(DescriptionType.Augment, name, desc);
         }
     }
+
+    //레벨 보상 페이지
     private void UpdateLevelRewardDesPage()
     {
-        _view.ClearDescription(DescriptionType.LevelReward);
-        _view.ClearIcons(DescriptionType.LevelReward);
+        if (_userHeroData == null || _heroData == null) return;
+
+        //리워드 데이터 가져오기
+        var myRewards = TableManager.Instance.HeroLevelRewardTable.GetAll()
+            .FindAll(r=>r.heroId == _heroData.id);
+        myRewards.Sort((a,b) => a.level.CompareTo(b.level)); //레벨순 정렬 3,6,6,9
+
+        for(int i = 0; i < _view.RewardButtons.Length; i++)
+        {
+            int index = i;
+            _view.RewardButtons[i].onClick.RemoveAllListeners();
+
+            if (index < myRewards.Count)
+            {
+                string skillId = myRewards[index].rewardId;
+
+                // 버튼 클릭 시 해당 스킬 정보 표시
+                _view.RewardButtons[index].onClick.AddListener(() => ShowLevelRewardDetail(skillId,index));
+
+                // 초기 화면 설정 (첫 번째 보상인 3레벨 보상을 먼저 보여줌)
+                if (index == 0) ShowLevelRewardDetail(skillId, index);
+            }
+            else
+            {
+                // 데이터가 없는 버튼은 비활성화하거나 숨김 처리
+                _view.RewardButtons[index].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    private void ShowLevelRewardDetail(string skillId,int index)
+    {
+        if (string.IsNullOrEmpty(skillId)) return;
+
+        //스킬인포 테이블에서 데이터 가저오기
+        var skillInfo = TableManager.Instance.SkillInfoTable.Get(skillId);
+        if (skillInfo == null) return;
+
+        // 스트링 테이블에서 번역 텍스트 가져오기
+        string translatedName = TableManager.Instance.GetString(skillInfo.skillName);
+        string translatedDes = TableManager.Instance.GetString(skillInfo.skillDes);
+
+        //view 업데이트
+        _view.UpdateLevelRewardUI(_userHeroData.level, translatedName, translatedDes, index);
     }
 
     //스텟 페이지 갱신
@@ -237,11 +281,11 @@ public class HeroDetailPresenter : MonoBehaviour
         if (status == null) return;
 
         //성장수치 보여줄 애들은 성장수치도 보여주기
-        _view.AddStatItem("체력", $"{status.BaseHp} <color=#000BFF>(+{tableBase.ipLvHp})</color>", _statIcons.GetIcon(StatType.Hp));
-        _view.AddStatItem("공격력", $"{status.baseAttackPower} <color=#000BFF>(+{tableBase.ipLvAttackPower})</color>", _statIcons.GetIcon(StatType.AttackPower));
+        _view.AddStatItem("체력", $"{status.BaseHp} <color=#FF0500>(+{tableBase.ipLvHp})</color>", _statIcons.GetIcon(StatType.Hp),Color.green);
+        _view.AddStatItem("공격력", $"{status.baseAttackPower} <color=#FF0500>(+{tableBase.ipLvAttackPower})</color>", _statIcons.GetIcon(StatType.AttackPower), Color.green);
 
         if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0)
-            _view.AddStatItem("치유력", $"{status.baseHealingPower} <color=#000BFF>(+{tableBase.ipLvHealingPower})</color>", _statIcons.GetIcon(StatType.HealingPower));
+            _view.AddStatItem("치유력", $"{status.baseHealingPower} <color=#FF0500>(+{tableBase.ipLvHealingPower})</color>", _statIcons.GetIcon(StatType.HealingPower), Color.green);
 
         _view.AddStatItem("공격 속도", status.attackSpeed.ToString("F2"), _statIcons.GetIcon(StatType.AttackSpeed));
         _view.AddStatItem("이동 속도", status.moveSpeed.ToString("F1"), _statIcons.GetIcon(StatType.MoveSpeed));

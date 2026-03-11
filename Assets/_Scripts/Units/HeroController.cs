@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class HeroController : UnitController
 {
@@ -8,12 +9,6 @@ public class HeroController : UnitController
 
     [Header("기본 스킬 (증강 미적용)")]
     [SerializeField] private BaseSkillSO _standardSkillData;
-    [Header("증강 A타입, 강화형")]
-    [SerializeField] private BaseSkillSO _typeASkillData;
-    [SerializeField] private BaseSkillSO _typeAEnhanceSkillData;
-    [Header("증강 B타입, 강화형")]
-    [SerializeField] private BaseSkillSO _typeBSkillData;
-    [SerializeField] private BaseSkillSO _typeBEnhanceSkillData;
 
     private float _respawnTime;
     public ISkill curUniqueSkill;
@@ -25,7 +20,10 @@ public class HeroController : UnitController
     public CastingState CastState { get; private set; }
     public ISkill CurUniqueSkill => curUniqueSkill;
     public float RespawnTime => _respawnTime;
-    
+
+    //이번 스폰/갱신 때 이미 적용한 스킬 증강 ID를 기억해서 중복 덮어쓰기 방지
+    private HashSet<string> _appliedAugments = new HashSet<string>();
+
 
     public override void Spawned()
     {
@@ -41,16 +39,7 @@ public class HeroController : UnitController
         if (!Object.HasStateAuthority) return;
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
 
-        //스킬 증강 적용
-        foreach (var player in _stageManager.PlayerDataMap)
-        {
-            if (player.Value.Team != team)
-            {
-                continue;
-            }
-
-            ApplySkillAugments(player.Value);
-        }
+        RefreshAugments();
 
         // 상태 인스턴스 생성
         StateMachine = new StateMachine();
@@ -69,9 +58,6 @@ public class HeroController : UnitController
         _unitStat.Init(statData);
 
         _unitStat.OnStatChanged += RefreshStatRuntime;//이벤트 구독
-
-        //데미지증가 적용 확인용(추후에 제거할듯)
-        _unitStat.AddModifier(EffectType.IncreaseAttackPower, new StatModifier(10f, StatModType.Flat, this));
 
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
@@ -148,24 +134,32 @@ public class HeroController : UnitController
     }
 
     // 스킬 증강 시 스킬 교체(실제 교체)
-    private void ChangeSkill(BaseSkillSO newSkillData)
+    private void ChangeSkill(BaseSkillSO newSkillSO)
     {
-        if (curUniqueSkill != null && newSkillData.GetType() == curUniqueSkill.GetType())
-            curUniqueSkill.ChangeData(newSkillData);
-        else
-            curUniqueSkill = newSkillData.CreateInstance(this);
-        Debug.Log($"[영웅스킬교체] {unitId} → {newSkillData.name}");
+        if (newSkillSO != null)
+        {
+            curUniqueSkill = newSkillSO.CreateInstance(this);
+            Debug.Log($"[{unitId}] 스킬이 {newSkillSO.name}으로 교체되었습니다!");
+        }
     }
 
-    //스킬 증강에 사용될 메서드 (스폰에 적용시 이미 배치된 영웅은 적용이 안될것인데....)
-    private void ApplySkillAugments(PlayerNetworkData data)
+    //3.11 리팩토링
+    //콘피그테이블 참조하도록 변경, 팀원 증강 중복방지 
+    private void ApplyAugments(PlayerNetworkData data)
     {
-        //3.3 여현구
-        //배열에서 구조체로 바뀌어서 여기 수정했습니다.
+        //Config 테이블 참조
+        int reinforceNum = 6; 
+        var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
+        if (config != null) reinforceNum = int.Parse(config.configValue);
+
         for (int i = 0; i < SlotData_5.Length; i++)
         {
             string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
             if (string.IsNullOrEmpty(augmentId))
+                continue;
+
+            //중복 방지
+            if (_appliedAugments.Contains(augmentId))
                 continue;
 
             SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
@@ -175,7 +169,7 @@ public class HeroController : UnitController
             if (so.TargetHeroID != unitId)
                 continue;
 
-            int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
+            int tierIndex = data.TotalAugmentPicks >= reinforceNum ? 1 : 0;
 
             if (tierIndex >= so.Tiers.Length)
                 continue;
@@ -184,7 +178,11 @@ public class HeroController : UnitController
 
             if (newSkill == null)
                 continue;
-            Debug.Log($"[스킬 증강 적용] {unitId} <- {augmentId}");
+
+            Debug.Log($"[팀 공유 스킬 증강 적용] 영웅:{unitId} <- 증강:{augmentId} (Tier: {tierIndex})");
+
+            //적용된 증강 기록 및 실제 스킬 교체
+            _appliedAugments.Add(augmentId);
             ChangeSkill(newSkill);
         }
     }
@@ -197,12 +195,14 @@ public class HeroController : UnitController
             return;
         }
 
+        _appliedAugments.Clear();
+
         foreach (var player in _stageManager.PlayerDataMap)
         {
             if (player.Value.Team != team)
                 continue;
 
-            ApplySkillAugments(player.Value);
+            ApplyAugments(player.Value);
         }
     }
 
