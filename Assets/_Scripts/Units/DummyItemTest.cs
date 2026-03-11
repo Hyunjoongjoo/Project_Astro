@@ -25,20 +25,20 @@ public class DummyItemTest : NetworkBehaviour
 
             Debug.Log($"[test] 공격력 증가 적용 → 현재 공격력: {_hero.AttackPower}");
         }
-        if (Input.GetKeyDown(KeyCode.U))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             Debug.Log("더미 아이템 사용 -> 받피감 30%");
 
             _unitStat.AddModifier(
-                EffectType.IncreaseDamageTaken,
-                new StatModifier(0.3f, StatModType.Flat, this)
+                EffectType.DecreaseDamageTaken,
+                new StatModifier(-0.3f, StatModType.Flat, this)
             );
         }
 
         if (Input.GetKeyDown(KeyCode.Y))
         {
             _unitStat.RemoveModifier(EffectType.IncreaseAttackPower,this);
-            _unitStat.RemoveModifier(EffectType.IncreaseDamageTaken, this);
+            _unitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);
             Debug.Log("더미 아이템 효과 제거");
         }
     }

@@ -7,7 +7,11 @@ public abstract class UnitBase : NetworkBehaviour
 {
     [Header("범위 체크용 빨간 원")]
     [SerializeField] private float _testRange;
-    
+
+    [Header("사망 이펙트")]
+    [SerializeField] protected GameObject deathEffectPrefab;
+    [SerializeField] protected float deathEffectLifeTime = 2f;
+
     [Header("체력과 방어력 설정")]
     [Networked] public float MaxHealth { get; set; }
     protected float deffense;
@@ -57,12 +61,12 @@ public abstract class UnitBase : NetworkBehaviour
     // 여기서 최종 받는 데미지를 계산한다.
     public virtual void TakeDamage(float amount)
     {
+        if (!Object.HasStateAuthority) return;
+        if (IsDead) return;
         if (unitType == UnitType.Hero)
         {
             Debug.Log("영웅 받은 데미지 : " + amount);
         }
-        if (!Object.HasStateAuthority) return;
-        if (IsDead) return;
 
         float finalTakenDamage = amount;
 
@@ -72,15 +76,28 @@ public abstract class UnitBase : NetworkBehaviour
         // TableManager.Instance.ConfigTable.Get("min_hero_damage_reduce");
         if (_unitStat != null)
         {
-            finalTakenDamage *= (1 - _unitStat.DamageReduction.Value);
+            //finalTakenDamage *= (1 + _unitStat.DamageReduction.Value);
+            float modify = _unitStat.DamageReduction.Value;
+
+            var config = TableManager.Instance.ConfigTable.Get("min_hero_damage_reduce");
+            float minModify = 0f;
+
+            if (config != null)
+            {
+                float.TryParse(config.configValue, out minModify);
+            }
+
+            modify = Mathf.Max(modify, minModify);
+
+            finalTakenDamage *= (1f + modify);
         }
         if (unitType == UnitType.Hero)
         {
             Debug.Log("받피감 적용 후 데미지 : " + finalTakenDamage);
         }
-        CurrentHealth = Mathf.Max(CurrentHealth - finalTakenDamage, 0); ;
+        CurrentHealth = Mathf.Max(CurrentHealth - finalTakenDamage, 0f); ;
 
-        if (CurrentHealth < 1)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
+        if (CurrentHealth <= 0f)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
             Die();
     }
 
@@ -105,7 +122,11 @@ public abstract class UnitBase : NetworkBehaviour
             AudioManager.Instance.PlaySfx(SfxList.DestroySound);
 
         if (Object.HasStateAuthority == true)
+        {
             ObjectContainer.Instance.IncreaseAugmentGauge(team, unitType);
+
+            RPC_PlayDeathEffect(transform.position, transform.rotation);
+        }
 
         Runner.Despawn(selfNetworkObj);
     }
@@ -120,6 +141,18 @@ public abstract class UnitBase : NetworkBehaviour
         {
             HpBarManager.Instance.OnUnitDamaged(transform, networkedTeam, CurrentHealth, MaxHealth, unitType);
         }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    protected void RPC_PlayDeathEffect(Vector3 position, Quaternion rotation)
+    {
+        if (deathEffectPrefab == null)
+        {
+            return;
+        }
+
+        GameObject deathEffectObject = Instantiate(deathEffectPrefab, position, rotation);
+        Destroy(deathEffectObject, deathEffectLifeTime);
     }
 
 #if UNITY_EDITOR
