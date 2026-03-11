@@ -106,6 +106,10 @@ public class AuthService : MonoBehaviour
     public void Logout()
     {
         Auth.SignOut();
+        if(GoogleSignIn.DefaultInstance != null)
+        {
+            GoogleSignIn.DefaultInstance.SignOut();
+        }
         Debug.Log("[Auth] User signed out");
     }
 }
