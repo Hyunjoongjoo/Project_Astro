@@ -64,8 +64,8 @@ public class StageManager : NetworkBehaviour
 
     private int _requiredPlayerCount;
 
-    private readonly int GAME_DURATION;
-    private readonly int AUGMENT_GAUGE;
+    private int GAME_DURATION;
+    private int AUGMENT_GAUGE;
     private readonly float PLAYER_INFO_DURATION = 4f;
     private readonly float COUNTDOWN_INTERVAL = 1f;
 
@@ -87,13 +87,6 @@ public class StageManager : NetworkBehaviour
     //더미 클라이언트 존재 여부
     private bool _existDummy;
 
-    public StageManager()
-    {
-        AUGMENT_GAUGE = int.Parse(TableManager.Instance.ConfigTable.Get("augment_gauge").configValue);
-        GAME_DURATION = int.Parse(TableManager.Instance.ConfigTable.Get("game_time_limit").configValue);
-        Debug.Log("[StageManager] 테이블에서 값 할당 완료");
-    }
-
     private void Awake()
     {
         _mainCamera = Camera.main;
@@ -110,6 +103,9 @@ public class StageManager : NetworkBehaviour
     {
         if (_stageUI != null)
             _stageUI.SetMaxValueAugmentSlider(AUGMENT_GAUGE);
+
+        AUGMENT_GAUGE = int.Parse(TableManager.Instance.ConfigTable.Get("augment_gauge").configValue);
+        GAME_DURATION = int.Parse(TableManager.Instance.ConfigTable.Get("game_time_limit").configValue);
     }
 
     public void Initialize(MatchType matchType, int requiredPlayerCount, bool existDummy)
