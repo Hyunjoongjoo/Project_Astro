@@ -480,7 +480,7 @@ public class StageManager : NetworkBehaviour
     {
         if ( AugmentExp.TryGet(team, out int curExp) )
         {
-            int value = AugmentExp.Set(team, Mathf.Min(AUGMENT_GAUGE, curExp + amount));
+            int value = AugmentExp.Set(team, curExp + amount);
             RPC_UpdateAugmentGauge(team, value);
         }
 
