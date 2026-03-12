@@ -69,7 +69,6 @@ public class HealSkill : ISkill
                 //        if (unit.UnitType == UnitType.Hero)
                 //        {
                 //            float healthRatio = unit.CurrentHealth / unit.MaxHealth;
-
                 //            if (healthRatio < minHealthRatio)
                 //            {
                 //                minHealthRatio = healthRatio;
@@ -219,6 +218,9 @@ public class HealSkill : ISkill
         {
             foreach (var target in targets)
             {
+                if (target.Object.IsValid == false)
+                    continue;
+
                 // 도트 힐 도중 타겟이 파괴될 수 있으므로 null 체크 필수
                 if (target != null && target.CurrentHealth < target.MaxHealth)
                 {
