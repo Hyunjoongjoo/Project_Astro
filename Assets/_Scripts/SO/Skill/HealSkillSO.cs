@@ -8,6 +8,8 @@ public class HealSkillSO : BaseSkillSO
     public float range;
     public float duration;
     public float interval;
+    public float cooldownMultiplier = 1f;//쿨다운비율 30퍼쿨감->0.7
+
     [Header("광역화")]
     public bool areaOfEffect;
 

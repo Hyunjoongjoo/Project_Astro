@@ -25,6 +25,6 @@ MonoBehaviour:
   canDashMinDistance: 2
   dashCount: 3
   dashInterval: 0.15
-  damageRatio: 2
+  damageRatio: 3
   areaOfEffect: 0
   attackRange: 0
