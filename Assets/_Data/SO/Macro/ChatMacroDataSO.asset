@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 036fd810f2ea8f4478a09c18e7f43d23, type: 3}
+  m_Name: ChatMacroDataSO
+  m_EditorClassIdentifier: Assembly-CSharp::ChatMacroDataSO
+  allMacros:
+  - id: m1
+    type: 0
+    text: "\uC88C\uCE21 \uB77C\uC778 \uACF5\uACA9!"
+    emoticonSprite: {fileID: 0}
+  - id: m2
+    type: 0
+    text: "\uC6B0\uCE21 \uB77C\uC778 \uACF5\uACA9!"
+    emoticonSprite: {fileID: 0}
+  - id: m3
+    type: 0
+    text: "\uC8C4\uC1A1\uD569\uB2C8\uB2E4"
+    emoticonSprite: {fileID: 0}
+  - id: m4
+    type: 0
+    text: "\uAC10\uC0AC\uD569\uB2C8\uB2E4"
+    emoticonSprite: {fileID: 0}
+  - id: m5
+    type: 0
+    text: "\uC99D\uAC15 \uC120\uD0DD \uD655\uC778 \uC694\uB9DD"
+    emoticonSprite: {fileID: 0}
+  - id: m6
+    type: 0
+    text: "\uC88C\uCE21 \uB77C\uC778 \uBC29\uC5B4!"
+    emoticonSprite: {fileID: 0}
+  - id: m7
+    type: 0
+    text: "\uC6B0\uCE21 \uB77C\uC778 \uBC29\uC5B4!"
+    emoticonSprite: {fileID: 0}
+  - id: e1
+    type: 1
+    text: 
+    emoticonSprite: {fileID: 21300000, guid: 482701d7fe23a4094b9fa72ba3be7ccd, type: 3}
+  - id: e2
+    type: 1
+    text: 
+    emoticonSprite: {fileID: 21300000, guid: 70f78e062098c4496b852abefff63acf, type: 3}
+  - id: e3
+    type: 1
+    text: 
+    emoticonSprite: {fileID: 21300000, guid: 41d4323f253da4231926d204a4916fc0, type: 3}
+  - id: e4
+    type: 1
+    text: 
+    emoticonSprite: {fileID: 21300000, guid: 21c23add3f7694b01b863c28bd584e7f, type: 3}
+  - id: e5
+    type: 1
+    text: 
+    emoticonSprite: {fileID: 21300000, guid: 91fdb8cfb473e46d59e8ea63da630818, type: 3}
+  - id: e6
+    type: 1
+    text: 
+    emoticonSprite: {fileID: 21300000, guid: e5163cef17f0f480986d5690c070effe, type: 3}
+  - id: e7
+    type: 1
+    text: 
+    emoticonSprite: {fileID: 21300000, guid: 2f687d4452dc74d6489d7513e5ec2a3d, type: 3}
