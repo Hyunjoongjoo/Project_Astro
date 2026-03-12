@@ -20,5 +20,5 @@ MonoBehaviour:
   skillType: 2
   initCooldown: 4
   cooldown: 8
-  damageReduction: 0.5
+  damageReduction: -0.5
   duration: 5
