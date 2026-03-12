@@ -33,6 +33,9 @@ public class AugmentController : NetworkBehaviour
     //2vs2 분할 배송을 위한 클라이언트 임시 보관소
     private List<AugmentData> _tempMyCards;
 
+    //중복 클릭 방지용 변수 추가(클라이언트 둘이 동시에 눌렀을 때 카드 2배 생성 방지)
+    private float _lastBlueRequestTime = 0f;
+    private float _lastRedRequestTime = 0f;
 
     //인스펙터 직렬화 해둘 히어로 아이콘SO
     [SerializeField] private HeroIconDataSO _heroIconSO;
@@ -109,7 +112,8 @@ public class AugmentController : NetworkBehaviour
     //UI에서 증강선택 토글 버튼 눌렀을 때 호출
 
     //3.9 서버가 팀원 데이터를 모아 덱 매니저 돌리고 클라로 배달
-    public void OpenAugmentWindow()
+    //3.12 매개변수 추가: targetTeam이 null이면 전체, 값이 있으면 해당 팀만
+    public void OpenAugmentWindow(Team? targetTeam = null)
     {
         if (_stageManager == null)
         {
@@ -136,6 +140,7 @@ public class AugmentController : NetworkBehaviour
         {
             if (kvp.Value.Team == Team.Blue || kvp.Value.Team == Team.Red)
             {
+                if (targetTeam != null && kvp.Value.Team != targetTeam) continue;
                 teamPlayers[kvp.Value.Team].Add(kvp.Key);
             }
         }
@@ -144,6 +149,7 @@ public class AugmentController : NetworkBehaviour
         //팀 단위로 겹침 방지 처리하며 카드 생성
         foreach (var team in teamPlayers.Values)
         {
+            if (team.Count == 0) continue; //적팀은 패스
             List<string> excludedSkillTargets = new List<string>();
             List<string> teamHeroes = new List<string>();
 
@@ -303,6 +309,8 @@ public class AugmentController : NetworkBehaviour
     {
         if (Runner.LocalPlayer == target)
         {
+            Debug.Log("RPC_DeliverTeamCards 수신됨 - 1vs1인데 이게 찍히면 버그");
+
             PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer); 
             int reinforceNum = 6;
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
@@ -544,8 +552,34 @@ public class AugmentController : NetworkBehaviour
             {
                 _stageManager.UpdateTeammateUI(ownerPlayer, latestData.OwnedHeroes);
             }
+
+            //아군이 확정했음을 UI에 전달하고 양방향 검사
+            if (AugmentManager.Instance != null)
+            {
+                AugmentManager.Instance.NotifyTeammateConfirmed();
+            }
         }
     }
+    //클라이언트의 버튼 클릭 요청을 받는 RPC
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_RequestAugmentCards(PlayerRef requester)
+    {
+        if (_stageManager.PlayerDataMap.TryGet(requester, out var data))
+        {
+            Team requestTeam = data.Team;
+
+            // 1초 쿨타임 (아군 2명이 겹쳐서 눌렀을 때 중복 생성되는 것 방지)
+            if (requestTeam == Team.Blue && Time.time - _lastBlueRequestTime < 1f) return;
+            if (requestTeam == Team.Red && Time.time - _lastRedRequestTime < 1f) return;
+
+            if (requestTeam == Team.Blue) _lastBlueRequestTime = Time.time;
+            if (requestTeam == Team.Red) _lastRedRequestTime = Time.time;
+
+            // 해당 팀의 카드만 생성하라고 지시
+            OpenAugmentWindow(requestTeam);
+        }
+    }
+
 
     //반려
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

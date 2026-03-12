@@ -108,6 +108,11 @@ public class HeroController : UnitController
         }
 
         StateMachine.Update();
+
+        if (curUniqueSkill is ShieldSkill shield)
+        {
+            shield.Tick();
+        }
     }
 
     // --- 생성시 초기화 관련 메서드 ---
@@ -214,5 +219,20 @@ public class HeroController : UnitController
             agent.speed = MoveSpeed;
         }
     }
+#if UNITY_EDITOR
+    protected override void OnDrawGizmosSelected()
+    {
+        base.OnDrawGizmosSelected();//기존 기즈모
+
+        if (curUniqueSkill == null)
+            return;
+
+        if (curUniqueSkill.Data is ShieldSkillSO shieldData)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position, shieldData.aoeRange);
+        }
+    }
+#endif
 }
 

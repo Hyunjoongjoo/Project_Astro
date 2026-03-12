@@ -18,6 +18,7 @@ public class TableManager : Singleton<TableManager>
     public TableBase<StringData> StringTable = new TableBase<StringData>();
     public TableBase<UnitData> UnitTable = new TableBase<UnitData>();
     public TableBase<SkillInfoData> SkillInfoTable = new TableBase<SkillInfoData>();
+    public TableBase<MatchRewardData> MatchRewardTable = new TableBase<MatchRewardData>();
 
 
     protected override void Awake()

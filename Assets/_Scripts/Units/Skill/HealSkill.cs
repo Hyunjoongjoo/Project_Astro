@@ -14,6 +14,8 @@ public class HealSkill : ISkill
     // 물리 탐색 시 메모리 할당(GC)을 줄이기 위한 NonAlloc 배열
     private Collider[] _hitColliders = new Collider[20];
 
+    private List<UnitBase> _targetsToHeal = new List<UnitBase>(10);
+
     public BaseSkillSO Data => _data;
     public bool IsCasting => _isCasting;
 
@@ -53,28 +55,60 @@ public class HealSkill : ISkill
         {
             if (_hitColliders[i].TryGetComponent(out UnitBase unit))
             {
-                // 자신은 제외하며, 체력이 100% 미만인 경우
-                if (unit.CurrentHealth < unit.MaxHealth && unit != _cachedUnit)
+                //// 자신은 제외하며, 체력이 100% 미만인 경우
+                //if (unit.CurrentHealth < unit.MaxHealth && unit != _cachedUnit)
+                //{
+                //    if (_data.areaOfEffect)
+                //    {
+                //        // 광역 힐이면 다친 아군이 1명이라도 있으면 즉시 사용 조건 통과
+                //        return true;
+                //    }
+                //    else
+                //    {
+                //        // 단일 힐이라면, 체력 비율이 가장 낮은 아군영웅을 탐색하여 _targetAlly에 캐싱
+                //        if (unit.UnitType == UnitType.Hero)
+                //        {
+                //            float healthRatio = unit.CurrentHealth / unit.MaxHealth;
+                //            if (healthRatio < minHealthRatio)
+                //            {
+                //                minHealthRatio = healthRatio;
+                //                _targetAlly = unit;
+                //                canCast = true;
+                //            }
+                //        }
+                //    }
+                //}
+                // 본인 제외
+                if (unit == _cachedUnit)
                 {
-                    if (_data.areaOfEffect)
-                    {
-                        // 광역 힐이면 다친 아군이 1명이라도 있으면 즉시 사용 조건 통과
-                        return true;
-                    }
-                    else
-                    {
-                        // 단일 힐이라면, 체력 비율이 가장 낮은 아군영웅을 탐색하여 _targetAlly에 캐싱
-                        if (unit.UnitType == UnitType.Hero)
-                        {
-                            float healthRatio = unit.CurrentHealth / unit.MaxHealth;
+                    continue;
+                }
 
-                            if (healthRatio < minHealthRatio)
-                            {
-                                minHealthRatio = healthRatio;
-                                _targetAlly = unit;
-                                canCast = true;
-                            }
-                        }
+                // 영웅만 힐 (기획 기준)
+                if (unit.UnitType != UnitType.Hero)
+                {
+                    continue;
+                }
+
+                // 풀피면 제외
+                if (unit.CurrentHealth >= unit.MaxHealth)
+                {
+                    continue;
+                }
+
+                if (_data.areaOfEffect)
+                {
+                    return true;
+                }
+                else
+                {
+                    float healthRatio = unit.CurrentHealth / unit.MaxHealth;
+
+                    if (healthRatio < minHealthRatio)
+                    {
+                        minHealthRatio = healthRatio;
+                        _targetAlly = unit;
+                        canCast = true;
                     }
                 }
             }
@@ -89,15 +123,23 @@ public class HealSkill : ISkill
 
     public void Casting()
     {
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
+        float finalCooldown = _data.cooldown * _data.cooldownMultiplier;
+        Debug.Log( $"[힐스킬] 쿨감 적용 | 기본:{_data.cooldown} 비율:{_data.cooldownMultiplier} 최종쿨:{finalCooldown}");
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
 
-        List<UnitBase> targetsToHeal = new List<UnitBase>();
+        //List<UnitBase> targetsToHeal = new List<UnitBase>();
+        _targetsToHeal.Clear();
 
         if (_data.areaOfEffect)
         {
+            //대상 중심 AoE
+            Vector3 center = _targetAlly != null
+               ? _targetAlly.transform.position
+               : _cachedUnit.transform.position;
+
             // 광역 힐: 다시 한 번 범위 내 다친 아군을 수집
             int hitCount = Physics.OverlapSphereNonAlloc(
-                _cachedUnit.transform.position,
+                center,
                 _data.range,
                 _hitColliders,
                 _cachedUnit.AllyLayer
@@ -106,7 +148,19 @@ public class HealSkill : ISkill
             {
                 if (_hitColliders[i].TryGetComponent(out UnitBase unit) )
                 {
-                    targetsToHeal.Add(unit);
+                    if (unit == _cachedUnit)//시전자 제외
+                    {
+                        continue;
+                    }
+                    if (unit.UnitType == UnitType.Tower || unit.UnitType == UnitType.Bridge)//타워,함교는 제외
+                    {
+                        continue;
+                    }
+                    if (unit.CurrentHealth >= unit.MaxHealth)//풀피 유닛 제외
+                    {
+                        continue;
+                    }
+                    _targetsToHeal.Add(unit);
                 }
             }
         }
@@ -115,18 +169,18 @@ public class HealSkill : ISkill
             // 단일 힐: UsingConditionCheck에서 찾은 대상이 아직 유효한지(파괴되지 않았는지) 확인
             if (_targetAlly != null)
             {
-                targetsToHeal.Add(_targetAlly);
+                _targetsToHeal.Add(_targetAlly);
             }
         }
 
         // 도트 힐(duration > 0)인지 단발 힐인지 판단하여 실행
         if (_data.duration > 0 && _data.interval > 0)
         {
-            _cachedUnit.StartCoroutine(DoTHealRoutine(targetsToHeal));
+            _cachedUnit.StartCoroutine(DoTHealRoutine(_targetsToHeal));
         }
         else
         {
-            InstantHeal(targetsToHeal);
+            InstantHeal(_targetsToHeal);
         }
     }
 
@@ -137,8 +191,11 @@ public class HealSkill : ISkill
         {
             if (target != null)
             {
-                target.TakeHeal(_data.recoveryAmount);//나중에 스탯기반으로 교체
-                Debug.Log($"힐 적용 → {target.name} / {target.CurrentHealth}");
+                float beforeHp = target.CurrentHealth;
+                float healAmount = _cachedUnit.HealPower * _data.healCoefficient;
+                target.TakeHeal(healAmount);//치유량 * 스킬계수
+                float afterHp = target.CurrentHealth;
+                Debug.Log($"힐 적용 → {target.name} 힐량: {afterHp - beforeHp} | {beforeHp} → {afterHp}");
                 // RPC로 이펙트 출력 요청 (NetworkObject의 Id를 넘겨 타겟 식별)
                 if (target.Object != null)
                 {
@@ -153,13 +210,17 @@ public class HealSkill : ISkill
     {
         float elapsed = 0f;
         int tickCount = Mathf.FloorToInt(_data.duration / _data.interval);
-        float healPerTick = _data.recoveryAmount / tickCount; // 총 회복량을 틱당 회복량으로 분할
+        float totalHeal = _cachedUnit.HealPower * _data.healCoefficient;
+        float healPerTick = totalHeal / tickCount; // 총 회복량을 틱당 회복량으로 분할
         WaitForSeconds delay = new WaitForSeconds(_data.interval);
 
         while (elapsed < _data.duration)
         {
             foreach (var target in targets)
             {
+                if (target.Object.IsValid == false)
+                    continue;
+
                 // 도트 힐 도중 타겟이 파괴될 수 있으므로 null 체크 필수
                 if (target != null && target.CurrentHealth < target.MaxHealth)
                 {

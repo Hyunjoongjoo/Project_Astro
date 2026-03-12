@@ -37,7 +37,7 @@ public class AugmentManager : Singleton<AugmentManager>
             _toggleBtn.onClick.RemoveAllListeners();
             _toggleBtn.onClick.AddListener(() =>
             {
-                AugmentController.Instance.OpenAugmentWindow();
+                AugmentController.Instance.RPC_RequestAugmentCards(AugmentController.Instance.Runner.LocalPlayer);
                 HideAugmentToggleBtn();
             });
             _toggleBtn.gameObject.SetActive(true);
@@ -54,28 +54,31 @@ public class AugmentManager : Singleton<AugmentManager>
     {
         //UIManager를 통해 팝업 형식으로 띄움
         _currentWindow = UIManager.Instance.ShowUI<AugmentWindowUI>(_augmentWindowPrefab, true);
-        _toggleBtn.gameObject.SetActive(true);
-        if (_currentWindow != null)
-        {
-            _currentWindow.SetupAndOpen(myDatas, teamDatas, teamName);
+        if (_cachedStageManager == null) _cachedStageManager = FindFirstObjectByType<StageManager>();
 
+        //Playing 상태일 때만 토글 버튼 활성화
+        if (_cachedStageManager != null && _cachedStageManager.CurrentState == StageState.Playing)
+        {
+            _toggleBtn.gameObject.SetActive(true);
             _toggleBtn.onClick.RemoveAllListeners();
             _toggleBtn.onClick.AddListener(() =>
             {
-                if (_currentWindow != null)
-                {
-                    _currentWindow.Toggle();
-                }
-                else
-                {
-                    HideAugmentToggleBtn();
-                }
+                if (_currentWindow != null) _currentWindow.Toggle();
+                else HideAugmentToggleBtn();
             });
 
+            if (UIManager.Instance.TopContainer != null)
+                _toggleBtn.transform.SetParent(UIManager.Instance.TopContainer);
         }
-        if (UIManager.Instance.TopContainer != null && _toggleBtn != null)
+        else
         {
-            _toggleBtn.transform.SetParent(UIManager.Instance.TopContainer);
+            //PreGameAugment 상태에서는 숨김
+            HideAugmentToggleBtn();
+        }
+
+        if (_currentWindow != null)
+        {
+            _currentWindow.SetupAndOpen(myDatas, teamDatas, teamName);
         }
     }
 
@@ -97,6 +100,18 @@ public class AugmentManager : Singleton<AugmentManager>
         {
             card.Setup(data);
         }
+
+        if (_cachedStageManager == null)
+        {
+            _cachedStageManager = FindFirstObjectByType<StageManager>();
+        }
+
+        if (_cachedStageManager != null)
+        {
+            // 증강 선택은 로컬 플레이어가 수행하므로 Runner.LocalPlayer를 사용
+            _cachedStageManager.RPC_MarkHeroUsed(_cachedStageManager.Runner.LocalPlayer, data.targetId);
+            Debug.Log($"[Masking] 증강 선택으로 영웅 기록됨: {data.targetId}");
+        }
     }
 
     //3.9 타임아웃 시 실행될 강제 픽 함수 추가
@@ -108,4 +123,34 @@ public class AugmentManager : Singleton<AugmentManager>
             _currentWindow.ForceRandomPick();
         }
     }
+
+    //창 닫고 버튼도 끄는 통합 함수
+    public void CloseAndHideToggle()
+    {
+        if (_currentWindow != null)
+        {
+            _currentWindow.Close();
+        }
+        HideAugmentToggleBtn();
+    }
+
+    //양측 모두 확정했는지 검사하는 함수
+    public void CheckBothConfirmed()
+    {
+        if (_currentWindow != null && _currentWindow.IsForcePicked && _currentWindow.IsTeammateConfirmed)
+        {
+            CloseAndHideToggle();
+        }
+    }
+
+    //캡슐화 메서드
+    public void NotifyTeammateConfirmed()
+    {
+        if (_currentWindow != null)
+        {
+            _currentWindow.IsTeammateConfirmed = true;
+            CheckBothConfirmed(); 
+        }
+    }
 }
+

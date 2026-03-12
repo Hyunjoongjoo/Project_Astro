@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Firebase.Firestore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class UserDataManager : Singleton<UserDataManager>
 {
@@ -31,20 +33,60 @@ public class UserDataManager : Singleton<UserDataManager>
     public WalletModel WalletModel => _walletModel;
     public List<HeroDbModel> HeroesModel => _heroesModel;
 
+    // 모든 정보 갱신
+    public async Task UpdateAll(Dictionary<string, object> updates = null, List<HeroDbModel> heroesToUpdate = null)
+    {
+        try
+        {
+            // 1. 서버(Firestore) 업데이트 실행 및 완료 대기
+            await UserDataStore.Instance.UpdateAllAsync(ProfileModel.uuid, updates, heroesToUpdate);
+
+            // 2. 서버 저장 성공 시 로컬 캐시(Wallet, Record) 갱신
+            if (updates != null)
+            {
+                if (updates.ContainsKey("Wallet.gold"))
+                    WalletModel.gold = (int)updates["Wallet.gold"];
+
+                if (updates.ContainsKey("Record.win"))
+                    RecordModel.win = (int)updates["Record.win"];
+
+                if (updates.ContainsKey("Record.lose"))
+                    RecordModel.lose = (int)updates["Record.lose"];
+            }
+
+            // 3. 영웅 데이터 로컬 캐시 갱신
+            if (heroesToUpdate != null)
+            {
+                foreach (var updatedHero in heroesToUpdate)
+                {
+                    var targetHero = HeroesModel.Find(h => h.heroId == updatedHero.heroId);
+                    if (targetHero != null)
+                    {
+                        targetHero.level = updatedHero.level;
+                        targetHero.exp = updatedHero.exp;
+                        targetHero.isUnlock = updatedHero.isUnlock;
+                    }
+                }
+            }
+
+            Debug.Log("[UserDataManager] 서버 저장 및 로컬 캐시 갱신 완료");
+        }
+        catch (System.Exception e)
+        {
+            // 서버 저장 실패 시 캐시는 변하지 않음
+            Debug.LogError($"[UserDataManager] 데이터 동기화 실패: {e.Message}");
+        }
+    }
+
     // 골드 갱신
     public async Task UpdateWallet(int amount)
     {
-        var updates = new Dictionary<string, object> 
+        var updateGold = new Dictionary<string, object> 
         {
             { "Wallet.gold", _walletModel.gold + amount }
         };
         // DB 업데이트 하기
-        await UserDataStore.Instance.UpdateUserDataAsync(_profileModel.uuid, updates);
-
-        // 성공하면 로컬 캐싱 데이터 갱신
-        _walletModel.gold += amount;
-
-        Debug.Log($"[Sync] DB와 로컬 골드 동기화 완료: {_walletModel.gold}");
+        await UpdateAll(updates: updateGold);
 
         // 골드 변경 알림 (구독자들에게 전파)
         OnGoldChanged?.Invoke(_walletModel.gold);
@@ -53,17 +95,17 @@ public class UserDataManager : Singleton<UserDataManager>
     // 영웅 갱신
     public async Task UpdateHero(string heroId, int level, int exp, bool unlock)
     {
-        // DB 업데이트
-        await UserDataStore.Instance.UpdateHeroDataAsync(_profileModel.uuid, heroId, level, exp, unlock);
-
-        // 성공 로컬 갱신
-        var hero = _heroesModel.Find(h => h.heroId == heroId);
-        if (hero != null)
+        var updataHeroList = new List<HeroDbModel>
         {
-            hero.level = level;
-            hero.exp = exp;
-            hero.isUnlock = unlock;
-        }
+            new HeroDbModel 
+            { 
+                heroId = heroId,
+                level = level, 
+                exp = exp, 
+                isUnlock = unlock 
+            }
+        };
+        await UpdateAll(heroesToUpdate: updataHeroList);
 
         // 런타임 스텟 재계산
         HeroManager.Instance.UpdateHeroRuntimeStatus(heroId, level);
@@ -75,54 +117,23 @@ public class UserDataManager : Singleton<UserDataManager>
     // 프로파일 갱신
     public async Task UpdateUserDb(int expDelta, int levelDelta = 0) 
     {
-        // 변경될 데이터 딕셔너리
-        var updates = new Dictionary<string, object>
+        var updateProfile = new Dictionary<string, object>
         {
             { "Profile.userLevel", _profileModel.userLevel + levelDelta },
             { "Profile.userExp", _profileModel.userExp + expDelta }
         };
-
-        try
-        {
-            // DB 업데이트
-            await UserDataStore.Instance.UpdateUserDataAsync(_profileModel.uuid, updates);
-
-            // 성공 로컬 갱신
-            _profileModel.userLevel += levelDelta;
-            _profileModel.userExp += expDelta;
-
-            Debug.Log($"[UserDataManager] Profile Sync Success: Lv.{_profileModel.userLevel}");
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[UserDataManager] Profile Sync Failed: {e.Message}");
-        }
+        await UpdateAll(updates: updateProfile);
     }
 
     // 전적 갱신
     public async Task UpdateRecord(int winDelta, int loseDelta) 
     {
-        var updates = new Dictionary<string, object>
+        var updateRecord = new Dictionary<string, object>
         {
             { "Record.win", _recordModel.win + winDelta },
             { "Record.lose", _recordModel.lose + loseDelta }
         };
-
-        try
-        {
-            // DB 업데이트
-            await UserDataStore.Instance.UpdateUserDataAsync(_profileModel.uuid, updates);
-
-            // 성공 로컬 갱신
-            _recordModel.win += winDelta;
-            _recordModel.lose += loseDelta;
-
-            Debug.Log($"[UserDataManager] Record Sync Success: {_recordModel.win}W {_recordModel.lose}L");
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[UserDataManager] Record Sync Failed: {e.Message}");
-        }
+        await UpdateAll(updates: updateRecord);
     }
 
     // 신규 영웅 생성 시(CSV 기준!) DB 대조하여 가감 (DB 로드 완료 이후 호출되어야함.)

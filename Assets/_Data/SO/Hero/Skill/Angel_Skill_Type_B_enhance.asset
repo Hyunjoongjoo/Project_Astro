@@ -10,18 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c1f9d6b0d47c40d488c9ed19547416d7, type: 3}
-  m_Name: Angel_Skill_Standard
+  m_Name: Angel_Skill_Type_B_enhance
   m_EditorClassIdentifier: Assembly-CSharp::HealSkillSO
   heroId: hero_angel
-  skillName: skill_name_angel
+  skillName: enhance_augment_name_angel_B
   skillDescription: 
   note: 
   skillVFX: {fileID: 7343538280686139031, guid: 921bfdf400594b2459b6504da1d4e296, type: 3}
-  skillType: 1
+  skillType: 3
   initCooldown: 5
   cooldown: 10
-  healCoefficient: 1.5
+  healCoefficient: 2
   range: 3
   duration: 0
   interval: 0
+  cooldownMultiplier: 0.7
   areaOfEffect: 0

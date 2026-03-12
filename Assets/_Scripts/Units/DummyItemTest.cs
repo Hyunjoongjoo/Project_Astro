@@ -15,15 +15,33 @@ public class DummyItemTest : NetworkBehaviour
     void Update()
     {
         if (!Object.HasStateAuthority) return;
-
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
-            Debug.Log("더미 아이템 사용 -> 공격력증가");
-            _unitStat.AddModifier(EffectType.IncreaseAttackPower,
-                new StatModifier(10f, StatModType.Flat, this)
-            );
+            Debug.Log("더미 아이템 사용 -> 이동속도증가 15%");
 
-            Debug.Log($"[test] 공격력 증가 적용 → 현재 공격력: {_hero.AttackPower}");
+            _unitStat.AddModifier(
+                EffectType.IncreaseMoveSpeed,
+                new StatModifier(0.15f, StatModType.PercentAdd, this)
+            );
+            Debug.Log("MoveSpeed : " + _hero.MoveSpeed);
+        }
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            Debug.Log("더미 아이템 사용 -> 탐지범위증가 15%");
+
+            _unitStat.AddModifier(
+                EffectType.IncreaseDetectionRange,
+                new StatModifier(0.15f, StatModType.PercentAdd, this)
+            );
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            Debug.Log("더미 아이템 사용 -> 받피증 30%");
+
+            _unitStat.AddModifier(
+                EffectType.IncreaseDamageTaken,
+                new StatModifier(0.3f, StatModType.Flat, this)
+            );
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -34,11 +52,32 @@ public class DummyItemTest : NetworkBehaviour
                 new StatModifier(-0.3f, StatModType.Flat, this)
             );
         }
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            Debug.Log("더미 아이템 사용 -> 공격력증가");
+            _unitStat.AddModifier(EffectType.IncreaseAttackPower,
+                new StatModifier(10f, StatModType.Flat, this)
+            );
 
+            Debug.Log($"[test] 공격력 증가 적용 → 현재 공격력: {_hero.AttackPower}");
+        }
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            _unitStat.RemoveModifier(EffectType.IncreaseAttackPower,this);
+            Debug.Log("더미 아이템 사용 -> 힐량증가");
+
+            _unitStat.AddModifier(
+                EffectType.IncreaseHealPower,
+                new StatModifier(100f, StatModType.Flat, this)
+            );
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            _unitStat.RemoveModifier(EffectType.IncreaseMoveSpeed, this);
+            _unitStat.RemoveModifier(EffectType.IncreaseDetectionRange, this);
+            _unitStat.RemoveModifier(EffectType.IncreaseDamageTaken, this);
             _unitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);
+            _unitStat.RemoveModifier(EffectType.IncreaseAttackPower,this);
+            _unitStat.RemoveModifier(EffectType.IncreaseHealPower, this);
             Debug.Log("더미 아이템 효과 제거");
         }
     }
