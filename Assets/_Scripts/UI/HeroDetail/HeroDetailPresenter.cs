@@ -109,6 +109,9 @@ public class HeroDetailPresenter : MonoBehaviour
             return;
         }
 
+        //DB 중복 처리 방어
+        if (DBStatus.IsUpdating) return;
+
         // 클릭 시점에 최신 데이터를 다시 확인
         _userHeroData = UserDataManager.Instance.HeroesModel.Find(h => h.heroId == _heroData.id);
         if (_userHeroData == null) return;
@@ -126,11 +129,26 @@ public class HeroDetailPresenter : MonoBehaviour
             popup.Setup(
                 $"{translatedName}을(를) 구매하시겠습니까?",
                 async () => {
-                    var updates = new Dictionary<string, object> { { "Wallet.gold", UserDataManager.Instance.WalletModel.gold - _heroData.goldRequirement } };
-                    var heroes = new List<HeroDbModel> { new HeroDbModel { heroId = _heroData.id, level = 1, exp = 0, isUnlock = true } };
+                    if (DBStatus.IsUpdating) return;
+                    DBStatus.IsUpdating = true;
 
-                    await UserDataManager.Instance.UpdateAll(updates, heroes);
-                    RefreshAll();
+                    try
+                    {
+
+                        var updates = new Dictionary<string, object> { { "Wallet.gold", UserDataManager.Instance.WalletModel.gold - _heroData.goldRequirement } };
+                        var heroes = new List<HeroDbModel> { new HeroDbModel { heroId = _heroData.id, level = 1, exp = 0, isUnlock = true } };
+
+                        await UserDataManager.Instance.UpdateAll(updates, heroes);
+                        RefreshAll();
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogError($"구매 실패 : {ex.Message}");
+                    }
+                    finally
+                    {
+                        DBStatus.IsUpdating = false;
+                    }
                 },
                 isBuy,
                 "골드가 부족하여 구매할 수 없습니다."
@@ -149,30 +167,44 @@ public class HeroDetailPresenter : MonoBehaviour
                 "레벨업 하시겠습니까?", 
                 async () =>
                 {
-                    // 다시 한번 최종 데이터 확인
-                    var userHero = UserDataManager.Instance.HeroesModel.Find(h => h.heroId == _heroData.id);
-                    var costData = TableManager.Instance.HeroLevelTable.Get(userHero.level.ToString());
+                    if (DBStatus.IsUpdating) return;
+                    DBStatus.IsUpdating = true;
 
-                    // 최종 조건 체크 (이미 경험치가 찼는지 && 골드가 충분한지)
-                    if (userHero.exp >= costData.expRequirement && UserDataManager.Instance.WalletModel.gold >= costData.goldRequirement)
+                    try
                     {
-                        HeroStatData oldStatus = HeroManager.Instance.GetStatus(_heroData.id);
+                        // 다시 한번 최종 데이터 확인
+                        var userHero = UserDataManager.Instance.HeroesModel.Find(h => h.heroId == _heroData.id);
+                        var costData = TableManager.Instance.HeroLevelTable.Get(userHero.level.ToString());
 
-                        var updates = new Dictionary<string, object> { { "Wallet.gold", UserDataManager.Instance.WalletModel.gold - costData.goldRequirement } };
-                        var heroes = new List<HeroDbModel>
+                        // 최종 조건 체크 (이미 경험치가 찼는지 && 골드가 충분한지)
+                        if (userHero.exp >= costData.expRequirement && UserDataManager.Instance.WalletModel.gold >= costData.goldRequirement)
                         {
-                            new HeroDbModel
-                            {
-                                heroId = _heroData.id,
-                                level = userHero.level + 1,
-                                exp = userHero.exp - costData.expRequirement,
-                                isUnlock = true
-                            }
-                        };
+                            HeroStatData oldStatus = HeroManager.Instance.GetStatus(_heroData.id);
 
-                        await UserDataManager.Instance.UpdateAll(updates, heroes);
-                        RefreshAll();
-                        ShowUpgradeResult(oldStatus);
+                            var updates = new Dictionary<string, object> { { "Wallet.gold", UserDataManager.Instance.WalletModel.gold - costData.goldRequirement } };
+                            var heroes = new List<HeroDbModel>
+                            {
+                                new HeroDbModel
+                                {
+                                    heroId = _heroData.id,
+                                    level = userHero.level + 1,
+                                    exp = userHero.exp - costData.expRequirement,
+                                    isUnlock = true
+                                }
+                            };
+
+                            await UserDataManager.Instance.UpdateAll(updates, heroes);
+                            RefreshAll();
+                            ShowUpgradeResult(oldStatus);
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogError($"레벨업 실패 : {ex.Message}");
+                    }
+                    finally
+                    {
+                        DBStatus.IsUpdating = false;
                     }
                 },
                 isExpFull && isGoldEnough, // 버튼 활성화 조건: 경험치와 골드 모두 충족 시

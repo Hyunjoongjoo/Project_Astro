@@ -1,5 +1,7 @@
 ﻿using Firebase.Firestore;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -245,43 +247,54 @@ public class UserDataStore : Singleton<UserDataStore>
     // 유저 데이터 모두 업데이트
     public async Task UpdateAllAsync(string uuid, Dictionary<string, object> updates = null, List<HeroDbModel> heroDatas = null)
     {
-        try
+        using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20)))
         {
-            WriteBatch batch = _firestore.StartBatch();
+            try
+            {
+                WriteBatch batch = _firestore.StartBatch();
 
-            if(updates != null)
-            {
-                DocumentReference userDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid);
-                batch.Update(userDocRef, updates);
-                Debug.Log($"[Firestore] User data queued for update: {uuid}");
-            }
-            
-            if (heroDatas != null)
-            {
-                foreach (var hero in heroDatas)
+                if (updates != null)
                 {
-                    var heroDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid)
-                                        .Collection(COLLECTION_HERO).Document(hero.heroId);
+                    DocumentReference userDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid);
+                    batch.Update(userDocRef, updates);
+                    Debug.Log($"[Firestore] User data queued for update: {uuid}");
+                }
 
-                    Dictionary<string, object> heroUpdates = new Dictionary<string, object>
+                if (heroDatas != null)
+                {
+                    foreach (var hero in heroDatas)
+                    {
+                        var heroDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid)
+                                            .Collection(COLLECTION_HERO).Document(hero.heroId);
+
+                        Dictionary<string, object> heroUpdates = new Dictionary<string, object>
                     {
                         { "level", hero.level },
                         { "exp", hero.exp },
-                        { "isUnlock", hero.isUnlock } 
+                        { "isUnlock", hero.isUnlock }
                     };
 
-                    batch.Update(heroDocRef, heroUpdates);
-                    Debug.Log($"[Batch Queue] 영웅 {hero.heroId} (Level: {hero.level}) 추가");
+                        batch.Update(heroDocRef, heroUpdates);
+                        Debug.Log($"[Batch Queue] 영웅 {hero.heroId} (Level: {hero.level}) 추가");
+                    }
                 }
-            }
-            await batch.CommitAsync();
-            Debug.Log("[Batch] DB UpdateAll 성공");
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[Firestore] All Update 실패: {e.Message}");
-        }
 
+                Task commitTask = batch.CommitAsync();
+                Task delayTask = Task.Delay(TimeSpan.FromSeconds(20), cts.Token);
+                Task completedTask = await Task.WhenAny(commitTask, delayTask);
+
+                if (completedTask == delayTask)
+                {
+                    throw new TimeoutException("[Firestore] 서버 응답 시간이 초과되었습니다. (20s)");
+                }
+                await commitTask;
+                Debug.Log("[Batch] DB UpdateAll 성공");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[Firestore] All Update 실패: {e.Message}");
+            }
+        }
     }
     #endregion
 

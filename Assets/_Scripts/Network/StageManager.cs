@@ -86,6 +86,8 @@ public class StageManager : NetworkBehaviour
         _userDataManager = FindFirstObjectByType<UserDataManager>();
         if (_userDataManager == null)
             Debug.Log("UserDataManager 찾지 못함");
+
+        DBStatus.IsUpdating = false;
     }
 
     private void Start()
@@ -519,6 +521,12 @@ public class StageManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_GameOver(Team victory)
     {
+        if(DBStatus.IsUpdating)
+        {
+            return;
+        }
+        DBStatus.IsUpdating = true;
+
         Debug.Log("게임오버 RPC 진입 성공");
         _stageUI.gameObject.SetActive(true);
         _stageUI.goLobbyBtn.onClick.AddListener(ShutDownAndSceneChange);
@@ -527,7 +535,6 @@ public class StageManager : NetworkBehaviour
 
         Team myTeam = _localPlayerMap.Team;
         Debug.Log($"승리팀 : {victory}, 내 팀 : {myTeam}, 비트마스크 : {_localPlayerMap.UsedHeroBitmask}");
-
 
         bool isWin = (myTeam == victory);
         bool isDraw = (victory == Team.None);
