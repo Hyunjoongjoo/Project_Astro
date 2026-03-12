@@ -35,6 +35,7 @@ public class HeroDetailView : BaseUI
     [SerializeField] private TMP_Text _rewardNameTxt;
     [SerializeField] private TMP_Text _rewardDesTxt;
     [SerializeField] private GameObject _lockPanel;
+    [SerializeField] private TMP_Text _locktxt;
 
     [Header("스텟 페이지 설정")]
     [SerializeField] private Transform _statContainer;
@@ -167,6 +168,8 @@ public class HeroDetailView : BaseUI
 
         bool isCurrentSelectedLocked = currentLevel < unlockLevels[selectedIndex];
         _lockPanel.SetActive(isCurrentSelectedLocked);
+
+        _locktxt.text = $"레벨 {unlockLevels[selectedIndex]} 달성 시 해금";
 
         _rewardNameTxt.text = rewardName;
         _rewardDesTxt.text = rewardDes;
