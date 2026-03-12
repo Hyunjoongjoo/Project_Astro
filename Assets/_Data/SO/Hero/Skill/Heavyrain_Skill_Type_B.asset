@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
   heroId: hero_heavyrain
   skillName: augmentSkill_heavyrain_A
-  skillDescription: Heavyrain's augment A skill
+  skillDescription: Heavyrain's augment B skill
   note: 
   skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
   skillType: 2
@@ -24,7 +24,7 @@ MonoBehaviour:
   range: 5
   projectileSpeed: 10
   isHoming: 0
-  oneShotProjectileNum: 1
-  spreadAngle: 0
-  repeatingFire: 5
-  interval: 0.3
+  oneShotProjectileNum: 3
+  spreadAngle: 30
+  repeatingFire: 1
+  interval: 0
