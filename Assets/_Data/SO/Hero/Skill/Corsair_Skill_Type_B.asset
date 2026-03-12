@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 906afe7c667c0444788587ba088d1cb0, type: 3}
-  m_Name: Corsair_Skill_Type_A
+  m_Name: Corsair_Skill_Type_B
   m_EditorClassIdentifier: Assembly-CSharp::DashSkillSO
   heroId: hero_corsair
-  skillName: augmentSkill_corsair_A
+  skillName: augmentSkill_corsair_B
   skillDescription: 
   note: 
   skillVFX: {fileID: 6393617126741755569, guid: cd314f7e717ada041bb94a53b1fdff9c, type: 3}
