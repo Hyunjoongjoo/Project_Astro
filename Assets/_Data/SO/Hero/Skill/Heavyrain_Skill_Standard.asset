@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
   heroId: hero_heavyrain
   skillName: skill_name_heavyrain
-  skillDescription: Heavyrain's normal skill
+  skillDescription: 
   note: 
   skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
   skillType: 1
