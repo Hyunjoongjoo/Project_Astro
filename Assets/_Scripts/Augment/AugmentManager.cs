@@ -52,6 +52,13 @@ public class AugmentManager : Singleton<AugmentManager>
 
     public void ShowAugmentWindow(List<AugmentData> myDatas, List<AugmentData> teamDatas = null, string teamName = "")
     {
+        //새 창을 열기 전 이전 라운드의 창이 남아있으면 닫아줌
+        if (_currentWindow != null)
+        {
+            _currentWindow.Close();
+            _currentWindow = null;
+        }
+
         //UIManager를 통해 팝업 형식으로 띄움
         _currentWindow = UIManager.Instance.ShowUI<AugmentWindowUI>(_augmentWindowPrefab, true);
         if (_cachedStageManager == null) _cachedStageManager = FindFirstObjectByType<StageManager>();
@@ -124,32 +131,14 @@ public class AugmentManager : Singleton<AugmentManager>
         }
     }
 
-    //창 닫고 버튼도 끄는 통합 함수
-    public void CloseAndHideToggle()
-    {
-        if (_currentWindow != null)
-        {
-            _currentWindow.Close();
-        }
-        HideAugmentToggleBtn();
-    }
-
-    //양측 모두 확정했는지 검사하는 함수
-    public void CheckBothConfirmed()
-    {
-        if (_currentWindow != null && _currentWindow.IsForcePicked && _currentWindow.IsTeammateConfirmed)
-        {
-            CloseAndHideToggle();
-        }
-    }
-
     //캡슐화 메서드
     public void NotifyTeammateConfirmed()
     {
         if (_currentWindow != null)
         {
-            _currentWindow.IsTeammateConfirmed = true;
-            CheckBothConfirmed(); 
+            //UI에게 아군이 확정했다는 사실만 전달함
+            //절 대 직 접 닫 지 마
+            _currentWindow.ReceiveTeammateConfirmed();
         }
     }
 }
