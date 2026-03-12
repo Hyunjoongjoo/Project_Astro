@@ -540,9 +540,9 @@ RectTransform:
   - {fileID: 5118364995609616671}
   m_Father: {fileID: 1942497559963883025}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 2125, y: -507.73904}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 850, y: 1012.478}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3154871236222086175
@@ -716,7 +716,7 @@ GameObject:
   - component: {fileID: 1275384604322198227}
   - component: {fileID: 3177097928363213947}
   m_Layer: 5
-  m_Name: Text (TMP) (1)
+  m_Name: rewardDes_txt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1336,7 +1336,7 @@ GameObject:
   - component: {fileID: 4675953505677529755}
   - component: {fileID: 7146233554471503114}
   m_Layer: 5
-  m_Name: Panel (1)
+  m_Name: lockPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1872,9 +1872,9 @@ RectTransform:
   - {fileID: 8824964905931049037}
   m_Father: {fileID: 1942497559963883025}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 425, y: -507.73904}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 850, y: 1012.478}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2527835631390331805
@@ -4134,7 +4134,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5724744471569154802}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
   m_Name: 
@@ -4956,9 +4956,9 @@ RectTransform:
   - {fileID: 2323891492917923050}
   m_Father: {fileID: 1942497559963883025}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 2975, y: -507.73904}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 850, y: 1012.478}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5194705667832336315
@@ -5011,7 +5011,7 @@ GameObject:
   - component: {fileID: 8406187556896635623}
   - component: {fileID: 8529145093596306133}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: rewardName_txt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5289,6 +5289,20 @@ MonoBehaviour:
   _augmentIconContainer: {fileID: 1398005952034523580}
   _skillIconPrefab: {fileID: 3635320979166440665, guid: 8a4677203ae4c154c8ba0a4c53995491, type: 3}
   _desPanelPrefab: {fileID: 7692701966302501289, guid: b87765d86d24d164ab77d1b1ae483d11, type: 3}
+  _rewardBtns:
+  - {fileID: 3745184918428917094}
+  - {fileID: 3471679893944488130}
+  - {fileID: 798641136194735792}
+  - {fileID: 1879993862162891672}
+  _lockImgs:
+  - {fileID: 6695972685262017417}
+  - {fileID: 627022273188320947}
+  - {fileID: 1746825936569536428}
+  - {fileID: 7846842430376993277}
+  _rewardNameTxt: {fileID: 8529145093596306133}
+  _rewardDesTxt: {fileID: 3177097928363213947}
+  _lockPanel: {fileID: 2204195021020397185}
+  _locktxt: {fileID: 6277916263674691501}
   _statContainer: {fileID: 2323891492917923050}
   _statPanelPrefab: {fileID: 3287407771323433971, guid: 32cf3c1672a8b4944aecf9ab640c783b, type: 3}
   _upgradeBtn: {fileID: 4900040001319930337}
@@ -5954,9 +5968,9 @@ RectTransform:
   - {fileID: 1255648650891643045}
   m_Father: {fileID: 1942497559963883025}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1275, y: -507.73904}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 850, y: 1012.478}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8307514871510284899
