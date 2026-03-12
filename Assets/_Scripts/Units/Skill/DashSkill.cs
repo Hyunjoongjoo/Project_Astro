@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ public class DashSkill : ISkill
     private TickTimer _skillCooldown;
 
     private Collider[] _hitColliders;
+    private Collider[] _searchColliders = new Collider[20];//타겟 검색용 배열
 
     public BaseSkillSO Data => _data;
     public bool IsCasting => _isCasting;
@@ -62,7 +64,66 @@ public class DashSkill : ISkill
         if (_cachedUnit.currentTarget == null) return;
 
         // 코루틴을 통해 목표 지점까지 이동하는 로직 실행
-        _cachedUnit.StartCoroutine(DashRoutine(_cachedUnit.currentTarget));
+        //_cachedUnit.StartCoroutine(DashRoutine(_cachedUnit.currentTarget));
+        _cachedUnit.StartCoroutine(DashSequence());
+    }
+
+    //여러 번 돌진을 관리하는 코루틴
+    private IEnumerator DashSequence()
+    {
+        HashSet<UnitBase> dashedTargets = new HashSet<UnitBase>();
+
+        for (int i = 0; i < _data.dashCount; i++)
+        {
+            UnitBase target = FindNextTarget(dashedTargets);
+
+            if (target == null)
+            {
+                yield break;
+            }
+
+            dashedTargets.Add(target);
+
+            yield return _cachedUnit.StartCoroutine(DashRoutine(target));
+
+            //돌진 사이 텀 추가
+            yield return new WaitForSeconds(_data.dashInterval);
+        }
+    }
+
+    //기획서 기준 다음 돌진 타겟 찾기 (가장 멀리 있는 적, 같은 적 제외)
+    private UnitBase FindNextTarget(HashSet<UnitBase> excludedTargets)
+    {
+        int hitCount = Physics.OverlapSphereNonAlloc(
+            _cachedUnit.transform.position,
+            _data.canDashMaxDistance,
+            _searchColliders,
+            _cachedUnit.TargetLayer
+        );
+
+        UnitBase bestTarget = null;
+        float farthestDistance = 0f;
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            Collider col = _searchColliders[i];
+
+            if (col.TryGetComponent(out UnitBase enemy))
+            {
+                if (excludedTargets.Contains(enemy))
+                    continue;
+
+                float dist = Vector3.Distance(_cachedUnit.transform.position, enemy.transform.position);
+
+                if (dist > farthestDistance)
+                {
+                    farthestDistance = dist;
+                    bestTarget = enemy;
+                }
+            }
+        }
+
+        return bestTarget;
     }
 
     private IEnumerator DashRoutine(UnitBase target)
