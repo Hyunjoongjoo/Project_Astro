@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 33bf744b4e39dc04999fede7c64beeea, type: 3}
-  m_Name: Heavyrain_Skill_Standard
+  m_Name: Heavyrain_Skill_Type_B_enhance
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
   heroId: hero_heavyrain
-  skillName: normalSkill_heavyrain
-  skillDescription: Heavyrain's normal skill
+  skillName: augmentSkill_heavyrain_A
+  skillDescription: Heavyrain's augment A skill
   note: 
   skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
-  skillType: 1
+  skillType: 2
   initCooldown: 4
   cooldown: 8
   damageRatio: 1
@@ -26,5 +26,5 @@ MonoBehaviour:
   isHoming: 0
   oneShotProjectileNum: 1
   spreadAngle: 0
-  repeatingFire: 3
+  repeatingFire: 5
   interval: 0.3
