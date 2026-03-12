@@ -224,17 +224,31 @@ public class UnitController : UnitBase
         if (_towerA == null && _towerB == null)
             return _bridge;
 
-        //둘 중 하나만 남았다면 그 포탑으로
-        if (_towerA == null)
-            return _towerB;
+        // 살아있는 건물들 중 가장 가까운 것을 반환
+        UnitBase closest = _bridge;
+        float closestDist = (transform.position - _bridge.transform.position).sqrMagnitude;
 
-        if (_towerB == null)
-            return _towerA;
+        if (_towerA != null)
+        {
+            float distA = (transform.position - _towerA.transform.position).sqrMagnitude;
+            if (distA < closestDist)
+            {
+                closest = _towerA;
+                closestDist = distA;
+            }
+        }
 
-        float distA = (transform.position - _towerA.transform.position).sqrMagnitude;
-        float distB = (transform.position - _towerB.transform.position).sqrMagnitude;
+        if (_towerB != null)
+        {
+            float distB = (transform.position - _towerB.transform.position).sqrMagnitude;
+            if (distB < closestDist)
+            {
+                closest = _towerB;
+                closestDist = distB;
+            }
+        }
 
-        return distA <= distB ? _towerA : _towerB;
+        return closest;
     }
 
     // === RPC 메서드들 모음 ===
