@@ -242,7 +242,7 @@ public class UserDataStore : Singleton<UserDataStore>
     #endregion
 
     #region DB Update
-    // 유저 데이터 업데이트
+    // 유저 데이터 모두 업데이트
     public async Task UpdateAllAsync(string uuid, Dictionary<string, object> updates = null, List<HeroDbModel> heroDatas = null)
     {
         try
@@ -283,42 +283,6 @@ public class UserDataStore : Singleton<UserDataStore>
         }
 
     }
-
-    public async Task UpdateUserDataAsync(string uuid, Dictionary<string, object> updates)
-    {
-        await _firestore
-            .Collection(COLLECTION_NAME)
-            .Document(uuid)
-            .UpdateAsync(updates);
-
-        Debug.Log($"[Firestore] User data updated for UUID: {uuid}");
-    }
-
-    // 영웅의 값 업데이트
-    public async Task UpdateHeroDataAsync(string uuid, string heroId, int level, int exp, bool isUnlock)
-    {
-        var heroDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid)
-        .Collection(COLLECTION_HERO).Document(heroId);
-
-        Dictionary<string, object> updates = new Dictionary<string, object>
-        {
-            { "level", level },
-            { "exp", exp },
-            { "isUnlock", isUnlock }
-        };
-
-        try
-        {
-            await heroDocRef.UpdateAsync(updates);
-
-            Debug.Log($"[Firestore] 영웅 {heroId} 업데이트 완료 (Level: {level}, exp: {exp}, isUnlock = {isUnlock})");
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[Firestore] 영웅 업데이트 실패: {e.Message}");
-        }
-    }
-
     #endregion
 
 

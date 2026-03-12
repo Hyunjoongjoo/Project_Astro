@@ -126,8 +126,10 @@ public class HeroDetailPresenter : MonoBehaviour
             popup.Setup(
                 $"{translatedName}을(를) 구매하시겠습니까?",
                 async () => {
-                    await UserDataManager.Instance.UpdateWallet(-_heroData.goldRequirement);
-                    await UserDataManager.Instance.UpdateHero(_heroData.id, _userHeroData.level, _userHeroData.exp, true);
+                    var updates = new Dictionary<string, object> { { "Wallet.gold", UserDataManager.Instance.WalletModel.gold - _heroData.goldRequirement } };
+                    var heroes = new List<HeroDbModel> { new HeroDbModel { heroId = _heroData.id, level = 1, exp = 0, isUnlock = true } };
+
+                    await UserDataManager.Instance.UpdateAll(updates, heroes);
                     RefreshAll();
                 },
                 isBuy,
@@ -156,11 +158,19 @@ public class HeroDetailPresenter : MonoBehaviour
                     {
                         HeroStatData oldStatus = HeroManager.Instance.GetStatus(_heroData.id);
 
-                        int nextLevel = userHero.level + 1;
-                        // 레벨업 시 골드,경험치 삭감
-                        await UserDataManager.Instance.UpdateWallet(-costData.goldRequirement);
-                        await UserDataManager.Instance.UpdateHero(_heroData.id, nextLevel, userHero.exp - costData.expRequirement, true);
+                        var updates = new Dictionary<string, object> { { "Wallet.gold", UserDataManager.Instance.WalletModel.gold - costData.goldRequirement } };
+                        var heroes = new List<HeroDbModel>
+                        {
+                            new HeroDbModel
+                            {
+                                heroId = _heroData.id,
+                                level = userHero.level + 1,
+                                exp = userHero.exp - costData.expRequirement,
+                                isUnlock = true
+                            }
+                        };
 
+                        await UserDataManager.Instance.UpdateAll(updates, heroes);
                         RefreshAll();
                         ShowUpgradeResult(oldStatus);
                     }
