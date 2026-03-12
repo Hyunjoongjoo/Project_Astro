@@ -53,6 +53,9 @@ public class HealSkill : ISkill
         {
             if (_hitColliders[i].TryGetComponent(out UnitBase unit))
             {
+                if (unit.Object.IsValid == false)
+                    continue;
+
                 // 자신은 제외하며, 체력이 100% 미만인 경우
                 if (unit.CurrentHealth < unit.MaxHealth && unit != _cachedUnit)
                 {
@@ -160,6 +163,9 @@ public class HealSkill : ISkill
         {
             foreach (var target in targets)
             {
+                if (target.Object.IsValid == false)
+                    continue;
+
                 // 도트 힐 도중 타겟이 파괴될 수 있으므로 null 체크 필수
                 if (target != null && target.CurrentHealth < target.MaxHealth)
                 {
