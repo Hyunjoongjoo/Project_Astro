@@ -130,12 +130,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0807c2c902d934c971569602ccad0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewHeroController
+  _testRange: 0
+  deathEffectPrefab: {fileID: 2657706564968800909, guid: d0eee260816bd1440b043ff10e023225, type: 3}
+  deathEffectLifeTime: 0.5
+  _MaxHealth: 0
   team: 0
   _networkedTeam: 0
   _CurrentHealth: 0
   agent: {fileID: 0}
-  moveSpeed: 0
-  searchRange: 0
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -147,10 +149,6 @@ MonoBehaviour:
   currentTarget: {fileID: 0}
   _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}
   _standardSkillData: {fileID: 11400000, guid: b0fad8a3236bb7e4597f6d58c11cc918, type: 2}
-  _typeASkillData: {fileID: 11400000, guid: 1fa882fa5cd54be48bd4e31b912e7b0b, type: 2}
-  _typeAEnhanceSkillData: {fileID: 0}
-  _typeBSkillData: {fileID: 0}
-  _typeBEnhanceSkillData: {fileID: 0}
 --- !u!114 &707048002635603553
 MonoBehaviour:
   m_ObjectHideFlags: 0

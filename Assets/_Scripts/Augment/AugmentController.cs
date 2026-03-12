@@ -33,6 +33,9 @@ public class AugmentController : NetworkBehaviour
     //2vs2 분할 배송을 위한 클라이언트 임시 보관소
     private List<AugmentData> _tempMyCards;
 
+    //중복 클릭 방지용 변수 추가(클라이언트 둘이 동시에 눌렀을 때 카드 2배 생성 방지)
+    private float _lastBlueRequestTime = 0f;
+    private float _lastRedRequestTime = 0f;
 
     //인스펙터 직렬화 해둘 히어로 아이콘SO
     [SerializeField] private HeroIconDataSO _heroIconSO;
@@ -109,7 +112,8 @@ public class AugmentController : NetworkBehaviour
     //UI에서 증강선택 토글 버튼 눌렀을 때 호출
 
     //3.9 서버가 팀원 데이터를 모아 덱 매니저 돌리고 클라로 배달
-    public void OpenAugmentWindow()
+    //3.12 매개변수 추가: targetTeam이 null이면 전체, 값이 있으면 해당 팀만
+    public void OpenAugmentWindow(Team? targetTeam = null)
     {
         if (_stageManager == null)
         {
@@ -136,6 +140,7 @@ public class AugmentController : NetworkBehaviour
         {
             if (kvp.Value.Team == Team.Blue || kvp.Value.Team == Team.Red)
             {
+                if (targetTeam != null && kvp.Value.Team != targetTeam) continue;
                 teamPlayers[kvp.Value.Team].Add(kvp.Key);
             }
         }
@@ -144,6 +149,7 @@ public class AugmentController : NetworkBehaviour
         //팀 단위로 겹침 방지 처리하며 카드 생성
         foreach (var team in teamPlayers.Values)
         {
+            if (team.Count == 0) continue; //적팀은 패스
             List<string> excludedSkillTargets = new List<string>();
             List<string> teamHeroes = new List<string>();
 
@@ -303,6 +309,8 @@ public class AugmentController : NetworkBehaviour
     {
         if (Runner.LocalPlayer == target)
         {
+            Debug.Log("RPC_DeliverTeamCards 수신됨 - 1vs1인데 이게 찍히면 버그");
+
             PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer); 
             int reinforceNum = 6;
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
@@ -463,31 +471,57 @@ public class AugmentController : NetworkBehaviour
     }
 
     //통과
+    //3.10 무료 증강 예외처리 삭제 & 이중 차감 방지 로직 구현
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_ConfirmAugment(string targetId, AugmentType type, PlayerRef player)
     {
-        //마스터 권한인 경우엔 PlayerNetworkData 업데이트
+        //마스터 권한인 경우엔 PlayerNetworkData 업데이트 및 게이지 차감 처리
         if (Object.HasStateAuthority)
         {
-            AugmentExecutor.ApplyAugment(_stageManager, player, type, targetId);
-
-            //나를 포함한 모든 유저에게 갱신 알림을 보냄
-            RPC_NotifyTeammateRefresh(player);
-
-            //호스트만 처리하도록 안으로 이동
             if (_stageManager.PlayerDataMap.TryGet(player, out PlayerNetworkData data))
             {
-                //서버 승인이 떨어졌으므로, 100 게이지를 차감
-                _stageManager.DecreaseAugmentGauge(data.Team, 120);
-            }
-            //선택이 확정되었으므로 인게임 타이머 정지 및 초기화
-            if (_stageManager.CurrentState == StageState.Playing)
-            {
-                IsPlayerAugmenting.Set(player, false);
-                PlayerAugmentTimers.Set(player, 0f);
-            }
-        }
+                Team myTeam = data.Team;
 
+                //카드 확정 전에 우리 팀의 현재 최대 증강 횟수 파악
+                int currentTeamMaxPicks = 0;
+                foreach (var kvp in _stageManager.PlayerDataMap)
+                {
+                    if (kvp.Value.Team == myTeam && kvp.Value.TotalAugmentPicks > currentTeamMaxPicks)
+                    {
+                        currentTeamMaxPicks = kvp.Value.TotalAugmentPicks;
+                    }
+                }
+
+                //실제 데이터 적용
+                AugmentExecutor.ApplyAugment(_stageManager, player, type, targetId);
+
+                var updatedData = _stageManager.PlayerDataMap.Get(player);
+
+                //내 새로운 픽 횟수가 팀의 기존 최대 픽 횟수보다 크다면 얘가 결제
+                if (updatedData.TotalAugmentPicks > currentTeamMaxPicks)
+                {
+                    //Config 테이블에서 비용 가져오기 (기본값 120)
+                    int cost = 120;
+                    var config = TableManager.Instance.ConfigTable.Get("augment_gauge");
+                    if (config != null) cost = int.Parse(config.configValue);
+
+                    _stageManager.DecreaseAugmentGauge(myTeam, cost);
+                }
+                else
+                {
+                    Debug.Log($"[{myTeam}] 아군이 이미 게이지 소모해서 패스");
+                }
+
+                //인게임 타이머 초기화 처리
+                if (_stageManager.CurrentState == StageState.Playing)
+                {
+                    IsPlayerAugmenting.Set(player, false);
+                    PlayerAugmentTimers.Set(player, 0f);
+                }
+            }
+            //나를 포함한 모든 유저에게 갱신 알림을 보냄
+            RPC_NotifyTeammateRefresh(player);
+        }
         //카드를 산 사람이 로컬이 맞다면, UI를 갱신
         if (player == Runner.LocalPlayer)
         {
@@ -499,13 +533,7 @@ public class AugmentController : NetworkBehaviour
                     AugmentManager.Instance.AddHeroCard(_localSelectedData);
                     _localSelectedData = null; // 다 썼으니 비워줌
                 }
-
-                //HeroIconSO가 추가되면 아이콘로직 추가
             }
-
-            //토글버튼 숨김
-            AugmentManager.Instance.HideAugmentToggleBtn();
-
             //전투 시작 전이면 카드 다 골랐다고 스테이지에 보고
             if (_stageManager.CurrentState == StageState.PreGameAugment)
             {
@@ -524,8 +552,34 @@ public class AugmentController : NetworkBehaviour
             {
                 _stageManager.UpdateTeammateUI(ownerPlayer, latestData.OwnedHeroes);
             }
+
+            //아군이 확정했음을 UI에 전달하고 양방향 검사
+            if (AugmentManager.Instance != null)
+            {
+                AugmentManager.Instance.NotifyTeammateConfirmed();
+            }
         }
     }
+    //클라이언트의 버튼 클릭 요청을 받는 RPC
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_RequestAugmentCards(PlayerRef requester)
+    {
+        if (_stageManager.PlayerDataMap.TryGet(requester, out var data))
+        {
+            Team requestTeam = data.Team;
+
+            // 1초 쿨타임 (아군 2명이 겹쳐서 눌렀을 때 중복 생성되는 것 방지)
+            if (requestTeam == Team.Blue && Time.time - _lastBlueRequestTime < 1f) return;
+            if (requestTeam == Team.Red && Time.time - _lastRedRequestTime < 1f) return;
+
+            if (requestTeam == Team.Blue) _lastBlueRequestTime = Time.time;
+            if (requestTeam == Team.Red) _lastRedRequestTime = Time.time;
+
+            // 해당 팀의 카드만 생성하라고 지시
+            OpenAugmentWindow(requestTeam);
+        }
+    }
+
 
     //반려
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

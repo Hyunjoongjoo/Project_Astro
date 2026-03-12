@@ -7,6 +7,8 @@ public class ShieldSkill : ISkill
     private bool _isCasting;
     private UnitController _cachedUnit;
     private TickTimer _skillCooldown;
+    private TickTimer _aoeTimer;
+    private TickTimer _durationTimer;
 
     public BaseSkillSO Data => _data;
     public bool IsCasting => _isCasting;
@@ -44,10 +46,55 @@ public class ShieldSkill : ISkill
 
     public void Casting()
     {
-        Debug.Log("실드 스킬 실행됨");
         _cachedUnit.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);//중복방지
         var modifier = new StatModifier(_data.damageReduction, StatModType.Flat, this);
         _cachedUnit.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, modifier, _data.duration);
         _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, _cachedUnit.Object.Id, _data.skillType, true, _data.duration);
+        _durationTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.duration);
+        if (_data.aoeDamageRatio > 0)
+        {
+            _aoeTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.aoeInterval);
+        }
+    }
+
+    public void Tick()
+    {
+        // 스킬이 시작되지 않았으면 실행 안함
+        if (!_durationTimer.IsRunning || _durationTimer.Expired(_cachedUnit.Runner))
+            return;
+        // 스킬 종료
+        if (_durationTimer.Expired(_cachedUnit.Runner))
+            return;
+
+        // 증강 B 없으면 실행 안함
+        if (_data.aoeDamageRatio <= 0)
+            return;
+
+        if (_aoeTimer.Expired(_cachedUnit.Runner))
+        {
+            DoAOEDamage();
+
+            _aoeTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.aoeInterval);
+        }
+    }
+    private void DoAOEDamage()
+    {
+        if (!_cachedUnit.Object.HasStateAuthority)
+            return;
+
+        float damage = _cachedUnit.UnitStat.Attack.Value * _data.aoeDamageRatio;
+        Collider[] hits = Physics.OverlapSphere(
+            _cachedUnit.transform.position,
+            _data.aoeRange,
+            _cachedUnit.TargetLayer);
+
+        foreach (var hit in hits)
+        {
+            UnitController target = hit.GetComponentInParent<UnitController>();
+
+            if (target == null || target == _cachedUnit)
+                continue;
+            target.TakeDamage(damage);
+        }
     }
 }

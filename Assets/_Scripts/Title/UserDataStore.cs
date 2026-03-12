@@ -1,5 +1,7 @@
 ﻿using Firebase.Firestore;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -79,7 +81,7 @@ public class UserDataStore : Singleton<UserDataStore>
             // 0. Hero제외 다른 데이터의 묶음 처리
             var data = new Dictionary<string, object>
             {
-                // 1. Profile Map 생성
+                // Profile Map 생성
                 { "Profile", new Dictionary<string, object>
                     {
                         { "uuid", uuid },
@@ -89,14 +91,14 @@ public class UserDataStore : Singleton<UserDataStore>
                         { "createdAt", FieldValue.ServerTimestamp }
                     }
                 },
-                // 2. Record Map 생성
+                // Record Map 생성
                 { "Record", new Dictionary<string, object>
                     {
                         { "win", 0 },
                         { "lose", 0 }
                     }
                 },
-                // 3. Wallet Map 생성
+                // Wallet Map 생성
                 { "Wallet", new Dictionary<string, object>
                     {
                         { "gold", 0 }
@@ -107,8 +109,17 @@ public class UserDataStore : Singleton<UserDataStore>
             batch.Set(userDocRef, data);
             Debug.Log("유저데이터 배치 완료");
 
-            if (TableManager.Instance == null) { Debug.LogError("TableManager 인스턴스가 없습니다!"); return; }
-            if (TableManager.Instance.HeroTable == null) { Debug.LogError("HeroTable이 로드되지 않았습니다!"); return; }
+            if (TableManager.Instance == null)
+            {
+                Debug.LogError("TableManager 인스턴스가 없습니다!");
+                return;
+            }
+
+            if (TableManager.Instance.HeroTable == null)
+            {
+                Debug.LogError("HeroTable이 로드되지 않았습니다!");
+                return;
+            }
 
             // 3. 영웅 정보 생성 (CSV파서를 통한 TableManager에서 Id값 가져옴)
             var csvHeroDatas = TableManager.Instance.HeroTable.GetAll();
@@ -133,7 +144,8 @@ public class UserDataStore : Singleton<UserDataStore>
                     batch.Set(userDocRef.Collection(COLLECTION_HERO).Document(heroId), initHeroDbData);
                 }
             }
-            Debug.Log("[Step 5] 영웅 데이터 배치 설정 완료. 이제 커밋합니다.");
+            Debug.Log("[Step 5] 영웅 데이터 배치 설정 완료");
+            // awite Exception 관련 이슈 출력 기능 추가.
             await batch.CommitAsync();
             Debug.Log($"[Firestore] 유저 '{nickname}' 생성 및 기본 영웅 {csvHeroDatas.Count}종 생성 완료");
         }
@@ -232,39 +244,56 @@ public class UserDataStore : Singleton<UserDataStore>
     #endregion
 
     #region DB Update
-    // 유저 데이터 업데이트
-    public async Task UpdateUserDataAsync(string uuid, Dictionary<string, object> updates)
+    // 유저 데이터 모두 업데이트
+    public async Task UpdateAllAsync(string uuid, Dictionary<string, object> updates = null, List<HeroDbModel> heroDatas = null)
     {
-        await _firestore
-            .Collection(COLLECTION_NAME)
-            .Document(uuid)
-            .UpdateAsync(updates);
-
-        Debug.Log($"[Firestore] User data updated for UUID: {uuid}");
-    }
-
-    // 영웅의 값 업데이트
-    public async Task UpdateHeroDataAsync(string uuid, string heroId, int level, int exp, bool isUnlock)
-    {
-        var heroDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid)
-        .Collection(COLLECTION_HERO).Document(heroId);
-
-        Dictionary<string, object> updates = new Dictionary<string, object>
+        using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20)))
         {
-            { "level", level },
-            { "exp", exp },
-            { "isUnlock", isUnlock }
-        };
+            try
+            {
+                WriteBatch batch = _firestore.StartBatch();
 
-        try
-        {
-            await heroDocRef.UpdateAsync(updates);
-    
-            Debug.Log($"[Firestore] 영웅 {heroId} 업데이트 완료 (Level: {level}, exp: {exp}, isUnlock = {isUnlock})");
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[Firestore] 영웅 업데이트 실패: {e.Message}");
+                if (updates != null)
+                {
+                    DocumentReference userDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid);
+                    batch.Update(userDocRef, updates);
+                    Debug.Log($"[Firestore] User data queued for update: {uuid}");
+                }
+
+                if (heroDatas != null)
+                {
+                    foreach (var hero in heroDatas)
+                    {
+                        var heroDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid)
+                                            .Collection(COLLECTION_HERO).Document(hero.heroId);
+
+                        Dictionary<string, object> heroUpdates = new Dictionary<string, object>
+                    {
+                        { "level", hero.level },
+                        { "exp", hero.exp },
+                        { "isUnlock", hero.isUnlock }
+                    };
+
+                        batch.Update(heroDocRef, heroUpdates);
+                        Debug.Log($"[Batch Queue] 영웅 {hero.heroId} (Level: {hero.level}) 추가");
+                    }
+                }
+
+                Task commitTask = batch.CommitAsync();
+                Task delayTask = Task.Delay(TimeSpan.FromSeconds(20), cts.Token);
+                Task completedTask = await Task.WhenAny(commitTask, delayTask);
+
+                if (completedTask == delayTask)
+                {
+                    throw new TimeoutException("[Firestore] 서버 응답 시간이 초과되었습니다. (20s)");
+                }
+                await commitTask;
+                Debug.Log("[Batch] DB UpdateAll 성공");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[Firestore] All Update 실패: {e.Message}");
+            }
         }
     }
     #endregion

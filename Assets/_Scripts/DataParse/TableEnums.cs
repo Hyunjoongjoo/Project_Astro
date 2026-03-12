@@ -120,3 +120,12 @@ public enum Team
 {
     None, Blue, Red
 }
+
+//3.11 추가
+
+public enum MatchResult
+{
+    Win,
+    Draw,
+    Lose
+}

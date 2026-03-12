@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class AuthService : MonoBehaviour
+public class AuthService : Singleton<AuthService>
 {
     public FirebaseAuth Auth { get; private set; }
 
@@ -20,6 +20,8 @@ public class AuthService : MonoBehaviour
 
     public void Initialize()
     {
+        if (Auth != null) return;
+
         Auth = FirebaseAuth.DefaultInstance;
         Debug.Log("[Auth] Firebase Auth initialized");
 
@@ -106,6 +108,10 @@ public class AuthService : MonoBehaviour
     public void Logout()
     {
         Auth.SignOut();
+        if(GoogleSignIn.DefaultInstance != null)
+        {
+            GoogleSignIn.DefaultInstance.SignOut();
+        }
         Debug.Log("[Auth] User signed out");
     }
 }

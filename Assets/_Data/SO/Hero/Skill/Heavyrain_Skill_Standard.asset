@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Heavyrain_Skill_Standard
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
   heroId: hero_heavyrain
-  skillName: normalSkill_heavyrain
+  skillName: skill_name_heavyrain
   skillDescription: 
   note: 
   skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
@@ -24,7 +24,7 @@ MonoBehaviour:
   range: 5
   projectileSpeed: 10
   isHoming: 0
-  oneShotProjectileNum: 3
+  oneShotProjectileNum: 1
   spreadAngle: 0
-  repeatingFire: 1
+  repeatingFire: 3
   interval: 0.3

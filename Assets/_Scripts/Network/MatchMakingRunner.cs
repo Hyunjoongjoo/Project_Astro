@@ -120,7 +120,7 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
                     StageManager stageManager = obj.GetComponent<StageManager>();
                     stageManager.Initialize(_curMatchType, _requiredPlayerCount, _existDummy);
                 });
-
+            GameManager.Instance.SetSceneState(SceneState.Stage);
             Debug.Log("마스터 클라이언트 StageManager 생성 완료");
         }
     }

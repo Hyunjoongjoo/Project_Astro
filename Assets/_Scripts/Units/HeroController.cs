@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class HeroController : UnitController
 {
@@ -8,24 +9,21 @@ public class HeroController : UnitController
 
     [Header("기본 스킬 (증강 미적용)")]
     [SerializeField] private BaseSkillSO _standardSkillData;
-    [Header("증강 A타입, 강화형")]
-    [SerializeField] private BaseSkillSO _typeASkillData;
-    [SerializeField] private BaseSkillSO _typeAEnhanceSkillData;
-    [Header("증강 B타입, 강화형")]
-    [SerializeField] private BaseSkillSO _typeBSkillData;
-    [SerializeField] private BaseSkillSO _typeBEnhanceSkillData;
 
     private float _respawnTime;
     public ISkill curUniqueSkill;
     private Vector3 _targetPos;
     private float _deployDelay;
+    private StageManager _stageManager;
 
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
     public ISkill CurUniqueSkill => curUniqueSkill;
-
     public float RespawnTime => _respawnTime;
-    public float HealPower => _unitStat.HealPower.Value;
+
+    //이번 스폰/갱신 때 이미 적용한 스킬 증강 ID를 기억해서 중복 덮어쓰기 방지
+    private HashSet<string> _appliedAugments = new HashSet<string>();
+
 
     public override void Spawned()
     {
@@ -36,9 +34,13 @@ public class HeroController : UnitController
         normalAttack = _normalAttackData.CreateInstance(this);
         curUniqueSkill = _standardSkillData.CreateInstance(this);
 
+        _stageManager = FindFirstObjectByType<StageManager>();
+
         if (!Object.HasStateAuthority) return;
-        ApplySkillAugments();
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
+
+        RefreshAugments();
+
         // 상태 인스턴스 생성
         StateMachine = new StateMachine();
         DeployState = new DeployState(this);
@@ -55,13 +57,13 @@ public class HeroController : UnitController
         //UnitStat 초기화
         _unitStat.Init(statData);
 
+        _unitStat.OnStatChanged += RefreshStatRuntime;//이벤트 구독
+
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
-        moveSpeed = _unitStat.MoveSpeed.Value;
-        searchRange = _unitStat.DetectRange.Value;
         _respawnTime = _unitStat.RespawnTime.Value;
-        agent.speed = moveSpeed;
+        agent.speed = MoveSpeed;
 
         if (agent != null)
         {
@@ -81,6 +83,14 @@ public class HeroController : UnitController
         StateMachine.ChangeState(DeployState);
     }
 
+    private void OnDestroy()
+    {
+        if (_unitStat != null)
+        {
+            _unitStat.OnStatChanged -= RefreshStatRuntime;//이벤트 해제
+        }
+    }
+
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority) return;
@@ -98,6 +108,11 @@ public class HeroController : UnitController
         }
 
         StateMachine.Update();
+
+        if (curUniqueSkill is ShieldSkill shield)
+        {
+            shield.Tick();
+        }
     }
 
     // --- 생성시 초기화 관련 메서드 ---
@@ -123,33 +138,33 @@ public class HeroController : UnitController
         return null;
     }
 
-    // 스킬 증강 시 스킬 교체
-    private void ChangeSkill(BaseSkillSO newSkillData)
+    // 스킬 증강 시 스킬 교체(실제 교체)
+    private void ChangeSkill(BaseSkillSO newSkillSO)
     {
-        if (curUniqueSkill != null && newSkillData.GetType() == curUniqueSkill.GetType())
-            curUniqueSkill.ChangeData(newSkillData);
-        else
-            curUniqueSkill = newSkillData.CreateInstance(this);
+        if (newSkillSO != null)
+        {
+            curUniqueSkill = newSkillSO.CreateInstance(this);
+            Debug.Log($"[{unitId}] 스킬이 {newSkillSO.name}으로 교체되었습니다!");
+        }
     }
 
-    //스킬증강에 사용될 메서드 (스폰에 적용시 이미 배치된 영웅은 적용이 안될것인데....)
-    private void ApplySkillAugments()
+    //3.11 리팩토링
+    //콘피그테이블 참조하도록 변경, 팀원 증강 중복방지 
+    private void ApplyAugments(PlayerNetworkData data)
     {
-        StageManager stageManager = FindFirstObjectByType<StageManager>();
+        //Config 테이블 참조
+        int reinforceNum = 6; 
+        var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
+        if (config != null) reinforceNum = int.Parse(config.configValue);
 
-        if (stageManager == null)
-            return;
-
-        if (!stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out PlayerNetworkData data))
-            return;
-
-        //3.3 여현구
-        //배열에서 구조체로 바뀌어서 여기 수정했습니다.
         for (int i = 0; i < SlotData_5.Length; i++)
         {
             string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
-
             if (string.IsNullOrEmpty(augmentId))
+                continue;
+
+            //중복 방지
+            if (_appliedAugments.Contains(augmentId))
                 continue;
 
             SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
@@ -159,7 +174,7 @@ public class HeroController : UnitController
             if (so.TargetHeroID != unitId)
                 continue;
 
-            int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
+            int tierIndex = data.TotalAugmentPicks >= reinforceNum ? 1 : 0;
 
             if (tierIndex >= so.Tiers.Length)
                 continue;
@@ -169,20 +184,55 @@ public class HeroController : UnitController
             if (newSkill == null)
                 continue;
 
-             ChangeSkill(newSkill);
-        }
+            Debug.Log($"[팀 공유 스킬 증강 적용] 영웅:{unitId} <- 증강:{augmentId} (Tier: {tierIndex})");
 
+            //적용된 증강 기록 및 실제 스킬 교체
+            _appliedAugments.Add(augmentId);
+            ChangeSkill(newSkill);
+        }
     }
 
-    //외부에서 증강을 갱신할 것이라면...
-    //public void RefreshAugments()
-    //{
-    //    if (!Object.HasStateAuthority)
-    //    {
-    //        return;
-    //    }
+    //외부에서 스킬 증강을 갱신할 것이라면...
+    public void RefreshAugments()
+    {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
 
-    //    ApplySkillAugments();
-    //}
+        _appliedAugments.Clear();
+
+        foreach (var player in _stageManager.PlayerDataMap)
+        {
+            if (player.Value.Team != team)
+                continue;
+
+            ApplyAugments(player.Value);
+        }
+    }
+
+    //Stat 변경 시 NavMesh 갱신용 메서드 추가(이미 배치된 유닛의 이동속도 변경 시)
+    public void RefreshStatRuntime()
+    {
+        if (agent != null)
+        {
+            agent.speed = MoveSpeed;
+        }
+    }
+#if UNITY_EDITOR
+    protected override void OnDrawGizmosSelected()
+    {
+        base.OnDrawGizmosSelected();//기존 기즈모
+
+        if (curUniqueSkill == null)
+            return;
+
+        if (curUniqueSkill.Data is ShieldSkillSO shieldData)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position, shieldData.aoeRange);
+        }
+    }
+#endif
 }
 

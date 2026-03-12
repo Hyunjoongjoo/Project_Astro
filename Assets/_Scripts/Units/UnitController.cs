@@ -6,8 +6,8 @@ public class UnitController : UnitBase
 {
     [Header("내비게이션 및 탐지")]
     public NavMeshAgent agent;
-    public float moveSpeed;
-    public float searchRange;
+    //public float moveSpeed;
+    //public float searchRange;
     public LayerMask targetLayer;
     public float searchInterval = 0.3f;
     [SerializeField] protected MoveType moveType;
@@ -36,9 +36,14 @@ public class UnitController : UnitBase
     [Header("평타 공격")]
     [SerializeField] protected BaseSkillSO _normalAttackData;
 
-    public UnitBase CurrentTarget => currentTarget;
+    //stat 실시간 참조
     public float AttackPower => _unitStat.Attack.Value;
     public float AttackSpeed => _unitStat.AttackSpeed.Value;
+    public float HealPower => _unitStat.HealPower.Value;//나중에 힐스킬에 연결
+    public float MoveSpeed => _unitStat.MoveSpeed.Value;
+    public float DetectRange => _unitStat.DetectRange.Value;
+
+    public UnitBase CurrentTarget => currentTarget;
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
     public LayerMask TargetLayer => targetLayer;
@@ -77,9 +82,9 @@ public class UnitController : UnitBase
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
-        moveSpeed = _unitStat.MoveSpeed.Value;
-        searchRange = _unitStat.DetectRange.Value;
-        agent.speed = moveSpeed;
+        //moveSpeed = _unitStat.MoveSpeed.Value;
+        //searchRange = _unitStat.DetectRange.Value;
+        agent.speed = MoveSpeed;
 
         StateMachine.ChangeState(DetectState);
     }
@@ -189,7 +194,7 @@ public class UnitController : UnitBase
     public UnitBase FindTarget()
     {
         // 기존 MobilityUnit의 OverlapSphere 탐색 로직
-        Collider[] hits = Physics.OverlapSphere(transform.position, searchRange, targetLayer);
+        Collider[] hits = Physics.OverlapSphere(transform.position, DetectRange, targetLayer);
         float minDistance = float.MaxValue;
         UnitBase closest = null;
 
@@ -219,17 +224,31 @@ public class UnitController : UnitBase
         if (_towerA == null && _towerB == null)
             return _bridge;
 
-        //둘 중 하나만 남았다면 그 포탑으로
-        if (_towerA == null)
-            return _towerB;
+        // 살아있는 건물들 중 가장 가까운 것을 반환
+        UnitBase closest = _bridge;
+        float closestDist = (transform.position - _bridge.transform.position).sqrMagnitude;
 
-        if (_towerB == null)
-            return _towerA;
+        if (_towerA != null)
+        {
+            float distA = (transform.position - _towerA.transform.position).sqrMagnitude;
+            if (distA < closestDist)
+            {
+                closest = _towerA;
+                closestDist = distA;
+            }
+        }
 
-        float distA = (transform.position - _towerA.transform.position).sqrMagnitude;
-        float distB = (transform.position - _towerB.transform.position).sqrMagnitude;
+        if (_towerB != null)
+        {
+            float distB = (transform.position - _towerB.transform.position).sqrMagnitude;
+            if (distB < closestDist)
+            {
+                closest = _towerB;
+                closestDist = distB;
+            }
+        }
 
-        return distA <= distB ? _towerA : _towerB;
+        return closest;
     }
 
     // === RPC 메서드들 모음 ===

@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Angel_Skill_Standard
   m_EditorClassIdentifier: Assembly-CSharp::HealSkillSO
   heroId: hero_angel
-  skillName: normalSkill_angel
+  skillName: skill_name_angel
   skillDescription: 
   note: 
   skillVFX: {fileID: 7343538280686139031, guid: 921bfdf400594b2459b6504da1d4e296, type: 3}
   skillType: 1
   initCooldown: 5
   cooldown: 10
-  recoveryAmount: 100
+  healCoefficient: 1.5
   range: 3
   duration: 0
   interval: 0

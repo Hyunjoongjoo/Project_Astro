@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System;
 
 //현재 스탯을 계산하여 유닛에게 달아줄 관리자
 //외부 요인의 효과 적용을 알맞은 Stat 객체로 분배
@@ -27,7 +28,8 @@ public class UnitStat : MonoBehaviour
     public Stat DamageReduction { get; private set; }
     public Stat CooldownReduction { get; private set; }
 
-
+    //03-10 스탯 변경 알림 이벤트
+    public Action OnStatChanged;
 
     //EffectType 을 확인, 어떤 Stat 객체에 넣어줄지 연결해주는 딕셔너리
     private Dictionary<EffectType, Stat> _statMap = new Dictionary<EffectType, Stat>();
@@ -132,7 +134,7 @@ public class UnitStat : MonoBehaviour
 
             stat.AddModifier(modifier);
             Debug.Log($"<color=green>[StatMod]</color> {type} 변경: {before} -> {stat.Value} (Source: {modifier.Source})");
-
+            OnStatChanged?.Invoke();//03-10
         }
         else
         {
@@ -166,6 +168,7 @@ public class UnitStat : MonoBehaviour
         if (_statMap.TryGetValue(type, out Stat stat))
         {
             stat.RemoveModifier(source);
+            OnStatChanged?.Invoke();//03-10
         }
     }
 
