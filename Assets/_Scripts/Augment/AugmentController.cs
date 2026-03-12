@@ -309,6 +309,8 @@ public class AugmentController : NetworkBehaviour
     {
         if (Runner.LocalPlayer == target)
         {
+            Debug.Log("RPC_DeliverTeamCards 수신됨 - 1vs1인데 이게 찍히면 버그");
+
             PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer); 
             int reinforceNum = 6;
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
