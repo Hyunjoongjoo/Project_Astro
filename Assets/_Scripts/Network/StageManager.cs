@@ -15,13 +15,6 @@ public enum StageState
     GameOver              // 게임 종료
 }
 
-public struct RewardData
-{
-    public int UserExp;
-    public int HeroExp;
-    public int GoldAmount;
-}
-
 public struct HeroResultData
 {
     public string HeroId;        
@@ -70,10 +63,6 @@ public class StageManager : NetworkBehaviour
     private readonly float COUNTDOWN_INTERVAL = 1f;
 
     private PlayerNetworkData _localPlayerMap = default;
-
-    private readonly RewardData _winReward = new RewardData { UserExp = 10, HeroExp = 10, GoldAmount = 1000 };
-    private readonly RewardData _drawReward = new RewardData { UserExp = 9, HeroExp = 9, GoldAmount = 800 };
-    private readonly RewardData _loseReward = new RewardData { UserExp = 8, HeroExp = 8, GoldAmount = 500 };
 
     //팀원 UI관리용 딕셔너리
     private Dictionary<PlayerRef, TeamCardSlotUI> _teammateUIList = new Dictionary<PlayerRef, TeamCardSlotUI>();
@@ -542,18 +531,27 @@ public class StageManager : NetworkBehaviour
         bool isDraw = (victory == Team.None);
 
         // 승패 결과에 따른 리워드 세팅
-        RewardData reward = (victory == Team.None) ? _drawReward : (myTeam == victory ? _winReward : _loseReward);
+        MatchResult resultType = isDraw ? MatchResult.Draw : (isWin ? MatchResult.Win : MatchResult.Lose);
+
+        var rewardData = TableManager.Instance.MatchRewardTable.GetAll().Find(r =>
+            r.matchType == CurMatchType && r.matchResult == resultType);
+
+        if (rewardData == null)
+        {
+            Debug.LogError($"[GameOver] 리워드 테이블 데이터를 찾을 수 없습니다! Type: {CurMatchType}, Result: {resultType}");
+            return;
+        }
 
         // DB에 업데이트
-        _ = _userDataManager.UpdateWallet(reward.GoldAmount);
-        _ = _userDataManager.UpdateUserDb(reward.UserExp);
+        _ = _userDataManager.UpdateWallet(rewardData.gold);
+        //_ = _userDataManager.UpdateUserDb(rewardData.exp);
 
         if (victory != Team.None)
         {
             _ = _userDataManager.UpdateRecord(isWin ? 1 : 0, isWin ? 0 : 1);
         }
 
-        int totalGold = _userDataManager.WalletModel.gold;
+        Debug.Log("획득한 골드량 : " + rewardData.gold);
 
         List<HeroResultData> resultHeroes = new List<HeroResultData>();
         var allHeroTable = TableManager.Instance.HeroTable.GetAll();
@@ -583,12 +581,12 @@ public class StageManager : NetworkBehaviour
                             HeroName   = tableData.heroName,
                             Level      = heroModel.level,
                             CurrentExp = heroModel.exp,
-                            AddedExp   = reward.HeroExp,
+                            AddedExp   = rewardData.exp,
                             MaxExp     = maxExp
                         });
 
                         // 3. 개별 영웅 경험치 DB 업데이트
-                        _ = _userDataManager.UpdateHero(heroId, heroModel.level, heroModel.exp + reward.HeroExp, heroModel.isUnlock);
+                        _ = _userDataManager.UpdateHero(heroId, heroModel.level, heroModel.exp + rewardData.exp, heroModel.isUnlock);
                     }
                 }
             }
@@ -596,11 +594,18 @@ public class StageManager : NetworkBehaviour
 
         // 획득한 골드량과 함께 UI 호출
         //_stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, reward.GoldAmount, reward.UserExp); //이건 나중에 유저 경험치도 하게된다면.
-        _stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, reward.GoldAmount);
+        _stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, rewardData.gold);
 
         // UI 출력
         GameManager.Instance.ChangeState(GameState.Result);
     }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_MarkHeroUsed(PlayerRef player, string heroId)
+    {
+        MarkHeroUsed(player, heroId);
+    }
+
     public void MarkHeroUsed(PlayerRef unitOwner, string heroId)
     {
         if (!Object.HasStateAuthority) return;
