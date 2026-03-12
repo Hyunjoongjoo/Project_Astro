@@ -83,7 +83,6 @@ public class ShieldSkill : ISkill
             return;
 
         float damage = _cachedUnit.UnitStat.Attack.Value * _data.aoeDamageRatio;
-        Debug.Log($"[ShieldSkill] AoE Triggered damage:{damage}");
         Collider[] hits = Physics.OverlapSphere(
             _cachedUnit.transform.position,
             _data.aoeRange,
@@ -95,7 +94,6 @@ public class ShieldSkill : ISkill
 
             if (target == null || target == _cachedUnit)
                 continue;
-            Debug.Log($"[ShieldSkill] Hit {target.name}");
             target.TakeDamage(damage);
         }
     }

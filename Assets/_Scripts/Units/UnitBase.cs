@@ -62,10 +62,6 @@ public abstract class UnitBase : NetworkBehaviour
     {
         if (!Object.HasStateAuthority) return;
         if (IsDead) return;
-        if (unitType == UnitType.Hero)
-        {
-            Debug.Log("영웅 받은 데미지 : " + amount);
-        }
 
         float finalTakenDamage = amount;
 
@@ -90,10 +86,7 @@ public abstract class UnitBase : NetworkBehaviour
 
             finalTakenDamage *= (1f + modify);
         }
-        if (unitType == UnitType.Hero)
-        {
-            Debug.Log("받피감 적용 후 데미지 : " + finalTakenDamage);
-        }
+
         CurrentHealth = Mathf.Max(CurrentHealth - finalTakenDamage, 0f); ;
 
         if (CurrentHealth <= 0f)  // 1 미만인 이유는 float이라 가끔 0.0000..1 로 살아있을 수 있음
