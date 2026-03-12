@@ -39,6 +39,16 @@ public class AugmentWindowUI : BaseUI
     //생성된 카드 추적용 리스트
     private List<GameObject> _spawnedCards = new List<GameObject>();
 
+    //3.11 리팩토링
+    //상태 체크용 변수 추가
+    //1vs1, 2vs2 체크
+    private bool _is2vs2;
+
+    public bool IsForcePicked => _isForcePicked;
+
+    //아군 확정 여부 추적 프로퍼티
+    public bool IsTeammateConfirmed { get; set; } = false;
+
     //3.10 리팩토링
     //아군 데이터와 이름도 받을 수 있도록 매개변수 추가 (아군 데이터는 없을 수도 있으므로 null 허용)
     public void SetupAndOpen(List<AugmentData> myDatas, List<AugmentData> teamDatas = null, string teamName = "")
@@ -48,6 +58,10 @@ public class AugmentWindowUI : BaseUI
         _isForcePicked = false;
         _selectedData = null;
         _selectedCardUI = null;
+
+        //2vs2 여부 판단 및 저장, 아군 확정 상태 초기화
+        _is2vs2 = (teamDatas != null && teamDatas.Count > 0);
+        IsTeammateConfirmed = false;
 
 
         //확정버튼초기화
@@ -179,7 +193,21 @@ public class AugmentWindowUI : BaseUI
         _confirmBtn.interactable = false;
 
         AugmentManager.Instance.SelectAugment(_selectedData);
-        Close();
+
+        //1vs1 / 2vs2 분기 처리
+        if (_is2vs2)
+        {
+            //아군보다 나중에 확정했다면 창과 버튼 파괴
+            if (IsTeammateConfirmed)
+                AugmentManager.Instance.CloseAndHideToggle();
+            else
+                DeActivate(); //아군이 아직 안 골랐다면 토글 가능하도록 숨기기만
+        }
+        else
+        {
+            //1:1 모드일 때는 무조건 파괴 및 여닫기 버튼 증발
+            AugmentManager.Instance.CloseAndHideToggle();
+        }
     }
 
     //타임아웃 시
@@ -199,7 +227,17 @@ public class AugmentWindowUI : BaseUI
 
             //유저가 직접 클릭한 것과 같은 로직
             AugmentManager.Instance.SelectAugment(pickedData);
-            Close();
+
+            //타임아웃 강제선택 시에도 클릭 확정과 동일한 분기 로직 적용
+            if (_is2vs2)
+            {
+                if (IsTeammateConfirmed) AugmentManager.Instance.CloseAndHideToggle();
+                else DeActivate();
+            }
+            else
+            {
+                AugmentManager.Instance.CloseAndHideToggle();
+            }
         }
     }
 
