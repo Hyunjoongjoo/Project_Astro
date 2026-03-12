@@ -500,6 +500,8 @@ public class StageManager : NetworkBehaviour
     // =============== 여기부터 함교 파괴 감지 ~ 게임 종료 후 로비로 복귀까지 ===============
     private void BridgeDestroyed(UnitBase unit)
     {
+        if (CurrentState == StageState.GameOver) return;
+
         Debug.Log("브릿지 파괴 이벤트 메서드에 진입 완료");
         CurrentState = StageState.GameOver;
 
@@ -542,18 +544,25 @@ public class StageManager : NetworkBehaviour
             return;
         }
 
-        // DB에 업데이트
-        _ = _userDataManager.UpdateWallet(rewardData.gold);
-        //_ = _userDataManager.UpdateUserDb(rewardData.exp);
+        // DB에 업데이트 파트
+        Dictionary<string, object> updates = new Dictionary<string, object>();
 
-        if (victory != Team.None)
+        int finalGold = UserDataManager.Instance.WalletModel.gold + rewardData.gold;
+        updates.Add("Wallet.gold", finalGold);
+
+        if (!isDraw)
         {
-            _ = _userDataManager.UpdateRecord(isWin ? 1 : 0, isWin ? 0 : 1);
+            int winAdd = isWin ? 1 : 0;
+            int loseAdd = isWin ? 0 : 1;
+            updates.Add("Record.win", UserDataManager.Instance.RecordModel.win + winAdd);
+            updates.Add("Record.lose", UserDataManager.Instance.RecordModel.lose + loseAdd);
         }
 
         Debug.Log("획득한 골드량 : " + rewardData.gold);
 
         List<HeroResultData> resultHeroes = new List<HeroResultData>();
+        List<HeroDbModel> heroesToUpdate = new List<HeroDbModel>();
+
         var allHeroTable = TableManager.Instance.HeroTable.GetAll();
 
         for (int i = 0; i < 32; i++)
@@ -575,6 +584,7 @@ public class StageManager : NetworkBehaviour
                         var levelData = TableManager.Instance.HeroLevelTable.Get(heroModel.level.ToString());
                         int maxExp = (levelData != null) ? levelData.expRequirement : 10000;
 
+                        // UI 출력용 모델
                         resultHeroes.Add(new HeroResultData
                         {
                             HeroId     = tableData.id,
@@ -585,12 +595,21 @@ public class StageManager : NetworkBehaviour
                             MaxExp     = maxExp
                         });
 
-                        // 3. 개별 영웅 경험치 DB 업데이트
-                        _ = _userDataManager.UpdateHero(heroId, heroModel.level, heroModel.exp + rewardData.exp, heroModel.isUnlock);
+                        // DB 저장용 모델 (최종 합산된 데이터)
+                        heroesToUpdate.Add(new HeroDbModel
+                        {
+                            heroId = tableData.id,
+                            level = heroModel.level,
+                            exp = heroModel.exp + rewardData.exp,
+                            isUnlock = heroModel.isUnlock
+                        });
                     }
                 }
             }
         }
+        // 4. DB 일괄 업데이트 실행 (배치 커밋)
+        string myUuid = UserDataManager.Instance.ProfileModel.uuid;
+        _ = _userDataManager.UpdateAll(updates, heroesToUpdate);
 
         // 획득한 골드량과 함께 UI 호출
         //_stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, reward.GoldAmount, reward.UserExp); //이건 나중에 유저 경험치도 하게된다면.

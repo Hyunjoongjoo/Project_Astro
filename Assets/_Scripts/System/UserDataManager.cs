@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Firebase.Firestore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class UserDataManager : Singleton<UserDataManager>
 {
@@ -30,6 +32,51 @@ public class UserDataManager : Singleton<UserDataManager>
     public RecordModel RecordModel => _recordModel;
     public WalletModel WalletModel => _walletModel;
     public List<HeroDbModel> HeroesModel => _heroesModel;
+
+    // 모든 정보 갱신
+    public async Task UpdateAll(Dictionary<string, object> updates, List<HeroDbModel> heroesToUpdate)
+    {
+        try
+        {
+            // 1. 서버(Firestore) 업데이트 실행 및 완료 대기
+            await UserDataStore.Instance.UpdateAllAsync(ProfileModel.uuid, updates, heroesToUpdate);
+
+            // 2. 서버 저장 성공 시 로컬 캐시(Wallet, Record) 갱신
+            if (updates != null)
+            {
+                if (updates.ContainsKey("Wallet.gold"))
+                    WalletModel.gold = (int)updates["Wallet.gold"];
+
+                if (updates.ContainsKey("Record.win"))
+                    RecordModel.win = (int)updates["Record.win"];
+
+                if (updates.ContainsKey("Record.lose"))
+                    RecordModel.lose = (int)updates["Record.lose"];
+            }
+
+            // 3. 영웅 데이터 로컬 캐시 갱신
+            if (heroesToUpdate != null)
+            {
+                foreach (var updatedHero in heroesToUpdate)
+                {
+                    var targetHero = HeroesModel.Find(h => h.heroId == updatedHero.heroId);
+                    if (targetHero != null)
+                    {
+                        targetHero.level = updatedHero.level;
+                        targetHero.exp = updatedHero.exp;
+                        targetHero.isUnlock = updatedHero.isUnlock;
+                    }
+                }
+            }
+
+            Debug.Log("[UserDataManager] 서버 저장 및 로컬 캐시 갱신 완료");
+        }
+        catch (System.Exception e)
+        {
+            // 서버 저장 실패 시 캐시는 변하지 않음
+            Debug.LogError($"[UserDataManager] 데이터 동기화 실패: {e.Message}");
+        }
+    }
 
     // 골드 갱신
     public async Task UpdateWallet(int amount)
