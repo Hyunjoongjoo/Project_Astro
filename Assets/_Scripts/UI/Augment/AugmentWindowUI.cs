@@ -52,7 +52,7 @@ public class AugmentWindowUI : BaseUI
     //3.10 리팩토링
     //아군 데이터와 이름도 받을 수 있도록 매개변수 추가 (아군 데이터는 없을 수도 있으므로 null 허용)
     //3.12 리팩토링
-    public void SetupAndOpen(List<AugmentData> myDatas, List<AugmentData> teamDatas = null, string teamName = "")
+    public void SetupAndOpen(List<AugmentData> myDatas, List<AugmentData> teamDatas = null, string teamName = "", bool isForcedOpen = true)
     {
         _currentDatas = myDatas;
         _stageManager = FindFirstObjectByType<StageManager>();
@@ -92,8 +92,14 @@ public class AugmentWindowUI : BaseUI
             //1vs1 모드이거나 아군 데이터가 없으면 아군 패널 숨김
             if (_teamAugmentGroup != null) _teamAugmentGroup.SetActive(false);
         }
-
-        base.Open();
+        if (isForcedOpen)
+        {
+            base.Open(); //내가 눌렀거나 강제 오픈 시엔 눈앞에 띄움
+        }
+        else
+        {
+            DeActivate(); //아군이 눌렀을 땐 생성만하고 숨겨두기
+        }
     }
 
     //3.10
