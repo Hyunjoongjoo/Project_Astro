@@ -28,6 +28,19 @@ public class UserDataManager : Singleton<UserDataManager>
         Debug.Log($"[UserDataManager] 캐싱 완료: {profile.nickName}님 환영합니다.");
     }
 
+    public void ClearCache()
+    {
+        _profileModel = null;
+        _recordModel = null;
+        _walletModel = null;
+        _heroesModel.Clear();
+
+        OnGoldChanged = null;
+        OnHeroDataChanged = null;
+
+        Debug.Log("[UserDataManager] 캐시가 초기화되었습니다.");
+    }
+
     public ProfileDbModel ProfileModel => _profileModel;
     public RecordModel RecordModel => _recordModel;
     public WalletModel WalletModel => _walletModel;
@@ -49,6 +62,9 @@ public class UserDataManager : Singleton<UserDataManager>
 
                 if (updates.ContainsKey("Record.win"))
                     RecordModel.win = (int)updates["Record.win"];
+
+                if (updates.ContainsKey("Record.draw"))
+                    RecordModel.draw = (int)updates["Record.draw"];
 
                 if (updates.ContainsKey("Record.lose"))
                     RecordModel.lose = (int)updates["Record.lose"];
@@ -141,11 +157,12 @@ public class UserDataManager : Singleton<UserDataManager>
     }
 
     // 전적 갱신
-    public async Task UpdateRecord(int winDelta, int loseDelta) 
+    public async Task UpdateRecord(int winDelta, int loseDelta, int drawDelta) 
     {
         var updateRecord = new Dictionary<string, object>
         {
             { "Record.win", _recordModel.win + winDelta },
+            { "Record.draw", _recordModel.draw + drawDelta },
             { "Record.lose", _recordModel.lose + loseDelta }
         };
         await UpdateAll(updates: updateRecord);
