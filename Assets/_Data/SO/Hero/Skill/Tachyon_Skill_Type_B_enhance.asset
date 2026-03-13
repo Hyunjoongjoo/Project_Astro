@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1d76162b30c76474fa71185b76b18d9f, type: 3}
-  m_Name: Tachyon_Skill_Standard
+  m_Name: Tachyon_Skill_Type_B_enhance
   m_EditorClassIdentifier: Assembly-CSharp::OnHitSkillSO
   heroId: hero_tachyon
   skillName: 
   skillDescription: 
   note: 
-  skillVFX: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
-  skillType: 1
+  skillVFX: {fileID: 2393817908272368249, guid: 7537a6e46ee655442b7f88a123228e37, type: 3}
+  skillType: 3
   initCooldown: 3
   cooldown: 3
   additionalDamageRatio: 2
-  onhitPerAttack: 5
+  onhitPerAttack: 4

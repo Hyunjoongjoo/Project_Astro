@@ -90,7 +90,7 @@ public class OnHitSkill : ISkill
 
         // 5발 마다 쏘는거면 4발째 쏘는 순간이 스킬 시전 조건이다.
         _normalAttackCounter++;
-        if (_normalAttackCounter >= _data.onhitPerCasting - 1)
+        if (_normalAttackCounter >= _data.onhitPerAttack - 1)
         {
             _onReady = true;
             _yetShoot = false;
