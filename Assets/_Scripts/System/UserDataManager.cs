@@ -73,6 +73,16 @@ public class UserDataManager : Singleton<UserDataManager>
                 }
             }
 
+            if (updates != null && updates.ContainsKey("Wallet.gold"))
+            {
+                OnGoldChanged?.Invoke(WalletModel.gold);
+            }
+
+            if (heroesToUpdate != null && heroesToUpdate.Count > 0)
+            {
+                OnHeroDataChanged?.Invoke();
+            }
+
             Debug.Log("[UserDataManager] 서버 저장 및 로컬 캐시 갱신 완료");
         }
         catch (System.Exception e)
