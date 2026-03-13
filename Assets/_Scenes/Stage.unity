@@ -3902,6 +3902,8 @@ MonoBehaviour:
   - {fileID: 1600975131}
   _chatBubblePrefab: {fileID: 3847908261100917592, guid: 8beb80bbca8be794fa99c8f541b6e7f8, type: 3}
   _stageUI: {fileID: 1083987633}
+  _txtPanel: {fileID: 1178242315}
+  _emoticonPanel: {fileID: 748217435}
 --- !u!1 &233470477
 GameObject:
   m_ObjectHideFlags: 0
@@ -14139,9 +14141,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 748217435}
-        m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
-        m_MethodName: Toggle
+      - m_Target: {fileID: 225820721}
+        m_TargetAssemblyTypeName: ChatManager, Assembly-CSharp
+        m_MethodName: OpenEmoticonPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -25824,7 +25826,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &850477905
 RectTransform:
   m_ObjectHideFlags: 0
@@ -64295,9 +64297,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1178242315}
-        m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
-        m_MethodName: Toggle
+      - m_Target: {fileID: 225820721}
+        m_TargetAssemblyTypeName: ChatManager, Assembly-CSharp
+        m_MethodName: OpenTextPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -11,10 +11,25 @@ public class ChatManager : NetworkBehaviour
     [SerializeField] private List<Button> _emoticonBtns;
     [SerializeField] private GameObject _chatBubblePrefab;
     [SerializeField] private StageUI _stageUI;
+    [SerializeField] private AnimUI _txtPanel;
+    [SerializeField] private AnimUI _emoticonPanel;
 
     private void Start()
     {
         ApplySavedMacros();
+    }
+    // 텍스트 패널을 여는 메서드
+    public void OpenTextPanel()
+    {
+        _emoticonPanel.DeActivate(); // 반대쪽 끄기
+        _txtPanel.Open();       // 이쪽 켜기
+    }
+
+    // 이모티콘 패널을 여는 메서드
+    public void OpenEmoticonPanel()
+    {
+        _txtPanel.DeActivate(); // 반대쪽 끄기
+        _emoticonPanel.Open();       // 이쪽 켜기
     }
 
     private void ApplySavedMacros()
@@ -59,7 +74,13 @@ public class ChatManager : NetworkBehaviour
         else iconImg.sprite = data.emoticonSprite;
 
         btn.onClick.RemoveAllListeners();
-        btn.onClick.AddListener(() => SendChat(data.id));
+        btn.onClick.AddListener(() =>
+        {
+            SendChat(data.id);
+
+            var panelUI = btn.GetComponentInParent<AnimUI>();
+            panelUI.DeActivate();
+        });
     }
 
     // 버튼 클릭 시 호출
