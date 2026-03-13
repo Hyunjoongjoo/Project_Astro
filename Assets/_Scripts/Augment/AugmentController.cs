@@ -391,9 +391,9 @@ public class AugmentController : NetworkBehaviour
             {
                 int tierIndex = (myData.TotalAugmentPicks >= reinforceNum) ? 1 : 0;
 
-                data.titleName = TableManager.Instance.GetString(skill.TitleStringID);
+                data.titleName = TableManager.Instance.GetString(skill.Tiers[tierIndex].TitleStringID);
                 data.description = TableManager.Instance.GetString(skill.Tiers[tierIndex].DescStringID);
-                data.mainIcon = skill.Icon;
+                data.mainIcon = skill.Tiers[tierIndex].Icon;
                 data.skillData = skill.Tiers[tierIndex].CombatSkillData;
 
                 var heroData = TableManager.Instance.HeroTable.Get(skill.TargetHeroID);

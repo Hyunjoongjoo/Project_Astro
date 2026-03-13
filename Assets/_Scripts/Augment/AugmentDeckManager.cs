@@ -275,11 +275,12 @@ public class AugmentDeckManager
                     int tierIndex = (totalPicks >= reinforceNum) ? 1 : 0;
 
                     refId = pickedSkill.AugmentID;
-                    icon = pickedSkill.Icon;
 
-                    title = GetString(pickedSkill.TitleStringID);
+                    icon = pickedSkill.Tiers[tierIndex].Icon;
+                    title = GetString(pickedSkill.Tiers[tierIndex].TitleStringID);
                     desc = GetString(pickedSkill.Tiers[tierIndex].DescStringID);
                     bSkill = pickedSkill.Tiers[tierIndex].CombatSkillData;
+
                     //스킬 증강 카드일 때 영웅의 원본 정보들을 추적해서 채워줌
                     var heroData = TableManager.Instance.HeroTable.Get(pickedSkill.TargetHeroID);
                     if (heroData != null) tHeroName = GetString(heroData.heroName);
