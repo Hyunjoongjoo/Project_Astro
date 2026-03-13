@@ -3902,7 +3902,6 @@ MonoBehaviour:
   - {fileID: 1600975131}
   _chatBubblePrefab: {fileID: 3847908261100917592, guid: 8beb80bbca8be794fa99c8f541b6e7f8, type: 3}
   _stageUI: {fileID: 1083987633}
-  _stageManager: {fileID: -2723386092329298971, guid: 16488f2564acc914cac6aa2d340c235a, type: 3}
 --- !u!1 &233470477
 GameObject:
   m_ObjectHideFlags: 0
@@ -11903,7 +11902,7 @@ GameObject:
   - component: {fileID: 518667469}
   - component: {fileID: 518667468}
   m_Layer: 5
-  m_Name: Image
+  m_Name: EmoticonIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12827,7 +12826,7 @@ GameObject:
   - component: {fileID: 605725378}
   - component: {fileID: 605725377}
   m_Layer: 5
-  m_Name: Image
+  m_Name: EmoticonIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13467,7 +13466,7 @@ GameObject:
   - component: {fileID: 634126689}
   - component: {fileID: 634126688}
   m_Layer: 5
-  m_Name: Image
+  m_Name: EmoticonIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14140,10 +14139,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 748217429}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 748217435}
+        m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
+        m_MethodName: Toggle
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -19617,7 +19616,9 @@ GameObject:
   - component: {fileID: 748217430}
   - component: {fileID: 748217433}
   - component: {fileID: 748217432}
+  - component: {fileID: 748217435}
   - component: {fileID: 748217431}
+  - component: {fileID: 748217434}
   m_Layer: 5
   m_Name: EmoticonMacroPanel
   m_TagString: Untagged
@@ -19714,6 +19715,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 748217429}
   m_CullTransparentMesh: 1
+--- !u!225 &748217434
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748217429}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &748217435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748217429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9bdadde66b81a04e81364142c7f22cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimUI
+  _uiName: 
+  _fadeDuration: 0.25
+  _scaleDuration: 0.25
 --- !u!1 &764932662
 GameObject:
   m_ObjectHideFlags: 0
@@ -26212,7 +26240,7 @@ GameObject:
   - component: {fileID: 901173736}
   - component: {fileID: 901173735}
   m_Layer: 5
-  m_Name: Image
+  m_Name: EmoticonIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -38020,7 +38048,7 @@ GameObject:
   - component: {fileID: 1109986073}
   - component: {fileID: 1109986072}
   m_Layer: 5
-  m_Name: Image
+  m_Name: EmoticonIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44576,7 +44604,9 @@ GameObject:
   - component: {fileID: 1178242310}
   - component: {fileID: 1178242313}
   - component: {fileID: 1178242312}
+  - component: {fileID: 1178242315}
   - component: {fileID: 1178242311}
+  - component: {fileID: 1178242314}
   m_Layer: 5
   m_Name: TxtMacroPanel
   m_TagString: Untagged
@@ -44673,6 +44703,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1178242309}
   m_CullTransparentMesh: 1
+--- !u!225 &1178242314
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1178242309}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &1178242315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1178242309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9bdadde66b81a04e81364142c7f22cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimUI
+  _uiName: 
+  _fadeDuration: 0.25
+  _scaleDuration: 0.25
 --- !u!1 &1180466685
 GameObject:
   m_ObjectHideFlags: 0
@@ -63227,7 +63284,7 @@ GameObject:
   - component: {fileID: 1880880576}
   - component: {fileID: 1880880575}
   m_Layer: 5
-  m_Name: Image
+  m_Name: EmoticonIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -63509,7 +63566,7 @@ GameObject:
   - component: {fileID: 1901328435}
   - component: {fileID: 1901328434}
   m_Layer: 5
-  m_Name: Image
+  m_Name: EmoticonIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -64238,10 +64295,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1178242309}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 1178242315}
+        m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
+        m_MethodName: Toggle
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -64744,7 +64801,7 @@ GameObject:
   - component: {fileID: 1958889632}
   - component: {fileID: 1958889631}
   m_Layer: 5
-  m_Name: Image
+  m_Name: EmoticonIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
