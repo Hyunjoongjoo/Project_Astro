@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using Fusion;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -25,6 +26,12 @@ public class StageUI : MonoBehaviour
     [SerializeField] private GameObject _heroResultPrefab;
     [SerializeField] private Transform _heroListPanel;
     [SerializeField] private TextMeshProUGUI _resultGoldText;
+
+    [Header("채팅 앵커")]
+    [SerializeField] private Transform _myAnchor;
+    [SerializeField] private Transform _teammateAnchor;
+    [SerializeField] private Transform _enemy1Anchor;
+    [SerializeField] private Transform _enemy2Anchor;
 
     public Button goLobbyBtn;
     private MatchType _matchType;
@@ -204,5 +211,23 @@ public class StageUI : MonoBehaviour
         }
 
         _resultPanel.SetActive(true);
+    }
+
+    public Transform GetChatAnchor(PlayerRef sender, PlayerRef localPlayer, Team senderTeam, Team myTeam, PlayerRef[] enemyRefs)
+    {
+        // 나 자신
+        if (sender == localPlayer) return _myAnchor;
+
+        // 아군
+        if (senderTeam == myTeam) return _teammateAnchor;
+
+        // 적군 구분 (적 배열과 비교)
+        if (enemyRefs != null)
+        {
+            if (sender == enemyRefs[0]) return _enemy1Anchor;
+            if (enemyRefs.Length > 1 && sender == enemyRefs[1]) return _enemy2Anchor;
+        }
+
+        return _enemy1Anchor; // 기본값
     }
 }
