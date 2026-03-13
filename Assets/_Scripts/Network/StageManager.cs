@@ -561,13 +561,16 @@ public class StageManager : NetworkBehaviour
         int finalGold = UserDataManager.Instance.WalletModel.gold + rewardData.gold;
         updates.Add("Wallet.gold", finalGold);
 
-        if (!isDraw)
-        {
-            int winAdd = isWin ? 1 : 0;
-            int loseAdd = isWin ? 0 : 1;
+        int winAdd = (resultType == MatchResult.Win) ? 1 : 0;
+        int loseAdd = (resultType == MatchResult.Lose) ? 1 : 0;
+        int drawAdd = (resultType == MatchResult.Draw) ? 1 : 0;
+
+        if (winAdd > 0)
             updates.Add("Record.win", UserDataManager.Instance.RecordModel.win + winAdd);
+        if (loseAdd > 0)
             updates.Add("Record.lose", UserDataManager.Instance.RecordModel.lose + loseAdd);
-        }
+        if (drawAdd > 0)
+            updates.Add("Record.draw", UserDataManager.Instance.RecordModel.draw + drawAdd);
 
         Debug.Log("획득한 골드량 : " + rewardData.gold);
 
