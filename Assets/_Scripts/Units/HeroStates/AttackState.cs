@@ -8,7 +8,7 @@ public class AttackState : IState
     private TickTimer _attackTimer;
 
     // 평타를 시전하는 것이 스킬의 조건 등 다른 곳에 영향을 끼치는 경우 구독.
-    public event Action OnNormalAttack;
+    public Action OnNormalAttack;
 
     public AttackState(UnitController unit)
     {
@@ -21,7 +21,8 @@ public class AttackState : IState
         _unit.StopMove();
 
         // 진입 직후 바로 첫 공격이 가능하도록 타이머를 0초로 세팅
-        _attackTimer = TickTimer.CreateFromSeconds(_unit.Runner, 0f);
+        if (_attackTimer.ExpiredOrNotRunning(_unit.Runner))
+            _attackTimer = TickTimer.CreateFromSeconds(_unit.Runner, 0f);
     }
 
     public void Update()
