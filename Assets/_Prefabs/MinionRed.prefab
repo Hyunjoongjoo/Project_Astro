@@ -184,12 +184,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d380522b2ad33e4db63a2aa1f2bd383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinionController
+  _testRange: 0
+  deathEffectPrefab: {fileID: 0}
+  deathEffectLifeTime: 0.5
+  _MaxHealth: 0
   team: 0
   _networkedTeam: 0
   _CurrentHealth: 0
   agent: {fileID: 8596131259578450949}
-  moveSpeed: 6
-  searchRange: 4
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -199,7 +201,7 @@ MonoBehaviour:
   unitId: unit_minion
   firePoint: {fileID: 7239607078526745090}
   currentTarget: {fileID: 0}
-  _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}
+  _normalAttackData: {fileID: 11400000, guid: 5dc969de02cce174ba3e698396bdc920, type: 2}
 --- !u!114 &7786030501378965668
 MonoBehaviour:
   m_ObjectHideFlags: 0
