@@ -22,5 +22,5 @@ MonoBehaviour:
     CombatSkillData: {fileID: 11400000, guid: ca6c9d171086a2f4cb6861b7949d561d, type: 2}
   - TitleStringID: enhance_augment_name_heavyrain_A
     DescStringID: enhance_augment_desc_heavyrain_A
-    Icon: {fileID: 21300000, guid: 55b0f70fdf1ebf2418649925f2b9e1da, type: 3}
+    Icon: {fileID: 21300000, guid: 737d7137e78c26841bda3496d7da6b27, type: 3}
     CombatSkillData: {fileID: 11400000, guid: 8f4a45cbfd563db4aadfd7318bc5729b, type: 2}

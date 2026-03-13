@@ -15,6 +15,12 @@ public class HeroDetailPresenter : MonoBehaviour
     private HeroData _heroData;
     private HeroDbModel _userHeroData;
 
+
+    private void Start()
+    {
+        DBStatus.IsUpdating = false;
+    }
+
     // 외부(LobbyHeroCardUI)에서 호출하는 진입점
     public void Setup(HeroData data)
     {

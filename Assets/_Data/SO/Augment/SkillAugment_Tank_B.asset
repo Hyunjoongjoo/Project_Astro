@@ -18,9 +18,9 @@ MonoBehaviour:
   Tiers:
   - TitleStringID: augment_name_tank_B
     DescStringID: augment_desc_tank_B
-    Icon: {fileID: 21300000, guid: 35cce0223f886ee4296bc55a8ec6fc6c, type: 3}
+    Icon: {fileID: 21300000, guid: 2b6fe1acdd9b0874b83e790e632bffc0, type: 3}
     CombatSkillData: {fileID: 11400000, guid: 0ce96eb9786aa3c4db613b1127065650, type: 2}
   - TitleStringID: enhance_augment_name_tank_B
     DescStringID: enhance_augment_desc_tank_B
-    Icon: {fileID: 21300000, guid: 40b05006eb286bb4fa97551113b24cc3, type: 3}
+    Icon: {fileID: 21300000, guid: c4d2ebadb9dd4d34ca5f534ff744babb, type: 3}
     CombatSkillData: {fileID: 11400000, guid: 08ff1c375d782854fb6d0cc9b0041cdf, type: 2}

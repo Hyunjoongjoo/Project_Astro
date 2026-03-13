@@ -532,6 +532,7 @@ public class StageManager : NetworkBehaviour
 
         Debug.Log("게임오버 RPC 진입 성공");
         _stageUI.gameObject.SetActive(true);
+        _stageUI.goLobbyBtn.onClick.RemoveAllListeners();
         _stageUI.goLobbyBtn.onClick.AddListener(ShutDownAndSceneChange);
 
         _localPlayerMap = PlayerDataMap.Get(Runner.LocalPlayer);
