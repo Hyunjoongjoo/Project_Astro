@@ -56,6 +56,7 @@ public class Bridge : UnitBase
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority) return;
+        if (GameManager.Instance.IsGameStarted == false) return;
 
         if (_currentTarget == null || _currentTarget.IsDead)
         {
@@ -69,6 +70,12 @@ public class Bridge : UnitBase
         {
             if (_attackTimer.ExpiredOrNotRunning(Runner))
             {
+                // 공격 전 타겟과의 거리가 정말 유효한지 체크
+                if (Vector3.Distance(transform.position, _currentTarget.transform.position) > SearchRange)
+                {
+                    _currentTarget = null;
+                    return;
+                }
                 PerformAttack();
                 _attackTimer = TickTimer.CreateFromSeconds(Runner, _normalAttackData.cooldown);
             }
