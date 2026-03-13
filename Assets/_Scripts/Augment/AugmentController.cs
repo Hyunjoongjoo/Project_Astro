@@ -113,7 +113,7 @@ public class AugmentController : NetworkBehaviour
 
     //3.9 서버가 팀원 데이터를 모아 덱 매니저 돌리고 클라로 배달
     //3.12 매개변수 추가: targetTeam이 null이면 전체, 값이 있으면 해당 팀만
-    public void OpenAugmentWindow(Team? targetTeam = null)
+    public void OpenAugmentWindow(Team? targetTeam = null, PlayerRef? requester = null)
     {
         if (_stageManager == null)
         {
@@ -212,6 +212,9 @@ public class AugmentController : NetworkBehaviour
                 var myCards = generatedCards[targetPlayer];
                 if (myCards.Count < 3) continue;
 
+                //게임 시작 시or 직접 버튼을 누른 본인이면 true
+                bool forceOpen = (requester == null) || (requester.Value == targetPlayer);
+
                 PlayerRef teammateRef = default;
                 List<AugmentData> teamCards = null;
                 string teammateName = "";
@@ -235,14 +238,14 @@ public class AugmentController : NetworkBehaviour
                         myCards[0].targetId, (int)myCards[0].type,
                         myCards[1].targetId, (int)myCards[1].type,
                         myCards[2].targetId, (int)myCards[2].type,
-                        true);
+                        true, forceOpen);
 
                     //아군 카드 후속 배송
                     RPC_DeliverTeamCards(targetPlayer,
                         teamCards[0].targetId, (int)teamCards[0].type,
                         teamCards[1].targetId, (int)teamCards[1].type,
                         teamCards[2].targetId, (int)teamCards[2].type,
-                        teammateName);
+                        teammateName, forceOpen);
                 }
                 else
                 {
@@ -251,7 +254,7 @@ public class AugmentController : NetworkBehaviour
                         myCards[0].targetId, (int)myCards[0].type,
                         myCards[1].targetId, (int)myCards[1].type,
                         myCards[2].targetId, (int)myCards[2].type,
-                        false);
+                        false, forceOpen);
                 }
             }
         }
@@ -267,7 +270,8 @@ public class AugmentController : NetworkBehaviour
         NetworkString<_32> id0, int type0,
         NetworkString<_32> id1, int type1,
         NetworkString<_32> id2, int type2,
-        NetworkBool hasTeamCards)
+        NetworkBool hasTeamCards,
+        NetworkBool isForcedOpen)
     {
         if (Runner.LocalPlayer == target)
         {
@@ -288,7 +292,7 @@ public class AugmentController : NetworkBehaviour
             // 1vs1 모드라면 더 기다릴 것 없이 바로 화면에 출력!
             if (!hasTeamCards && _tempMyCards.Count > 0)
             {
-                AugmentManager.Instance.ShowAugmentWindow(_tempMyCards);
+                AugmentManager.Instance.ShowAugmentWindow(_tempMyCards, null, "", isForcedOpen);
 
                 if (_stageManager.CurrentState == StageState.Playing)
                 {
@@ -298,14 +302,16 @@ public class AugmentController : NetworkBehaviour
             }
         }
     }
-
+    
     //아군 카드만 전달받는 후속 RPC 패킷넘치는 거 방지용
+    //3.12 네트워크 매개변수 추가
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_DeliverTeamCards(PlayerRef target,
         NetworkString<_32> id0, int type0,
         NetworkString<_32> id1, int type1,
         NetworkString<_32> id2, int type2,
-        NetworkString<_16> teamName)
+        NetworkString<_16> teamName,
+        NetworkBool isForcedOpen)
     {
         if (Runner.LocalPlayer == target)
         {
@@ -327,7 +333,7 @@ public class AugmentController : NetworkBehaviour
             //미리 도착해 있던 내 카드와 방금 도착한 아군 카드를 합쳐서 UI에 넘겨줌
             if (_tempMyCards != null && _tempMyCards.Count > 0)
             {
-                AugmentManager.Instance.ShowAugmentWindow(_tempMyCards, teamCards, teamName.ToString());
+                AugmentManager.Instance.ShowAugmentWindow(_tempMyCards, teamCards, teamName.ToString(), isForcedOpen);
 
                 if (_stageManager.CurrentState == StageState.Playing)
                 {
@@ -561,6 +567,8 @@ public class AugmentController : NetworkBehaviour
         }
     }
     //클라이언트의 버튼 클릭 요청을 받는 RPC
+    //3.12 리팩토링
+    //해당 팀의 카드를 생성하라고 누가 요청했는지까지 전달
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestAugmentCards(PlayerRef requester)
     {
@@ -568,15 +576,15 @@ public class AugmentController : NetworkBehaviour
         {
             Team requestTeam = data.Team;
 
-            // 1초 쿨타임 (아군 2명이 겹쳐서 눌렀을 때 중복 생성되는 것 방지)
+            //1초 쿨타임 (아군 2명이 겹쳐서 눌렀을 때 중복 생성되는 것 방지)
             if (requestTeam == Team.Blue && Time.time - _lastBlueRequestTime < 1f) return;
             if (requestTeam == Team.Red && Time.time - _lastRedRequestTime < 1f) return;
 
             if (requestTeam == Team.Blue) _lastBlueRequestTime = Time.time;
             if (requestTeam == Team.Red) _lastRedRequestTime = Time.time;
 
-            // 해당 팀의 카드만 생성하라고 지시
-            OpenAugmentWindow(requestTeam);
+            //해당 팀의 카드만 생성하라고 지시
+            OpenAugmentWindow(requestTeam, requester);
         }
     }
 

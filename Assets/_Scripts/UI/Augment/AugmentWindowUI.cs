@@ -51,7 +51,8 @@ public class AugmentWindowUI : BaseUI
 
     //3.10 리팩토링
     //아군 데이터와 이름도 받을 수 있도록 매개변수 추가 (아군 데이터는 없을 수도 있으므로 null 허용)
-    public void SetupAndOpen(List<AugmentData> myDatas, List<AugmentData> teamDatas = null, string teamName = "")
+    //3.12 리팩토링
+    public void SetupAndOpen(List<AugmentData> myDatas, List<AugmentData> teamDatas = null, string teamName = "", bool isForcedOpen = true)
     {
         _currentDatas = myDatas;
         _stageManager = FindFirstObjectByType<StageManager>();
@@ -91,8 +92,14 @@ public class AugmentWindowUI : BaseUI
             //1vs1 모드이거나 아군 데이터가 없으면 아군 패널 숨김
             if (_teamAugmentGroup != null) _teamAugmentGroup.SetActive(false);
         }
-
-        base.Open();
+        if (isForcedOpen)
+        {
+            base.Open(); //내가 눌렀거나 강제 오픈 시엔 눈앞에 띄움
+        }
+        else
+        {
+            DeActivate(); //아군이 눌렀을 땐 생성만하고 숨겨두기
+        }
     }
 
     //3.10
@@ -192,22 +199,25 @@ public class AugmentWindowUI : BaseUI
         _isForcePicked = true;
         _confirmBtn.interactable = false;
 
-        AugmentManager.Instance.SelectAugment(_selectedData);
-
         //1vs1 / 2vs2 분기 처리
         if (_is2vs2)
         {
             //아군보다 나중에 확정했다면 창과 버튼 파괴
             if (IsTeammateConfirmed)
-                AugmentManager.Instance.CloseAndHideToggle();
+            {
+                AugmentManager.Instance.HideAugmentToggleBtn();
+                this.Close(); //무조건 현재 본인 UI 윈도우만 닫도록(다음꺼 제외)
+            }
             else
                 DeActivate(); //아군이 아직 안 골랐다면 토글 가능하도록 숨기기만
         }
         else
         {
             //1:1 모드일 때는 무조건 파괴 및 여닫기 버튼 증발
-            AugmentManager.Instance.CloseAndHideToggle();
+            AugmentManager.Instance.HideAugmentToggleBtn();
+            this.Close();
         }
+        AugmentManager.Instance.SelectAugment(_selectedData);
     }
 
     //타임아웃 시
@@ -224,20 +234,29 @@ public class AugmentWindowUI : BaseUI
             AugmentData pickedData = _currentDatas[randIndex];
 
             Debug.Log($"타임아웃으로인해 자동 선택: {pickedData.titleName}");
+            //타임아웃 강제선택 시에도 클릭 확정과 동일한 분기 로직 적용
+            if (_is2vs2)
+            {
+                if (IsTeammateConfirmed)
+                {
+                    AugmentManager.Instance.HideAugmentToggleBtn();
+                    this.Close();
+                }
+
+                else
+                {
+                    DeActivate();
+                }
+            }
+            else
+            {
+                AugmentManager.Instance.HideAugmentToggleBtn();
+                this.Close();
+            }
 
             //유저가 직접 클릭한 것과 같은 로직
             AugmentManager.Instance.SelectAugment(pickedData);
 
-            //타임아웃 강제선택 시에도 클릭 확정과 동일한 분기 로직 적용
-            if (_is2vs2)
-            {
-                if (IsTeammateConfirmed) AugmentManager.Instance.CloseAndHideToggle();
-                else DeActivate();
-            }
-            else
-            {
-                AugmentManager.Instance.CloseAndHideToggle();
-            }
         }
     }
 
@@ -259,4 +278,18 @@ public class AugmentWindowUI : BaseUI
 
         base.Close();
     }
+
+    //아군의 확정 신호를 수신했을 때 스스로 판단해서 닫음
+    public void ReceiveTeammateConfirmed()
+    {
+        IsTeammateConfirmed = true;
+
+        //내가 이미 고른 상태에서 아군까지골랐으면 파괴
+        if (_isForcePicked)
+        {
+            AugmentManager.Instance.HideAugmentToggleBtn();
+            this.Close();
+        }
+    }
+
 }

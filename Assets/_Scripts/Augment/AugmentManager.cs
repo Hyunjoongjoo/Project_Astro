@@ -20,6 +20,9 @@ public class AugmentManager : Singleton<AugmentManager>
     //3.9 열려있는 윈도우 캐싱용 변수 추가
     private AugmentWindowUI _currentWindow;
 
+    //3.12 서버의 응답을 기다리고있는지 체크하는 변수
+    private bool _isWaitingForServerResponse = false;
+
     private void Start()
     {
         //토글버튼 최상단 컨테이너로 가게
@@ -37,6 +40,8 @@ public class AugmentManager : Singleton<AugmentManager>
             _toggleBtn.onClick.RemoveAllListeners();
             _toggleBtn.onClick.AddListener(() =>
             {
+                //서버에 패킷 쏘기 전에 기다린다고 표시
+                _isWaitingForServerResponse = true;
                 AugmentController.Instance.RPC_RequestAugmentCards(AugmentController.Instance.Runner.LocalPlayer);
                 HideAugmentToggleBtn();
             });
@@ -50,8 +55,21 @@ public class AugmentManager : Singleton<AugmentManager>
             _toggleBtn.gameObject.SetActive(false);
     }
 
-    public void ShowAugmentWindow(List<AugmentData> myDatas, List<AugmentData> teamDatas = null, string teamName = "")
+    //3.12 리팩토링
+    //매개변수에 isForcedOpen 추가
+    public void ShowAugmentWindow(List<AugmentData> myDatas, List<AugmentData> teamDatas = null, string teamName = "", bool isForcedOpen = true)
     {
+        //강제로 열거나 내가 버튼을 눌러서 기다리던 중일때만 열기
+        bool finalOpen = isForcedOpen || _isWaitingForServerResponse;
+        _isWaitingForServerResponse = false; //됐으면 초기화
+
+        //새 창을 열기 전 이전 라운드의 창이 남아있으면 닫아줌
+        if (_currentWindow != null)
+        {
+            _currentWindow.Close();
+            _currentWindow = null;
+        }
+
         //UIManager를 통해 팝업 형식으로 띄움
         _currentWindow = UIManager.Instance.ShowUI<AugmentWindowUI>(_augmentWindowPrefab, true);
         if (_cachedStageManager == null) _cachedStageManager = FindFirstObjectByType<StageManager>();
@@ -78,7 +96,7 @@ public class AugmentManager : Singleton<AugmentManager>
 
         if (_currentWindow != null)
         {
-            _currentWindow.SetupAndOpen(myDatas, teamDatas, teamName);
+            _currentWindow.SetupAndOpen(myDatas, teamDatas, teamName, finalOpen);
         }
     }
 
@@ -124,32 +142,14 @@ public class AugmentManager : Singleton<AugmentManager>
         }
     }
 
-    //창 닫고 버튼도 끄는 통합 함수
-    public void CloseAndHideToggle()
-    {
-        if (_currentWindow != null)
-        {
-            _currentWindow.Close();
-        }
-        HideAugmentToggleBtn();
-    }
-
-    //양측 모두 확정했는지 검사하는 함수
-    public void CheckBothConfirmed()
-    {
-        if (_currentWindow != null && _currentWindow.IsForcePicked && _currentWindow.IsTeammateConfirmed)
-        {
-            CloseAndHideToggle();
-        }
-    }
-
     //캡슐화 메서드
     public void NotifyTeammateConfirmed()
     {
         if (_currentWindow != null)
         {
-            _currentWindow.IsTeammateConfirmed = true;
-            CheckBothConfirmed(); 
+            //UI에게 아군이 확정했다는 사실만 전달함
+            //절 대 직 접 닫 지 마
+            _currentWindow.ReceiveTeammateConfirmed();
         }
     }
 }
