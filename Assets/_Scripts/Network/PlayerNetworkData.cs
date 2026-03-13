@@ -27,4 +27,10 @@ public struct PlayerNetworkData : INetworkStruct
 
     //내가 사용한 영웅들 비트값으로 처리하기 위한 목록 (최대 32개)
     public uint UsedHeroBitmask;
+
+    //3.14 임시아이템슬롯
+    public NetworkString<_32> TempItemSlot;
+
+    //영웅별 장착 아이템 리스트
+    public SlotData_10 HeroEquippedItems;
 }
