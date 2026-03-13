@@ -110,8 +110,8 @@ public class DashSkill : ISkill
 
             if (col.TryGetComponent(out UnitBase enemy))
             {
-                if (enemy.IsDead) continue;
-                if (excludedTargets.Contains(enemy)) continue;
+                if (excludedTargets.Contains(enemy))
+                    continue;
 
                 float dist = Vector3.Distance(_cachedUnit.transform.position, enemy.transform.position);
 

@@ -69,17 +69,5 @@ public class AttackState : IState
     private void PerformAttack()
     {
         _unit.normalAttack.Execute();
-
-        //평타 카운트
-        if (_unit is HeroController hero)
-        {
-            if (hero.UnitId == "hero_tachyon")//타키온만
-            {
-                if (hero.CurUniqueSkill is ProjectileSkill skill)
-                {
-                    skill.RegisterBasicAttack();
-                }
-            }
-        }
     }
 }
