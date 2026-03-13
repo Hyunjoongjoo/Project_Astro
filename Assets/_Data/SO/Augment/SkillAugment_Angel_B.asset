@@ -18,9 +18,9 @@ MonoBehaviour:
   Tiers:
   - TitleStringID: augment_name_angel_B
     DescStringID: augment_desc_angel_B
-    Icon: {fileID: 21300000, guid: 8ea9191646be3814ea8a3f368f667b08, type: 3}
-    CombatSkillData: {fileID: 11400000, guid: c58705a6061f3204db40e9abc3b16054, type: 2}
+    Icon: {fileID: 21300000, guid: 73efa1ed679fb4244bbacb58592b4fff, type: 3}
+    CombatSkillData: {fileID: 11400000, guid: 964de74d5e6f11d458c2c9dc632680aa, type: 2}
   - TitleStringID: enhance_augment_name_angel_B
     DescStringID: enhance_augment_desc_angel_B
-    Icon: {fileID: 21300000, guid: ef860b773511ec54ca15ff7cf0539d71, type: 3}
-    CombatSkillData: {fileID: 11400000, guid: 83d4d0b0f83a73a4c8c10629fe303e02, type: 2}
+    Icon: {fileID: 21300000, guid: e491cba57d7cdc442a26e48679e96b50, type: 3}
+    CombatSkillData: {fileID: 11400000, guid: cdc376259f6cce34ca5125b847e50ad0, type: 2}

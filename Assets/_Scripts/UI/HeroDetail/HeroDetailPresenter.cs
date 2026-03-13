@@ -15,6 +15,12 @@ public class HeroDetailPresenter : MonoBehaviour
     private HeroData _heroData;
     private HeroDbModel _userHeroData;
 
+
+    private void Start()
+    {
+        DBStatus.IsUpdating = false;
+    }
+
     // 외부(LobbyHeroCardUI)에서 호출하는 진입점
     public void Setup(HeroData data)
     {
@@ -136,7 +142,7 @@ public class HeroDetailPresenter : MonoBehaviour
                     {
 
                         var updates = new Dictionary<string, object> { { "Wallet.gold", UserDataManager.Instance.WalletModel.gold - _heroData.goldRequirement } };
-                        var heroes = new List<HeroDbModel> { new HeroDbModel { heroId = _heroData.id, level = 1, exp = 0, isUnlock = true } };
+                        var heroes = new List<HeroDbModel> { new HeroDbModel { heroId = _heroData.id, level = 1, exp = _userHeroData.exp, isUnlock = true } };
 
                         await UserDataManager.Instance.UpdateAll(updates, heroes);
                         RefreshAll();

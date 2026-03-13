@@ -22,5 +22,5 @@ MonoBehaviour:
     CombatSkillData: {fileID: 11400000, guid: c58705a6061f3204db40e9abc3b16054, type: 2}
   - TitleStringID: enhance_augment_name_angel_A
     DescStringID: enhance_augment_desc_angel_A
-    Icon: {fileID: 21300000, guid: 475adf970c4563e468851b67decefa4a, type: 3}
+    Icon: {fileID: 21300000, guid: 12f2fffe50c16e441b3189530db79609, type: 3}
     CombatSkillData: {fileID: 11400000, guid: 83d4d0b0f83a73a4c8c10629fe303e02, type: 2}

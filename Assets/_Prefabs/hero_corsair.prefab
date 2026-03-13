@@ -178,7 +178,7 @@ MonoBehaviour:
   unitId: hero_corsair
   firePoint: {fileID: 533690703149539074}
   currentTarget: {fileID: 0}
-  _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}
+  _normalAttackData: {fileID: 11400000, guid: 1eda0784ad35dfb46afe69f001332443, type: 2}
   _standardSkillData: {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
 --- !u!114 &250558184794622207
 MonoBehaviour:
