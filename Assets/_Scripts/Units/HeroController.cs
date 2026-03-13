@@ -79,6 +79,7 @@ public class HeroController : UnitController
             agent.enabled = true;
             agent.ResetPath();
         }
+        curUniqueSkill.Initialize();
         DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
     }

@@ -1,10 +1,14 @@
 ﻿using Fusion;
+using System;
 using UnityEngine;
 
 public class AttackState : IState
 {
     private UnitController _unit;
     private TickTimer _attackTimer;
+
+    // 평타를 시전하는 것이 스킬의 조건 등 다른 곳에 영향을 끼치는 경우 구독.
+    public event Action OnNormalAttack;
 
     public AttackState(UnitController unit)
     {
@@ -69,5 +73,6 @@ public class AttackState : IState
     private void PerformAttack()
     {
         _unit.normalAttack.Execute();
+        OnNormalAttack?.Invoke();
     }
 }
