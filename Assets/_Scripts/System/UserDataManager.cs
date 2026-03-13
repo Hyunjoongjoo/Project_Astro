@@ -52,6 +52,9 @@ public class UserDataManager : Singleton<UserDataManager>
 
                 if (updates.ContainsKey("Record.lose"))
                     RecordModel.lose = (int)updates["Record.lose"];
+
+                if (updates.ContainsKey("Profile.isAgreed"))
+                    ProfileModel.isAgreed = (bool)updates["Profile.isAgreed"];
             }
 
             // 3. 영웅 데이터 로컬 캐시 갱신
@@ -75,6 +78,7 @@ public class UserDataManager : Singleton<UserDataManager>
         {
             // 서버 저장 실패 시 캐시는 변하지 않음
             Debug.LogError($"[UserDataManager] 데이터 동기화 실패: {e.Message}");
+            throw;
         }
     }
 
@@ -203,4 +207,14 @@ public class UserDataManager : Singleton<UserDataManager>
             HeroManager.Instance.InitAllHeroStats(_heroesModel);
         }
     }
+
+    public async Task UpdateAccept(bool successed)
+    {
+        var updateProfile = new Dictionary<string, object>
+        {
+            { "Profile.isAgreed", successed }
+        };
+        await UpdateAll(updates: updateProfile);
+    }
+
 }
