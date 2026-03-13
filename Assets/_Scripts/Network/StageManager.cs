@@ -27,6 +27,8 @@ public struct HeroResultData
 
 public class StageManager : NetworkBehaviour
 {
+    public static StageManager Instance { get; private set; }
+
     [Networked, HideInInspector] public StageState CurrentState { get; set; }
     [Networked, HideInInspector] public float StateTimer { get; set; }
     [Networked, HideInInspector] public int CountdownValue { get; set; }
@@ -108,6 +110,7 @@ public class StageManager : NetworkBehaviour
 
     public override void Spawned()
     {
+        Instance = this;
         GameManager.Instance.ChangeState(GameState.Ready);
         _objectContainer = ObjectContainer.Instance;
         _objectContainer.OnIncreasedAugmentGauge += IncreaseAugmentGauge;
