@@ -23,6 +23,7 @@ public class ProfileDbModel
     [FirestoreProperty] public string nickName { get; set; }
     [FirestoreProperty] public int userLevel { get; set; }
     [FirestoreProperty] public int userExp { get; set; }
+    [FirestoreProperty] public bool isAgreed { get; set; }
     [FirestoreProperty] public Timestamp createdAt { get; set; }
 }
 
@@ -88,6 +89,7 @@ public class UserDataStore : Singleton<UserDataStore>
                         { "nickName", nickname },
                         { "userLevel", 1 },
                         { "userExp", 0 },
+                        { "isAgreed", false },
                         { "createdAt", FieldValue.ServerTimestamp }
                     }
                 },
