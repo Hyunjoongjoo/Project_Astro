@@ -43,17 +43,31 @@ public class AugmentManager : Singleton<AugmentManager>
                 //서버에 패킷 쏘기 전에 기다린다고 표시
                 _isWaitingForServerResponse = true;
                 AugmentController.Instance.RPC_RequestAugmentCards(AugmentController.Instance.Runner.LocalPlayer);
-                HideAugmentToggleBtn();
+                ExecuteHideToggleBtn();
             });
             _toggleBtn.gameObject.SetActive(true);
         }
     }
 
+    //3.13 변경 (내가 아직 확정을 내리지 않았다면 외부의 숨김 요청을  return)
     public void HideAugmentToggleBtn()
     {
-        if (_toggleBtn.gameObject.activeSelf)
-            _toggleBtn.gameObject.SetActive(false);
+        if (_currentWindow != null && !_currentWindow.IsForcePicked)
+        {
+            return;
+        }
+        ExecuteHideToggleBtn();
     }
+
+    //3.13 추가
+    private void ExecuteHideToggleBtn()
+    {
+        if (_toggleBtn != null && _toggleBtn.gameObject.activeSelf)
+        {
+            _toggleBtn.gameObject.SetActive(false);
+        }
+    }
+
 
     //3.12 리팩토링
     //매개변수에 isForcedOpen 추가
@@ -90,8 +104,8 @@ public class AugmentManager : Singleton<AugmentManager>
         }
         else
         {
-            //PreGameAugment 상태에서는 숨김
-            HideAugmentToggleBtn();
+            //PreGameAugment 상태에서는 숨김, 방어막에 안막히게 직접 끄기(처음만)
+            ExecuteHideToggleBtn();
         }
 
         if (_currentWindow != null)
@@ -124,6 +138,7 @@ public class AugmentManager : Singleton<AugmentManager>
             _cachedStageManager = FindFirstObjectByType<StageManager>();
         }
 
+        //3.n 윤혁 수정사항
         if (_cachedStageManager != null)
         {
             // 증강 선택은 로컬 플레이어가 수행하므로 Runner.LocalPlayer를 사용
