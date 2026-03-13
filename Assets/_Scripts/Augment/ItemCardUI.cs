@@ -25,8 +25,11 @@ public class ItemCardUI : MonoBehaviour, IAugmentUI
         // 아이콘 세팅
         if (_skillIconImg != null) _skillIconImg.sprite = data.mainIcon;
 
-        //3. 증강 이름 세팅 (테이블에서 꺼내온 이름)
+        // 아이템 이름 세팅 (테이블에서 꺼내온 이름)
         if (_titleTxt != null) _titleTxt.text = data.titleName;
+
+        // 아이템 설명 세팅
+        _itemDescription.text = "여기에 아이템 효과 설명이 들어갑니다.";
 
         //버튼 클릭 이벤트 세팅
         _selectBtn.onClick.RemoveAllListeners();
