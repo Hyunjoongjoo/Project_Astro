@@ -101,34 +101,69 @@ public class AugmentDeckManager
     }
 
     //기획서에 명시된 예외 처리
-    //0 ~ 2 첫 증강이거나 영웅이 0명이면 hero 3장
-    //첫번째 슬롯이 hero인데 영웅슬롯 찼으면 스킬or아이템카드, 스킬강화도 끝났으면 아이템으로
+
+    //3.4 수정사항 반영(스킬증강 완료전까지 따로 보관해야함)
+    //3.13 Case 별 우선순위 세분화 완료
+    //순서대로 1 -> 8 쓰면 단일 조건이 복합 조건을 삼켜버리는 경우가 생기므로 순서 정해두는 리팩토링
+    //Case2 최초 -> 예외처리 -> Case6~8 단일보다 먼저 -> Case3~5 단일조건(복합에서 걸러진 케이스) -> Case1 조건 X 
     private AugmentType[] DetermineSlotTypes(bool isFirstSelection, int heroCount, bool isSkillMax, bool isItemFull)
     {
-        if (isFirstSelection) return new AugmentType[] { AugmentType.Hero, AugmentType.Hero, AugmentType.Hero };
-        if (heroCount == 0) return new AugmentType[] { AugmentType.Hero, AugmentType.Hero, AugmentType.Hero };
+        bool isHeroFull = heroCount >= SlotData_5.Length;
 
-        AugmentType[] types = new AugmentType[] { AugmentType.Hero, AugmentType.Skill, AugmentType.Item };
+        //Case 2. 최초 증강 선택 시
+        if (isFirstSelection || heroCount == 0)
+            return new AugmentType[] { AugmentType.Hero, AugmentType.Hero, AugmentType.Hero };
 
-        for (int i = 0; i < types.Length; i++)
+        //3가지가 모두 꽉 차면 예외처리
+        if (isHeroFull && isItemFull && isSkillMax)
+            return new AugmentType[] { AugmentType.Hero, AugmentType.Hero, AugmentType.Hero };
+
+        //Case 6~8 복합조건
+
+        //Case 6
+        if (isHeroFull && isItemFull && !isSkillMax)
+            return new AugmentType[] { AugmentType.Skill, AugmentType.Skill, AugmentType.Skill };
+
+        //Case 7
+        if (isHeroFull && !isItemFull && isSkillMax)
+            return new AugmentType[] { AugmentType.Item, AugmentType.Item, AugmentType.Item };
+
+        //Case 8
+        if (!isHeroFull && isItemFull && isSkillMax)
+            return new AugmentType[] { AugmentType.Hero, AugmentType.Hero, AugmentType.Hero };
+
+        //Case 3~5는 단일조건
+        //Case 3
+        if (isHeroFull && !isItemFull && !isSkillMax)
         {
-            if (types[i] == AugmentType.Hero && heroCount >= SlotData_5.Length)
-            {
-                types[i] = isSkillMax ? AugmentType.Item : AugmentType.Skill;
-            }
-
-            else if (types[i] == AugmentType.Skill && isSkillMax)
-            {
-                types[i] = isItemFull ? AugmentType.Hero : AugmentType.Item;
-            }
-
-            else if (types[i] == AugmentType.Item && isItemFull)
-            {
-                types[i] = isSkillMax ? AugmentType.Hero : AugmentType.Skill;
-            }
+            int rand = Random.Range(0, 2);
+            if (rand == 0) return new AugmentType[] { AugmentType.Skill, AugmentType.Skill, AugmentType.Item };
+            else return new AugmentType[] { AugmentType.Skill, AugmentType.Item, AugmentType.Item };
         }
 
-        return types;
+        //Case4
+        if (!isHeroFull && isItemFull && !isSkillMax)
+        {
+            int rand = Random.Range(0, 2);
+            if (rand == 0) return new AugmentType[] { AugmentType.Hero, AugmentType.Skill, AugmentType.Skill };
+            else return new AugmentType[] { AugmentType.Hero, AugmentType.Hero, AugmentType.Skill };
+        }
+
+        //Case 5
+
+        if (!isHeroFull && !isItemFull && isSkillMax)
+        {
+            int rand = Random.Range(0, 2);
+            if (rand == 0) return new AugmentType[] { AugmentType.Hero, AugmentType.Item, AugmentType.Item };
+            else return new AugmentType[] { AugmentType.Hero, AugmentType.Hero, AugmentType.Item };
+        }
+
+        //Case1 조건X
+        //셋 중 무작위
+        int defaultRand = Random.Range(0, 3);
+        if (defaultRand == 0) return new AugmentType[] { AugmentType.Hero, AugmentType.Skill, AugmentType.Item };
+        else if (defaultRand == 1) return new AugmentType[] { AugmentType.Hero, AugmentType.Hero, AugmentType.Item };
+        else return new AugmentType[] { AugmentType.Hero, AugmentType.Hero, AugmentType.Skill };
     }
 
     //카드 생성기
@@ -275,11 +310,12 @@ public class AugmentDeckManager
                     int tierIndex = (totalPicks >= reinforceNum) ? 1 : 0;
 
                     refId = pickedSkill.AugmentID;
-                    icon = pickedSkill.Icon;
 
-                    title = GetString(pickedSkill.TitleStringID);
+                    icon = pickedSkill.Tiers[tierIndex].Icon;
+                    title = GetString(pickedSkill.Tiers[tierIndex].TitleStringID);
                     desc = GetString(pickedSkill.Tiers[tierIndex].DescStringID);
                     bSkill = pickedSkill.Tiers[tierIndex].CombatSkillData;
+
                     //스킬 증강 카드일 때 영웅의 원본 정보들을 추적해서 채워줌
                     var heroData = TableManager.Instance.HeroTable.Get(pickedSkill.TargetHeroID);
                     if (heroData != null) tHeroName = GetString(heroData.heroName);

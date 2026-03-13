@@ -759,4 +759,5 @@ MonoBehaviour:
   _scaleDuration: 0.25
   _messageTxt: {fileID: 8439950579393298036}
   _yesBtn: {fileID: 5772203774115773821}
+  _yesBtnTxt: {fileID: 6531615448633282529}
   _noBtn: {fileID: 8291953582166701657}

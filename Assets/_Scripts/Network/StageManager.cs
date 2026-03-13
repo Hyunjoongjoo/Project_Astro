@@ -27,6 +27,8 @@ public struct HeroResultData
 
 public class StageManager : NetworkBehaviour
 {
+    public static StageManager Instance { get; private set; }
+
     [Networked, HideInInspector] public StageState CurrentState { get; set; }
     [Networked, HideInInspector] public float StateTimer { get; set; }
     [Networked, HideInInspector] public int CountdownValue { get; set; }
@@ -108,6 +110,7 @@ public class StageManager : NetworkBehaviour
 
     public override void Spawned()
     {
+        Instance = this;
         GameManager.Instance.ChangeState(GameState.Ready);
         _objectContainer = ObjectContainer.Instance;
         _objectContainer.OnIncreasedAugmentGauge += IncreaseAugmentGauge;
@@ -529,6 +532,7 @@ public class StageManager : NetworkBehaviour
 
         Debug.Log("게임오버 RPC 진입 성공");
         _stageUI.gameObject.SetActive(true);
+        _stageUI.goLobbyBtn.onClick.RemoveAllListeners();
         _stageUI.goLobbyBtn.onClick.AddListener(ShutDownAndSceneChange);
 
         _localPlayerMap = PlayerDataMap.Get(Runner.LocalPlayer);
@@ -557,13 +561,16 @@ public class StageManager : NetworkBehaviour
         int finalGold = UserDataManager.Instance.WalletModel.gold + rewardData.gold;
         updates.Add("Wallet.gold", finalGold);
 
-        if (!isDraw)
-        {
-            int winAdd = isWin ? 1 : 0;
-            int loseAdd = isWin ? 0 : 1;
+        int winAdd = (resultType == MatchResult.Win) ? 1 : 0;
+        int loseAdd = (resultType == MatchResult.Lose) ? 1 : 0;
+        int drawAdd = (resultType == MatchResult.Draw) ? 1 : 0;
+
+        if (winAdd > 0)
             updates.Add("Record.win", UserDataManager.Instance.RecordModel.win + winAdd);
+        if (loseAdd > 0)
             updates.Add("Record.lose", UserDataManager.Instance.RecordModel.lose + loseAdd);
-        }
+        if (drawAdd > 0)
+            updates.Add("Record.draw", UserDataManager.Instance.RecordModel.draw + drawAdd);
 
         Debug.Log("획득한 골드량 : " + rewardData.gold);
 

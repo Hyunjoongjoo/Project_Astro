@@ -28,6 +28,19 @@ public class UserDataManager : Singleton<UserDataManager>
         Debug.Log($"[UserDataManager] 캐싱 완료: {profile.nickName}님 환영합니다.");
     }
 
+    public void ClearCache()
+    {
+        _profileModel = null;
+        _recordModel = null;
+        _walletModel = null;
+        _heroesModel.Clear();
+
+        OnGoldChanged = null;
+        OnHeroDataChanged = null;
+
+        Debug.Log("[UserDataManager] 캐시가 초기화되었습니다.");
+    }
+
     public ProfileDbModel ProfileModel => _profileModel;
     public RecordModel RecordModel => _recordModel;
     public WalletModel WalletModel => _walletModel;
@@ -50,8 +63,14 @@ public class UserDataManager : Singleton<UserDataManager>
                 if (updates.ContainsKey("Record.win"))
                     RecordModel.win = (int)updates["Record.win"];
 
+                if (updates.ContainsKey("Record.draw"))
+                    RecordModel.draw = (int)updates["Record.draw"];
+
                 if (updates.ContainsKey("Record.lose"))
                     RecordModel.lose = (int)updates["Record.lose"];
+
+                if (updates.ContainsKey("Profile.isAgreed"))
+                    ProfileModel.isAgreed = (bool)updates["Profile.isAgreed"];
             }
 
             // 3. 영웅 데이터 로컬 캐시 갱신
@@ -66,7 +85,18 @@ public class UserDataManager : Singleton<UserDataManager>
                         targetHero.exp = updatedHero.exp;
                         targetHero.isUnlock = updatedHero.isUnlock;
                     }
+                    HeroManager.Instance.UpdateHeroRuntimeStatus(targetHero.heroId, targetHero.level);
                 }
+            }
+
+            if (updates != null && updates.ContainsKey("Wallet.gold"))
+            {
+                OnGoldChanged?.Invoke(WalletModel.gold);
+            }
+
+            if (heroesToUpdate != null && heroesToUpdate.Count > 0)
+            {
+                OnHeroDataChanged?.Invoke();
             }
 
             Debug.Log("[UserDataManager] 서버 저장 및 로컬 캐시 갱신 완료");
@@ -75,6 +105,7 @@ public class UserDataManager : Singleton<UserDataManager>
         {
             // 서버 저장 실패 시 캐시는 변하지 않음
             Debug.LogError($"[UserDataManager] 데이터 동기화 실패: {e.Message}");
+            throw;
         }
     }
 
@@ -126,11 +157,12 @@ public class UserDataManager : Singleton<UserDataManager>
     }
 
     // 전적 갱신
-    public async Task UpdateRecord(int winDelta, int loseDelta) 
+    public async Task UpdateRecord(int winDelta, int loseDelta, int drawDelta) 
     {
         var updateRecord = new Dictionary<string, object>
         {
             { "Record.win", _recordModel.win + winDelta },
+            { "Record.draw", _recordModel.draw + drawDelta },
             { "Record.lose", _recordModel.lose + loseDelta }
         };
         await UpdateAll(updates: updateRecord);
@@ -203,4 +235,14 @@ public class UserDataManager : Singleton<UserDataManager>
             HeroManager.Instance.InitAllHeroStats(_heroesModel);
         }
     }
+
+    public async Task UpdateAccept(bool successed)
+    {
+        var updateProfile = new Dictionary<string, object>
+        {
+            { "Profile.isAgreed", successed }
+        };
+        await UpdateAll(updates: updateProfile);
+    }
+
 }

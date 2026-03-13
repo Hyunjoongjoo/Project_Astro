@@ -23,6 +23,7 @@ public class ProfileDbModel
     [FirestoreProperty] public string nickName { get; set; }
     [FirestoreProperty] public int userLevel { get; set; }
     [FirestoreProperty] public int userExp { get; set; }
+    [FirestoreProperty] public bool isAgreed { get; set; }
     [FirestoreProperty] public Timestamp createdAt { get; set; }
 }
 
@@ -39,6 +40,7 @@ public class HeroDbModel
 public class RecordModel
 {
     [FirestoreProperty] public int win { set; get; }
+    [FirestoreProperty] public int draw { set; get; }
     [FirestoreProperty] public int lose { set; get; }
 }
 
@@ -88,6 +90,7 @@ public class UserDataStore : Singleton<UserDataStore>
                         { "nickName", nickname },
                         { "userLevel", 1 },
                         { "userExp", 0 },
+                        { "isAgreed", false },
                         { "createdAt", FieldValue.ServerTimestamp }
                     }
                 },
@@ -95,6 +98,7 @@ public class UserDataStore : Singleton<UserDataStore>
                 { "Record", new Dictionary<string, object>
                     {
                         { "win", 0 },
+                        { "draw", 0 },
                         { "lose", 0 }
                     }
                 },
@@ -186,6 +190,35 @@ public class UserDataStore : Singleton<UserDataStore>
         catch (System.Exception e)
         {
             Debug.LogError($"[Firestore] 영웅 삭제 실패: {e.Message}");
+        }
+    }
+
+    // 계정 삭제
+    public async Task DeleteUserId(string uuid)
+    {
+        try
+        {
+            WriteBatch batch = _firestore.StartBatch();
+            DocumentReference userDoc = _firestore.Collection(COLLECTION_NAME).Document(uuid);
+
+            // 서브 컬렉션 모든 문서 조회하기
+            QuerySnapshot heroSnapshot = await userDoc.Collection("COL_Hero").GetSnapshotAsync();
+            foreach (DocumentSnapshot doc in heroSnapshot.Documents)
+            {
+                batch.Delete(doc.Reference);
+            }
+
+            // 최상위 컬렉션 삭제 배치
+            batch.Delete(userDoc);
+
+            // DB 실행.
+            await batch.CommitAsync();
+
+            Debug.Log($"[Firestore] 유저({uuid})의 모든 데이터(영웅 포함) 삭제 완료");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[Firestore] 데이터 완전 삭제 실패: {e.Message}");
         }
     }
 

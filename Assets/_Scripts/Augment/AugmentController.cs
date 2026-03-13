@@ -210,7 +210,7 @@ public class AugmentController : NetworkBehaviour
             foreach (var targetPlayer in team)
             {
                 var myCards = generatedCards[targetPlayer];
-                if (myCards.Count < 3) continue;
+                if (myCards.Count == 0) continue;
 
                 //게임 시작 시or 직접 버튼을 누른 본인이면 true
                 bool forceOpen = (requester == null) || (requester.Value == targetPlayer);
@@ -231,30 +231,25 @@ public class AugmentController : NetworkBehaviour
                     }
                 }
 
+                //3.13 리팩토링
+                //데이터가 부족하면 빈 문자열과 -1 보내서 카드가 없음을 알림
+                string myId0 = myCards.Count > 0 ? myCards[0].targetId : ""; int myType0 = myCards.Count > 0 ? (int)myCards[0].type : -1;
+                string myId1 = myCards.Count > 1 ? myCards[1].targetId : ""; int myType1 = myCards.Count > 1 ? (int)myCards[1].type : -1;
+                string myId2 = myCards.Count > 2 ? myCards[2].targetId : ""; int myType2 = myCards.Count > 2 ? (int)myCards[2].type : -1;
+
                 if (teamCards != null && teamCards.Count == 3)
                 {
-                    //내 카드 배송
-                    RPC_DeliverMyCards(targetPlayer,
-                        myCards[0].targetId, (int)myCards[0].type,
-                        myCards[1].targetId, (int)myCards[1].type,
-                        myCards[2].targetId, (int)myCards[2].type,
-                        true, forceOpen);
+                    string tId0 = teamCards.Count > 0 ? teamCards[0].targetId : ""; int tType0 = teamCards.Count > 0 ? (int)teamCards[0].type : -1;
+                    string tId1 = teamCards.Count > 1 ? teamCards[1].targetId : ""; int tType1 = teamCards.Count > 1 ? (int)teamCards[1].type : -1;
+                    string tId2 = teamCards.Count > 2 ? teamCards[2].targetId : ""; int tType2 = teamCards.Count > 2 ? (int)teamCards[2].type : -1;
 
-                    //아군 카드 후속 배송
-                    RPC_DeliverTeamCards(targetPlayer,
-                        teamCards[0].targetId, (int)teamCards[0].type,
-                        teamCards[1].targetId, (int)teamCards[1].type,
-                        teamCards[2].targetId, (int)teamCards[2].type,
-                        teammateName, forceOpen);
+                    RPC_DeliverMyCards(targetPlayer, myId0, myType0, myId1, myType1, myId2, myType2, true, forceOpen);
+                    RPC_DeliverTeamCards(targetPlayer, tId0, tType0, tId1, tType1, tId2, tType2, teammateName, forceOpen);
                 }
                 else
                 {
                     //1vs1: 내 카드 3장만 배달
-                    RPC_DeliverMyCards(targetPlayer,
-                        myCards[0].targetId, (int)myCards[0].type,
-                        myCards[1].targetId, (int)myCards[1].type,
-                        myCards[2].targetId, (int)myCards[2].type,
-                        false, forceOpen);
+                    RPC_DeliverMyCards(targetPlayer, myId0, myType0, myId1, myType1, myId2, myType2, false, forceOpen);
                 }
             }
         }
@@ -391,9 +386,9 @@ public class AugmentController : NetworkBehaviour
             {
                 int tierIndex = (myData.TotalAugmentPicks >= reinforceNum) ? 1 : 0;
 
-                data.titleName = TableManager.Instance.GetString(skill.TitleStringID);
+                data.titleName = TableManager.Instance.GetString(skill.Tiers[tierIndex].TitleStringID);
                 data.description = TableManager.Instance.GetString(skill.Tiers[tierIndex].DescStringID);
-                data.mainIcon = skill.Icon;
+                data.mainIcon = skill.Tiers[tierIndex].Icon;
                 data.skillData = skill.Tiers[tierIndex].CombatSkillData;
 
                 var heroData = TableManager.Instance.HeroTable.Get(skill.TargetHeroID);

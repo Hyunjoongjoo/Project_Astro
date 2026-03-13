@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 33bf744b4e39dc04999fede7c64beeea, type: 3}
-  m_Name: General_Normal_Attack
+  m_Name: Heavyrain_Normal_Attack
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
   heroId: 
   skillName: 
@@ -21,7 +21,7 @@ MonoBehaviour:
   initCooldown: 0
   cooldown: 1
   damageRatio: 1
-  range: 3
+  range: 5
   projectileSpeed: 10
   isHoming: 0
   oneShotProjectileNum: 1

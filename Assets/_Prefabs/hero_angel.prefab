@@ -147,7 +147,7 @@ MonoBehaviour:
   unitId: hero_angel
   firePoint: {fileID: 4179351352739521411}
   currentTarget: {fileID: 0}
-  _normalAttackData: {fileID: 11400000, guid: 142253d9302a5784e9cb753b2360ce2c, type: 2}
+  _normalAttackData: {fileID: 11400000, guid: 4f1db6d9c612e93408341a464f2f84f6, type: 2}
   _standardSkillData: {fileID: 11400000, guid: d6dd206c7bea98c44acb6c53c617a268, type: 2}
 --- !u!114 &5106166068817242912
 MonoBehaviour:
