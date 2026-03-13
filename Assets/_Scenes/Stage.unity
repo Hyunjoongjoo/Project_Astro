@@ -64318,8 +64318,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f34ed423aa32da64b99a8d7d364e6a65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AugmentController
-  _allSkillAugments: []
-  _allBaseSkills: []
+  _allSkillAugments:
+  - {fileID: 11400000, guid: 78b45b79a76971a48824363a06471806, type: 2}
+  - {fileID: 11400000, guid: d8427d6d31064c84a9f549b0020ab520, type: 2}
+  - {fileID: 11400000, guid: e9620e6d73753c1479910cb0c87bc523, type: 2}
+  - {fileID: 11400000, guid: 827c2de2bb622e546865bff114eec44e, type: 2}
+  - {fileID: 11400000, guid: 00119d2cde3280342b5c9f12edcacd48, type: 2}
+  - {fileID: 11400000, guid: ef90a41469242924d8135cdecee0a189, type: 2}
+  - {fileID: 11400000, guid: 998b3776ff0376c47a1f1a230a3af1b9, type: 2}
+  - {fileID: 11400000, guid: 024c7cd4a4066014e84fe4b5bbf9c560, type: 2}
+  _allBaseSkills:
+  - {fileID: 11400000, guid: d6dd206c7bea98c44acb6c53c617a268, type: 2}
+  - {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
+  - {fileID: 11400000, guid: 4cd053f36a047424babc7a75bd69c41c, type: 2}
+  - {fileID: 11400000, guid: b0fad8a3236bb7e4597f6d58c11cc918, type: 2}
   _heroIconSO: {fileID: 11400000, guid: 59f5c354744c3014e8112428c930f6a4, type: 2}
   _PlayerAugmentTimers:
     _items: []
