@@ -22,5 +22,5 @@ MonoBehaviour:
     CombatSkillData: {fileID: 11400000, guid: 1fa882fa5cd54be48bd4e31b912e7b0b, type: 2}
   - TitleStringID: enhance_augment_name_tank_A
     DescStringID: enhance_augment_desc_tank_A
-    Icon: {fileID: 21300000, guid: 8182f3d373e1442408032a2bf7ad53a9, type: 3}
+    Icon: {fileID: 21300000, guid: 1680618d4247fa849ac5b62defe8b0b9, type: 3}
     CombatSkillData: {fileID: 11400000, guid: 7acce1a686baf6b4fb3fb7b0ee4f550a, type: 2}
