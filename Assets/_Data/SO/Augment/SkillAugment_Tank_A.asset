@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a380b5b6bec34244eb97d541666aeb18, type: 3}
+  m_Name: SkillAugment_Tank_A
+  m_EditorClassIdentifier: Assembly-CSharp::SkillAugmentSO
+  AugmentID: augmentSkill_tank_A
+  ConflictID: augmentSkill_tank_B
+  TargetHeroID: hero_tank
+  Tiers:
+  - TitleStringID: augment_name_tank_A
+    DescStringID: augment_desc_tank_A
+    Icon: {fileID: 21300000, guid: 602741b566380d14aa899bc7bd2c3fe3, type: 3}
+    CombatSkillData: {fileID: 11400000, guid: 1fa882fa5cd54be48bd4e31b912e7b0b, type: 2}
+  - TitleStringID: enhance_augment_name_tank_A
+    DescStringID: enhance_augment_desc_tank_A
+    Icon: {fileID: 21300000, guid: 8182f3d373e1442408032a2bf7ad53a9, type: 3}
+    CombatSkillData: {fileID: 11400000, guid: 7acce1a686baf6b4fb3fb7b0ee4f550a, type: 2}
