@@ -69,6 +69,7 @@ public class UserDataManager : Singleton<UserDataManager>
                         targetHero.exp = updatedHero.exp;
                         targetHero.isUnlock = updatedHero.isUnlock;
                     }
+                    HeroManager.Instance.UpdateHeroRuntimeStatus(targetHero.heroId, targetHero.level);
                 }
             }
 
