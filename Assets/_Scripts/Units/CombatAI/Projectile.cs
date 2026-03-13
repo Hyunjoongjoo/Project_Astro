@@ -1,16 +1,20 @@
-﻿using Fusion;
+﻿using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private Renderer _targetRenderer;
     private bool isInitialized = false;
-    
+
     private float _finalPower;
+    private int _remainingPierce;
 
     ProjectileSkillSO _data;
     private NetworkRunner _runner;
     Team _team;
+
+    private HashSet<UnitBase> _hitTargets = new HashSet<UnitBase>();
 
     private Vector3 _target;
     private float _homingRotationSpeed = 10f; // 유도탄의 궤적 꺾임 속도 (유도탄 테스트를 위한 임시 값)
@@ -22,6 +26,8 @@ public class Projectile : MonoBehaviour
         _team = team;
         _runner = runner;
         _finalPower = power * _data.damageRatio;
+        _remainingPierce = _data.pierceCount;
+        _hitTargets.Clear();
         ApplyTeamColor(team);
         isInitialized = true;
     }
@@ -66,18 +72,42 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if ( other.gameObject.TryGetComponent(out UnitBase target) )
-        {
-            if (target.Object == null || target.Object.IsValid == false)
-                return;
+        if (!other.TryGetComponent(out UnitBase target)) return;
+        if (target.Object == null || target.Object.IsValid == false) return;
+        if (target.networkedTeam == _team) return;
+        if (_hitTargets.Contains(target)) return;
 
-            if (target.networkedTeam != _team)
+        _hitTargets.Add(target);
+
+        if (_runner.IsSharedModeMasterClient)
+            target.TakeDamage(_finalPower);
+
+        // 광역 피해
+        if (_data.areaOfEffect && _runner.IsSharedModeMasterClient)
+        {
+            Collider[] hits = Physics.OverlapSphere(
+                transform.position,
+                _data.attackRange
+            );
+
+            foreach (var hit in hits)
             {
-                if (_runner.IsSharedModeMasterClient)
-                    target.TakeDamage(_finalPower);
-                Destroy(gameObject);
+                if (!hit.TryGetComponent(out UnitBase enemy)) continue;
+                if (enemy.networkedTeam == _team) continue;
+                if (enemy == target) continue;//타겟이 2번 맞는것은 제외
+                enemy.TakeDamage(_finalPower);
             }
         }
+
+        if (_remainingPierce > 0)
+        {
+            _remainingPierce--;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
     }
 
     // 팀 색에 맞춰 투사체에도 색상 적용

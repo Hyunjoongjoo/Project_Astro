@@ -36,6 +36,7 @@ public class UnitController : UnitBase
     [Header("평타 공격")]
     [SerializeField] protected BaseSkillSO _normalAttackData;
 
+
     //stat 실시간 참조
     public float AttackPower => _unitStat.Attack.Value;
     public float AttackSpeed => _unitStat.AttackSpeed.Value;
@@ -47,7 +48,7 @@ public class UnitController : UnitBase
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
     public LayerMask TargetLayer => targetLayer;
-    public string HeroId => unitId;
+    public string UnitId => unitId;
     public LayerMask AllyLayer
     {
         get
