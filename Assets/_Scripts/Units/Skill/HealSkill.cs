@@ -55,29 +55,6 @@ public class HealSkill : ISkill
         {
             if (_hitColliders[i].TryGetComponent(out UnitBase unit))
             {
-                //// 자신은 제외하며, 체력이 100% 미만인 경우
-                //if (unit.CurrentHealth < unit.MaxHealth && unit != _cachedUnit)
-                //{
-                //    if (_data.areaOfEffect)
-                //    {
-                //        // 광역 힐이면 다친 아군이 1명이라도 있으면 즉시 사용 조건 통과
-                //        return true;
-                //    }
-                //    else
-                //    {
-                //        // 단일 힐이라면, 체력 비율이 가장 낮은 아군영웅을 탐색하여 _targetAlly에 캐싱
-                //        if (unit.UnitType == UnitType.Hero)
-                //        {
-                //            float healthRatio = unit.CurrentHealth / unit.MaxHealth;
-                //            if (healthRatio < minHealthRatio)
-                //            {
-                //                minHealthRatio = healthRatio;
-                //                _targetAlly = unit;
-                //                canCast = true;
-                //            }
-                //        }
-                //    }
-                //}
                 // 본인 제외
                 if (unit == _cachedUnit)
                 {
