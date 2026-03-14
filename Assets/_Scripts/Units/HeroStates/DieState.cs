@@ -10,16 +10,18 @@ public class DieState : IState
 
     public void Enter()
     {
-
+        if (_unit.UnitType == UnitType.Hero)
+            _unit.HeroAnimator.SetBool("IsDied", true);
+        _unit.OnDie();
     }
 
     public void Exit()
     {
-
+        _unit.UnitDespawn();
     }
 
     public void Update()
     {
-
+        Exit();
     }
 }

@@ -12,6 +12,7 @@ public class CastingState : IState
     public void Enter()
     {
         Debug.Log("Casting 상태 진입");
+        _hero.HeroAnimator.SetTrigger("SkillTrigger");
         _hero.curUniqueSkill.Execute();
     }
 

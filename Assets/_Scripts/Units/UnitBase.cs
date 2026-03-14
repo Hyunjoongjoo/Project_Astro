@@ -104,21 +104,29 @@ public abstract class UnitBase : NetworkBehaviour
 
     public virtual void Die()
     {
-        if (IsDead) return;
+        if (this is UnitController)
+        {
+            UnitController unit = this as UnitController;
+            unit.StateMachine.ChangeState(unit.DieState);
+            return;
+        }
 
+        if (IsDead) return;
         IsDead = true;
 
+        OnDie();
+        UnitDespawn();
+    }
+
+    public void OnDie()
+    {
         OnDeath?.Invoke(this);
 
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlaySfx(SfxList.DestroySound);
 
         if (Object.HasStateAuthority == true)
-        {
             ObjectContainer.Instance.IncreaseAugmentGauge(team, unitType);
-
-            Runner.Despawn(Object);
-        }      
     }
 
     // 체력이 변했을 때 모든 클라이언트에서 실행될 콜백
@@ -147,6 +155,12 @@ public abstract class UnitBase : NetworkBehaviour
 
             Destroy(deathEffectObject, deathEffectLifeTime);
         }
+    }
+
+    public void UnitDespawn()
+    {
+        if (Object.HasStateAuthority == true)
+            Runner.Despawn(Object);
     }
 
 #if UNITY_EDITOR
