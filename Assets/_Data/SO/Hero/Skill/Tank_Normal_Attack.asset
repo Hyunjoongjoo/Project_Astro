@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33bf744b4e39dc04999fede7c64beeea, type: 3}
   m_Name: Tank_Normal_Attack
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
-  heroId: 
+  heroId: hero_tank
   skillName: 
   skillDescription: 
   note: 
