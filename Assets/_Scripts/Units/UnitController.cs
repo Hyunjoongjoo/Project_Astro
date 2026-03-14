@@ -25,6 +25,10 @@ public class UnitController : UnitBase
 
     public ISkill normalAttack;
 
+    [Header("스킬 데이터")]
+    [Header("평타 공격")]
+    [SerializeField] protected BaseSkillSO _normalAttackData;
+
     // 상태 머신과 상태 인스턴스들
     public StateMachine StateMachine { get; protected set; }
     public DetectState DetectState { get; protected set; }
@@ -32,9 +36,10 @@ public class UnitController : UnitBase
     public AttackState AttackState { get; protected set; }
     public DieState DieState { get; protected set; }
 
-    [Header("스킬 데이터")]
-    [Header("평타 공격")]
-    [SerializeField] protected BaseSkillSO _normalAttackData;
+    public Animator HeroAnimator { get; protected set; }
+    public Animator BoosterAnimator { get; protected set; }
+
+    [Networked] public bool BoosterRender { get; set; }
 
     //stat 실시간 참조
     public float AttackPower => _unitStat.Attack.Value;

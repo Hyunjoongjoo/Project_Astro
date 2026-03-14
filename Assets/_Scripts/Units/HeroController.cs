@@ -24,7 +24,6 @@ public class HeroController : UnitController
     //이번 스폰/갱신 때 이미 적용한 스킬 증강 ID를 기억해서 중복 덮어쓰기 방지
     private HashSet<string> _appliedAugments = new HashSet<string>();
 
-
     public override void Spawned()
     {
         BaseUnitInit();
@@ -35,6 +34,10 @@ public class HeroController : UnitController
         curUniqueSkill = _standardSkillData.CreateInstance(this);
 
         _stageManager = FindFirstObjectByType<StageManager>();
+
+        HeroAnimator = GetComponent<Animator>();
+        // 부스터는 반드시 자식 오브젝트에서 첫번째에 위치한다.
+        BoosterAnimator = transform.GetChild(0).GetComponent<Animator>();
 
         if (!Object.HasStateAuthority) return;
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
@@ -219,6 +222,12 @@ public class HeroController : UnitController
             agent.speed = MoveSpeed;
         }
     }
+
+    public override void Render()
+    {
+        BoosterAnimator.SetBool("isActive", BoosterRender);
+    }
+
 #if UNITY_EDITOR
     protected override void OnDrawGizmosSelected()
     {
