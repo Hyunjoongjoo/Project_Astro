@@ -18,11 +18,20 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private Image _cooldownCover;      //쿨타임 오브젝트
     [SerializeField] private TextMeshProUGUI _cooldownText; //텍스트
 
+    //3.15 추가
+    public int HeroIndex { get; private set; } //인덱스 표시
+
+    //장착템1,2
+    [Header("Equipped Items UI")]
+    [SerializeField] private Image _itemSlot1; 
+    [SerializeField] private Image _itemSlot2; 
+
     private float _currentTimer = 0f;
     private bool IsCooldown => _currentTimer > 0f;
 
-    public void Setup(AugmentData data)
+    public void Setup(AugmentData data, int heroIndex)
     {
+        HeroIndex = heroIndex;
         _data = data;
         _iconImg.sprite = data.mainIcon;
         _mainCam = Camera.main;
@@ -129,5 +138,21 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public NetworkPrefabRef GetUnitPrefab()
     {
         return _data != null ? _data.heroPrefab : default;
+    }
+
+    //3.15
+    //아이템갱신용
+    public void UpdateEquippedItems(Sprite itemIcon1, Sprite itemIcon2)
+    {
+        if (_itemSlot1 != null)
+        {
+            _itemSlot1.sprite = itemIcon1;
+            _itemSlot1.gameObject.SetActive(itemIcon1 != null);
+        }
+        if (_itemSlot2 != null)
+        {
+            _itemSlot2.sprite = itemIcon2;
+            _itemSlot2.gameObject.SetActive(itemIcon2 != null);
+        }
     }
 }

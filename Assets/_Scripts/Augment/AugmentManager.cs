@@ -130,7 +130,8 @@ public class AugmentManager : Singleton<AugmentManager>
         var go = Instantiate(_heroCardSlotPrefab, _slotContainer);
         if (go.TryGetComponent(out HeroHandCardUI card))
         {
-            card.Setup(data);
+            int myIndex = _slotContainer.childCount - 1;
+            card.Setup(data, myIndex);
         }
 
         if (_cachedStageManager == null)

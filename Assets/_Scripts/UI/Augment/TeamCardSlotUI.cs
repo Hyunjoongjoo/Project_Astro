@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Fusion;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -8,11 +9,17 @@ public class TeamCardSlotUI : MonoBehaviour
     [SerializeField] private Transform _cardSlot;
     [SerializeField] private TeamHeroCardUI _cardPrefab;
 
+    //3.15 추가
+    public PlayerRef AllyPlayerRef { get; private set; }
+
     //처음 슬룻 만들기
-    public void Initialize(string nickname)
+    public void Initialize(string nickname, PlayerRef allyRef) //매개변수 추가
     {
         _nameTxt.text = nickname;
+        AllyPlayerRef = allyRef;
     }
+
+
 
     //데이터 변경시 호출
     public void Refresh(SlotData_5 heroData)
