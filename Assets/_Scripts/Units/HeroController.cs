@@ -21,6 +21,9 @@ public class HeroController : UnitController
     public ISkill CurUniqueSkill => curUniqueSkill;
     public float RespawnTime => _respawnTime;
 
+    //아이템용 옵저버
+    [SerializeField] private HeroItemObserver _itemObserver;
+
     //이번 스폰/갱신 때 이미 적용한 스킬 증강 ID를 기억해서 중복 덮어쓰기 방지
     private HashSet<string> _appliedAugments = new HashSet<string>();
 
@@ -81,6 +84,7 @@ public class HeroController : UnitController
         }
         DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
+        ApplyEquippedItems();
     }
 
     private void OnDestroy()
@@ -219,6 +223,77 @@ public class HeroController : UnitController
             agent.speed = MoveSpeed;
         }
     }
+
+    private void ApplyEquippedItems()
+    {
+        if (!Object.HasStateAuthority) return;
+
+        //자신의 영웅 슬롯 인덱스 찾기
+        var playerData = _stageManager.PlayerDataMap.Get(Object.StateAuthority);
+        int myHeroIndex = -1;
+
+        for (int i = 0; i < SlotData_5.Length; i++)
+        {
+            string ownedId = playerData.OwnedHeroes.Get(i).Replace("\0", "").Trim();
+            if (ownedId == unitId)
+            {
+                myHeroIndex = i;
+                break;
+            }
+        }
+
+        //덱에 없는 유닛이면 무시
+        if (myHeroIndex == -1) return;
+
+        //장착된 아이템 ID 추출 (인덱스 * 2, 인덱스 * 2 + 1)
+        int slotA = myHeroIndex * 2;
+        int slotB = myHeroIndex * 2 + 1;
+
+        string itemA = playerData.HeroEquippedItems.Get(slotA).Replace("\0", "").Trim();
+        string itemB = playerData.HeroEquippedItems.Get(slotB).Replace("\0", "").Trim();
+
+        List<string> equippedItemIds = new List<string>();
+        if (!string.IsNullOrEmpty(itemA)) equippedItemIds.Add(itemA);
+        if (!string.IsNullOrEmpty(itemB)) equippedItemIds.Add(itemB);
+
+        if (equippedItemIds.Count == 0) return; //낀 아이템이 없으면 패스
+
+        //ItemEffectData 수집
+        List<ItemEffectData> totalEffects = new List<ItemEffectData>();
+        var allEffects = TableManager.Instance.ItemEffectTable.GetAll();
+
+        foreach (string itemId in equippedItemIds)
+        {
+            var itemData = TableManager.Instance.ItemTable.Get(itemId);
+            if (itemData != null)
+            {
+                //EffectGroupId와 일치하는 효과들 전부 적ㅇ용
+                for (int i = 0; i < allEffects.Count; i++)
+                {
+                    if (allEffects[i].effectGroupId == itemData.effectGroupId)
+                    {
+                        totalEffects.Add(allEffects[i]);
+                    }
+                }
+            }
+        }
+
+        //옵저버에 데이터 주입하고 업데이트 시작
+        if (totalEffects.Count > 0)
+        {
+            if (_itemObserver != null)
+            {
+                _itemObserver.Init(this, _unitStat, totalEffects);
+                _itemObserver.enabled = true;
+                Debug.Log($"영웅 {unitId}에 {totalEffects.Count}개의 아이템 효과 부착완료");
+            }
+            else
+            {
+                Debug.LogWarning($"{unitId} 프리팹 확인 필요,  HeroItemObserver 컴포넌트");
+            }
+        }
+    }
+
 #if UNITY_EDITOR
     protected override void OnDrawGizmosSelected()
     {
