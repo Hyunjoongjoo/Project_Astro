@@ -119,11 +119,23 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             Debug.Log($"소환 지점 발견: {hit.point}");
             Debug.Log($"맞은 오브젝트: {hit.collider.name}");
 
+            //03-16
+            Vector3 spawnPos = hit.point;
+            Team team = GameManager.Instance.PlayerTeam;
+
+            if (!HeroSpawner.Instance.CanPreviewDeployHero(spawnPos, team))
+            {
+                Debug.Log("배치 거리 초과 - 소환 불가");
+                transform.position = _originPos;
+                return;
+            }
+
             HeroSpawner.Instance.RPC_SpawnUnit(
                 GetUnitPrefab(),
-                hit.point,
-                GameManager.Instance.PlayerTeam
+                spawnPos,
+                team
             );
+
             //소환 성공 시 타이머 시작 및 UI 갱신
             _currentTimer = _data.currentSpawnCooldown;
             UpdateCooldownUI();

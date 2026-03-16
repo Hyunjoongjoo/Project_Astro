@@ -56,6 +56,20 @@ public class HeroSpawner : NetworkBehaviour
         return distance <= _maxDeployDistance;
     }
 
+    public bool CanPreviewDeployHero(Vector3 spawnPos, Team team)//UI체크
+    {
+        Transform origin = GetDeployOrigin(team);
+
+        if (origin == null)
+        {
+            return false;
+        }
+
+        float distance = Vector3.Distance(origin.position, spawnPos);
+
+        return distance <= _maxDeployDistance;
+    }
+
     private Transform GetDeployOrigin(Team team)//함교 위치를 반환
     {
         UnitBase[] myStructures = team == Team.Blue
