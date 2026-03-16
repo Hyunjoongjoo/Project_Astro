@@ -50,6 +50,7 @@ GameObject:
   - component: {fileID: -5489522264367414398}
   - component: {fileID: 2855897766000902951}
   - component: {fileID: 3004527260053282529}
+  - component: {fileID: 3893419372111871097}
   m_Layer: 6
   m_Name: hero_angel
   m_TagString: Untagged
@@ -189,6 +190,7 @@ MonoBehaviour:
   _normalAttackData: {fileID: 11400000, guid: 4f1db6d9c612e93408341a464f2f84f6, type: 2}
   _BoosterRender: 0
   _standardSkillData: {fileID: 11400000, guid: d6dd206c7bea98c44acb6c53c617a268, type: 2}
+  _itemObserver: {fileID: 3893419372111871097}
 --- !u!114 &5106166068817242912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,6 +304,18 @@ MonoBehaviour:
   StateHashes: 0000000008d1f633caa33791aa8996ba993ab38d2b1a167c79406955035a2e70ed38e605ec8c6e63074fe69eeb10a7ae05726fdbf2580dc3571cea7c00b8b0491dbf770ee9975430ca27579647378686e2736139c03097dbf383b2ec
   TriggerHashes: 000000002b122898ae5e9e1bdb3d378f33bfaa54
   TotalWords: 1
+--- !u!114 &3893419372111871097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2207229902267668355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d64c90d56df5a49bee77671aa71cd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeroItemObserver
 --- !u!1 &3890984778915997263
 GameObject:
   m_ObjectHideFlags: 0

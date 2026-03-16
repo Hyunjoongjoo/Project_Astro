@@ -50,6 +50,7 @@ GameObject:
   - component: {fileID: -3041197003229238917}
   - component: {fileID: 6310724996773941285}
   - component: {fileID: -7434854230275319481}
+  - component: {fileID: -68219660388525080}
   m_Layer: 6
   m_Name: hero_corsair
   m_TagString: Untagged
@@ -187,6 +188,7 @@ MonoBehaviour:
   _normalAttackData: {fileID: 11400000, guid: 1eda0784ad35dfb46afe69f001332443, type: 2}
   _BoosterRender: 0
   _standardSkillData: {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
+  _itemObserver: {fileID: -68219660388525080}
 --- !u!114 &250558184794622207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,6 +302,18 @@ MonoBehaviour:
   StateHashes: 0000000008d1f633caa33791aa8996ba993ab38d2b1a167c79406955035a2e70ed38e6059d506d597693e5a4eb10a7ae05726fdbf2580dc3571cea7c00b8b0491dbf770ee9975430ca27579647378686e2736139c03097dbf383b2ec
   TriggerHashes: 000000002b122898ae5e9e1b
   TotalWords: 1
+--- !u!114 &-68219660388525080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1619433986598075239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d64c90d56df5a49bee77671aa71cd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeroItemObserver
 --- !u!1001 &4340370083633650000
 PrefabInstance:
   m_ObjectHideFlags: 0

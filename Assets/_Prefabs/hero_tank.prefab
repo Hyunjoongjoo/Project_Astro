@@ -83,6 +83,7 @@ GameObject:
   - component: {fileID: -2192352356554374425}
   - component: {fileID: -2785823311829026228}
   - component: {fileID: 6137906956002236487}
+  - component: {fileID: 4454760260522156934}
   m_Layer: 6
   m_Name: hero_tank
   m_TagString: Untagged
@@ -222,6 +223,7 @@ MonoBehaviour:
   _normalAttackData: {fileID: 11400000, guid: 4176918f5beebca46941c85e2c4b7287, type: 2}
   _BoosterRender: 0
   _standardSkillData: {fileID: 11400000, guid: b0fad8a3236bb7e4597f6d58c11cc918, type: 2}
+  _itemObserver: {fileID: 4454760260522156934}
 --- !u!114 &707048002635603553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,6 +337,18 @@ MonoBehaviour:
   StateHashes: 0000000008d1f633caa33791aa8996ba993ab38d2b1a167c79406955035a2e70ed38e605ec8c6e63074fe69eeb10a7ae05726fdbf2580dc3571cea7c00b8b0491dbf770ee9975430ca27579647378686e2736139c03097dbf383b2ec
   TriggerHashes: 000000002b122898ae5e9e1bdb3d378f33bfaa54
   TotalWords: 1
+--- !u!114 &4454760260522156934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324447883655620717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d64c90d56df5a49bee77671aa71cd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeroItemObserver
 --- !u!1 &4516873832323991094
 GameObject:
   m_ObjectHideFlags: 0
