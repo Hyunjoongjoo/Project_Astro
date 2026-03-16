@@ -31872,7 +31872,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &944970967
 RectTransform:
   m_ObjectHideFlags: 0
@@ -51849,9 +51849,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
     - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
+      propertyPath: _tower.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
       propertyPath: _targetLayer.m_Bits
       value: 2147483648
       objectReference: {fileID: 0}
+    - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
+      propertyPath: '_tower.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1318979820}
+    - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
+      propertyPath: '_tower.Array.data[1]'
+      value: 
+      objectReference: {fileID: 347813271}
     - target: {fileID: 958817914886337179, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -54645,9 +54657,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
     - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
+      propertyPath: _tower.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
       propertyPath: _targetLayer.m_Bits
       value: 1073741824
       objectReference: {fileID: 0}
+    - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
+      propertyPath: '_tower.Array.data[0]'
+      value: 
+      objectReference: {fileID: 60874092}
+    - target: {fileID: 834048530255958114, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
+      propertyPath: '_tower.Array.data[1]'
+      value: 
+      objectReference: {fileID: 712904762}
     - target: {fileID: 958817914886337179, guid: 1db5266c4b6a95a48840a0088a031436, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
