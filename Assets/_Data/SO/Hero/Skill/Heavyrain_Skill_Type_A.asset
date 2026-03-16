@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Heavyrain_Skill_Type_A
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
   heroId: hero_heavyrain
-  skillIcon: {fileID: 0}
+  skillIcon: {fileID: 21300000, guid: a8ee57c91fe02b24595b398f9b398ee3, type: 3}
   skillName: augment_name_heavyrain_A
   skillDescription: augment_desc_heavyrain_A
   note: 
