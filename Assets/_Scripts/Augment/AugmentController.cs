@@ -23,6 +23,7 @@ public class AugmentController : NetworkBehaviour
     //추후 리소스로드 or 어드레서블로 관리
     [Header("스킬 증강 데이터베이스")]
     [SerializeField] private List<SkillAugmentSO> _allSkillAugments;
+    
 
     //영웅들의 기본 스킬 SO들을 담아둘 리스트 추가
     [Header("기본 스킬 데이터베이스 (영웅 카드용)")]
@@ -40,6 +41,9 @@ public class AugmentController : NetworkBehaviour
     //인스펙터 직렬화 해둘 히어로 아이콘SO
     [SerializeField] private HeroIconDataSO _heroIconSO;
 
+    //아이템 아이콘 SO
+    [SerializeField] private ItemIconDataSO _itemIconDataSO;
+
     //인게임 개별 타이머용 네트워크 변수 선언
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, float> PlayerAugmentTimers => default;
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, NetworkBool> IsPlayerAugmenting => default;
@@ -54,7 +58,7 @@ public class AugmentController : NetworkBehaviour
     public override void Spawned()
     {
         //할당된 SO 데이터를 바탕으로 DeckManager 가동
-        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO, _allBaseSkills);
+        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO, _allBaseSkills, _itemIconDataSO);
         //현재 씬에 있는 스테이지 매니저 찾아서 캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
     }
@@ -424,9 +428,47 @@ public class AugmentController : NetworkBehaviour
             var itemData = TableManager.Instance.ItemTable.Get(id);
             if (itemData != null)
             {
+                //이름 세팅
                 data.titleName = TableManager.Instance.GetString(itemData.name);
-                data.description = "";
+
+                //설명 세팅인데 걍 스트링빌더 써야할 듯, 기획서 상 줄넘김 필요
+                System.Text.StringBuilder descBuilder = new System.Text.StringBuilder();
+
+                //테이블을 순회하며 그룹아디 매칭되는 효과 찾기
+                foreach (var effect in TableManager.Instance.ItemEffectTable.GetAll())
+                {
+                    if (effect != null && effect.effectGroupId == itemData.effectGroupId)
+                    {
+                        //스트링 테이블에서 번역된 텍스트 가져오기
+                        string translatedDesc = TableManager.Instance.GetString(effect.effectDesc);
+
+                        //빌더에 이미 다른 텍스트가 있다면 줄바꿈 추가
+                        if (descBuilder.Length > 0)
+                        {
+                            descBuilder.AppendLine();
+                        }
+
+                        descBuilder.Append(translatedDesc);
+                    }
+                }
+
+                //완성된 텍스트를 data에 삽입
+                if (descBuilder.Length > 0)
+                {
+                    data.description = descBuilder.ToString();
+                }
+                else
+                {
+                    data.description = "설명을 찾을 수 없습니다.";
+                }
+
+                //아이콘 세팅
+                if (_itemIconDataSO != null)
+                {
+                    data.mainIcon = _itemIconDataSO.GetIcon(id);
+                }
             }
+        
         }
 
         return data;

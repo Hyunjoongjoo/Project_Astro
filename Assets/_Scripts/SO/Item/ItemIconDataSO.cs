@@ -19,6 +19,7 @@ public class ItemIconDataSO : ScriptableObject
 
     public Sprite GetIcon(string id)
     {
+        if (string.IsNullOrEmpty(id)) return null;
         if (_iconCache == null)
         {
             CacheData();

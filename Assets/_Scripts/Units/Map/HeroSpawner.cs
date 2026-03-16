@@ -10,7 +10,11 @@ public class HeroSpawner : NetworkBehaviour
     [SerializeField] private float _minDeployTime = 0.25f;
     [SerializeField] private float _maxDeployTime = 2.5f;
     [SerializeField] private float _minDeployDistance = 1f;
-    [SerializeField] private float _maxDeployDistance = 15f;
+
+    [Header("배치 거리 확장")]
+    [SerializeField] private float _baseDeployDistance = 8f;
+    [SerializeField] private float _deployExpandPerTower = 3f;
+    [SerializeField] private float _maxDeployDistance = 14f;
 
     // 플레이어,영웅 프리팹 기준으로 소환 쿨다운을 분리 관리
     private readonly Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer> _respawnTimers
@@ -32,6 +36,32 @@ public class HeroSpawner : NetworkBehaviour
 
         return timer.ExpiredOrNotRunning(Runner);
     }
+    
+    private int GetDestroyedTowerCount(Team team)//현재 파괴된 포탑 수
+    {
+        int aliveCount = 0;
+
+        Team enemyTeam = team == Team.Blue ? Team.Red : Team.Blue;
+
+        foreach (var tower in Tower.AliveTowers)
+        {
+            if (tower.networkedTeam == enemyTeam)
+            {
+                aliveCount++;
+            }
+        }
+
+        return Mathf.Clamp(2 - aliveCount, 0, 2);//팀당 포탑 2개 기준
+    }
+    
+    private float GetCurrentDeployDistance(Team team)//현재 배치 가능 거리 계산
+    {
+        int destroyedCount = GetDestroyedTowerCount(team);
+
+        float distance = _baseDeployDistance + destroyedCount * _deployExpandPerTower;
+
+        return Mathf.Min(distance, _maxDeployDistance);
+    }
 
     public bool CanDeployHero(Vector3 spawnPos, Team team)//해당 위치에 영웅 배치가 가능한지 검사
     {
@@ -51,9 +81,25 @@ public class HeroSpawner : NetworkBehaviour
             return false;
         }
 
+        //Vector3 dir = spawnPos - deployOrigin.position;//이부분은 이야기가 나올시...
+
+        ////함교 뒤쪽 배치 방지
+        //if (team == Team.Blue && dir.z < 0)
+        //{
+        //    Debug.Log($"함교보다 뒤에 배치됨");
+        //    return false;
+        //}
+
+        //if (team == Team.Red && dir.z > 0)
+        //{
+        //    Debug.Log($"함교보다 뒤에 배치됨");
+        //    return false;
+        //}
+
         //최대 배치 거리 초과 시 차단
         float distance = Vector3.Distance(deployOrigin.position, spawnPos);
-        return distance <= _maxDeployDistance;
+        float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
+        return distance <= maxDistance;
     }
 
     public bool CanPreviewDeployHero(Vector3 spawnPos, Team team)//UI체크
@@ -65,9 +111,22 @@ public class HeroSpawner : NetworkBehaviour
             return false;
         }
 
-        float distance = Vector3.Distance(origin.position, spawnPos);
+        //Vector3 dir = spawnPos - origin.position;//이부분은 이야기가 나올시...
 
-        return distance <= _maxDeployDistance;
+        ////함교 뒤쪽 배치 방지
+        //if (team == Team.Blue && dir.z < 0)
+        //{
+        //    return false;
+        //}
+
+        //if (team == Team.Red && dir.z > 0)
+        //{
+        //    return false;
+        //}
+
+        float distance = Vector3.Distance(origin.position, spawnPos);
+        float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
+        return distance <= maxDistance;
     }
 
     private Transform GetDeployOrigin(Team team)//함교 위치를 반환
@@ -76,10 +135,17 @@ public class HeroSpawner : NetworkBehaviour
             ? ObjectContainer.Instance.blueSideStructure
             : ObjectContainer.Instance.redSideStructure;
 
-        //index 2 = 함교
-        return myStructures != null && myStructures.Length > 2
-            ? myStructures[2].transform
-            : null;
+        if (myStructures == null || myStructures.Length <= 2)
+        {
+            return null;
+        }
+
+        if (myStructures[2] == null)
+        {
+            return null;
+        }
+
+        return myStructures[2].transform;
     }
 
     private float GetDeployDelay(float distance)//거리 기반 배치 지연시간
@@ -140,6 +206,7 @@ public class HeroSpawner : NetworkBehaviour
         }
 
         Transform origin = GetDeployOrigin(team);
+        if (origin == null) return;
         float distance = Vector3.Distance(origin.position, spawnPos);
         float deployDelay = GetDeployDelay(distance);
 
@@ -155,6 +222,19 @@ public class HeroSpawner : NetworkBehaviour
                 //배치 및 지연 처리는 컨트롤러가 수행
                 StartSummonCooldown(caller, prefab, hero.RespawnTime);
             });
-        Debug.Log($"영웅 소환 완료!");
     }
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying) return;
+
+        Transform origin = GetDeployOrigin(Team.Blue);
+        if (origin == null) return;
+
+        float distance = GetCurrentDeployDistance(Team.Blue);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(origin.position, distance);
+    }
+#endif
 }

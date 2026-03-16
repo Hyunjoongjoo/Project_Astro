@@ -5,3 +5,4 @@ hero_corsair,name_hero_corsair,desc_hero_corsair,spacecraft,melee,stat_hero_cors
 hero_heavyrain,name_hero_heavyrain,desc_hero_heavyrain,spacecraft,ranged,stat_hero_heavyrain,1000,icon_hero_heavyrain,model_hero_heavyrain,포격형 우수함선 헤비레인
 hero_tank,name_hero_tank,desc_hero_tank,spacecraft,tank,stat_hero_tank,1000,icon_hero_tank,model_hero_tank,방어형 우주함선 탱크
 hero_angel,name_hero_angel,desc_hero_angel,spacecraft,healer,stat_hero_angel,1000,icon_hero_angel,model_hero_angel,지원형 우주함선 앤젤
+hero_tachyon,name_hero_tachyon,desc_hero_tachyon,spacecraft,melee,stat_hero_tachyon,1000,icon_hero_tachyon,model_hero_tachyon,강습형 우주함선 타키온

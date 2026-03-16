@@ -5,10 +5,12 @@ name_hero_corsair,커세어,커세어 영웅 이름
 name_hero_heavyrain,헤비레인,헤비레인 영웅 이름
 name_hero_tank,탱크,탱크 영웅 이름
 name_hero_angel,앤젤,앤젤 영웅 이름
-desc_hero_corsair,커세어 설명입니다,커세어 영웅 설명
-desc_hero_heavyrain,헤비레인 설명입니다,헤비레인 영웅 설명
-desc_hero_tank,탱크 설명입니다,탱크 영웅 설명
-desc_hero_angel,앤젤 설명입니다,앤젤 영웅 설명
+name_hero_tachyon,타키온,타키온
+desc_hero_corsair,"압도적인 가속력으로 전선의 사각을 파고들어, 적의 핵심 전력을 단숨에 무력화하는 돌격의 기수입니다",커세어 영웅 설명
+desc_hero_heavyrain,안전거리 밖에서 적의 진형을 초토화하는 원거리 화력의 정점입니다,헤비레인 영웅 설명
+desc_hero_tank,"적의 파상공격을 정면으로 받아내며, 아군의 진격로를 개척하는 움직이는 요새입니다",탱크 영웅 설명
+desc_hero_angel,나노-리페어 기술로 손상된 아군 유닛을 복구하는 전장의 수호천사입니다,앤젤 영웅 설명
+desc_hero_tachyon,주무기를 통해 에너지를 모은 뒤 오버클럭 탄환을 발사하여 원거리의 적을 무력화합니다.,타키온
 name_unit_minion,미니언,미니언 이름
 name_unit_superminion,강화 미니언,강화미니언 이름
 name_unit_bridge,함교,함교 이름
@@ -21,58 +23,72 @@ skill_name_corsair,코로나 폭발,커세어 기본 스킬 이름
 skill_name_heavyrain,일점 사격,헤비레인 기본 스킬 이름
 skill_name_tank,장갑 강화,탱크 기본 스킬 이름
 skill_name_angel,긴급 수리,앤젤 기본 스킬 이름
+skill_name_tachyon,타키온,타키온
 skill_desc_corsair,자신 주변에 1회의 범위 대미지를 준다,커세어 기본 스킬 설명
 skill_desc_heavyrain,기본 공격을 동시에 3발 발사한다,헤비레인 기본 스킬 설명
 skill_desc_tank,본인의 받는 피해량이 감소한다,탱크 기본 스킬 설명
 skill_desc_angel,본인을 제외한 아군 영웅 한 명의 체력을 회복시킨다,앤젤 기본 스킬 설명
+skill_desc_tachyon,타키온,타키온
 augment_name_corsair_A,태양의 불꽃,커세어 증강 스킬1 이름
 augment_name_heavyrain_A,초토화,헤비레인 증강 스킬1 이름
 augment_name_tank_A,성벽,탱크 증강 스킬1 이름
 augment_name_angel_A,나노봇 투여,앤젤 증강 스킬1 이름
+augment_name_tachyon_A,타키온,타키온
 augment_desc_corsair_A,스킬의 범위가 증가한다,커세어 증강 스킬1 설명
 augment_desc_heavyrain_A,기본 공격을 동시에 5발 발사한다,헤비레인 증강 스킬1 설명
 augment_desc_tank_A,본인의 받는 피해량이 대폭 감소한다,탱크 증강 스킬1 설명
 augment_desc_angel_A,범위 내 아군을 회복시킨다,앤젤 증강 스킬1 설명
+augment_desc_tachyon_A,타키온,타키온
 enhance_augment_name_corsair_A,태양의 불꽃+,커세어 강화 증강 스킬1 이름
 enhance_augment_name_heavyrain_A,초토화+,헤비레인 강화 증강 스킬1 이름
 enhance_augment_name_tank_A,성벽+,탱크 강화 증강 스킬1 이름
 enhance_augment_name_angel_A,나노봇 투여+,앤젤 강화 증강 스킬1 이름
+enhance_augment_name_tachyon_A,타키온,타키온
 enhance_augment_desc_corsair_A,커세어 강화 증강 스킬1 설명,커세어 강화 증강 스킬1 설명
 enhance_augment_desc_heavyrain_A,헤비레인 강화 증강 스킬1 설명,헤비레인 강화 증강 스킬1 설명
 enhance_augment_desc_tank_A,탱크 강화 증강 스킬1 설명,탱크 강화 증강 스킬1 설명
 enhance_augment_desc_angel_A,앤젤 강화 증강 스킬1 설명,앤젤 강화 증강 스킬1 설명
+enhance_augment_desc_tachyon_A,타키온,타키온
 augment_name_corsair_B,커세어 증강 스킬2 이름,커세어 증강 스킬2 이름
 augment_name_heavyrain_B,헤비레인 증강 스킬2 이름,헤비레인 증강 스킬2 이름
 augment_name_tank_B,탱크 증강 스킬2 이름,탱크 증강 스킬2 이름
 augment_name_angel_B,앤젤 증강 스킬2 이름,앤젤 증강 스킬2 이름
+augment_name_tachyon_B,타키온,타키온
 augment_desc_corsair_B,커세어 증강 스킬2 설명,커세어 증강 스킬2 설명
 augment_desc_heavyrain_B,헤비레인 증강 스킬2 설명,헤비레인 증강 스킬2 설명
 augment_desc_tank_B,탱크 증강 스킬2 설명,탱크 증강 스킬2 설명
 augment_desc_angel_B,앤젤 증강 스킬2 설명,앤젤 증강 스킬2 설명
+augment_desc_tachyon_B,타키온,타키온
 enhance_augment_name_corsair_B,커세어 증강 스킬2+ 이름,커세어 강화 증강 스킬2 이름
 enhance_augment_name_heavyrain_B,헤비레인 증강 스킬2+ 이름,헤비레인 강화 증강 스킬2 이름
 enhance_augment_name_tank_B,탱크 증강 스킬2+ 이름,탱크 강화 증강 스킬2 이름
 enhance_augment_name_angel_B,앤젤 증강 스킬2+ 이름,앤젤 강화 증강 스킬2 이름
+enhance_augment_name_tachyon_B,타키온,타키온
 enhance_augment_desc_corsair_B,커세어 강화 증강 스킬2 설명,커세어 강화 증강 스킬2 설명
 enhance_augment_desc_heavyrain_B,헤비레인 강화 증강 스킬2 설명,헤비레인 강화 증강 스킬2 설명
 enhance_augment_desc_tank_B,탱크 강화 증강 스킬2 설명,탱크 강화 증강 스킬2 설명
 enhance_augment_desc_angel_B,앤젤 강화 증강 스킬2 설명,앤젤 강화 증강 스킬2 설명
+enhance_augment_desc_tachyon_B,타키온,타키온
 passive_name_corsair_1,커세어 패시브 스킬1 이름,커세어 패시브 스킬1 이름
 passive_name_heavyrain_1,헤비레인 패시브 스킬1 이름,헤비레인 패시브 스킬1 이름
 passive_name_tank_1,탱크 패시브 스킬1 이름,탱크 패시브 스킬1 이름
 passive_name_angel_1,앤젤 패시브 스킬1 이름,앤젤 패시브 스킬1 이름
+passive_name_tachyon_1,타키온,타키온
 passive_desc_corsair_1,커세어 패시브 스킬1 설명,커세어 패시브 스킬1 설명
 passive_desc_heavyrain_1,헤비레인 패시브 스킬1 설명,헤비레인 패시브 스킬1 설명
 passive_desc_tank_1,탱크 패시브 스킬1 설명,탱크 패시브 스킬1 설명
 passive_desc_angel_1,앤젤 패시브 스킬1 설명,앤젤 패시브 스킬1 설명
+passive_desc_tachyon_1,타키온,타키온
 passive_name_corsair_2,커세어 패시브 스킬2 이름,커세어 패시브 스킬2 이름
 passive_name_heavyrain_2,헤비레인 패시브 스킬2 이름,헤비레인 패시브 스킬2 이름
 passive_name_tank_2,탱크 패시브 스킬2 이름,탱크 패시브 스킬2 이름
 passive_name_angel_2,앤젤 패시브 스킬2 이름,앤젤 패시브 스킬2 이름
+passive_name_tachyon_2,타키온,타키온
 passive_desc_corsair_2,커세어 패시브 스킬2 설명,커세어 패시브 스킬2 설명
 passive_desc_heavyrain_2,헤비레인 패시브 스킬2 설명,헤비레인 패시브 스킬2 설명
 passive_desc_tank_2,탱크 패시브 스킬2 설명,탱크 패시브 스킬2 설명
 passive_desc_angel_2,앤젤 패시브 스킬2 설명,앤젤 패시브 스킬2 설명
+passive_desc_tachyon_2,타키온 패시브 스킬2 설명,타키온 패시브 스킬2 설명
 hero_type_robot,전술 슈트,영웅의 heroType이 robot이면 정보창에 표시
 hero_type_spacecraft,우주 함선,영웅의 heroType이 spacecraft면 정보창에 표시
 hero_role_tank,방어형,영웅의 heroRole이 tank면 정보창에 표시
@@ -169,3 +185,10 @@ attack_power,공격력,
 healing_power,치유력,
 ui_toast_need_exp,경험치가 부족합니다.,"영웅 레벨업 필요 경험치 > 영웅 현재 경험치 일 때, 영웅 레벨업 버튼 입력 시 출력될 토스트 메시지"
 ui_toast_need_gold,골드가 부족합니다.,"영웅 레벨업 필요 골드 > 계정 내 골드량 일 때, 영웅 레벨업 버튼 입력 시 출력될 토스트 메시지"
+ui_text_win,Congratulation!!! ,
+ui_title_win,You Win !!!,
+ui_text_lose,So Sad...,
+ui_title_lose,You Lose....,
+ui_text_draw,Nice Try,
+ui_title_draw,Draw ,
+btn_quit_stage,돌아가기,
