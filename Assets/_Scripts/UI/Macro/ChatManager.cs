@@ -3,18 +3,82 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Fusion;
+using System.Collections;
 
 public class ChatManager : NetworkBehaviour
 {
+    [Header("매크로 데이터SO")]
     [SerializeField] private ChatMacroDataSO _database;
+    [Header("기본 설정")]
     [SerializeField] private List<Button> _txtMacroBtns;
     [SerializeField] private List<Button> _emoticonBtns;
     [SerializeField] private GameObject _chatBubblePrefab;
     [SerializeField] private StageUI _stageUI;
+    [SerializeField] private AnimUI _txtPanel;
+    [SerializeField] private AnimUI _emoticonPanel;
+    [SerializeField] private TMP_Text _toggleTxt;
+    [SerializeField] private AnimUI _toastObject; //비어있을때 출력용 토스트 메시지
+
+
+    private bool _isTeamChat = false; //기본 전체 채팅
 
     private void Start()
     {
         ApplySavedMacros();
+    }
+    // 텍스트 패널을 여는 메서드
+    public void OpenTextPanel()
+    {
+        bool hasData = false;
+        foreach (var btn in _txtMacroBtns) if (btn.gameObject.activeSelf) hasData = true;
+
+        if (!hasData)
+        {
+            StopAllCoroutines();
+            StartCoroutine(CO_ShowToastMsg());
+            return;
+        }
+
+        if (_txtPanel.IsOpened)
+        {
+            _txtPanel.DeActivate();
+        }
+        else
+        {
+            _emoticonPanel.DeActivate(); // 반대쪽 끄기
+            _txtPanel.Open();       // 이쪽 켜기
+        }
+    }
+
+    // 이모티콘 패널을 여는 메서드
+    public void OpenEmoticonPanel()
+    {
+        bool hasData = false;
+        foreach (var btn in _emoticonBtns) if (btn.gameObject.activeSelf) hasData = true;
+
+        if (!hasData)
+        {
+            StopAllCoroutines();
+            StartCoroutine(CO_ShowToastMsg());
+            return;
+        }
+
+        if (_emoticonPanel.IsOpened)
+        {
+            _emoticonPanel.DeActivate();
+        }
+        else
+        {
+            _txtPanel.DeActivate(); // 반대쪽 끄기
+            _emoticonPanel.Open();       // 이쪽 켜기
+        }
+    }
+
+    private IEnumerator CO_ShowToastMsg()
+    {
+        _toastObject.Open();
+        yield return new WaitForSeconds(2.5f);
+        _toastObject.DeActivate();
     }
 
     private void ApplySavedMacros()
@@ -59,7 +123,13 @@ public class ChatManager : NetworkBehaviour
         else iconImg.sprite = data.emoticonSprite;
 
         btn.onClick.RemoveAllListeners();
-        btn.onClick.AddListener(() => SendChat(data.id));
+        btn.onClick.AddListener(() =>
+        {
+            SendChat(data.id);
+
+            var panelUI = btn.GetComponentInParent<AnimUI>();
+            panelUI.DeActivate();
+        });
     }
 
     // 버튼 클릭 시 호출
@@ -81,6 +151,12 @@ public class ChatManager : NetworkBehaviour
 
         //안전한 데이터 취득
         if (!stageManager.PlayerDataMap.TryGet(sender, out var senderData) || !stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out var myData))
+        {
+            return;
+        }
+
+        // 팀챗일때 팀다르면 수신 거부
+        if (isTeamChat && senderData.Team != myData.Team && sender != Runner.LocalPlayer)
         {
             return;
         }
@@ -122,10 +198,15 @@ public class ChatManager : NetworkBehaviour
             Destroy(bubble, 2.0f);
         }
     }
+    public void ToggleChatMode()
+    {
+        _isTeamChat = !_isTeamChat;
 
+        _toggleTxt.text = _isTeamChat ? "팀원" : "전체";
+    }
     private bool IsTeamChatMode()
     {
         // 여기서 현재 토글 버튼 상태를 반환
-        return false;
+        return _isTeamChat;
     }
 }
