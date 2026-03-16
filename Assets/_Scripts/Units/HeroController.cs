@@ -27,7 +27,6 @@ public class HeroController : UnitController
     //이번 스폰/갱신 때 이미 적용한 스킬 증강 ID를 기억해서 중복 덮어쓰기 방지
     private HashSet<string> _appliedAugments = new HashSet<string>();
 
-
     public override void Spawned()
     {
         BaseUnitInit();
@@ -38,6 +37,10 @@ public class HeroController : UnitController
         curUniqueSkill = _standardSkillData.CreateInstance(this);
 
         _stageManager = FindFirstObjectByType<StageManager>();
+
+        HeroAnimator = GetComponent<Animator>();
+        // 부스터는 반드시 자식 오브젝트에서 첫번째에 위치한다.
+        BoosterAnimator = transform.GetChild(0).GetComponent<Animator>();
 
         if (!Object.HasStateAuthority) return;
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
@@ -99,10 +102,11 @@ public class HeroController : UnitController
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority) return;
-        if (IsDead) return; // 사망 시 중단 (혹은 DieState에서 처리)
 
         // 기본 스킬의 시전은 어느 상태든 상관없이 조건만 만족하면 바로 전환한다.
-        if (StateMachine.CurrentState != DeployState && StateMachine.CurrentState != CastState)
+        if (StateMachine.CurrentState != DieState &&
+            StateMachine.CurrentState != DeployState &&
+            StateMachine.CurrentState != CastState)
         {
             if (curUniqueSkill.UsingConditionCheck())
             {
@@ -293,6 +297,11 @@ public class HeroController : UnitController
                 Debug.LogWarning($"{unitId} 프리팹 확인 필요,  HeroItemObserver 컴포넌트");
             }
         }
+    }
+
+    public override void Render()
+    {
+        BoosterAnimator.SetBool("isActive", BoosterRender);
     }
 
 #if UNITY_EDITOR

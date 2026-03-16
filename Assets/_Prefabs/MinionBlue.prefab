@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinionController
   _testRange: 0
-  deathEffectPrefab: {fileID: 0}
+  deathEffectPrefab: {fileID: 2657706564968800909, guid: d0eee260816bd1440b043ff10e023225, type: 3}
   deathEffectLifeTime: 0.5
   _MaxHealth: 0
   team: 0
@@ -201,7 +201,9 @@ MonoBehaviour:
   unitId: unit_minion
   firePoint: {fileID: 7239607078526745090}
   currentTarget: {fileID: 0}
+  _networkedOnHit: 0
   _normalAttackData: {fileID: 11400000, guid: 5dc969de02cce174ba3e698396bdc920, type: 2}
+  _BoosterRender: 0
 --- !u!114 &7786030501378965668
 MonoBehaviour:
   m_ObjectHideFlags: 0
