@@ -6,8 +6,6 @@ public class UnitController : UnitBase
 {
     [Header("내비게이션 및 탐지")]
     public NavMeshAgent agent;
-    //public float moveSpeed;
-    //public float searchRange;
     public LayerMask targetLayer;
     public float searchInterval = 0.3f;
     [SerializeField] protected MoveType moveType;
@@ -24,6 +22,7 @@ public class UnitController : UnitBase
     protected UnitBase _bridge;
 
     public ISkill normalAttack;
+    [Networked] public bool networkedOnHit { get; set; }
 
     // 상태 머신과 상태 인스턴스들
     public StateMachine StateMachine { get; protected set; }
@@ -338,7 +337,13 @@ public class UnitController : UnitBase
 
             // 평타 공격인가 스킬인가
             if (type == SkillType.NormalAttack)
-                projectileSO = unit._normalAttackData as ProjectileSkillSO;
+            {
+                projectileSO = unit.normalAttack.Data as ProjectileSkillSO;
+                if (networkedOnHit == true)
+                    prefab = (unit as HeroController).CurUniqueSkill.Data.skillVFX;
+                else
+                    prefab = projectileSO.skillVFX;
+            }
 
             else
             {
@@ -348,8 +353,6 @@ public class UnitController : UnitBase
 
             if (projectileSO == null)
                 return;
-
-            prefab = projectileSO.skillVFX;
 
             int oneShotProjectileNum = projectileSO.oneShotProjectileNum;
             float spreadAngle = projectileSO.spreadAngle;

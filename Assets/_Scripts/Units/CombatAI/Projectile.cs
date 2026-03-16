@@ -4,6 +4,12 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private Renderer _targetRenderer;
+    [Header("관통 옵션")]
+    [SerializeField] private bool _isFierce;
+    [Header("폭발 옵션")]
+    [SerializeField] private bool _isExplosion;
+    [SerializeField] private float _range;
+
     private bool isInitialized = false;
     
     private float _finalPower;
@@ -74,8 +80,32 @@ public class Projectile : MonoBehaviour
             if (target.networkedTeam != _team)
             {
                 if (_runner.IsSharedModeMasterClient)
-                    target.TakeDamage(_finalPower);
-                Destroy(gameObject);
+                {
+                    if (_isExplosion)
+                    {
+                        LayerMask layer;
+                        int enemyLayer;
+                        if (_team == Team.Red)
+                            enemyLayer = LayerMask.NameToLayer("BlueTeam");
+                        else
+                            enemyLayer = LayerMask.NameToLayer("RedTeam");
+
+                        layer = 1 << enemyLayer;
+
+                        Collider[] colliders = Physics.OverlapSphere(target.transform.position, _range, layer);
+                        foreach (Collider collider in colliders) 
+                        {
+                            if ( collider.TryGetComponent(out UnitBase unit) )
+                            {
+                                unit.TakeDamage(_finalPower);
+                            }
+                        }
+                    }
+                    else
+                        target.TakeDamage(_finalPower);
+                }
+                if (!_isFierce)
+                    Destroy(gameObject);
             }
         }
     }

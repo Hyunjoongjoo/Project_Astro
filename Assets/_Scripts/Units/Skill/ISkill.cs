@@ -5,6 +5,8 @@ public interface ISkill
 
     bool IsCasting { get; } // 시전 중인 동안 캐스팅 상태에 머문다.
 
+    void Initialize() { }
+
     /// <summary>
     /// 후딜레이 메서드. Casting 다음 실행됨.
     /// </summary>
