@@ -11,7 +11,7 @@ public class HeroIconDataSO : ScriptableObject
     {
         public string heroId; //테이블 매칭용
         public Sprite iconSprite; // 영웅 초상화 아이콘
-        public List<Sprite> skillIcons; //스킬 아이콘 리스트
+        public List<BaseSkillSO> skillIcons; //스킬 아이콘 리스트
         public NetworkPrefabRef heroPrefab; //소환용 네트워크 프리팹 추가
     }
 
@@ -19,7 +19,7 @@ public class HeroIconDataSO : ScriptableObject
 
     // 빠른 검색을 위한 딕셔너리 캐싱
     private Dictionary<string, Sprite> _iconCache;
-    private Dictionary<string, List<Sprite>> _skillIconCache;
+    private Dictionary<string, List<BaseSkillSO>> _skillIconCache;
 
     //3.3 여현구 프리팹캐싱
     private Dictionary<string, NetworkPrefabRef> _prefabCache;
@@ -43,23 +43,10 @@ public class HeroIconDataSO : ScriptableObject
     /// <summary>
     /// 해당 영웅의 모든 스킬 아이콘 리스트를 반환
     /// </summary>
-    public List<Sprite> GetSkillIcons(string id)
+    public List<BaseSkillSO> GetSkillIcons(string id)
     {
         if (_skillIconCache == null) CacheData();
-        return _skillIconCache.TryGetValue(id, out List<Sprite> icons) ? icons : null;
-    }
-
-    /// <summary>
-    /// 해당 영웅의 특정 인덱스 스킬 아이콘을 반환
-    /// </summary>
-    public Sprite GetSkillIconByIndex(string id, int index)
-    {
-        var icons = GetSkillIcons(id);
-        if (icons != null && index >= 0 && index < icons.Count)
-        {
-            return icons[index];
-        }
-        return null;
+        return _skillIconCache.TryGetValue(id, out List<BaseSkillSO> icons) ? icons : null;
     }
 
     //3.3 여현구 프리팹받아오는 메서드
@@ -78,7 +65,7 @@ public class HeroIconDataSO : ScriptableObject
     {
         _iconCache = new Dictionary<string, Sprite>();
         _prefabCache = new Dictionary<string, NetworkPrefabRef>();
-        _skillIconCache = new Dictionary<string, List<Sprite>>();
+        _skillIconCache = new Dictionary<string, List<BaseSkillSO>>();
 
         foreach (var info in _iconList)
         {
