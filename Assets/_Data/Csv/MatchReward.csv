@@ -1,9 +1,9 @@
 대전 보상 테이블 기본키,게임모드,대전 결과,경험치량,골드량,기획용 비고
 id,matchType,matchResult,exp,gold,note
 String,MatchType,MatchResult,Int,Int,String
-reward_1v1_win,OneVsOne,win,40,4400,1v1 매칭 승리시 지급 보상
-reward_1v1_draw,OneVsOne,draw,16,1760,1v1 매칭 무승부 시 지급 보상
-reward_1v1_lose,OneVsOne,lose,8,880,1v1 매칭 패배 시 지급 보상
-reward_2v2_win,TwoVsTwo,win,40,4400,2v2 매칭 승리 시 지급 보상
-reward_2v2_draw,TwoVsTwo,draw,16,1760,2v2 매칭 무승부 시 지급 보상
-reward_2v2_lose,TwoVsTwo,lose,8,880,2v2 매칭 패배 시 지급 보상
+reward_1v1_win,OneVsOne,win,18,,1v1 매칭 승리시 지급 보상
+reward_1v1_draw,OneVsOne,draw,9,,1v1 매칭 무승부 시 지급 보상
+reward_1v1_lose,OneVsOne,lose,6,,1v1 매칭 패배 시 지급 보상
+reward_2v2_win,TwoVsTwo,win,36,,2v2 매칭 승리 시 지급 보상
+reward_2v2_draw,TwoVsTwo,draw,18,,2v2 매칭 무승부 시 지급 보상
+reward_2v2_lose,TwoVsTwo,lose,12,,2v2 매칭 패배 시 지급 보상
