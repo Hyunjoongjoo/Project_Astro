@@ -120,6 +120,7 @@ public abstract class UnitBase : NetworkBehaviour
 
     public void OnDie()
     {
+        IsDead = true;
         OnDeath?.Invoke(this);
 
         if (AudioManager.Instance != null)

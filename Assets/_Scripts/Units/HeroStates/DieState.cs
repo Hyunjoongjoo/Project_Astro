@@ -29,14 +29,10 @@ public class DieState : IState
         if (_unit.UnitType == UnitType.Hero)
         {
             AnimatorStateInfo stateInfo = _unit.HeroAnimator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.normalizedTime >= 0.95f)
+            if (stateInfo.IsName("Destroyed") && stateInfo.normalizedTime >= 0.95f)
                 Exit();
-            else
-                Debug.Log("사망 애니메이션 재생 중이어야 함");
         }
         else
-        {
             Exit();
-        }
     }
 }

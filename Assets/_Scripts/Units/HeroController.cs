@@ -98,10 +98,11 @@ public class HeroController : UnitController
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority) return;
-        if (IsDead) return; // 사망 시 중단 (혹은 DieState에서 처리)
 
         // 기본 스킬의 시전은 어느 상태든 상관없이 조건만 만족하면 바로 전환한다.
-        if (StateMachine.CurrentState != DeployState && StateMachine.CurrentState != CastState)
+        if (StateMachine.CurrentState != DieState &&
+            StateMachine.CurrentState != DeployState &&
+            StateMachine.CurrentState != CastState)
         {
             if (curUniqueSkill.UsingConditionCheck())
             {

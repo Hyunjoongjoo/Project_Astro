@@ -186,7 +186,9 @@ MonoBehaviour:
   unitId: hero_heavyrain
   firePoint: {fileID: 4892445714994426902}
   currentTarget: {fileID: 0}
+  _networkedOnHit: 0
   _normalAttackData: {fileID: 11400000, guid: be0452d7f5c132b49a64045a821bb76b, type: 2}
+  _BoosterRender: 0
   _standardSkillData: {fileID: 11400000, guid: 4cd053f36a047424babc7a75bd69c41c, type: 2}
 --- !u!114 &288590522490992711
 MonoBehaviour:
@@ -637,15 +639,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7462999412968334864, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
       propertyPath: m_LocalScale.x
-      value: 30
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7462999412968334864, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
       propertyPath: m_LocalScale.y
-      value: 30
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7462999412968334864, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
       propertyPath: m_LocalScale.z
-      value: 30
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8804866681676252824, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
       propertyPath: m_LocalPosition.x

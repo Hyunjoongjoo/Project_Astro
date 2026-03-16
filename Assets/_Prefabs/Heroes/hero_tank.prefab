@@ -218,6 +218,7 @@ MonoBehaviour:
   unitId: hero_tank
   firePoint: {fileID: 128638915413792048}
   currentTarget: {fileID: 0}
+  _networkedOnHit: 0
   _normalAttackData: {fileID: 11400000, guid: 4176918f5beebca46941c85e2c4b7287, type: 2}
   _BoosterRender: 0
   _standardSkillData: {fileID: 11400000, guid: b0fad8a3236bb7e4597f6d58c11cc918, type: 2}
@@ -647,6 +648,22 @@ PrefabInstance:
     - target: {fileID: 8742986767827863226, guid: 2d6afb3c9e8220142bc91d347514bbc1, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8744081905104265014, guid: 2d6afb3c9e8220142bc91d347514bbc1, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8744081905104265014, guid: 2d6afb3c9e8220142bc91d347514bbc1, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8744081905104265014, guid: 2d6afb3c9e8220142bc91d347514bbc1, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8744081905104265014, guid: 2d6afb3c9e8220142bc91d347514bbc1, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8888546421154591526, guid: 2d6afb3c9e8220142bc91d347514bbc1, type: 3}
       propertyPath: looping
