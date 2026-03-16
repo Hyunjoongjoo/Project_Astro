@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Tank_Skill_Type_B
   m_EditorClassIdentifier: Assembly-CSharp::ShieldSkillSO
   heroId: hero_tank
+  skillIcon: {fileID: 0}
   skillName: augment_name_tank_B
-  skillDescription: 
+  skillDescription: augment_desc_tank_B
   note: 
   skillVFX: {fileID: 7424493359620386997, guid: 833382efe84507f499871838888a8c8a, type: 3}
   skillType: 2
