@@ -135,10 +135,17 @@ public class HeroSpawner : NetworkBehaviour
             ? ObjectContainer.Instance.blueSideStructure
             : ObjectContainer.Instance.redSideStructure;
 
-        //index 2 = 함교
-        return myStructures != null && myStructures.Length > 2
-            ? myStructures[2].transform
-            : null;
+        if (myStructures == null || myStructures.Length <= 2)
+        {
+            return null;
+        }
+
+        if (myStructures[2] == null)
+        {
+            return null;
+        }
+
+        return myStructures[2].transform;
     }
 
     private float GetDeployDelay(float distance)//거리 기반 배치 지연시간
@@ -199,6 +206,7 @@ public class HeroSpawner : NetworkBehaviour
         }
 
         Transform origin = GetDeployOrigin(team);
+        if (origin == null) return;
         float distance = Vector3.Distance(origin.position, spawnPos);
         float deployDelay = GetDeployDelay(distance);
 
