@@ -1,5 +1,4 @@
-﻿using DG.Tweening;
-using Fusion;
+﻿using Fusion;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -23,6 +22,7 @@ public class StageUI : MonoBehaviour
     [SerializeField] private GameObject _resultPanel;
     [SerializeField] private GameObject _victoryPanel;
     [SerializeField] private GameObject _defeatPanel;
+    [SerializeField] private GameObject _drawPanel;
     [SerializeField] private GameObject _heroResultPrefab;
     [SerializeField] private Transform _heroListPanel;
     [SerializeField] private TextMeshProUGUI _resultGoldText;
@@ -185,10 +185,20 @@ public class StageUI : MonoBehaviour
             AugmentManager.Instance.HideAugmentToggleBtn();
     }
 
-    public void ShowResultPanel(bool isVictory, List<HeroResultData> heroes, int goldAmount)
+    public void ShowResultPanel(MatchResult result, List<HeroResultData> heroes, int goldAmount)
     {
-        _victoryPanel.SetActive(isVictory);
-        _defeatPanel.SetActive(!isVictory);
+        switch (result)
+        {
+            case MatchResult.Win:
+                _victoryPanel.SetActive(true);
+                break;
+            case MatchResult.Lose:
+                _defeatPanel.SetActive(true);
+                break;
+            case MatchResult.Draw:
+                _drawPanel.SetActive(true);
+                break;
+        }
 
         // 골드 텍스트 설정
         if (_resultGoldText != null)
