@@ -271,6 +271,12 @@ public class StageManager : NetworkBehaviour
         }
 
         _stageUI.ShowPlayerInfo(data);
+        var chatManager = FindFirstObjectByType<ChatManager>();
+        if (chatManager != null)
+        {
+            // PlayerDataMap.Count가 2이면 1:1, 4이면 2:2
+            chatManager.RefreshBlockButtons(PlayerDataMap.Count);
+        }
     }
 
     //타이머 깎는 함수 추가
