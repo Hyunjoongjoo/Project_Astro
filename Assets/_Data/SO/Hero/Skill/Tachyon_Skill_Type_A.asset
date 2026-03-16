@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OnHitSkillSO
   heroId: hero_tachyon
   skillIcon: {fileID: 21300000, guid: ee3d8cf348f1cdb4d8ac80626613b9d7, type: 3}
-  skillName: 
-  skillDescription: 
+  skillName: augment_name_tachyon_A
+  skillDescription: augment_desc_tachyon_A
   note: 
   skillVFX: {fileID: 2393817908272368249, guid: f0db7e10bba6a83488d30c87355f22b7, type: 3}
   skillType: 2
