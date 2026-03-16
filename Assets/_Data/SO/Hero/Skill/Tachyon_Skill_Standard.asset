@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Tachyon_Skill_Standard
   m_EditorClassIdentifier: Assembly-CSharp::OnHitSkillSO
   heroId: hero_tachyon
+  skillIcon: {fileID: 0}
   skillName: 
   skillDescription: 
   note: 
