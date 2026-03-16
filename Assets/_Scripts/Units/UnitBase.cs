@@ -145,7 +145,8 @@ public abstract class UnitBase : NetworkBehaviour
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
         if (!hasState) return;
-        if (deathEffectPrefab != null)
+
+        if (unitType == UnitType.Minion && deathEffectPrefab != null)
         {
             GameObject deathEffectObject = Instantiate(
                 deathEffectPrefab,
