@@ -175,4 +175,12 @@ public class ItemManager : NetworkBehaviour
             }
         }
     }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
 }

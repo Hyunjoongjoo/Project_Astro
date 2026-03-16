@@ -3919,7 +3919,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66e71c8e37e76964e81e1b20e0faaae4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemUIManager
-  _dontDestroyOnLoad: 1
+  _dontDestroyOnLoad: 0
   _inventorySlots:
   - {fileID: 7325099992381237108}
   - {fileID: 7325099992381237107}

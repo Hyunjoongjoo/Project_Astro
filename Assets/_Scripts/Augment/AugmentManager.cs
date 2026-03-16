@@ -168,5 +168,16 @@ public class AugmentManager : Singleton<AugmentManager>
             _currentWindow.ReceiveTeammateConfirmed();
         }
     }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+        _cachedStageManager = null;
+        _currentWindow = null;
+        _isWaitingForServerResponse = false;
+    }
 }
 
