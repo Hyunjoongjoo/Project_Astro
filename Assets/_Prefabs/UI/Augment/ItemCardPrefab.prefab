@@ -469,7 +469,7 @@ GameObject:
   - component: {fileID: 7212854544900824172}
   - component: {fileID: 8203613301202766691}
   m_Layer: 5
-  m_Name: SkillICon
+  m_Name: ItemICon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -706,7 +706,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31396472805e8104687c8b5bfb365a72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemCardUI
-  _skillIconImg: {fileID: 8203613301202766691}
+  _ItemIconImg: {fileID: 8203613301202766691}
+  _itemIconData: {fileID: 0}
   _titleTxt: {fileID: 1122156057283281231}
   _itemDescription: {fileID: 6996938851940257511}
   _selectBtn: {fileID: 7135005315365410320}
@@ -798,7 +799,7 @@ GameObject:
   - component: {fileID: 3910527799725603446}
   - component: {fileID: 6065688666040451842}
   m_Layer: 5
-  m_Name: SkillIconFrame
+  m_Name: ItemIconFrame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
