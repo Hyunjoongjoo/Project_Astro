@@ -60,9 +60,9 @@ public class HeroDetailView : BaseUI
     }
 
     // 레벨 및 경험치 세팅
-    public void SetLevelInfo(int level, int currentExp, float maxExp)
+    public void SetLevelInfo(string level, int currentExp, float maxExp)
     {
-        _heroLevelTxt.text = $"Lv. {level}";
+        _heroLevelTxt.text = level;
         _heroExpBar.fillAmount = (float)currentExp / maxExp;
         _heroExpTxt.text = $"{currentExp} / {maxExp}";
     }
@@ -99,13 +99,15 @@ public class HeroDetailView : BaseUI
 
 
     //스텟 판넬 설정후 소환
-    public void AddStatItem(string name, string value, Sprite icon, Color color = default)
+    public StatPanelUI AddStatItem(string name, string value, Sprite icon, Color color = default)
     {
         GameObject obj = Instantiate(_statPanelPrefab, _statContainer);
         if (obj.TryGetComponent(out StatPanelUI statItem))
         {
             statItem.SetStat(name, value, icon, color);
+            return statItem;
         }
+        return null;
     }
     // 스킬 생성
     public void AddSkillItem(string name, string des,string cooltime, Sprite icon = null)

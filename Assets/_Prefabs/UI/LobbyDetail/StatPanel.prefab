@@ -323,6 +323,7 @@ MonoBehaviour:
   _statValueTxt: {fileID: 8899969118205833989}
   _statIcon: {fileID: 7320396874648389025}
   _panel: {fileID: 1806147070312628317}
+  _toastButton: {fileID: 8141263414149041741}
 --- !u!114 &1806147070312628317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -619,7 +620,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -17.045776, y: 0, z: -31.960815, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
