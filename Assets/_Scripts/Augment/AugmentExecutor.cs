@@ -58,9 +58,10 @@ public static class AugmentExecutor
                 }
                 else
                 {
-                    stageManager.PlayerDataMap.Set(player, playerData);
                     Debug.Log($"{player} 의 데이터에 {type} : {refId} 저장");
                 }
+                stageManager.PlayerDataMap.Set(player, playerData);
+                ItemManager.Instance.RPC_RefreshItemUI(player);
                 break;
 
             case AugmentType.Skill:

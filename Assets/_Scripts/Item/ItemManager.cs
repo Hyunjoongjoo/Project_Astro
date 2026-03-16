@@ -71,6 +71,8 @@ public class ItemManager : NetworkBehaviour
         _stageManager.PlayerDataMap.Set(requestPlayer, playerData);
         Debug.Log($"{requestPlayer}가 영웅 {heroIndex}번에게 아이템 {targetItemId} 장착 완료.");
 
+        //3.16 RPC
+        RPC_RefreshItemUI(requestPlayer);
     }
 
 
@@ -111,6 +113,9 @@ public class ItemManager : NetworkBehaviour
         _stageManager.PlayerDataMap.Set(requestPlayer, senderData);
         _stageManager.PlayerDataMap.Set(targetAlly, receiverData);
 
+        //3.16 얜 아군도 갱신(줬으니까)
+        RPC_RefreshItemUI(requestPlayer);
+        RPC_RefreshItemUI(targetAlly);
     }
 
 
@@ -152,6 +157,21 @@ public class ItemManager : NetworkBehaviour
             else
             {
                 Debug.LogWarning($"{message} (ToastMessageUI 인스턴스 없음)");
+            }
+        }
+    }
+
+    //3.16
+    //UI 새로고침 명령
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_RefreshItemUI(PlayerRef targetPlayer)
+    {
+        //대상자 로컬에서만 새로고침
+        if (Runner.LocalPlayer == targetPlayer)
+        {
+            if (ItemUIManager.Instance != null)
+            {
+                ItemUIManager.Instance.RefreshUI();
             }
         }
     }

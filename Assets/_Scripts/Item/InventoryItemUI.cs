@@ -41,7 +41,8 @@ public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnBeginDrag(PointerEventData eventData)
     {
         //빈 슬롯이면 드래그 불가
-        if (!_iconImg.gameObject.activeSelf) return;
+        //3.16 임시슬롯도 드래그 방어
+        if (!_iconImg.gameObject.activeSelf || InventoryIndex == 99) return;
 
         //롤백용
         _originPos = _rectTransform.anchoredPosition;
