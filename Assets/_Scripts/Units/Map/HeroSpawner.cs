@@ -12,9 +12,9 @@ public class HeroSpawner : NetworkBehaviour
     [SerializeField] private float _minDeployDistance = 1f;
 
     [Header("배치 거리 확장")]
-    [SerializeField] private float _baseDeployDistance = 9f;
-    [SerializeField] private float _deployExpandPerTower = 2f;
-    [SerializeField] private float _maxDeployDistance = 13f;
+    [SerializeField] private float _baseDeployDistance = 8f;
+    [SerializeField] private float _deployExpandPerTower = 3f;
+    [SerializeField] private float _maxDeployDistance = 14f;
 
     // 플레이어,영웅 프리팹 기준으로 소환 쿨다운을 분리 관리
     private readonly Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer> _respawnTimers
@@ -81,6 +81,21 @@ public class HeroSpawner : NetworkBehaviour
             return false;
         }
 
+        Vector3 dir = spawnPos - deployOrigin.position;
+
+        //함교 뒤쪽 배치 방지
+        if (team == Team.Blue && dir.z < 0)
+        {
+            Debug.Log($"함교보다 뒤에 배치됨");
+            return false;
+        }
+
+        if (team == Team.Red && dir.z > 0)
+        {
+            Debug.Log($"함교보다 뒤에 배치됨");
+            return false;
+        }
+
         //최대 배치 거리 초과 시 차단
         float distance = Vector3.Distance(deployOrigin.position, spawnPos);
         float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
@@ -92,6 +107,19 @@ public class HeroSpawner : NetworkBehaviour
         Transform origin = GetDeployOrigin(team);
 
         if (origin == null)
+        {
+            return false;
+        }
+
+        Vector3 dir = spawnPos - origin.position;
+
+        //함교 뒤쪽 배치 방지
+        if (team == Team.Blue && dir.z < 0)
+        {
+            return false;
+        }
+
+        if (team == Team.Red && dir.z > 0)
         {
             return false;
         }
@@ -186,7 +214,6 @@ public class HeroSpawner : NetworkBehaviour
                 //배치 및 지연 처리는 컨트롤러가 수행
                 StartSummonCooldown(caller, prefab, hero.RespawnTime);
             });
-        Debug.Log($"영웅 소환 완료!");
     }
 #if UNITY_EDITOR
     private void OnDrawGizmos()
