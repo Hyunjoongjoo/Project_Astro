@@ -10,7 +10,11 @@ public class HeroSpawner : NetworkBehaviour
     [SerializeField] private float _minDeployTime = 0.25f;
     [SerializeField] private float _maxDeployTime = 2.5f;
     [SerializeField] private float _minDeployDistance = 1f;
-    [SerializeField] private float _maxDeployDistance = 15f;
+
+    [Header("배치 거리 확장")]
+    [SerializeField] private float _baseDeployDistance = 9f;
+    [SerializeField] private float _deployExpandPerTower = 2f;
+    [SerializeField] private float _maxDeployDistance = 13f;
 
     // 플레이어,영웅 프리팹 기준으로 소환 쿨다운을 분리 관리
     private readonly Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer> _respawnTimers
@@ -31,6 +35,32 @@ public class HeroSpawner : NetworkBehaviour
         }
 
         return timer.ExpiredOrNotRunning(Runner);
+    }
+    
+    private int GetDestroyedTowerCount(Team team)//현재 파괴된 포탑 수
+    {
+        int aliveCount = 0;
+
+        Team enemyTeam = team == Team.Blue ? Team.Red : Team.Blue;
+
+        foreach (var tower in Tower.AliveTowers)
+        {
+            if (tower.networkedTeam == enemyTeam)
+            {
+                aliveCount++;
+            }
+        }
+
+        return Mathf.Clamp(2 - aliveCount, 0, 2);//팀당 포탑 2개 기준
+    }
+    
+    private float GetCurrentDeployDistance(Team team)//현재 배치 가능 거리 계산
+    {
+        int destroyedCount = GetDestroyedTowerCount(team);
+
+        float distance = _baseDeployDistance + destroyedCount * _deployExpandPerTower;
+
+        return Mathf.Min(distance, _maxDeployDistance);
     }
 
     public bool CanDeployHero(Vector3 spawnPos, Team team)//해당 위치에 영웅 배치가 가능한지 검사
@@ -53,7 +83,8 @@ public class HeroSpawner : NetworkBehaviour
 
         //최대 배치 거리 초과 시 차단
         float distance = Vector3.Distance(deployOrigin.position, spawnPos);
-        return distance <= _maxDeployDistance;
+        float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
+        return distance <= maxDistance;
     }
 
     public bool CanPreviewDeployHero(Vector3 spawnPos, Team team)//UI체크
@@ -66,8 +97,8 @@ public class HeroSpawner : NetworkBehaviour
         }
 
         float distance = Vector3.Distance(origin.position, spawnPos);
-
-        return distance <= _maxDeployDistance;
+        float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
+        return distance <= maxDistance;
     }
 
     private Transform GetDeployOrigin(Team team)//함교 위치를 반환
@@ -157,4 +188,18 @@ public class HeroSpawner : NetworkBehaviour
             });
         Debug.Log($"영웅 소환 완료!");
     }
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying) return;
+
+        Transform origin = GetDeployOrigin(Team.Blue);
+        if (origin == null) return;
+
+        float distance = GetCurrentDeployDistance(Team.Blue);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(origin.position, distance);
+    }
+#endif
 }

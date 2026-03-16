@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1324447883655620717
+--- !u!1 &3241183545430406344
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,54 +8,85 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4795688492054504817}
-  - component: {fileID: 5169243024188867454}
-  - component: {fileID: 3024502998042256592}
-  - component: {fileID: 7299576946842487594}
-  - component: {fileID: 8869414054069226404}
-  - component: {fileID: 707048002635603553}
-  - component: {fileID: 9158771151194973300}
-  - component: {fileID: -7269745521372557208}
-  - component: {fileID: -2192352356554374425}
-  - component: {fileID: 7260594039196514793}
+  - component: {fileID: 6694106697435261523}
   m_Layer: 6
-  m_Name: hero_tank
+  m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4795688492054504817
+--- !u!4 &6694106697435261523
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
+  m_GameObject: {fileID: 3241183545430406344}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 4.75}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8044162365271733262}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5887182521506401475
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8044162365271733262}
+  - component: {fileID: 7144126769425424577}
+  - component: {fileID: 7671788512925680709}
+  - component: {fileID: 4287002112101888563}
+  - component: {fileID: 5500652116819272087}
+  - component: {fileID: 2943168291852106741}
+  - component: {fileID: 4273220458179548794}
+  - component: {fileID: 3015100684850305733}
+  - component: {fileID: 8478596560654599407}
+  - component: {fileID: 7510330726489026033}
+  m_Layer: 6
+  m_Name: hero_tachyon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8044162365271733262
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5887182521506401475}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.138718, y: 38.070194, z: -78.7684}
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 128638915413792048}
+  - {fileID: 6694106697435261523}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &5169243024188867454
+--- !u!33 &7144126769425424577
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
-  m_Mesh: {fileID: 2191280616648274266, guid: 5c14422e95638304598a3adad94bbf2e, type: 3}
---- !u!23 &3024502998042256592
+  m_GameObject: {fileID: 5887182521506401475}
+  m_Mesh: {fileID: -2746435131391062208, guid: 1be931e70b01b2b409458d5802a32af8, type: 3}
+--- !u!23 &7671788512925680709
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
+  m_GameObject: {fileID: 5887182521506401475}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -74,7 +105,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8f9ee6e42e2005942a5b092cb9f2087c, type: 2}
+  - {fileID: 2100000, guid: 248508f42dcd00049925f29941b22e00, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -97,17 +128,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!195 &7299576946842487594
+--- !u!195 &4287002112101888563
 NavMeshAgent:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
+  m_GameObject: {fileID: 5887182521506401475}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 5.542556
-  m_Speed: 7
+  m_Radius: 5.667341
+  m_Speed: 6
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -115,17 +146,17 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2.806628
-  m_BaseOffset: 1.403314
+  m_Height: 4.238166
+  m_BaseOffset: 2.119083
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &8869414054069226404
+--- !u!114 &5500652116819272087
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
+  m_GameObject: {fileID: 5887182521506401475}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f0807c2c902d934c971569602ccad0c, type: 3}
@@ -143,54 +174,54 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
-  moveType: 1
-  attackRange: 3
-  unitId: hero_tank
-  firePoint: {fileID: 128638915413792048}
+  moveType: 0
+  attackRange: 5
+  unitId: hero_tachyon
+  firePoint: {fileID: 6694106697435261523}
   currentTarget: {fileID: 0}
   _networkedOnHit: 0
-  _normalAttackData: {fileID: 11400000, guid: 4176918f5beebca46941c85e2c4b7287, type: 2}
-  _standardSkillData: {fileID: 11400000, guid: b0fad8a3236bb7e4597f6d58c11cc918, type: 2}
-  _itemObserver: {fileID: 7260594039196514793}
---- !u!114 &707048002635603553
+  _normalAttackData: {fileID: 11400000, guid: b925f460ead9092459914239589e936c, type: 2}
+  _standardSkillData: {fileID: 11400000, guid: 5a3454fdb602d9240b32304b1c7baf13, type: 2}
+  _itemObserver: {fileID: 7510330726489026033}
+--- !u!114 &2943168291852106741
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
+  m_GameObject: {fileID: 5887182521506401475}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e06afd8dba25da47828c557178535da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitStat
---- !u!114 &9158771151194973300
+--- !u!114 &4273220458179548794
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
+  m_GameObject: {fileID: 5887182521506401475}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 1640594295
+  SortKey: 358727077
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 8869414054069226404}
-  - {fileID: -2192352356554374425}
+  - {fileID: 5500652116819272087}
+  - {fileID: 8478596560654599407}
   ForceRemoteRenderTimeframe: 0
---- !u!136 &-7269745521372557208
+--- !u!136 &3015100684850305733
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
+  m_GameObject: {fileID: 5887182521506401475}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -203,17 +234,17 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 4.97
-  m_Height: 2.8066292
+  m_Radius: 5.66734
+  m_Height: 4.2381673
   m_Direction: 1
-  m_Center: {x: 0, y: -0.0000007152557, z: -0.0000069141383}
---- !u!114 &-2192352356554374425
+  m_Center: {x: 0, y: -0.00000083446497, z: 0.0000007152557}
+--- !u!114 &8478596560654599407
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
+  m_GameObject: {fileID: 5887182521506401475}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
@@ -224,46 +255,15 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
---- !u!114 &7260594039196514793
+--- !u!114 &7510330726489026033
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324447883655620717}
+  m_GameObject: {fileID: 5887182521506401475}
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 84d64c90d56df5a49bee77671aa71cd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeroItemObserver
---- !u!1 &4516873832323991094
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 128638915413792048}
-  m_Layer: 6
-  m_Name: FirePoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &128638915413792048
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4516873832323991094}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 4.98}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4795688492054504817}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
