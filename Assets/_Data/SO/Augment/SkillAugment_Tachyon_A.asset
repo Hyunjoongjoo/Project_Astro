@@ -18,9 +18,9 @@ MonoBehaviour:
   Tiers:
   - TitleStringID: augment_name_tachyon_A
     DescStringID: augment_desc_tachyon_A
-    Icon: {fileID: 21300000, guid: 602741b566380d14aa899bc7bd2c3fe3, type: 3}
+    Icon: {fileID: 21300000, guid: ee3d8cf348f1cdb4d8ac80626613b9d7, type: 3}
     CombatSkillData: {fileID: 11400000, guid: 78ea71a2a7314a340af750248ef38849, type: 2}
   - TitleStringID: enhance_augment_name_tachyon_A
     DescStringID: enhance_augment_desc_tachyon_A
-    Icon: {fileID: 21300000, guid: 1680618d4247fa849ac5b62defe8b0b9, type: 3}
+    Icon: {fileID: 21300000, guid: f0b423e9e6d5c974ebff9dc1ab5a4f4f, type: 3}
     CombatSkillData: {fileID: 11400000, guid: 2323b34ae70c3d64d9f6775bf8155446, type: 2}

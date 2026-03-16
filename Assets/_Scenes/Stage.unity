@@ -65565,12 +65565,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ef90a41469242924d8135cdecee0a189, type: 2}
   - {fileID: 11400000, guid: 998b3776ff0376c47a1f1a230a3af1b9, type: 2}
   - {fileID: 11400000, guid: 024c7cd4a4066014e84fe4b5bbf9c560, type: 2}
+  - {fileID: 11400000, guid: e6a44efe39920a94c87bff59487e808a, type: 2}
+  - {fileID: 11400000, guid: 4f4da78988462894380af05c0d256dcb, type: 2}
   _allBaseSkills:
   - {fileID: 11400000, guid: d6dd206c7bea98c44acb6c53c617a268, type: 2}
   - {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
   - {fileID: 11400000, guid: 4cd053f36a047424babc7a75bd69c41c, type: 2}
   - {fileID: 11400000, guid: b0fad8a3236bb7e4597f6d58c11cc918, type: 2}
+  - {fileID: 11400000, guid: 5a3454fdb602d9240b32304b1c7baf13, type: 2}
   _heroIconSO: {fileID: 11400000, guid: 59f5c354744c3014e8112428c930f6a4, type: 2}
+  _itemIconDataSO: {fileID: 0}
   _PlayerAugmentTimers:
     _items: []
   _IsPlayerAugmenting:
