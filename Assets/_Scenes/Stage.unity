@@ -3921,12 +3921,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemUIManager
   _dontDestroyOnLoad: 1
   _inventorySlots:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  _heroCardContainer: {fileID: 0}
-  _tempSlotUI: {fileID: 0}
-  _itemIconData: {fileID: 0}
+  - {fileID: 7325099992381237108}
+  - {fileID: 7325099992381237107}
+  - {fileID: 7325099992381237106}
+  _heroCardContainer: {fileID: 136332901}
+  _tempSlotUI: {fileID: 7325099992381237109}
+  _itemIconData: {fileID: 11400000, guid: 836b9461e790b0c419b9873f779da732, type: 2}
 --- !u!1 &233470477
 GameObject:
   m_ObjectHideFlags: 0
@@ -67895,8 +67895,73 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 19278672043696684, guid: 6a916695f00a8ec47b1d88b7d3c0ccfd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7325099992381237109}
   m_SourcePrefab: {fileID: 100100000, guid: 6a916695f00a8ec47b1d88b7d3c0ccfd, type: 3}
+--- !u!114 &7325099992381237104 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6882606786995455079, guid: 6a916695f00a8ec47b1d88b7d3c0ccfd, type: 3}
+  m_PrefabInstance: {fileID: 7325099992381237103}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!1 &7325099992381237105 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 19278672043696684, guid: 6a916695f00a8ec47b1d88b7d3c0ccfd, type: 3}
+  m_PrefabInstance: {fileID: 7325099992381237103}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7325099992381237106 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8588249761672538617, guid: 6a916695f00a8ec47b1d88b7d3c0ccfd, type: 3}
+  m_PrefabInstance: {fileID: 7325099992381237103}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aba2f55b99698c642b8b788245fec870, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryItemUI
+--- !u!114 &7325099992381237107 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5548302960038648009, guid: 6a916695f00a8ec47b1d88b7d3c0ccfd, type: 3}
+  m_PrefabInstance: {fileID: 7325099992381237103}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aba2f55b99698c642b8b788245fec870, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryItemUI
+--- !u!114 &7325099992381237108 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5287838536764258765, guid: 6a916695f00a8ec47b1d88b7d3c0ccfd, type: 3}
+  m_PrefabInstance: {fileID: 7325099992381237103}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aba2f55b99698c642b8b788245fec870, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryItemUI
+--- !u!114 &7325099992381237109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7325099992381237105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aba2f55b99698c642b8b788245fec870, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryItemUI
+  _iconImg: {fileID: 7325099992381237104}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
