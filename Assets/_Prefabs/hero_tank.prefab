@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 9158771151194973300}
   - component: {fileID: -7269745521372557208}
   - component: {fileID: -2192352356554374425}
+  - component: {fileID: 7260594039196514793}
   m_Layer: 6
   m_Name: hero_tank
   m_TagString: Untagged
@@ -147,8 +148,10 @@ MonoBehaviour:
   unitId: hero_tank
   firePoint: {fileID: 128638915413792048}
   currentTarget: {fileID: 0}
+  _networkedOnHit: 0
   _normalAttackData: {fileID: 11400000, guid: 4176918f5beebca46941c85e2c4b7287, type: 2}
   _standardSkillData: {fileID: 11400000, guid: b0fad8a3236bb7e4597f6d58c11cc918, type: 2}
+  _itemObserver: {fileID: 7260594039196514793}
 --- !u!114 &707048002635603553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,6 +224,18 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
+--- !u!114 &7260594039196514793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324447883655620717}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d64c90d56df5a49bee77671aa71cd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeroItemObserver
 --- !u!1 &4516873832323991094
 GameObject:
   m_ObjectHideFlags: 0

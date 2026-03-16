@@ -32,17 +32,36 @@ public static class AugmentExecutor
 
             case AugmentType.Item:
                 //아이템은 본인 보관소로
+                //3.14 꽉 찼는 지 체크용
+                bool isStored = false;
                 for (int i = 0; i < SlotData_3.Length; i++)
                 {
                     if (string.IsNullOrEmpty(playerData.InventoryItems.Get(i).Replace("\0", "").Trim()))
                     {
                         playerData.InventoryItems = playerData.InventoryItems.Set(i, refId);
+                        isStored = true;
                         break;
                     }
-
+                }
+                //인벤토리가 꽉 찼다면 임시 슬롯에 보관
+                if (!isStored)
+                {
+                    if (string.IsNullOrEmpty(playerData.TempItemSlot.ToString().Replace("\0", "").Trim()))
+                    {
+                        playerData.TempItemSlot = refId;
+                        Debug.Log($"{player} 보관함 가득참. 임시 슬롯에 아이템 {refId} 저장");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"{player} 임시 슬롯도 가득참, 그냥 로그만 => 근데 그럴 일이 있을까?");
+                    }
+                }
+                else
+                {
+                    Debug.Log($"{player} 의 데이터에 {type} : {refId} 저장");
                 }
                 stageManager.PlayerDataMap.Set(player, playerData);
-                Debug.Log($"{player} 의 데이터에 {type} : {refId} 저장");
+                ItemManager.Instance.RPC_RefreshItemUI(player);
                 break;
 
             case AugmentType.Skill:

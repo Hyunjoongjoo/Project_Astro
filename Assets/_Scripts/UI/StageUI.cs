@@ -140,10 +140,11 @@ public class StageUI : MonoBehaviour
         Debug.Log("매칭된 플레이어 정보를 보여줌");
     }
 
-    public TeamCardSlotUI GetTeammateSlot(string nickname)
+    //3.15 매개변수 추가, 팀메이트 정보까지
+    public TeamCardSlotUI GetTeammateSlot(string nickname, PlayerRef allyRef)
     {
         var ui = _teamMemberSlot.GetComponent<TeamCardSlotUI>();
-        ui.Initialize(nickname);
+        ui.Initialize(nickname, allyRef);
         return ui; // 생성된 UI 컴포넌트를 반환하여 StageManager에게 전달
     }
 

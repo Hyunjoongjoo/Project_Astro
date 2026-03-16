@@ -186,11 +186,27 @@ public class AugmentController : NetworkBehaviour
                     if (!string.IsNullOrEmpty(skillId)) mySkills.Add(skillId);
                 }
 
+                //3.13 로직 변경
+                //보관함 3칸 + 임시 슬롯 1칸 모두 꽉 찼는지 검사
                 bool isItemFull = true;
+
+                //기본 인벤토리 검사
                 for (int i = 0; i < SlotData_3.Length; i++)
                 {
-                    string itemId = myData.InventoryItems.Get(i).Replace("\0", "").Trim();
-                    if (string.IsNullOrEmpty(itemId)) { isItemFull = false; break; }
+                    if (string.IsNullOrEmpty(myData.InventoryItems.Get(i).Replace("\0", "").Trim()))
+                    {
+                        isItemFull = false;
+                        break;
+                    }
+                }
+
+                //인벤토리가 꽉 차도 임시 슬롯이 비어있다면 Full이 아님
+                if (isItemFull)
+                {
+                    if (string.IsNullOrEmpty(myData.TempItemSlot.ToString().Replace("\0", "").Trim()))
+                    {
+                        isItemFull = false;
+                    }
                 }
 
                 List<AugmentData> cards = _deckManager.GenerateCards(
@@ -297,7 +313,7 @@ public class AugmentController : NetworkBehaviour
             }
         }
     }
-    
+
     //아군 카드만 전달받는 후속 RPC 패킷넘치는 거 방지용
     //3.12 네트워크 매개변수 추가
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -312,7 +328,7 @@ public class AugmentController : NetworkBehaviour
         {
             Debug.Log("RPC_DeliverTeamCards 수신됨 - 1vs1인데 이게 찍히면 버그");
 
-            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer); 
+            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer);
             int reinforceNum = 6;
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
             if (config != null) reinforceNum = int.Parse(config.configValue);
