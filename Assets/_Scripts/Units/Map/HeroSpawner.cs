@@ -81,20 +81,20 @@ public class HeroSpawner : NetworkBehaviour
             return false;
         }
 
-        Vector3 dir = spawnPos - deployOrigin.position;
+        //Vector3 dir = spawnPos - deployOrigin.position;//이부분은 이야기가 나올시...
 
-        //함교 뒤쪽 배치 방지
-        if (team == Team.Blue && dir.z < 0)
-        {
-            Debug.Log($"함교보다 뒤에 배치됨");
-            return false;
-        }
+        ////함교 뒤쪽 배치 방지
+        //if (team == Team.Blue && dir.z < 0)
+        //{
+        //    Debug.Log($"함교보다 뒤에 배치됨");
+        //    return false;
+        //}
 
-        if (team == Team.Red && dir.z > 0)
-        {
-            Debug.Log($"함교보다 뒤에 배치됨");
-            return false;
-        }
+        //if (team == Team.Red && dir.z > 0)
+        //{
+        //    Debug.Log($"함교보다 뒤에 배치됨");
+        //    return false;
+        //}
 
         //최대 배치 거리 초과 시 차단
         float distance = Vector3.Distance(deployOrigin.position, spawnPos);
@@ -111,18 +111,18 @@ public class HeroSpawner : NetworkBehaviour
             return false;
         }
 
-        Vector3 dir = spawnPos - origin.position;
+        //Vector3 dir = spawnPos - origin.position;//이부분은 이야기가 나올시...
 
-        //함교 뒤쪽 배치 방지
-        if (team == Team.Blue && dir.z < 0)
-        {
-            return false;
-        }
+        ////함교 뒤쪽 배치 방지
+        //if (team == Team.Blue && dir.z < 0)
+        //{
+        //    return false;
+        //}
 
-        if (team == Team.Red && dir.z > 0)
-        {
-            return false;
-        }
+        //if (team == Team.Red && dir.z > 0)
+        //{
+        //    return false;
+        //}
 
         float distance = Vector3.Distance(origin.position, spawnPos);
         float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
