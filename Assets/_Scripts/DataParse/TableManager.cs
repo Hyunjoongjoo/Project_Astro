@@ -26,6 +26,7 @@ public class TableManager : Singleton<TableManager>
         base.Awake();
         //코루틴으로 변경
         StartCoroutine(LoadAllData());
+        InputValidator.InitializeBadWords();
     }
 
 
