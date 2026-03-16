@@ -40,7 +40,11 @@ public class ShieldSkill : ISkill
         return false;
     }
 
-    public void PreDelay() { _isCasting = true; }
+    public void PreDelay() 
+    {
+        _cachedUnit.HeroAnimator.SetBool("IsCasting", true);
+        _isCasting = true; 
+    }
 
     public void PostDelay() { _isCasting = false; }
 
@@ -49,7 +53,7 @@ public class ShieldSkill : ISkill
         _cachedUnit.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);//중복방지
         var modifier = new StatModifier(_data.damageReduction, StatModType.Flat, this);
         _cachedUnit.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, modifier, _data.duration);
-        _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, _cachedUnit.Object.Id, _data.skillType, true, _data.duration);
+        //_cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, _cachedUnit.Object.Id, _data.skillType, true, _data.duration);
         _durationTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.duration);
         if (_data.aoeDamageRatio > 0)
         {
@@ -61,10 +65,16 @@ public class ShieldSkill : ISkill
     {
         // 스킬이 시작되지 않았으면 실행 안함
         if (!_durationTimer.IsRunning || _durationTimer.Expired(_cachedUnit.Runner))
+        {
+            _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
             return;
+        }
         // 스킬 종료
         if (_durationTimer.Expired(_cachedUnit.Runner))
+        {
+            _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
             return;
+        }
 
         // 증강 B 없으면 실행 안함
         if (_data.aoeDamageRatio <= 0)
