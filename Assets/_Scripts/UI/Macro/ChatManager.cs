@@ -19,6 +19,8 @@ public class ChatManager : NetworkBehaviour
     [SerializeField] private TMP_Text _toggleTxt;
     [SerializeField] private AnimUI _toastObject; //비어있을때 출력용 토스트 메시지
 
+    [Header("차단 버튼 (인덱스 순)")]
+    [SerializeField] private List<GameObject> _blockButtonObjects;
 
     private bool _isTeamChat = false; //기본 전체 채팅
 
@@ -135,6 +137,18 @@ public class ChatManager : NetworkBehaviour
     // 버튼 클릭 시 호출
     private void SendChat(string macroId)
     {
+        if (Runner == null)
+        {
+            Debug.LogError("ChatManager: Runner가 null입니다! 네트워크 연결 상태를 확인하세요.");
+            return;
+        }
+
+        // 2. StageManager.Instance 체크
+        if (StageManager.Instance == null)
+        {
+            Debug.LogError("ChatManager: StageManager.Instance가 null입니다! 씬에 StageManager가 있는지 확인하세요.");
+            return;
+        }
         // 서버에게 채팅 메시지 보내라고 요청 (RPC)
         RPC_SendChatMessage(Runner.LocalPlayer, macroId, IsTeamChatMode());
     }
@@ -153,6 +167,12 @@ public class ChatManager : NetworkBehaviour
         if (!stageManager.PlayerDataMap.TryGet(sender, out var senderData) || !stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out var myData))
         {
             return;
+        }
+
+        // 차단한 유저는 여기서 즉시 리턴
+        if (StageManager.Instance.IsBlocked(sender))
+        {
+            return; 
         }
 
         // 팀챗일때 팀다르면 수신 거부
@@ -208,5 +228,52 @@ public class ChatManager : NetworkBehaviour
     {
         // 여기서 현재 토글 버튼 상태를 반환
         return _isTeamChat;
+    }
+
+    //차단 토글버튼
+    public void ToggleBlockPlayer(int slotIndex)
+    {
+        //슬롯 인덱스로 PlayerRef를 가져옴
+        PlayerRef targetPlayer = StageManager.Instance.GetPlayerRefByIndex(slotIndex);
+
+        if (targetPlayer == PlayerRef.None || targetPlayer == Runner.LocalPlayer)
+            return; // 자기 자신은 차단 불가
+
+        // 이미 차단된 상태면 해제, 아니면 차단
+        if (StageManager.Instance.IsBlocked(targetPlayer))
+        {
+            StageManager.Instance.UnblockPlayer(targetPlayer);
+            Debug.Log($"플레이어 {targetPlayer} 차단 해제");
+        }
+        else
+        {
+            StageManager.Instance.BlockPlayer(targetPlayer);
+            Debug.Log($"플레이어 {targetPlayer} 차단 완료");
+        }
+    }
+
+    public void RefreshBlockButtons(int playerCount)
+    {
+        if (playerCount <= 2) // 1:1 상황
+        {
+            // 적 1번(인덱스 1)은 유지, 팀원(2)과 적 2번(3)은 숨김
+            if (_blockButtonObjects.Count >= 1) _blockButtonObjects[0].SetActive(true);
+            if (_blockButtonObjects.Count >= 2) _blockButtonObjects[1].SetActive(false);
+            if (_blockButtonObjects.Count >= 3) _blockButtonObjects[2].SetActive(false);
+
+            // 1:1이면 팀 채팅 토글 버튼도 숨김
+            if (_toggleTxt != null) _toggleTxt.transform.parent.gameObject.SetActive(false);
+        }
+        else // 2:2 상황
+        {
+            // 모든 버튼 활성화
+            foreach (var btn in _blockButtonObjects)
+            {
+                btn.SetActive(true);
+            }
+
+            // 팀 채팅 토글 버튼 표시
+            if (_toggleTxt != null) _toggleTxt.transform.parent.gameObject.SetActive(true);
+        }
     }
 }
