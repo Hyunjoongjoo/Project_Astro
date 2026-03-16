@@ -179,9 +179,10 @@ MonoBehaviour:
   unitId: hero_heavyrain
   firePoint: {fileID: 4892445714994426902}
   currentTarget: {fileID: 0}
+  _networkedOnHit: 0
   _normalAttackData: {fileID: 11400000, guid: be0452d7f5c132b49a64045a821bb76b, type: 2}
   _standardSkillData: {fileID: 11400000, guid: 4cd053f36a047424babc7a75bd69c41c, type: 2}
-  _itemObserver: {fileID: 0}
+  _itemObserver: {fileID: -2174105533878683743}
 --- !u!114 &288590522490992711
 MonoBehaviour:
   m_ObjectHideFlags: 0

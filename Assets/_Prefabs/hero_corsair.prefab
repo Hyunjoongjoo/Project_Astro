@@ -179,9 +179,10 @@ MonoBehaviour:
   unitId: hero_corsair
   firePoint: {fileID: 533690703149539074}
   currentTarget: {fileID: 0}
+  _networkedOnHit: 0
   _normalAttackData: {fileID: 11400000, guid: 1eda0784ad35dfb46afe69f001332443, type: 2}
   _standardSkillData: {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
-  _itemObserver: {fileID: 0}
+  _itemObserver: {fileID: -8649886449102431980}
 --- !u!114 &250558184794622207
 MonoBehaviour:
   m_ObjectHideFlags: 0
