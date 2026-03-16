@@ -51,12 +51,15 @@ public class AugmentDeckManager
 
     //아이콘, 프리팹 가져올 SO
     private HeroIconDataSO _heroIconSO;
+    private ItemIconDataSO _itemIconDataSO;
 
-    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO, List<BaseSkillSO> loadedBaseSkills)
+
+    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO, List<BaseSkillSO> loadedBaseSkills, ItemIconDataSO itemIcons)
     {
         _allSkillAugments = loadedSkillAugments;
         _heroIconSO = heroIconSO;
         _allBaseSkills = loadedBaseSkills;
+        _itemIconDataSO = itemIcons;
     }
 
     public List<AugmentData> GenerateCards(

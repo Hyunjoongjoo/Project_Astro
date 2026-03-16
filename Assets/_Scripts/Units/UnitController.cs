@@ -348,7 +348,10 @@ public class UnitController : UnitBase
             else
             {
                 if (unit is HeroController)
+                {
                     projectileSO = ((unit as HeroController).CurUniqueSkill.Data) as ProjectileSkillSO;
+                    prefab = projectileSO.skillVFX;
+                }
             }
 
             if (projectileSO == null)
