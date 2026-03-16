@@ -143,7 +143,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   searchInterval: 0.3
-  moveType: 0
+  moveType: 1
   attackRange: 3
   unitId: hero_tank
   firePoint: {fileID: 128638915413792048}
