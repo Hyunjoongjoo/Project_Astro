@@ -155,6 +155,12 @@ public class ChatManager : NetworkBehaviour
             return;
         }
 
+        // 차단한 유저는 여기서 즉시 리턴
+        if (StageManager.Instance.IsBlocked(sender))
+        {
+            return; 
+        }
+
         // 팀챗일때 팀다르면 수신 거부
         if (isTeamChat && senderData.Team != myData.Team && sender != Runner.LocalPlayer)
         {
@@ -208,5 +214,29 @@ public class ChatManager : NetworkBehaviour
     {
         // 여기서 현재 토글 버튼 상태를 반환
         return _isTeamChat;
+    }
+
+    //차단 토글버튼
+    public void ToggleBlockPlayer(int slotIndex)
+    {
+        //슬롯 인덱스로 PlayerRef를 가져옴
+        PlayerRef targetPlayer = StageManager.Instance.GetPlayerRefByIndex(slotIndex);
+
+        if (targetPlayer == PlayerRef.None || targetPlayer == Runner.LocalPlayer)
+            return; // 자기 자신은 차단 불가
+
+        // 이미 차단된 상태면 해제, 아니면 차단
+        if (StageManager.Instance.IsBlocked(targetPlayer))
+        {
+            StageManager.Instance.UnblockPlayer(targetPlayer);
+            Debug.Log($"플레이어 {targetPlayer} 차단 해제");
+            // TODO: UI에 차단 해제 상태 반영 (예: 차단 아이콘 끄기)
+        }
+        else
+        {
+            StageManager.Instance.BlockPlayer(targetPlayer);
+            Debug.Log($"플레이어 {targetPlayer} 차단 완료");
+            // TODO: UI에 차단 상태 반영 (예: 차단 아이콘 켜기)
+        }
     }
 }
