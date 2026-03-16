@@ -86,7 +86,7 @@ public class HeroDetailPresenter : MonoBehaviour
 
         if (levelData != null)
         {
-            _view.SetLevelInfo(_userHeroData.level, _userHeroData.exp, levelData.expRequirement);
+            _view.SetLevelInfo(_userHeroData.level.ToString(), _userHeroData.exp, levelData.expRequirement);
 
             // 버튼 텍스트 및 상태 결정 로직
             string priceText = _userHeroData.isUnlock ?

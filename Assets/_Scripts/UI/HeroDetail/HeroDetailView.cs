@@ -60,9 +60,9 @@ public class HeroDetailView : BaseUI
     }
 
     // 레벨 및 경험치 세팅
-    public void SetLevelInfo(int level, int currentExp, float maxExp)
+    public void SetLevelInfo(string level, int currentExp, float maxExp)
     {
-        _heroLevelTxt.text = $"Lv. {level}";
+        _heroLevelTxt.text = level;
         _heroExpBar.fillAmount = (float)currentExp / maxExp;
         _heroExpTxt.text = $"{currentExp} / {maxExp}";
     }
