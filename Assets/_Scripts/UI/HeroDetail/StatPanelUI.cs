@@ -8,7 +8,7 @@ public class StatPanelUI : MonoBehaviour
     [SerializeField] private TMP_Text _statValueTxt;
     [SerializeField] private Image _statIcon;
     [SerializeField] private Image _panel;
-
+    
     public void SetStat(string name,string value, Sprite icon,Color color = default)
     {
         _statNameTxt.text = name;

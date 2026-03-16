@@ -54,4 +54,12 @@ public class ToastMessageUI : BaseUI
 
         _toastCoroutine = null;
     }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
 }
