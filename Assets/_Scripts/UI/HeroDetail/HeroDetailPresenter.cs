@@ -7,6 +7,7 @@ public class HeroDetailPresenter : MonoBehaviour
     [SerializeField] private HeroDetailView _view;
     [SerializeField] private GameObject _confirmPopupPrefab;
     [SerializeField] private GameObject _upgradeResultPrefab;
+    [SerializeField] private GameObject _toastPrefab;
 
     [Header("리소스 SO")]
     [SerializeField] private StatIconDataSO _statIcons;
@@ -322,7 +323,17 @@ public class HeroDetailPresenter : MonoBehaviour
         _view.AddStatItem("피해 감소량", status.damageReduce.ToString("F1"), _statIcons.GetIcon(StatType.DamageReduction));
 
         string typeKey = $"hero_movetype_{status.moveType.ToString().ToLower()}";
-        _view.AddStatItem("이동 유형", TableManager.Instance.GetString(typeKey), _statIcons.GetIcon(StatType.MoveType));
+        string typeName = TableManager.Instance.GetString(typeKey);
+
+        var moveTypeItem = _view.AddStatItem("이동 유형", typeName, _statIcons.GetIcon(StatType.MoveType));
+
+        if (moveTypeItem != null)
+        {
+            moveTypeItem.EnableToastButton(() => {
+                UIManager.Instance.ShowToast<ToastUI>(_toastPrefab);
+                Debug.Log($"{typeName} 토스트 버튼 클릭됨!");
+            });
+        }
     }
 
     private void ShowUpgradeResult(HeroStatData oldStat)

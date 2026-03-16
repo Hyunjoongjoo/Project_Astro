@@ -99,13 +99,15 @@ public class HeroDetailView : BaseUI
 
 
     //스텟 판넬 설정후 소환
-    public void AddStatItem(string name, string value, Sprite icon, Color color = default)
+    public StatPanelUI AddStatItem(string name, string value, Sprite icon, Color color = default)
     {
         GameObject obj = Instantiate(_statPanelPrefab, _statContainer);
         if (obj.TryGetComponent(out StatPanelUI statItem))
         {
             statItem.SetStat(name, value, icon, color);
+            return statItem;
         }
+        return null;
     }
     // 스킬 생성
     public void AddSkillItem(string name, string des,string cooltime, Sprite icon = null)
