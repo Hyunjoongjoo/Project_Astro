@@ -78,6 +78,8 @@ public class StageManager : NetworkBehaviour
     // 매치 타입 동기화
     [Networked] private MatchType CurMatchType { get; set; }
 
+    [Networked, OnChangedRender(nameof(OnDetectedHostPause))] private bool IsHostPaused { get; set; }
+
     //더미 클라이언트 존재 여부
     private bool _existDummy;
 
@@ -106,23 +108,9 @@ public class StageManager : NetworkBehaviour
 
     private void OnApplicationPause(bool pause)
     {
-        if (pause)
-        {
-            // 호스트가 홈으로 갔을 때
-            if (Runner.IsSharedModeMasterClient)
-            {
-                // 모두에게 호스트 대기중 RPC를 쏨. (거의 제일 아래에 메서드 둘게요)
-                RPC_NetworkException(true);
-            }
-        }
-        else
-        {
-            // 호스트가 홈에서 돌아왔을 때
-            if (Runner.IsSharedModeMasterClient)
-            {
-                RPC_NetworkException(false);
-            }
-        }
+        // 호스트가 홈으로 가거나 복귀하는 등 상태 변화
+        if (Runner.IsSharedModeMasterClient)
+            IsHostPaused = pause;
     }
 
     public void Initialize(MatchType matchType, int requiredPlayerCount, bool existDummy)
@@ -677,13 +665,9 @@ public class StageManager : NetworkBehaviour
         MarkHeroUsed(player, heroId);
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_NetworkException(bool pause)
+    public void OnDetectedHostPause()
     {
-        if (_stageUI != null) 
-        {
-            NetworkExceptionUiControl(pause, true);
-        }
+        NetworkExceptionUiControl(IsHostPaused, true);
     }
 
     public void NetworkExceptionUiControl(bool panel, bool isWaiting)
