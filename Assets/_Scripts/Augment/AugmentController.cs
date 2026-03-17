@@ -24,6 +24,7 @@ public class AugmentController : NetworkBehaviour
     [Header("스킬 증강 데이터베이스")]
     [SerializeField] private List<SkillAugmentSO> _allSkillAugments;
 
+
     //영웅들의 기본 스킬 SO들을 담아둘 리스트 추가
     [Header("기본 스킬 데이터베이스 (영웅 카드용)")]
     [SerializeField] private List<BaseSkillSO> _allBaseSkills;
@@ -40,6 +41,9 @@ public class AugmentController : NetworkBehaviour
     //인스펙터 직렬화 해둘 히어로 아이콘SO
     [SerializeField] private HeroIconDataSO _heroIconSO;
 
+    //아이템 아이콘 SO
+    [SerializeField] private ItemIconDataSO _itemIconDataSO;
+
     //인게임 개별 타이머용 네트워크 변수 선언
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, float> PlayerAugmentTimers => default;
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, NetworkBool> IsPlayerAugmenting => default;
@@ -54,7 +58,7 @@ public class AugmentController : NetworkBehaviour
     public override void Spawned()
     {
         //할당된 SO 데이터를 바탕으로 DeckManager 가동
-        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO, _allBaseSkills);
+        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO, _allBaseSkills, _itemIconDataSO);
         //현재 씬에 있는 스테이지 매니저 찾아서 캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
     }
@@ -186,11 +190,27 @@ public class AugmentController : NetworkBehaviour
                     if (!string.IsNullOrEmpty(skillId)) mySkills.Add(skillId);
                 }
 
+                //3.13 로직 변경
+                //보관함 3칸 + 임시 슬롯 1칸 모두 꽉 찼는지 검사
                 bool isItemFull = true;
+
+                //기본 인벤토리 검사
                 for (int i = 0; i < SlotData_3.Length; i++)
                 {
-                    string itemId = myData.InventoryItems.Get(i).Replace("\0", "").Trim();
-                    if (string.IsNullOrEmpty(itemId)) { isItemFull = false; break; }
+                    if (string.IsNullOrEmpty(myData.InventoryItems.Get(i).Replace("\0", "").Trim()))
+                    {
+                        isItemFull = false;
+                        break;
+                    }
+                }
+
+                //인벤토리가 꽉 차도 임시 슬롯이 비어있다면 Full이 아님
+                if (isItemFull)
+                {
+                    if (string.IsNullOrEmpty(myData.TempItemSlot.ToString().Replace("\0", "").Trim()))
+                    {
+                        isItemFull = false;
+                    }
                 }
 
                 List<AugmentData> cards = _deckManager.GenerateCards(
@@ -297,7 +317,7 @@ public class AugmentController : NetworkBehaviour
             }
         }
     }
-    
+
     //아군 카드만 전달받는 후속 RPC 패킷넘치는 거 방지용
     //3.12 네트워크 매개변수 추가
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -312,7 +332,7 @@ public class AugmentController : NetworkBehaviour
         {
             Debug.Log("RPC_DeliverTeamCards 수신됨 - 1vs1인데 이게 찍히면 버그");
 
-            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer); 
+            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer);
             int reinforceNum = 6;
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
             if (config != null) reinforceNum = int.Parse(config.configValue);
@@ -408,9 +428,47 @@ public class AugmentController : NetworkBehaviour
             var itemData = TableManager.Instance.ItemTable.Get(id);
             if (itemData != null)
             {
+                //이름 세팅
                 data.titleName = TableManager.Instance.GetString(itemData.name);
-                data.description = "";
+
+                //설명 세팅인데 걍 스트링빌더 써야할 듯, 기획서 상 줄넘김 필요
+                System.Text.StringBuilder descBuilder = new System.Text.StringBuilder();
+
+                //테이블을 순회하며 그룹아디 매칭되는 효과 찾기
+                foreach (var effect in TableManager.Instance.ItemEffectTable.GetAll())
+                {
+                    if (effect != null && effect.effectGroupId == itemData.effectGroupId)
+                    {
+                        //스트링 테이블에서 번역된 텍스트 가져오기
+                        string translatedDesc = TableManager.Instance.GetString(effect.effectDesc);
+
+                        //빌더에 이미 다른 텍스트가 있다면 줄바꿈 추가
+                        if (descBuilder.Length > 0)
+                        {
+                            descBuilder.AppendLine();
+                        }
+
+                        descBuilder.Append(translatedDesc);
+                    }
+                }
+
+                //완성된 텍스트를 data에 삽입
+                if (descBuilder.Length > 0)
+                {
+                    data.description = descBuilder.ToString();
+                }
+                else
+                {
+                    data.description = "설명을 찾을 수 없습니다.";
+                }
+
+                //아이콘 세팅
+                if (_itemIconDataSO != null)
+                {
+                    data.mainIcon = _itemIconDataSO.GetIcon(id);
+                }
             }
+
         }
 
         return data;
@@ -457,8 +515,20 @@ public class AugmentController : NetworkBehaviour
 
         //패킷이 날아오는 동안 슬롯이 꽉 찼는지 다시 한번 확인
         if (type == AugmentType.Hero && IsSlotFull5(data.OwnedHeroes)) isValid = false;
-        if (type == AugmentType.Item && IsSlotFull3(data.InventoryItems)) isValid = false;
         if (type == AugmentType.Skill && IsSlotFull5(data.OwnedSkillAugments)) isValid = false;
+
+        //3.16
+        //아이템은 인벤 3칸과 임시 슬롯 1칸이 모두 꽉 찼을 때만 반려
+        if (type == AugmentType.Item)
+        {
+            bool isInvFull = IsSlotFull3(data.InventoryItems);
+            bool isTempFull = !string.IsNullOrEmpty(data.TempItemSlot.ToString().Replace("\0", "").Trim());
+
+            if (isInvFull && isTempFull)
+            {
+                isValid = false;
+            }
+        }
 
         //검증 통과 여부에 따라 컨펌 or 리젝트
         if (isValid)

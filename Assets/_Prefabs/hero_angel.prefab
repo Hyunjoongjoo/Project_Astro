@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 2564167791635826302}
   - component: {fileID: -6791266335917339417}
   - component: {fileID: -5489522264367414398}
+  - component: {fileID: 1071084571326590712}
   m_Layer: 6
   m_Name: hero_angel
   m_TagString: Untagged
@@ -147,8 +148,10 @@ MonoBehaviour:
   unitId: hero_angel
   firePoint: {fileID: 4179351352739521411}
   currentTarget: {fileID: 0}
+  _networkedOnHit: 0
   _normalAttackData: {fileID: 11400000, guid: 4f1db6d9c612e93408341a464f2f84f6, type: 2}
   _standardSkillData: {fileID: 11400000, guid: d6dd206c7bea98c44acb6c53c617a268, type: 2}
+  _itemObserver: {fileID: 1071084571326590712}
 --- !u!114 &5106166068817242912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,6 +224,18 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
+--- !u!114 &1071084571326590712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2207229902267668355}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d64c90d56df5a49bee77671aa71cd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeroItemObserver
 --- !u!1 &4222104986703637525
 GameObject:
   m_ObjectHideFlags: 0

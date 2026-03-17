@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 1679591168465454536}
   - component: {fileID: 479350263834020189}
   - component: {fileID: -3041197003229238917}
+  - component: {fileID: -8649886449102431980}
   m_Layer: 6
   m_Name: hero_corsair
   m_TagString: Untagged
@@ -178,8 +179,10 @@ MonoBehaviour:
   unitId: hero_corsair
   firePoint: {fileID: 533690703149539074}
   currentTarget: {fileID: 0}
+  _networkedOnHit: 0
   _normalAttackData: {fileID: 11400000, guid: 1eda0784ad35dfb46afe69f001332443, type: 2}
   _standardSkillData: {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
+  _itemObserver: {fileID: -8649886449102431980}
 --- !u!114 &250558184794622207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,3 +255,15 @@ CapsuleCollider:
   m_Height: 3.201604
   m_Direction: 1
   m_Center: {x: 0, y: -0.026866077, z: 0.000004768371}
+--- !u!114 &-8649886449102431980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1619433986598075239}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d64c90d56df5a49bee77671aa71cd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeroItemObserver

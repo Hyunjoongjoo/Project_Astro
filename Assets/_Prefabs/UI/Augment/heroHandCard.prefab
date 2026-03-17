@@ -368,8 +368,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "10\uCD08"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
-  m_sharedMaterial: {fileID: -8170916087460183402, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
+  m_sharedMaterial: {fileID: 8240547230195516182, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -582,6 +582,8 @@ MonoBehaviour:
     m_Bits: 128
   _cooldownCover: {fileID: 204617536065845859}
   _cooldownText: {fileID: 7344840667621078537}
+  _itemSlot1: {fileID: 3639963581002136360}
+  _itemSlot2: {fileID: 457633395502217841}
 --- !u!114 &1857677499821193337
 MonoBehaviour:
   m_ObjectHideFlags: 0

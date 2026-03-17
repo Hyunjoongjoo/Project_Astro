@@ -71,7 +71,7 @@ public class ProjectileSkill : ISkill
                 _cachedUnit.Object.Id,
                 _data.skillType,
                 _cachedUnit.currentTarget.transform.position,
-                _cachedUnit.AttackPower
+                _cachedUnit.AttackPower * _data.damageRatio
                 );
 
             // 마지막 발사가 아니면 간격만큼 대기

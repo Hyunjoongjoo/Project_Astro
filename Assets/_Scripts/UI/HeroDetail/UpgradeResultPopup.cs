@@ -28,7 +28,7 @@ public class UpgradeResultPopup : BaseUI
     {
         //상단 영웅 정보 갱신
         _nameTxt.text = TableManager.Instance.GetString(heroData.heroName);
-        _levelTxt.text = $"Lv. {userHero.level}";
+        _levelTxt.text = $"{userHero.level}";
 
         if (iconSO != null)
             _iconImg.sprite = iconSO.GetIcon(heroData.id);

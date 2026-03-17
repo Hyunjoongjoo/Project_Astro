@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Angel_Skill_Standard
   m_EditorClassIdentifier: Assembly-CSharp::HealSkillSO
   heroId: hero_angel
+  skillIcon: {fileID: 21300000, guid: bc36dfcdcc5cc3f408c4ae563bc9dba4, type: 3}
   skillName: skill_name_angel
-  skillDescription: 
+  skillDescription: skill_desc_angel
   note: 
   skillVFX: {fileID: 7343538280686139031, guid: 921bfdf400594b2459b6504da1d4e296, type: 3}
   skillType: 1
@@ -24,4 +25,5 @@ MonoBehaviour:
   range: 3
   duration: 0
   interval: 0
+  cooldownMultiplier: 1
   areaOfEffect: 0

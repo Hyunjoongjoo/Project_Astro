@@ -130,7 +130,8 @@ public class AugmentManager : Singleton<AugmentManager>
         var go = Instantiate(_heroCardSlotPrefab, _slotContainer);
         if (go.TryGetComponent(out HeroHandCardUI card))
         {
-            card.Setup(data);
+            int myIndex = _slotContainer.childCount - 1;
+            card.Setup(data, myIndex);
         }
 
         if (_cachedStageManager == null)
@@ -166,6 +167,17 @@ public class AugmentManager : Singleton<AugmentManager>
             //절 대 직 접 닫 지 마
             _currentWindow.ReceiveTeammateConfirmed();
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+        _cachedStageManager = null;
+        _currentWindow = null;
+        _isWaitingForServerResponse = false;
     }
 }
 

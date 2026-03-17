@@ -8,6 +8,7 @@ public class Bridge : UnitBase
     [SerializeField] private Transform _firePoint;
     [SerializeField] private LayerMask _targetLayer;
     [SerializeField] private float _scanInterval = 0.5f;
+    [SerializeField] private Tower[] _tower;
 
     [Header("스킬 데이터")]
     [Header("타워 공격")]
@@ -17,6 +18,8 @@ public class Bridge : UnitBase
 
     private TickTimer _scanTimer;
     private TickTimer _attackTimer;
+
+    private bool _attackMode;
 
     public float AttackPower => _unitStat.Attack.Value;
     public float AttackSpeed => _unitStat.AttackSpeed.Value;
@@ -29,6 +32,10 @@ public class Bridge : UnitBase
         base.Spawned();
 
         unitType = UnitType.Bridge;
+        foreach (Tower t in _tower) 
+        {
+            t.OnDeath += ActivateAttackMode;
+        }
 
         if (!Object.HasStateAuthority) return;
         if (_unitStat == null) _unitStat = GetComponent<UnitStat>();
@@ -49,6 +56,7 @@ public class Bridge : UnitBase
             $"DetectRange : {SearchRange}"
             );
 
+        _attackMode = false;
         _scanTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
     }
@@ -57,6 +65,7 @@ public class Bridge : UnitBase
     {
         if (!Object.HasStateAuthority) return;
         if (GameManager.Instance.IsGameStarted == false) return;
+        if (_attackMode == false) return;
 
         if (_currentTarget == null || _currentTarget.IsDead)
         {
@@ -132,6 +141,15 @@ public class Bridge : UnitBase
             }
         }
         return closest;
+    }
+
+    private void ActivateAttackMode(UnitBase unit)
+    {
+        _attackMode = true;
+        foreach (Tower t in _tower)
+        {
+            t.OnDeath -= ActivateAttackMode;
+        }
     }
 
     public override void Die()

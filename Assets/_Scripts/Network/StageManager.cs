@@ -69,6 +69,9 @@ public class StageManager : NetworkBehaviour
     //팀원 UI관리용 딕셔너리
     private Dictionary<PlayerRef, TeamCardSlotUI> _teammateUIList = new Dictionary<PlayerRef, TeamCardSlotUI>();
 
+    //내가 차단한 유저 목록
+    private HashSet<PlayerRef> _myBlockedPlayers = new HashSet<PlayerRef>();
+    public PlayerRef[] PlayerIndexMap = new PlayerRef[4]; //인덱스 매핑용
 
     //게임 시작 전 증강 g 추적 (1라운드, 2라운드)
     [Networked, HideInInspector] public int PreGameAugmentRound { get; set; }
@@ -237,29 +240,43 @@ public class StageManager : NetworkBehaviour
 
         PlayerNetworkData[] data = new PlayerNetworkData[PlayerDataMap.Count];
 
+        PlayerIndexMap = new PlayerRef[4]; // 매핑 초기화
+
         // 배열에 플레이어 정보를 채울건데
         // [나, 적1, 팀원, 적2] 순으로 채워짐.
         // 1:1 이면 [나, 적] 으로 채워짐.
         int index = 1;
         foreach (var player in PlayerDataMap)
         {
-            if (player.Key == Runner.LocalPlayer) // 나.
+            if (player.Key == Runner.LocalPlayer) //나
+            {
                 data[0] = player.Value;
+                PlayerIndexMap[0] = player.Key;
+            }   
             else if (player.Value.Team == myTeam) // 나는 아닌데 같은 팀 -> 2:2라는 뜻
             {
                 data[2] = player.Value;
+                PlayerIndexMap[2] = player.Key;
                 //팀원이면 UI 생성 및 등록
-                var ui = _stageUI.GetTeammateSlot(player.Value.PlayerName.ToString());
+                //3.15 플레이어 Ref 추가
+                var ui = _stageUI.GetTeammateSlot(player.Value.PlayerName.ToString(), player.Key);
                 RegisterTeammateUI(player.Key, ui);
             }
             else // 나도 아니고 같은 팀도 아님 -> 적이라는 뜻
             {
                 data[index] = player.Value;
+                PlayerIndexMap[index] = player.Key;
                 index += 2;
             }  
         }
 
         _stageUI.ShowPlayerInfo(data);
+        var chatManager = FindFirstObjectByType<ChatManager>();
+        if (chatManager != null)
+        {
+            // PlayerDataMap.Count가 2이면 1:1, 4이면 2:2
+            chatManager.RefreshBlockButtons(PlayerDataMap.Count);
+        }
     }
 
     //타이머 깎는 함수 추가
@@ -687,5 +704,20 @@ public class StageManager : NetworkBehaviour
         {
             ui.Refresh(newData); // TeamCardSlotUI의 Refresh 실행
         }
+    }
+
+    //---------차단 유저 관리용 메서드들 ----------
+    public void BlockPlayer(PlayerRef player) => _myBlockedPlayers.Add(player);
+    public void UnblockPlayer(PlayerRef player) => _myBlockedPlayers.Remove(player);
+    public bool IsBlocked(PlayerRef player) => _myBlockedPlayers.Contains(player);
+
+    //이 인덱스의 유저가 누구인지 반환
+    public PlayerRef GetPlayerRefByIndex(int index)
+    {
+        if (index >= 0 && index < PlayerIndexMap.Length)
+        {
+            return PlayerIndexMap[index];
+        }
+        return PlayerRef.None;
     }
 }
