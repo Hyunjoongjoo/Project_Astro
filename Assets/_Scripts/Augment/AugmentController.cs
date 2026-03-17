@@ -593,6 +593,22 @@ public class AugmentController : NetworkBehaviour
             //나를 포함한 모든 유저에게 갱신 알림을 보냄
             RPC_NotifyTeammateRefresh(player);
         }
+
+        //3.17 핸드카드 스킬 아이콘 UI 갱신 추가
+        //누군가 스킬 증강 사면 내 화면 스킬아이콘 갱신
+        if (type == AugmentType.Skill)
+        {
+            if (_stageManager.PlayerDataMap.TryGet(player, out var buyerData) &&
+                _stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out var myData))
+            {
+                if (buyerData.Team == myData.Team)
+                {
+                    //동기화 에러안나게 0.1초뒤
+                    AugmentManager.Instance.Invoke("DelayedRefreshSkillIcons", 0.1f);
+                }
+            }
+        }
+
         //카드를 산 사람이 로컬이 맞다면, UI를 갱신
         if (player == Runner.LocalPlayer)
         {

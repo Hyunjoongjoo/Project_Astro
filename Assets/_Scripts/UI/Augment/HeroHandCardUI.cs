@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -21,13 +22,18 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     //3.15 추가
     public int HeroIndex { get; private set; } //인덱스 표시
 
+    [Header("Skill Augment UI")]
+    [SerializeField] private Image[] _skillAugmentImgs;
+
     //장착템1,2
     [Header("Equipped Items UI")]
-    [SerializeField] private Image _itemSlot1; 
-    [SerializeField] private Image _itemSlot2; 
+    [SerializeField] private Image _itemSlot1;
+    [SerializeField] private Image _itemSlot2;
 
     private float _currentTimer = 0f;
     private bool IsCooldown => _currentTimer > 0f;
+
+    public string HeroId => _data != null ? _data.targetId : "";
 
     public void Setup(AugmentData data, int heroIndex)
     {
@@ -165,6 +171,26 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         {
             _itemSlot2.sprite = itemIcon2;
             _itemSlot2.gameObject.SetActive(itemIcon2 != null);
+        }
+    }
+
+    //3.17
+    //매니저가 스킬 아이콘 리스트를 주면 슬롯에 채워주는 함수
+    public void UpdateSkillAugmentIcons(List<Sprite> icons)
+    {
+        if (_skillAugmentImgs == null) return;
+
+        for (int i = 0; i < _skillAugmentImgs.Length; i++)
+        {
+            if (i < icons.Count && icons[i] != null)
+            {
+                _skillAugmentImgs[i].sprite = icons[i];
+                _skillAugmentImgs[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                _skillAugmentImgs[i].gameObject.SetActive(false);
+            }
         }
     }
 }
