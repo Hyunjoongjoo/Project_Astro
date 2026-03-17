@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Fusion;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using Fusion;
-using System.Collections;
 
 public class ChatManager : NetworkBehaviour
 {
@@ -18,16 +20,33 @@ public class ChatManager : NetworkBehaviour
     [SerializeField] private AnimUI _emoticonPanel;
     [SerializeField] private TMP_Text _toggleTxt;
     [SerializeField] private AnimUI _toastObject; //비어있을때 출력용 토스트 메시지
-
-    [Header("차단 버튼 (인덱스 순)")]
-    [SerializeField] private List<GameObject> _blockButtonObjects;
+    [Header("핑 설정")]
+    [SerializeField] private GameObject _pingPrefab;
+    [SerializeField] private string _targetTag = "AugmentPanel";
+    [SerializeField] private PlayerInput _playerInput;
+    private InputAction _pingAction;
 
     private bool _isTeamChat = false; //기본 전체 채팅
 
+
+    private void Awake()
+    {
+        _pingAction = _playerInput.actions["UIPing"];
+    }
     private void Start()
     {
         ApplySavedMacros();
     }
+    private void OnEnable()
+    {
+        _pingAction.performed += OnPingPerformed;
+    }
+
+    private void OnDisable()
+    {
+        _pingAction.performed -= OnPingPerformed;
+    }
+
     // 텍스트 패널을 여는 메서드
     public void OpenTextPanel()
     {
@@ -239,41 +258,96 @@ public class ChatManager : NetworkBehaviour
         if (targetPlayer == PlayerRef.None || targetPlayer == Runner.LocalPlayer)
             return; // 자기 자신은 차단 불가
 
+        //스테이지 매니저의 데이터 맵에서 닉네임 찾기
+        string targetNickname = targetPlayer.ToString(); // 기본값
+        if (StageManager.Instance.PlayerDataMap.TryGet(targetPlayer, out var data))
+        {
+            targetNickname = data.PlayerName.ToString();
+        }
+
         // 이미 차단된 상태면 해제, 아니면 차단
         if (StageManager.Instance.IsBlocked(targetPlayer))
         {
             StageManager.Instance.UnblockPlayer(targetPlayer);
-            Debug.Log($"플레이어 {targetPlayer} 차단 해제");
+            ToastMessageUI.Instance.ShowToast($"<color=green>차단 해제:</color> {targetNickname}");
         }
         else
         {
             StageManager.Instance.BlockPlayer(targetPlayer);
-            Debug.Log($"플레이어 {targetPlayer} 차단 완료");
+            ToastMessageUI.Instance.ShowToast($"<color=red>차단 완료:</color> {targetNickname}");
         }
     }
 
-    public void RefreshBlockButtons(int playerCount)
+    //팀 > 전체 전환토글 인원수에 따라 숨김처리
+    public void RefreshToggleButtons(int playerCount)
     {
         if (playerCount <= 2) // 1:1 상황
         {
-            // 적 1번(인덱스 1)은 유지, 팀원(2)과 적 2번(3)은 숨김
-            if (_blockButtonObjects.Count >= 1) _blockButtonObjects[0].SetActive(true);
-            if (_blockButtonObjects.Count >= 2) _blockButtonObjects[1].SetActive(false);
-            if (_blockButtonObjects.Count >= 3) _blockButtonObjects[2].SetActive(false);
-
             // 1:1이면 팀 채팅 토글 버튼도 숨김
             if (_toggleTxt != null) _toggleTxt.transform.parent.gameObject.SetActive(false);
         }
         else // 2:2 상황
         {
-            // 모든 버튼 활성화
-            foreach (var btn in _blockButtonObjects)
-            {
-                btn.SetActive(true);
-            }
-
             // 팀 채팅 토글 버튼 표시
             if (_toggleTxt != null) _toggleTxt.transform.parent.gameObject.SetActive(true);
+        }
+    }
+
+    private void OnPingPerformed(InputAction.CallbackContext context)
+    {
+        // 1. 현재 포인터(마우스 혹은 터치)의 위치 가져오기
+        Vector2 pointerPos = Vector2.zero;
+
+        if (context.control.device is Touchscreen)
+            pointerPos = Touchscreen.current.primaryTouch.position.ReadValue();
+        else
+            pointerPos = Mouse.current.position.ReadValue();
+
+        // 2. 해당 위치로 UI 레이캐스트 시도
+        TryUIPing(pointerPos);
+    }
+
+    private void TryUIPing(Vector2 screenPos)
+    {
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = screenPos;
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        foreach (RaycastResult result in results)
+        {
+            if (result.gameObject.CompareTag(_targetTag))
+            {
+                // 팀원들에게 핑 동기화 RPC 호출
+                RPC_SendPing(Runner.LocalPlayer, screenPos);
+                break;
+            }
+        }
+    }
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    private void RPC_SendPing(PlayerRef sender, Vector2 screenPos)
+    {
+        var stageManager = StageManager.Instance;
+        if (stageManager == null) return;
+
+        if (!stageManager.PlayerDataMap.TryGet(sender, out var senderData) ||
+            !stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out var myData)) return;
+
+        // 팀원 체크 및 차단 체크
+        if (senderData.Team == myData.Team && !stageManager.IsBlocked(sender))
+        {
+            CreatePingEffect(screenPos);
+        }
+    }
+
+    private void CreatePingEffect(Vector2 pos)
+    {
+        // UIManager의 TopContainer(최상단 레이어)에 생성
+        if (UIManager.Instance != null && UIManager.Instance.TopContainer != null)
+        {
+            GameObject ping = Instantiate(_pingPrefab, UIManager.Instance.TopContainer);
+            ping.transform.position = pos;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Fusion;
 
 //3.3 여현구
 //증강 관련 UI연출, 클라이언트 조작만 담당하도록 분리.
@@ -42,8 +43,8 @@ public class AugmentManager : Singleton<AugmentManager>
             {
                 //서버에 패킷 쏘기 전에 기다린다고 표시
                 _isWaitingForServerResponse = true;
-                AugmentController.Instance.RPC_RequestAugmentCards(AugmentController.Instance.Runner.LocalPlayer);
                 ExecuteHideToggleBtn();
+                AugmentController.Instance.RPC_RequestAugmentCards(AugmentController.Instance.Runner.LocalPlayer);
             });
             _toggleBtn.gameObject.SetActive(true);
         }
@@ -146,7 +147,10 @@ public class AugmentManager : Singleton<AugmentManager>
             _cachedStageManager.RPC_MarkHeroUsed(_cachedStageManager.Runner.LocalPlayer, data.targetId);
             Debug.Log($"[Masking] 증강 선택으로 영웅 기록됨: {data.targetId}");
         }
+        //카드 새로 깔릴 때, 아군이 먹어둔 스킬증강이 있으면 아이콘 바로 반영
+        RefreshHeroSkillIcons(AugmentController.Instance.Runner.LocalPlayer);
     }
+
 
     //3.9 타임아웃 시 실행될 강제 픽 함수 추가
     public void ForceRandomPick()
@@ -168,6 +172,58 @@ public class AugmentManager : Singleton<AugmentManager>
             _currentWindow.ReceiveTeammateConfirmed();
         }
     }
+
+
+    //3.17
+       //딜레이 호출용 헬퍼
+   public void DelayedRefreshSkillIcons()
+   {
+       if (AugmentController.Instance != null)
+           RefreshHeroSkillIcons(AugmentController.Instance.Runner.LocalPlayer);
+   }
+
+   //화면에 깔린 영웅 카드 돌고 스킬 증강 꽂아주기
+   public void RefreshHeroSkillIcons(PlayerRef player)
+   {
+       if (_cachedStageManager == null || _slotContainer == null) return;
+       if (!_cachedStageManager.PlayerDataMap.TryGet(player, out var data)) return;
+
+       //팀이 보유한 모든 스킬 증강 ID 수집
+       List<string> mySkills = new List<string>();
+       for (int i = 0; i < SlotData_5.Length; i++)
+       {
+           string skillId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+           if (!string.IsNullOrEmpty(skillId)) mySkills.Add(skillId);
+       }
+
+       //현재 티어 계산 (6픽 이상이면 1티어, 아니면 0티어)
+       int reinforceNum = 6;
+       var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
+       if (config != null) reinforceNum = int.Parse(config.configValue);
+       int tierIndex = (data.TotalAugmentPicks >= reinforceNum) ? 1 : 0;
+
+       //하단 덱을 순회하여 영웅 ID가 일치하는 스킬 아이콘 할당
+       foreach (Transform child in _slotContainer)
+       {
+           if (child.TryGetComponent(out HeroHandCardUI card))
+           {
+               List<Sprite> icons = new List<Sprite>();
+               foreach (var skillId in mySkills)
+               {
+                   var so = AugmentController.Instance.GetSkillAugmentById(skillId);
+                   //내가 찾은 스킬의 타겟 영웅 ID가 이 카드의 영웅 ID와 일치하면 추가
+                   if (so != null && so.TargetHeroID == card.HeroId)
+                   {
+                       if (so.Tiers != null && so.Tiers.Length > tierIndex)
+                       {
+                           icons.Add(so.Tiers[tierIndex].Icon);
+                       }
+                   }
+               }
+               card.UpdateSkillAugmentIcons(icons);
+           }
+       }
+   }
 
     private void OnDestroy()
     {

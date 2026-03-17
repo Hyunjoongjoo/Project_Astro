@@ -48,7 +48,7 @@ public class DashSkill : ISkill
         if (distanceToTarget >= _data.canDashMinDistance && distanceToTarget <= _data.canDashMaxDistance)
         {
             // 사용 조건을 만족하면 쿨다운을 돌리고 true 반환
-            _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
+            //_skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
             return true;
         }
 
@@ -61,10 +61,12 @@ public class DashSkill : ISkill
 
     public void Casting()
     {
+        if (!_cachedUnit.Object.HasStateAuthority) return;
         if (_cachedUnit.currentTarget == null) return;
 
         // 코루틴을 통해 목표 지점까지 이동하는 로직 실행
         //_cachedUnit.StartCoroutine(DashRoutine(_cachedUnit.currentTarget));
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _cachedUnit.StartCoroutine(DashSequence());
     }
 
@@ -77,10 +79,7 @@ public class DashSkill : ISkill
         {
             UnitBase target = FindNextTarget(dashedTargets);
 
-            if (target == null)
-            {
-                yield break;
-            }
+            if (target == null || target.IsDead) yield break;
 
             dashedTargets.Add(target);
 
@@ -104,16 +103,23 @@ public class DashSkill : ISkill
         UnitBase bestTarget = null;
         float farthestDistance = 0f;
 
+        bool blockBase = Tower.AliveTowers.Count >= 2;
+
         for (int i = 0; i < hitCount; i++)
         {
             Collider col = _searchColliders[i];
 
             if (col.TryGetComponent(out UnitBase enemy))
-            {
-                if (excludedTargets.Contains(enemy))
-                    continue;
+            {               
+                if (blockBase && enemy.UnitType == UnitType.Bridge) continue;
+                if (excludedTargets.Contains(enemy)) continue;
+                if (enemy == _cachedUnit) continue;
+                if (enemy.IsDead) continue;
 
-                float dist = Vector3.Distance(_cachedUnit.transform.position, enemy.transform.position);
+                float dist = Vector3.Distance(
+                    _cachedUnit.transform.position,
+                    enemy.transform.position
+                );
 
                 if (dist > farthestDistance)
                 {
@@ -129,7 +135,7 @@ public class DashSkill : ISkill
     private IEnumerator DashRoutine(UnitBase target)
     {
         // 대상이 사라질 경우 종료
-        if (target == null) yield break;
+        if (target == null || target.IsDead) yield break;
 
         bool hasReached = false;
 
@@ -138,7 +144,7 @@ public class DashSkill : ISkill
 
         while (!hasReached)
         {
-            if (target == null) yield break;
+            if (target == null || target.IsDead) yield break;
 
             Vector3 targetPos = target.transform.position;
 
@@ -174,11 +180,13 @@ public class DashSkill : ISkill
                 _hitColliders,
                 _cachedUnit.TargetLayer
                 );
+
+            _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, default, _data.skillType, false, 1.5f);
+
             for (int i = 0; i < hitCount; i++)
             {
                 if (_hitColliders[i].TryGetComponent(out UnitBase enemy))
-                {
-                    _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, default, _data.skillType, false, 1.5f);
+                {                    
                     // 네트워크 환경: 마스터 클라이언트에서만 데미지 연산 수행
                     if (_cachedUnit.Runner.IsSharedModeMasterClient)
                         enemy.TakeDamage(finalDamage);
@@ -186,10 +194,12 @@ public class DashSkill : ISkill
             }
         }
         else
-        {
+        {          
             // 단일 피해 처리
             if (mainTarget != null)
             {
+                _cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, default, _data.skillType, false, 1.5f);
+
                 if (_cachedUnit.Runner.IsSharedModeMasterClient)
                     mainTarget.TakeDamage(finalDamage);
             }

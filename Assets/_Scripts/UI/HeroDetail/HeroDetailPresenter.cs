@@ -307,14 +307,23 @@ public class HeroDetailPresenter : MonoBehaviour
         _view.ClearStats();
         HeroStatData status = HeroManager.Instance.GetStatus(_heroData.id);
         HeroStatData tableBase = TableManager.Instance.HeroStatTable.Get(_heroData.heroStatId);
-        if (status == null) return;
+        if (status == null || _userHeroData == null) return;
+
+        var nextLevelData = TableManager.Instance.HeroLevelTable.Get((_userHeroData.level).ToString());
+        bool isMaxLevel = nextLevelData == null; //다음레벨 없으면 만렙
+
+        string GetStatText(float baseVal, float growthVal)
+        {
+            if (isMaxLevel) return baseVal.ToString(); // 만렙이면 기본 수치만
+            return $"{baseVal} <color=#FF0500>(+{growthVal})</color>"; // 아니면 성장 수치 포함
+        }
 
         //성장수치 보여줄 애들은 성장수치도 보여주기
-        _view.AddStatItem("체력", $"{status.BaseHp} <color=#FF0500>(+{tableBase.ipLvHp})</color>", _statIcons.GetIcon(StatType.Hp),Color.green);
-        _view.AddStatItem("공격력", $"{status.baseAttackPower} <color=#FF0500>(+{tableBase.ipLvAttackPower})</color>", _statIcons.GetIcon(StatType.AttackPower), Color.green);
+        _view.AddStatItem("체력", GetStatText(status.BaseHp, tableBase.ipLvHp), _statIcons.GetIcon(StatType.Hp),Color.green);
+        _view.AddStatItem("공격력", GetStatText(status.baseAttackPower, tableBase.ipLvAttackPower), _statIcons.GetIcon(StatType.AttackPower), Color.green);
 
-        if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0)
-            _view.AddStatItem("치유력", $"{status.baseHealingPower} <color=#FF0500>(+{tableBase.ipLvHealingPower})</color>", _statIcons.GetIcon(StatType.HealingPower), Color.green);
+        if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0) //치유력은 있는애들만 표시
+            _view.AddStatItem("치유력", GetStatText(status.baseHealingPower, tableBase.ipLvHealingPower), _statIcons.GetIcon(StatType.HealingPower), Color.green);
 
         _view.AddStatItem("공격 속도", status.attackSpeed.ToString("F2"), _statIcons.GetIcon(StatType.AttackSpeed));
         _view.AddStatItem("이동 속도", status.moveSpeed.ToString("F1"), _statIcons.GetIcon(StatType.MoveSpeed));
