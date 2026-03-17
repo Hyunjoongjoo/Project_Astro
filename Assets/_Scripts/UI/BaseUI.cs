@@ -1,8 +1,9 @@
-﻿using UnityEngine;
-using DG.Tweening;
+﻿using DG.Tweening;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(CanvasGroup))]
-public abstract class BaseUI : MonoBehaviour
+public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
 {
     [Header("기본 세팅")]
     [SerializeField] protected string _uiName;
@@ -83,5 +84,10 @@ public abstract class BaseUI : MonoBehaviour
             // 닫혀 있으면 열기
             Open();
         }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        
     }
 }
