@@ -45,6 +45,7 @@ public class StageUI : MonoBehaviour
     private float _lastRecievedRPCTime = 0f;
     private const float TIMER_RPC_TIMEOUT = 3f;
     private bool _isHostPaused = false;
+    private bool _isGameOver = false;
 
     private void Awake()
     {
@@ -52,9 +53,16 @@ public class StageUI : MonoBehaviour
         _resultPanel.gameObject.SetActive(false);
     }
 
+    private void Start()
+    {
+        ObjectContainer.Instance.blueSideStructure[ObjectContainer.Instance.BridgeIndex].OnDeath += TimerCheckingStop;
+        ObjectContainer.Instance.redSideStructure[ObjectContainer.Instance.BridgeIndex].OnDeath += TimerCheckingStop;
+    }
+
     private void Update()
     {
         if (_lastRecievedRPCTime == 0f) return;
+        if (_isGameOver) return;
 
         // 마지막 RPC 받은 시간이 3초를 넘겼다면
         bool hostUnresponsive = Time.realtimeSinceStartup - _lastRecievedRPCTime > TIMER_RPC_TIMEOUT;
@@ -69,6 +77,17 @@ public class StageUI : MonoBehaviour
             _isHostPaused = false;
             SetNetworkExceptionPanel(false, true);
         }
+    }
+
+    private void OnDestroy()
+    {
+        ObjectContainer.Instance.blueSideStructure[ObjectContainer.Instance.BridgeIndex].OnDeath -= TimerCheckingStop;
+        ObjectContainer.Instance.redSideStructure[ObjectContainer.Instance.BridgeIndex].OnDeath -= TimerCheckingStop;
+    }
+
+    public void TimerCheckingStop(UnitBase unit)
+    {
+        _isGameOver = true;
     }
 
     public void SetMaxValueAugmentSlider(int value)
@@ -264,8 +283,10 @@ public class StageUI : MonoBehaviour
 
     public void SetNetworkExceptionPanel(bool panelActive, bool isWaiting)
     {
+        _disconnectPanel.SetActive(panelActive);
+        if (isWaiting == true && _disconnected.activeSelf == true) return;
+        
         _disconnected.SetActive(!isWaiting);
         _waitingHost.SetActive(isWaiting);
-        _disconnectPanel.SetActive(panelActive);
     }
 }

@@ -78,7 +78,6 @@ public class StageManager : NetworkBehaviour
     // 매치 타입 동기화
     [Networked] private MatchType CurMatchType { get; set; }
 
-    [Networked, OnChangedRender(nameof(OnDetectedHostPause))] private bool IsHostPaused { get; set; }
 
     //더미 클라이언트 존재 여부
     private bool _existDummy;
@@ -656,11 +655,6 @@ public class StageManager : NetworkBehaviour
     public void RPC_MarkHeroUsed(PlayerRef player, string heroId)
     {
         MarkHeroUsed(player, heroId);
-    }
-
-    public void OnDetectedHostPause()
-    {
-        NetworkExceptionUiControl(IsHostPaused, true);
     }
 
     public void NetworkExceptionUiControl(bool panel, bool isWaiting)
