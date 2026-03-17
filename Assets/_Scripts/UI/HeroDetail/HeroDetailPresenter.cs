@@ -97,6 +97,7 @@ public class HeroDetailPresenter : MonoBehaviour
         }
         else
         {
+            _view.SetLevelInfo(_userHeroData.level.ToString(), 0, 0); // 0, 0을 넘겨서 "MAX"가 뜨게 함
             _view.SetUpgradeButton(true, "최고 레벨", true);
         }
 

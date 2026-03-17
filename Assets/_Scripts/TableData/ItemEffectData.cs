@@ -6,9 +6,9 @@ public class ItemEffectData : ITableData
     public string id;
     public string effectGroupId;
     public EffectType effectType;
-    public string effectValue;
+    public float effectValue;
     public TriggerCondition triggerCondition;
-    public string triggerValue;
+    public float triggerValue;
     public Target target;
     public string effectDesc;
     public string note;

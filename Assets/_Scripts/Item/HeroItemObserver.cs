@@ -23,13 +23,9 @@ public class HeroItemObserver : MonoBehaviour
 
         foreach (var effect in effects)
         {
-            //수치 파싱
-            float val = 0f;
-            float.TryParse(effect.effectValue, out val);
-
-            //Modifier 생성 (기본 Flat 타입 기준. 필요시 PA, PM 변경 가능)
-            StatModifier mod = new StatModifier(val, StatModType.Flat, this);
-
+            float val = effect.effectValue;
+            StatModType modType = GetModTypeFromEffect(effect.effectType);
+            StatModifier mod = new StatModifier(val, modType, this);
             var tracker = new ItemEffectTracker
             {
                 Data = effect,
@@ -53,8 +49,9 @@ public class HeroItemObserver : MonoBehaviour
         //영웅이 죽었거나 세팅이 덜 되었다면 검사 중단
         if (_hero == null || _unitStat == null || _hero.IsDead) return;
 
-        //현재 체력 퍼센테이지 계산
-        float hpPercent = (_hero.CurrentHealth / _unitStat.MaxHp.Value) * 100f;
+        //현재 체력 퍼센테이지 계산 X
+        //3.16 테이블 변경으로 인해 *100 제거 
+        float hpPercent = (_hero.CurrentHealth / _unitStat.MaxHp.Value);
 
         //매 프레임마다 조건부 효과들을 순회하며 상태 갱신
         for (int i = 0; i < _trackers.Count; i++)
@@ -64,8 +61,7 @@ public class HeroItemObserver : MonoBehaviour
             //패시브 패스
             if (tracker.Data.triggerCondition == TriggerCondition.Passive) continue;
 
-            float triggerVal = 0f;
-            float.TryParse(tracker.Data.triggerValue, out triggerVal);
+            float triggerVal = tracker.Data.triggerValue;
 
             bool conditionMet = false;
 
@@ -108,4 +104,21 @@ public class HeroItemObserver : MonoBehaviour
         tracker.IsApplied = false;
     }
 
+   //디버프만 모드타입 바꿔두기
+   private StatModType GetModTypeFromEffect(EffectType type)
+   {
+       switch (type)
+       {
+           //디버프 효과들은 공식의 sumDec로 들어가도록 Mult 반환
+           case EffectType.DecreaseMaxHp:
+           case EffectType.DecreaseMoveSpeed:
+           case EffectType.IncreaseDamageTaken:
+           case EffectType.DecreaseAttackSpeed:
+               return StatModType.PercentMult;
+           
+           default:
+               //나머진 버프
+               return StatModType.PercentAdd;
+       }
+   }
 }

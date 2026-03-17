@@ -63,8 +63,17 @@ public class HeroDetailView : BaseUI
     public void SetLevelInfo(string level, int currentExp, float maxExp)
     {
         _heroLevelTxt.text = level;
-        _heroExpBar.fillAmount = (float)currentExp / maxExp;
-        _heroExpTxt.text = $"{currentExp} / {maxExp}";
+        if (maxExp > 0)
+        {
+            _heroExpBar.fillAmount = (float)currentExp / maxExp;
+            _heroExpTxt.text = $"{currentExp} / {maxExp}";
+        }
+        else
+        {
+            // 만렙일 경우 MAX 표시
+            _heroExpBar.fillAmount = 1f;
+            _heroExpTxt.text = "MAX";
+        }
     }
 
     // 버튼 상태 세팅
