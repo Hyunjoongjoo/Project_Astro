@@ -30,7 +30,6 @@ public class Tower : UnitBase
 
     public override void Spawned()
     {
-        Debug.Log("Spawned 실행됨");
         base.Spawned();
 
         unitType = UnitType.Tower;
