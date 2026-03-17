@@ -78,6 +78,8 @@ public class StageManager : NetworkBehaviour
     // 매치 타입 동기화
     [Networked] private MatchType CurMatchType { get; set; }
 
+    [Networked, OnChangedRender(nameof(OnDetectedHostPause))] private bool IsHostPaused { get; set; }
+
     //더미 클라이언트 존재 여부
     private bool _existDummy;
 
@@ -102,6 +104,13 @@ public class StageManager : NetworkBehaviour
 
         if (_stageUI != null)
             _stageUI.SetMaxValueAugmentSlider(AUGMENT_GAUGE);
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        // 호스트가 홈으로 가거나 복귀하는 등 상태 변화
+        if (Runner.IsSharedModeMasterClient)
+            IsHostPaused = pause;
     }
 
     public void Initialize(MatchType matchType, int requiredPlayerCount, bool existDummy)
@@ -654,6 +663,16 @@ public class StageManager : NetworkBehaviour
     public void RPC_MarkHeroUsed(PlayerRef player, string heroId)
     {
         MarkHeroUsed(player, heroId);
+    }
+
+    public void OnDetectedHostPause()
+    {
+        NetworkExceptionUiControl(IsHostPaused, true);
+    }
+
+    public void NetworkExceptionUiControl(bool panel, bool isWaiting)
+    {
+        _stageUI.SetNetworkExceptionPanel(panel, isWaiting);
     }
 
     public void MarkHeroUsed(PlayerRef unitOwner, string heroId)
