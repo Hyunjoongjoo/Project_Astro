@@ -74,25 +74,42 @@ public class LobbyHeroListWindow : BaseUI
         var userHeroes = UserDataManager.Instance.HeroesModel;
 
         //링큐 조인 이용해서 영웅정보랑, 플레이어 레벨/경험치를 섞어 사용가능하게
-        var sortedList = heroTable.Join(userHeroes,
+        var displayList = heroTable.Join(userHeroes,
             h => h.id,
             u => u.heroId,
-            (h, u) => new { Data = h, User = u });
+            (h, u) => new { 
+                Data = h, 
+                User = u,
+                // 정렬용 번역 데이터 추가
+                TranslatedName = TableManager.Instance.GetString(h.heroName),
+                TranslatedRole = TableManager.Instance.GetString($"hero_role_{h.heroRole.ToString().ToLower()}")
+            });
 
-        switch ((HeroSortType)_sortDropdown.value)
+        // 번역된 텍스트를 기준으로 정렬 수행
+        var sortType = (HeroSortType)_sortDropdown.value;
+        bool isDescending = _descendingToggle.isOn;
+
+        // 정렬 로직
+        var query = displayList.AsEnumerable();
+
+        switch (sortType)
         {
             case HeroSortType.Name:
-                sortedList = _descendingToggle.isOn ? sortedList.OrderByDescending(x => x.Data.heroName) : sortedList.OrderBy(x => x.Data.heroName);
+                query = isDescending ? query.OrderByDescending(x => x.TranslatedName) : query.OrderBy(x => x.TranslatedName);
                 break;
             case HeroSortType.Level:
-                sortedList = _descendingToggle.isOn ? sortedList.OrderByDescending(x => x.User.level) : sortedList.OrderBy(x => x.User.level);
+                query = isDescending ? query.OrderByDescending(x => x.User.level).ThenBy(x => x.TranslatedName) : query.OrderBy(x => x.User.level).ThenBy(x => x.TranslatedName);
                 break;
             case HeroSortType.Role:
-                sortedList = _descendingToggle.isOn ? sortedList.OrderByDescending(x => x.Data.heroRole) : sortedList.OrderBy(x => x.Data.heroRole);
+                query = isDescending ? query.OrderByDescending(x => x.TranslatedRole).ThenBy(x => x.TranslatedName) : query.OrderBy(x => x.TranslatedRole).ThenBy(x => x.TranslatedName);
+                break;
+            default:
+                query = query.OrderBy(x => x.Data.id);
                 break;
         }
 
-        foreach (var item in sortedList)
+        //생성
+        foreach (var item in query)
         {
             GameObject cardObj = Instantiate(_heroCardPrefab, _content);
             if (cardObj.TryGetComponent(out LobbyHeroCardUI cardUI))

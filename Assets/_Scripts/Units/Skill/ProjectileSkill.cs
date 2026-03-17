@@ -38,7 +38,7 @@ public class ProjectileSkill : ISkill
 
         if ( Vector3.Distance(_cachedUnit.transform.position, _cachedUnit.currentTarget.transform.position) > _data.range)
             return false;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
+        //_skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         return true;
     }
 
@@ -50,6 +50,8 @@ public class ProjectileSkill : ISkill
     {
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return;
         if (_cachedUnit.currentTarget == null) return;
+
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
 
         // 기존 코루틴이 있다면 정지 후 새로 시작 (UnitController를 통해 실행)
         if (_fireCoroutine != null)
