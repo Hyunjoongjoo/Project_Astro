@@ -1,8 +1,8 @@
 영웅 능력치 테이블 기본키,영웅 재소환 대기시간,1레벨 체력 수치,레벨 당 체력 수치,1레벨 공격력 수치,레벨 당 공격력 수치,1레벨 치유력 수치,레벨 당 치유력 수치,영웅의 공격 속도,받는 피해량 증감,스킬 쿨타임 증감,영웅의 이동 유형,영웅의 이동 속도,영웅의 탐지 범위,기획용 비고
 id,spawnCooldown,BaseHp,ipLvHp,baseAttackPower,ipLvAttackPower,baseHealingPower,ipLvHealingPower,attackSpeed,damageReduce,cooltimeReduce,moveType,moveSpeed,detectionRange,note
 String,Float,Int,Float,Int,Float,Int,Float,Float,float,float,MoveType,Float,Float,String
-stat_hero_corsair,28.8,1650,68.75,198,8.25,0,0,1,0,0,small,3,6,강습형 우주함선 커세어
-stat_hero_heavyrain,20.2,750,31.25,225,9.38,0,0,1,0,0,large,2,7.5,포격형 우수함선 헤비레인
-stat_hero_tank,52.8,3375,140.63,82,3.42,0,0,1,0,0,large,3,6,방어형 우주함선 탱크
-stat_hero_angel,30,1875,78.13,118,4.92,150,6.25,1,0,0,large,2,7.5,지원형 우주함선 앤젤
-stat_hero_tachyon,28.8,1650,68.75,198,8.25,0,0,1,0,0,small,3,6,강습형 우주함선 타키온
+stat_hero_corsair,28.8,1650,67,198,8,0,0,1,0,0,small,3,6,강습형 우주함선 커세어
+stat_hero_heavyrain,20.2,750,31,225,9,0,0,1,0,0,large,2,7.5,포격형 우수함선 헤비레인
+stat_hero_tank,52.8,3375,141,82,3,0,0,1,0,0,large,3,6,방어형 우주함선 탱크
+stat_hero_angel,30,1875,78,118,5,150,6,1,0,0,large,2,7.5,지원형 우주함선 앤젤
+stat_hero_tachyon,28.8,1650,79,198,8,0,0,1,0,0,small,3,6,강습형 우주함선 타키온

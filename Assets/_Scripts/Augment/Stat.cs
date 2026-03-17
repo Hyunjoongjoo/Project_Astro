@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public class StatModifier
 {
-    public float Value;         
+    public float Value;
     public StatModType Type;    //연산 타입(Flat,PA,PM)
     public object Source;       //중복방지용 출처 (뭐가 줬는지, 증강, 아이템 버프스킬 등등)
 
@@ -35,7 +35,7 @@ public class Stat
     protected List<StatModifier> _modifiers = new List<StatModifier>();
 
     protected bool _isDirty = true;
-    
+
     //최종적으로 계산이 끝난 값(캐싱용)
     protected float _value;
 
@@ -160,19 +160,21 @@ public class Stat
     //순수 퍼센트 수치 합산(Base 0)
     private float CalculateAdditive()
     {
-        float sumFlat = 0f;
+        float sumDec = 0f;
+        float sumInc = 0f;
 
         //깡스탯 먼저
         for (int i = 0; i < _modifiers.Count; i++)
         {
             StatModifier mod = _modifiers[i];
 
-            //쿨감/받피감의 경우, "20% 쿨감 증강"은 Value = 0.2 인 Flat 타입으로 들어온다고 가정
-            //얘도 리팩토링 예상됨 테이블값 보고 정하기
-            if (mod.Type == StatModType.Flat) sumFlat += mod.Value;
+            //3.16 리팩토링
+            if (mod.Type == StatModType.PercentAdd) sumInc += mod.Value;
+            else if (mod.Type == StatModType.PercentMult) sumDec += mod.Value;
+            else if (mod.Type == StatModType.Flat) sumInc += mod.Value; //얜 깡스탯호환용
         }
-
-        return BaseValue + sumFlat;
+        //0 + 버프수치(0.2 곱연산해서) - 디버프수치
+        return BaseValue +sumInc - sumDec;
     }
 
 
@@ -186,7 +188,7 @@ public class Stat
     }
 
     //기존 스탯 변동을 제거하는 메서드, Source 비교
-   public bool RemoveModifier(object source)
+    public bool RemoveModifier(object source)
     {
         //source와 일치하는 모든 효과 제거
         int removed = _modifiers.RemoveAll(x => x.Source == source);

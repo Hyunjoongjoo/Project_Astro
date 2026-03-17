@@ -23,7 +23,7 @@ public class AugmentController : NetworkBehaviour
     //추후 리소스로드 or 어드레서블로 관리
     [Header("스킬 증강 데이터베이스")]
     [SerializeField] private List<SkillAugmentSO> _allSkillAugments;
-    
+
 
     //영웅들의 기본 스킬 SO들을 담아둘 리스트 추가
     [Header("기본 스킬 데이터베이스 (영웅 카드용)")]
@@ -468,7 +468,7 @@ public class AugmentController : NetworkBehaviour
                     data.mainIcon = _itemIconDataSO.GetIcon(id);
                 }
             }
-        
+
         }
 
         return data;
@@ -515,8 +515,20 @@ public class AugmentController : NetworkBehaviour
 
         //패킷이 날아오는 동안 슬롯이 꽉 찼는지 다시 한번 확인
         if (type == AugmentType.Hero && IsSlotFull5(data.OwnedHeroes)) isValid = false;
-        if (type == AugmentType.Item && IsSlotFull3(data.InventoryItems)) isValid = false;
         if (type == AugmentType.Skill && IsSlotFull5(data.OwnedSkillAugments)) isValid = false;
+
+        //3.16
+        //아이템은 인벤 3칸과 임시 슬롯 1칸이 모두 꽉 찼을 때만 반려
+        if (type == AugmentType.Item)
+        {
+            bool isInvFull = IsSlotFull3(data.InventoryItems);
+            bool isTempFull = !string.IsNullOrEmpty(data.TempItemSlot.ToString().Replace("\0", "").Trim());
+
+            if (isInvFull && isTempFull)
+            {
+                isValid = false;
+            }
+        }
 
         //검증 통과 여부에 따라 컨펌 or 리젝트
         if (isValid)
