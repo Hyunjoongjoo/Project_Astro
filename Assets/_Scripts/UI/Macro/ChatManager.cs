@@ -236,16 +236,23 @@ public class ChatManager : NetworkBehaviour
         if (targetPlayer == PlayerRef.None || targetPlayer == Runner.LocalPlayer)
             return; // 자기 자신은 차단 불가
 
+        //스테이지 매니저의 데이터 맵에서 닉네임 찾기
+        string targetNickname = targetPlayer.ToString(); // 기본값
+        if (StageManager.Instance.PlayerDataMap.TryGet(targetPlayer, out var data))
+        {
+            targetNickname = data.PlayerName.ToString();
+        }
+
         // 이미 차단된 상태면 해제, 아니면 차단
         if (StageManager.Instance.IsBlocked(targetPlayer))
         {
             StageManager.Instance.UnblockPlayer(targetPlayer);
-            ToastMessageUI.Instance.ShowToast($"<color=green>차단 해제:</color> {targetPlayer}");
+            ToastMessageUI.Instance.ShowToast($"<color=green>차단 해제:</color> {targetNickname}");
         }
         else
         {
             StageManager.Instance.BlockPlayer(targetPlayer);
-            ToastMessageUI.Instance.ShowToast($"<color=red>차단 완료:</color> {targetPlayer}");
+            ToastMessageUI.Instance.ShowToast($"<color=red>차단 완료:</color> {targetNickname}");
         }
     }
 
