@@ -99,24 +99,16 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
     public void PlayerLeft(PlayerRef player)
     {
-        Debug.Log("플레이어가 떠남");
         // 만약 스테이지 씬 상태에서 누군가 떠났다면
         if (GameManager.Instance != null && 
-            GameManager.Instance.FlowState == SceneState.Stage)
+            GameManager.Instance.FlowState == SceneState.Stage &&
+            GameManager.Instance.CurrentGameState != GameState.Result)
         {
 
             if (StageManager.Instance != null)
             {
                 StartCoroutine(MomentWaitingAndExitGame());
             }
-            else
-            {
-                Debug.Log("StageManager 체크에서 false");
-            }
-        }
-        else
-        {
-            Debug.Log("GameManager 체크에서 false");
         }
     }
 

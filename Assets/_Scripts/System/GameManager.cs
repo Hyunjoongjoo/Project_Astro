@@ -15,7 +15,7 @@ public class GameManager : Singleton<GameManager>
     public bool IsGameStarted => _currentState == GameState.Play;
     public SceneState FlowState => _flowState;
 
-
+    public GameState CurrentGameState => _currentState;
     public Team PlayerTeam { get; private set; }
 
     protected override void Awake()
