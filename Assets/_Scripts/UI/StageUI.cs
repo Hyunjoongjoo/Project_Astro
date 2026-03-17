@@ -26,6 +26,7 @@ public class StageUI : MonoBehaviour
     [SerializeField] private GameObject _heroResultPrefab;
     [SerializeField] private Transform _heroListPanel;
     [SerializeField] private TextMeshProUGUI _resultGoldText;
+    public Button goLobbyBtn;
 
     [Header("채팅 앵커")]
     [SerializeField] private Transform _myAnchor;
@@ -33,13 +34,42 @@ public class StageUI : MonoBehaviour
     [SerializeField] private Transform _enemy1Anchor;
     [SerializeField] private Transform _enemy2Anchor;
 
-    public Button goLobbyBtn;
+    [Header("네트워크 관련 처리")]
+    [SerializeField] private GameObject _disconnectPanel;
+    [SerializeField] private GameObject _waitingHost;
+    [SerializeField] private GameObject _disconnected;
+
     private MatchType _matchType;
+
+    // 호스트가 홈으로 가서 일시정지 되었음을 감지하기 위한 변수
+    private float _lastRecievedRPCTime = 0f;
+    private const float TIMER_RPC_TIMEOUT = 3f;
+    private bool _isHostPaused = false;
 
     private void Awake()
     {
         _countdownIndicator.gameObject.SetActive(false);
         _resultPanel.gameObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (_lastRecievedRPCTime == 0f) return;
+        if (GameManager.Instance.CurrentGameState == GameState.Result) return;
+
+        // 마지막 RPC 받은 시간이 3초를 넘겼다면
+        bool hostUnresponsive = Time.realtimeSinceStartup - _lastRecievedRPCTime > TIMER_RPC_TIMEOUT;
+
+        if (hostUnresponsive == true && _isHostPaused == false)
+        {
+            _isHostPaused = true;
+            SetNetworkExceptionPanel(true, true);
+        }
+        else if (!hostUnresponsive && _isHostPaused)
+        {
+            _isHostPaused = false;
+            SetNetworkExceptionPanel(false, true);
+        }
     }
 
     public void SetMaxValueAugmentSlider(int value)
@@ -171,6 +201,7 @@ public class StageUI : MonoBehaviour
 
     public void UpdateStageTimer(int timeSeconds)
     {
+        _lastRecievedRPCTime = Time.realtimeSinceStartup;
         int minute = timeSeconds / 60;
         int second = timeSeconds % 60;
         _gameTimer.text = $"{minute} : {second:D2}";
@@ -230,5 +261,14 @@ public class StageUI : MonoBehaviour
         }
 
         return _enemy1Anchor; // 기본값
+    }
+
+    public void SetNetworkExceptionPanel(bool panelActive, bool isWaiting)
+    {
+        _disconnectPanel.SetActive(panelActive);
+        if (isWaiting == true && _disconnected.activeSelf == true) return;
+        
+        _disconnected.SetActive(!isWaiting);
+        _waitingHost.SetActive(isWaiting);
     }
 }

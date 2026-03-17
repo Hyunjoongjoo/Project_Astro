@@ -101,7 +101,7 @@ public class HealSkill : ISkill
     public void Casting()
     {
         float finalCooldown = _data.cooldown * _data.cooldownMultiplier;
-        Debug.Log( $"[힐스킬] 쿨감 적용 | 기본:{_data.cooldown} 비율:{_data.cooldownMultiplier} 최종쿨:{finalCooldown}");
+
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
 
         //List<UnitBase> targetsToHeal = new List<UnitBase>();
