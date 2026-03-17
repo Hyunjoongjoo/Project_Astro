@@ -26,6 +26,7 @@ public class StageUI : MonoBehaviour
     [SerializeField] private GameObject _heroResultPrefab;
     [SerializeField] private Transform _heroListPanel;
     [SerializeField] private TextMeshProUGUI _resultGoldText;
+    public Button goLobbyBtn;
 
     [Header("채팅 앵커")]
     [SerializeField] private Transform _myAnchor;
@@ -33,7 +34,11 @@ public class StageUI : MonoBehaviour
     [SerializeField] private Transform _enemy1Anchor;
     [SerializeField] private Transform _enemy2Anchor;
 
-    public Button goLobbyBtn;
+    [Header("네트워크 관련 처리")]
+    [SerializeField] private GameObject _disconnectPanel;
+    [SerializeField] private GameObject _waitingHost;
+    [SerializeField] private GameObject _disconnected;
+
     private MatchType _matchType;
 
     private void Awake()
@@ -230,5 +235,12 @@ public class StageUI : MonoBehaviour
         }
 
         return _enemy1Anchor; // 기본값
+    }
+
+    public void SetNetworkExceptionPanel(bool panelActive, bool isWaiting)
+    {
+        _disconnected.SetActive(!isWaiting);
+        _waitingHost.SetActive(isWaiting);
+        _disconnectPanel.SetActive(panelActive);
     }
 }

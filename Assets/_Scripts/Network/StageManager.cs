@@ -104,6 +104,27 @@ public class StageManager : NetworkBehaviour
             _stageUI.SetMaxValueAugmentSlider(AUGMENT_GAUGE);
     }
 
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+            // 호스트가 홈으로 갔을 때
+            if (Runner.IsSharedModeMasterClient)
+            {
+                // 모두에게 호스트 대기중 RPC를 쏨. (거의 제일 아래에 메서드 둘게요)
+                RPC_NetworkException(true);
+            }
+        }
+        else
+        {
+            // 호스트가 홈에서 돌아왔을 때
+            if (Runner.IsSharedModeMasterClient)
+            {
+                RPC_NetworkException(false);
+            }
+        }
+    }
+
     public void Initialize(MatchType matchType, int requiredPlayerCount, bool existDummy)
     {
         CurMatchType = matchType;
@@ -654,6 +675,20 @@ public class StageManager : NetworkBehaviour
     public void RPC_MarkHeroUsed(PlayerRef player, string heroId)
     {
         MarkHeroUsed(player, heroId);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_NetworkException(bool pause)
+    {
+        if (_stageUI != null) 
+        {
+            NetworkExceptionUiControl(pause, true);
+        }
+    }
+
+    public void NetworkExceptionUiControl(bool panel, bool isWaiting)
+    {
+        _stageUI.SetNetworkExceptionPanel(panel, isWaiting);
     }
 
     public void MarkHeroUsed(PlayerRef unitOwner, string heroId)
