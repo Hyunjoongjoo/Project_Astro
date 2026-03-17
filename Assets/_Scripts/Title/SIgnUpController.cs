@@ -6,6 +6,8 @@ public class SignUpController : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private SignUpView _signUpView;
+    [SerializeField] private AcceptUI _acceptUI;
+    [SerializeField] private AnimUI _loginSelectPanel;
 
     [Header("Validation")]
     [SerializeField] private int _minPasswordLength = 8;
@@ -13,20 +15,37 @@ public class SignUpController : MonoBehaviour
     [SerializeField] private int _minNicknameLength = 2;
     [SerializeField] private int _maxNicknameLength = 8;
 
+    private Action<string> _onSignUpComplete;
+
     private AuthService _authService;
     private UserDataStore _userDataStore;
     private bool _isProcessing;
     private bool _isNicknameVerified;
 
-    public void Initialize(AuthService authService, UserDataStore userDataStore)
+    public void Initialize(AuthService authService, UserDataStore userDataStore, Action<string> onSignUpComplete)
     {
         _authService = authService;
         _userDataStore = userDataStore;
+        _onSignUpComplete = onSignUpComplete;
     }
 
     public void OnClickActivePanel(bool active)
     {
-        _signUpView.gameObject.SetActive(active);
+        if (active)
+        {
+            _acceptUI.ShowPanel(() => { 
+                _signUpView.gameObject.SetActive(true); 
+            });
+        }
+        else
+        {
+            if (AuthService.Instance.CurrentUser != null)
+            {
+                AuthService.Instance.Logout();
+                _loginSelectPanel.Open();
+            }
+            _signUpView.gameObject.SetActive(false);
+        }
     }
 
     public void OnClickCheckNickname()
@@ -128,6 +147,12 @@ public class SignUpController : MonoBehaviour
 
             // 4단계: 성공 메시지 표시
             _signUpView.ShowSignUpSuccess(input.nickname);
+
+            // 4.5단계 : 글 읽을 시간 주기
+            await System.Threading.Tasks.Task.Delay(1000);
+
+            // 5단계 : 바로 로그인으로 이어주기
+            _onSignUpComplete?.Invoke(input.nickname);
         }
         catch (Firebase.FirebaseException firebaseEx)
         {

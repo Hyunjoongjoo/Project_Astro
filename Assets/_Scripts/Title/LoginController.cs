@@ -1,6 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
-using Unity.VisualScripting;
 using UnityEngine;
 
 // 로그인 관련 비즈니스 로직
@@ -13,23 +11,13 @@ public class LoginController : MonoBehaviour
 
     [SerializeField] private AuthService _authService;
     [SerializeField] private UserDataStore _userDataStore;
+    [SerializeField] private SignUpController _signUpController;
 
     private Action<string> _onLoginSuccess;
     private bool _isProcessing;
 
     private string _currentUserId;
     private DbModel _currentDb;
-
-    void Awake()
-    {
-        // AcceptUI로부터 성공 신호를 받으면 ProceedToGame 실행 등록
-        if (_acceptUI != null)
-        {
-            _acceptUI.OnAgreementComplete += () => {
-                ProceedToGame(_currentUserId, _currentDb);
-            };
-        }
-    }
 
     public void Initialize(AuthService authService, UserDataStore userDataStore, Action<string> onLoginSuccess)
     {
@@ -66,7 +54,7 @@ public class LoginController : MonoBehaviour
             Debug.Log("파이어베이스 유저 데이터 조회");
             if (userData == null)
             {
-                // 유저 데이터가 없으면 닉네임 생성 유도
+                // 유저 데이터가 없으면 닉네임 생성 유도하여 DB 최신화
                 _loginView.ShowNicknameCreationRequired(credentials.email);
                 return;
             }
@@ -80,7 +68,9 @@ public class LoginController : MonoBehaviour
             // 약관 동의된 상태인지 체크
             if (!_currentDb.profile.isAgreed)
             {
-                _acceptUI.ShowPanel();
+                _acceptUI.ShowPanel(() => {
+                    ProceedToGame(_currentUserId, _currentDb);
+                });
                 return;
             }
 
@@ -121,10 +111,17 @@ public class LoginController : MonoBehaviour
             Debug.Log("파이어베이스 유저 데이터 조회");
             if (userData == null)
             {
-                // 유저 데이터가 없으면 닉네임 생성 유도
-                _loginView.ShowNicknameCreationRequired(user.UserId);
-                _signUpView.SetNicknameOnlyMode(user.Email);
-                _signUpView.gameObject.SetActive(true);
+                // 약관 동의 먼저띄우고 난 뒤에
+                _acceptUI.ShowPanel(() => {
+                    // 약관 동의 성공 시에만 닉네임 설정 창 오픈
+                    _loginView.ShowNicknameCreationRequired(user.UserId);
+                    _signUpView.SetNicknameOnlyMode(user.Email);
+                    _signUpView.gameObject.SetActive(true);
+
+                    _signUpController.Initialize(_authService, _userDataStore, (nickName) => {
+                        HandlePostSignUpEntry(user.UserId);
+                    });
+                });
                 return;
             }
 
@@ -137,7 +134,9 @@ public class LoginController : MonoBehaviour
             // 약관 동의된 상태인지 체크
             if (!userData.profile.isAgreed)
             {
-                _acceptUI.ShowPanel();
+                _acceptUI.ShowPanel(() => {
+                    ProceedToGame(_currentUserId, _currentDb);
+                });
                 return;
             }
             ProceedToGame(_currentUserId, _currentDb);
@@ -177,6 +176,13 @@ public class LoginController : MonoBehaviour
             },
             _ => "로그인 중 오류가 발생했습니다."
         };
+    }
+    private async void HandlePostSignUpEntry(string userId)
+    {
+        var userData = await _userDataStore.GetUserDataAsync(userId);
+        var userHeroData = await _userDataStore.GetUserHeroDataAsync(userId);
+        UserDataManager.Instance.SetAllUserData(userData.profile, userData.record, userData.wallet, userHeroData);
+        ProceedToGame(userId, userData);
     }
 
     private async void ProceedToGame(string userId, DbModel Db)
