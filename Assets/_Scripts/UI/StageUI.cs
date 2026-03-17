@@ -41,10 +41,34 @@ public class StageUI : MonoBehaviour
 
     private MatchType _matchType;
 
+    // 호스트가 홈으로 가서 일시정지 되었음을 감지하기 위한 변수
+    private float _lastRecievedRPCTime = 0f;
+    private const float TIMER_RPC_TIMEOUT = 3f;
+    private bool _isHostPaused = false;
+
     private void Awake()
     {
         _countdownIndicator.gameObject.SetActive(false);
         _resultPanel.gameObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (_lastRecievedRPCTime == 0f) return;
+
+        // 마지막 RPC 받은 시간이 3초를 넘겼다면
+        bool hostUnresponsive = Time.realtimeSinceStartup - _lastRecievedRPCTime > TIMER_RPC_TIMEOUT;
+
+        if (hostUnresponsive == true && _isHostPaused == false)
+        {
+            _isHostPaused = true;
+            SetNetworkExceptionPanel(true, true);
+        }
+        else if (!hostUnresponsive && _isHostPaused)
+        {
+            _isHostPaused = false;
+            SetNetworkExceptionPanel(false, true);
+        }
     }
 
     public void SetMaxValueAugmentSlider(int value)
@@ -176,6 +200,7 @@ public class StageUI : MonoBehaviour
 
     public void UpdateStageTimer(int timeSeconds)
     {
+        _lastRecievedRPCTime = Time.realtimeSinceStartup;
         int minute = timeSeconds / 60;
         int second = timeSeconds % 60;
         _gameTimer.text = $"{minute} : {second:D2}";

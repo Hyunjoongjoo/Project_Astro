@@ -106,13 +106,6 @@ public class StageManager : NetworkBehaviour
             _stageUI.SetMaxValueAugmentSlider(AUGMENT_GAUGE);
     }
 
-    private void OnApplicationPause(bool pause)
-    {
-        // 호스트가 홈으로 가거나 복귀하는 등 상태 변화
-        if (Runner.IsSharedModeMasterClient)
-            IsHostPaused = pause;
-    }
-
     public void Initialize(MatchType matchType, int requiredPlayerCount, bool existDummy)
     {
         CurMatchType = matchType;
