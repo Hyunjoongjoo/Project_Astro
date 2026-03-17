@@ -43,8 +43,8 @@ public class AugmentManager : Singleton<AugmentManager>
             {
                 //서버에 패킷 쏘기 전에 기다린다고 표시
                 _isWaitingForServerResponse = true;
-                AugmentController.Instance.RPC_RequestAugmentCards(AugmentController.Instance.Runner.LocalPlayer);
                 ExecuteHideToggleBtn();
+                AugmentController.Instance.RPC_RequestAugmentCards(AugmentController.Instance.Runner.LocalPlayer);
             });
             _toggleBtn.gameObject.SetActive(true);
         }

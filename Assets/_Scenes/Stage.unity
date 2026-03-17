@@ -2268,7 +2268,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: df70fa95-8a34-4494-b137-73ab6b9c7d37
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!1 &233470477
@@ -11596,6 +11596,10 @@ PrefabInstance:
     - target: {fileID: 7156365648653329536, guid: 1ced5fe7b1fe49c42a4e08070a1b9bb3, type: 3}
       propertyPath: m_Name
       value: Augment_btn
+      objectReference: {fileID: 0}
+    - target: {fileID: 7156365648653329536, guid: 1ced5fe7b1fe49c42a4e08070a1b9bb3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8112760873175736723, guid: 1ced5fe7b1fe49c42a4e08070a1b9bb3, type: 3}
       propertyPath: m_Pivot.x
