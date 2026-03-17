@@ -174,8 +174,9 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
     }
 
-    //3.17
+    
     //매니저가 스킬 아이콘 리스트를 주면 슬롯에 채워주는 함수
+    //3.17 부모 프레임도 같이 출력되도록(기본 비활)
     public void UpdateSkillAugmentIcons(List<Sprite> icons)
     {
         if (_skillAugmentImgs == null) return;
@@ -186,10 +187,14 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             {
                 _skillAugmentImgs[i].sprite = icons[i];
                 _skillAugmentImgs[i].gameObject.SetActive(true);
+
+                //부모 프레임도 켬
+                _skillAugmentImgs[i].transform.parent.gameObject.SetActive(true);
             }
             else
             {
-                _skillAugmentImgs[i].gameObject.SetActive(false);
+                //부모프레임 채로 숨김
+                _skillAugmentImgs[i].transform.parent.gameObject.SetActive(false);
             }
         }
     }
