@@ -11241,10 +11241,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 764932663}
     m_Modifications:
-    - target: {fileID: 4544679830728892553, guid: 1ced5fe7b1fe49c42a4e08070a1b9bb3, type: 3}
-      propertyPath: m_RaycastTarget
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7156365648653329536, guid: 1ced5fe7b1fe49c42a4e08070a1b9bb3, type: 3}
       propertyPath: m_Name
       value: Augment_btn

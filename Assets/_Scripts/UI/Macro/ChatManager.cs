@@ -240,12 +240,12 @@ public class ChatManager : NetworkBehaviour
         if (StageManager.Instance.IsBlocked(targetPlayer))
         {
             StageManager.Instance.UnblockPlayer(targetPlayer);
-            Debug.Log($"플레이어 {targetPlayer} 차단 해제");
+            ToastMessageUI.Instance.ShowToast($"<color=green>차단 해제:</color> {targetPlayer}");
         }
         else
         {
             StageManager.Instance.BlockPlayer(targetPlayer);
-            Debug.Log($"플레이어 {targetPlayer} 차단 완료");
+            ToastMessageUI.Instance.ShowToast($"<color=red>차단 완료:</color> {targetPlayer}");
         }
     }
 
