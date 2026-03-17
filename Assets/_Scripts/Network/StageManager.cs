@@ -275,7 +275,7 @@ public class StageManager : NetworkBehaviour
         if (chatManager != null)
         {
             // PlayerDataMap.Count가 2이면 1:1, 4이면 2:2
-            chatManager.RefreshBlockButtons(PlayerDataMap.Count);
+            chatManager.RefreshToggleButtons(PlayerDataMap.Count);
         }
     }
 

@@ -19,9 +19,6 @@ public class ChatManager : NetworkBehaviour
     [SerializeField] private TMP_Text _toggleTxt;
     [SerializeField] private AnimUI _toastObject; //비어있을때 출력용 토스트 메시지
 
-    [Header("차단 버튼 (인덱스 순)")]
-    [SerializeField] private List<GameObject> _blockButtonObjects;
-
     private bool _isTeamChat = false; //기본 전체 채팅
 
     private void Start()
@@ -252,26 +249,16 @@ public class ChatManager : NetworkBehaviour
         }
     }
 
-    public void RefreshBlockButtons(int playerCount)
+    //팀 > 전체 전환토글 인원수에 따라 숨김처리
+    public void RefreshToggleButtons(int playerCount)
     {
         if (playerCount <= 2) // 1:1 상황
         {
-            // 적 1번(인덱스 1)은 유지, 팀원(2)과 적 2번(3)은 숨김
-            if (_blockButtonObjects.Count >= 1) _blockButtonObjects[0].SetActive(true);
-            if (_blockButtonObjects.Count >= 2) _blockButtonObjects[1].SetActive(false);
-            if (_blockButtonObjects.Count >= 3) _blockButtonObjects[2].SetActive(false);
-
             // 1:1이면 팀 채팅 토글 버튼도 숨김
             if (_toggleTxt != null) _toggleTxt.transform.parent.gameObject.SetActive(false);
         }
         else // 2:2 상황
         {
-            // 모든 버튼 활성화
-            foreach (var btn in _blockButtonObjects)
-            {
-                btn.SetActive(true);
-            }
-
             // 팀 채팅 토글 버튼 표시
             if (_toggleTxt != null) _toggleTxt.transform.parent.gameObject.SetActive(true);
         }
