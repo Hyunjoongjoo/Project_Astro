@@ -9,6 +9,7 @@ public class LoginController : MonoBehaviour
     [SerializeField] private LoginView _loginView;
     [SerializeField] private SignUpView _signUpView;
     [SerializeField] private AcceptUI _acceptUI;
+    [SerializeField] private AnimUI _loginSelectUI;
 
     [SerializeField] private SignUpController _signUpController;
 
@@ -109,6 +110,11 @@ public class LoginController : MonoBehaviour
             // 1단계: Firebase Auth 로그인
             var user = await _authService.SignInWithGoogleAsync();
             Debug.Log("파이어베이스 Auth 로그인 ");
+
+            if (_loginSelectUI.gameObject.activeSelf)
+            {
+                _loginSelectUI.DeActivate();
+            }
 
             // 2단계: Firestore에서 유저 데이터 조회
             var userData = await _userDataStore.GetUserDataAsync(user.UserId);
