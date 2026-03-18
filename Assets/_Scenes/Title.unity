@@ -3126,7 +3126,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: dc83c80c4591ebb49a247c9891c02164, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ace47327cf9f9444384ae0f2f8a01a34, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8570,18 +8570,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 402403900}
-        m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
-        m_MethodName: DeActivate
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!114 &1615404983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8602,7 +8590,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 6b7b67a37c8e09b448ad5e9a3067a870, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 75a30cb5b9afc1c4a9cc360043e8c804, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -9416,6 +9404,7 @@ MonoBehaviour:
   _bgmTable: {fileID: 11400000, guid: 88e256611483a764e85a5adc03e953e8, type: 2}
   _sfxTable: {fileID: 11400000, guid: 86352551f2f27774d89434e65e167c52, type: 2}
   _bgmFadeSeconds: 1.5
+  soundCooldown: 0.1
 --- !u!4 &1695326067
 Transform:
   m_ObjectHideFlags: 0
@@ -10377,9 +10366,8 @@ MonoBehaviour:
   _loginView: {fileID: 447407635}
   _signUpView: {fileID: 678791463}
   _acceptUI: {fileID: 801088952}
-  _authService: {fileID: 0}
-  _userDataStore: {fileID: 0}
-  _signUpController: {fileID: 0}
+  _loginSelectUI: {fileID: 402403900}
+  _signUpController: {fileID: 1782207120}
 --- !u!1 &1823824194
 GameObject:
   m_ObjectHideFlags: 0

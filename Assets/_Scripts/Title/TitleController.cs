@@ -27,8 +27,7 @@ public class TitleController : MonoBehaviour
             _authService = AuthService.Instance;
             _userDataStore = UserDataStore.Instance;
 
-            _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
-            _signUpController.Initialize(_authService, _userDataStore, OnLoginComplete);
+            SetupControllers();
             return;
         }
 
@@ -51,8 +50,7 @@ public class TitleController : MonoBehaviour
                     _authService.Initialize();
                     _userDataStore.Initialize();
 
-                    _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
-                    _signUpController.Initialize(_authService, _userDataStore, OnLoginComplete);
+                    SetupControllers();
 
                     Debug.Log("[Title] Firebase 및 서비스 주입 완료");
                 }
@@ -61,6 +59,23 @@ public class TitleController : MonoBehaviour
                     Debug.LogError("[Title] AuthService를 찾을 수 없음");
                 }
             });
+    }
+
+    private void SetupControllers()
+    {
+        // 공통 초기화 로직
+        _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
+        _signUpController.Initialize(_authService, _userDataStore, (data) =>
+        {
+            if (data.isGoogle)
+            {
+                _loginController.OnClickGoogleLogIn();
+            }
+            else
+            {
+                _loginController.OnClickLogin();
+            }
+        });
     }
 
     private void OnLoginComplete(string nickname)

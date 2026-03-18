@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 // 로그인 관련 비즈니스 로직
@@ -8,16 +9,14 @@ public class LoginController : MonoBehaviour
     [SerializeField] private LoginView _loginView;
     [SerializeField] private SignUpView _signUpView;
     [SerializeField] private AcceptUI _acceptUI;
+    [SerializeField] private AnimUI _loginSelectUI;
 
-    [SerializeField] private AuthService _authService;
-    [SerializeField] private UserDataStore _userDataStore;
     [SerializeField] private SignUpController _signUpController;
 
+    private AuthService _authService;
+    private UserDataStore _userDataStore;
     private Action<string> _onLoginSuccess;
     private bool _isProcessing;
-
-    private string _currentUserId;
-    private DbModel _currentDb;
 
     public void Initialize(AuthService authService, UserDataStore userDataStore, Action<string> onLoginSuccess)
     {
@@ -34,10 +33,22 @@ public class LoginController : MonoBehaviour
     private async void HandleLogin()
     {
         if (_isProcessing) return;
+
+        // 로그인 기반 정보 입력 읽어오기
         var credentials = _loginView.GetCredentials();
+        string email = credentials.email;
+        string password = credentials.password;
+
+        // 회원가입 기반 로그인하기 정보 입력 읽어오기
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            var signUpData = _signUpView.GetSignUpData();
+            email = signUpData.email;
+            password = signUpData.password;
+        }
 
         // 입력값 검증
-        if (!ValidateInput(credentials.email, credentials.password))
+        if (!ValidateInput(email, password))
             return;
 
         _isProcessing = true;
@@ -46,7 +57,7 @@ public class LoginController : MonoBehaviour
         try
         {
             // 1단계: Firebase Auth 로그인
-            var user = await _authService.LoginAsync(credentials.email, credentials.password);
+            var user = await _authService.LoginAsync(email, password);
             Debug.Log("파이어베이스 Auth 로그인 ");
             // 2단계: Firestore에서 유저 데이터 조회
             var userData = await _userDataStore.GetUserDataAsync(user.UserId);
@@ -55,26 +66,21 @@ public class LoginController : MonoBehaviour
             if (userData == null)
             {
                 // 유저 데이터가 없으면 닉네임 생성 유도하여 DB 최신화
-                _loginView.ShowNicknameCreationRequired(credentials.email);
+                _loginView.ShowNicknameCreationRequired(email);
                 return;
             }
 
-            _currentUserId = user.UserId;
-            _currentDb = userData;
-
-            var userHeroData = await _userDataStore.GetUserHeroDataAsync(user.UserId);
-            UserDataManager.Instance.SetAllUserData(userData.profile, userData.record, userData.wallet, userHeroData);
-
             // 약관 동의된 상태인지 체크
-            if (!_currentDb.profile.isAgreed)
+            if (!userData.profile.isAgreed)
             {
-                _acceptUI.ShowPanel(() => {
-                    ProceedToGame(_currentUserId, _currentDb);
+                _acceptUI.ShowPanel(async () =>
+                {
+                    await FinalizeLogin(user.UserId);
                 });
                 return;
             }
 
-            ProceedToGame(_currentUserId, _currentDb);
+            await FinalizeLogin(user.UserId);
         }
         catch (Exception ex)
         {
@@ -105,6 +111,11 @@ public class LoginController : MonoBehaviour
             var user = await _authService.SignInWithGoogleAsync();
             Debug.Log("파이어베이스 Auth 로그인 ");
 
+            if (_loginSelectUI.gameObject.activeSelf)
+            {
+                _loginSelectUI.DeActivate();
+            }
+
             // 2단계: Firestore에서 유저 데이터 조회
             var userData = await _userDataStore.GetUserDataAsync(user.UserId);
 
@@ -112,34 +123,31 @@ public class LoginController : MonoBehaviour
             if (userData == null)
             {
                 // 약관 동의 먼저띄우고 난 뒤에
-                _acceptUI.ShowPanel(() => {
+                _acceptUI.ShowPanel(() =>
+                {
                     // 약관 동의 성공 시에만 닉네임 설정 창 오픈
                     _loginView.ShowNicknameCreationRequired(user.UserId);
                     _signUpView.SetNicknameOnlyMode(user.Email);
                     _signUpView.gameObject.SetActive(true);
 
-                    _signUpController.Initialize(_authService, _userDataStore, (nickName) => {
-                        HandlePostSignUpEntry(user.UserId);
+                    _signUpController.Initialize(_authService, _userDataStore, async (data) =>
+                    {
+                        await FinalizeLogin(user.UserId);
                     });
                 });
                 return;
             }
 
-            _currentUserId = user.UserId;
-            _currentDb = userData;
-
-            var userHeroData = await _userDataStore.GetUserHeroDataAsync(user.UserId);
-            UserDataManager.Instance.SetAllUserData(userData.profile, userData.record, userData.wallet, userHeroData);
-
             // 약관 동의된 상태인지 체크
             if (!userData.profile.isAgreed)
             {
-                _acceptUI.ShowPanel(() => {
-                    ProceedToGame(_currentUserId, _currentDb);
+                _acceptUI.ShowPanel(async () =>
+                {
+                    await FinalizeLogin(user.UserId);
                 });
                 return;
             }
-            ProceedToGame(_currentUserId, _currentDb);
+            await FinalizeLogin(user.UserId);
         }
         catch (Exception ex)
         {
@@ -177,24 +185,21 @@ public class LoginController : MonoBehaviour
             _ => "로그인 중 오류가 발생했습니다."
         };
     }
-    private async void HandlePostSignUpEntry(string userId)
-    {
-        var userData = await _userDataStore.GetUserDataAsync(userId);
-        var userHeroData = await _userDataStore.GetUserHeroDataAsync(userId);
-        UserDataManager.Instance.SetAllUserData(userData.profile, userData.record, userData.wallet, userHeroData);
-        ProceedToGame(userId, userData);
-    }
 
-    private async void ProceedToGame(string userId, DbModel Db)
+    private async Task FinalizeLogin(string userId)
     {
         try
         {
+            var userData = await _userDataStore.GetUserDataAsync(userId);
+            var userHeroData = await _userDataStore.GetUserHeroDataAsync(userId);
+
+            // 데이터 캐싱
+            UserDataManager.Instance.SetAllUserData(userData.profile, userData.record, userData.wallet, userHeroData);
             await UserDataManager.Instance.SyncHeroDataAsync();
 
-            // 최종 콜백 (메인 씬 전환 등)
-            _loginView.ShowWelcomeMessage(Db.profile.nickName);
-            _onLoginSuccess?.Invoke(Db.profile.nickName);
-            Debug.Log($"[Final] {Db.profile.nickName}님 게임 진입 프로세스 완료");
+            // 씬 전환 콜백 호출
+            _loginView.ShowWelcomeMessage(userData.profile.nickName);
+            _onLoginSuccess?.Invoke(userData.profile.nickName);
         }
         catch (Exception ex)
         {
