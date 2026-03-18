@@ -139,6 +139,11 @@ MonoBehaviour:
   _nameTxt: {fileID: 7701764867693155674}
   _cardSlot: {fileID: 2652234959704661113}
   _cardPrefab: {fileID: 5866168497398183362, guid: 70ec4b5537a50e3499e63b4a9d60fac2, type: 3}
+  _itemSlots:
+  - {fileID: 3608055945418606596}
+  - {fileID: 3692448479644619176}
+  - {fileID: 1009757642306102387}
+  _itemIconData: {fileID: 11400000, guid: 836b9461e790b0c419b9873f779da732, type: 2}
 --- !u!114 &9098048863288654044
 MonoBehaviour:
   m_ObjectHideFlags: 0
