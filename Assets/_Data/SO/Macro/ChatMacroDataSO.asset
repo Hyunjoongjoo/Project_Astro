@@ -31,15 +31,15 @@ MonoBehaviour:
     emoticonSprite: {fileID: 0}
   - id: m5
     type: 0
-    text: "\uC99D\uAC15 \uC120\uD0DD \uD655\uC778 \uC694\uB9DD"
+    text: "\uB124\uB188\uC744 \uCD94\uACA9\uD574 \uC8FC\uC9C0!"
     emoticonSprite: {fileID: 0}
   - id: m6
     type: 0
-    text: "\uC88C\uCE21 \uB77C\uC778 \uBC29\uC5B4!"
+    text: "\uBE5B\uC774 \uB2F9\uC2E0\uC744 \uD0DC\uC6B8\uAC81\uB2C8\uB2E4"
     emoticonSprite: {fileID: 0}
   - id: m7
     type: 0
-    text: "\uC6B0\uCE21 \uB77C\uC778 \uBC29\uC5B4!"
+    text: "\uC81C\uB9C8\uBC95\uC774 \uB2F9\uC2E0\uC744 \uBD88\uD0DC\uC6B8 \uAC81\uB2C8"
     emoticonSprite: {fileID: 0}
   - id: e1
     type: 1

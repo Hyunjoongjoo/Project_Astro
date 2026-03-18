@@ -78,6 +78,7 @@ public class StageManager : NetworkBehaviour
     // 매치 타입 동기화
     [Networked] private MatchType CurMatchType { get; set; }
 
+
     //더미 클라이언트 존재 여부
     private bool _existDummy;
 
@@ -275,7 +276,7 @@ public class StageManager : NetworkBehaviour
         if (chatManager != null)
         {
             // PlayerDataMap.Count가 2이면 1:1, 4이면 2:2
-            chatManager.RefreshBlockButtons(PlayerDataMap.Count);
+            chatManager.RefreshToggleButtons(PlayerDataMap.Count);
         }
     }
 
@@ -686,6 +687,11 @@ public class StageManager : NetworkBehaviour
         MarkHeroUsed(player, heroId);
     }
 
+    public void NetworkExceptionUiControl(bool panel, bool isWaiting)
+    {
+        _stageUI.SetNetworkExceptionPanel(panel, isWaiting);
+    }
+
     public void MarkHeroUsed(PlayerRef unitOwner, string heroId)
     {
         if (!Object.HasStateAuthority) return;
@@ -733,7 +739,15 @@ public class StageManager : NetworkBehaviour
         if (_teammateUIList.TryGetValue(ownerPlayer, out var ui))
         {
             ui.Refresh(newData); // TeamCardSlotUI의 Refresh 실행
+
+            //3.18 여현구 추가
+            //맵에서 데이터 꺼내서 아이템 보관함도 갱신
+            if (PlayerDataMap.TryGet(ownerPlayer, out var data))
+            {
+                ui.UpdateItems(data.InventoryItems);
+            }
         }
+
     }
 
     //---------차단 유저 관리용 메서드들 ----------

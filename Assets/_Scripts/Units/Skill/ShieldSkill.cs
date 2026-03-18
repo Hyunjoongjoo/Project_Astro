@@ -33,7 +33,7 @@ public class ShieldSkill : ISkill
         if (_cachedUnit.currentTarget != null &&
             _skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner))
         {
-            _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
+            //_skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
             return true;
         }
 
@@ -46,6 +46,7 @@ public class ShieldSkill : ISkill
 
     public void Casting()
     {
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _cachedUnit.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);//중복방지
         var modifier = new StatModifier(_data.damageReduction, StatModType.Flat, this);
         _cachedUnit.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, modifier, _data.duration);

@@ -9,6 +9,7 @@ public class UserDataManager : Singleton<UserDataManager>
 {
     //옵저버 패턴용 이벤트
     public event Action<int> OnGoldChanged;
+    public event Action<int> OnWinCountChanged;
     public event Action OnHeroDataChanged;
 
     private ProfileDbModel _profileModel;
@@ -61,7 +62,10 @@ public class UserDataManager : Singleton<UserDataManager>
                     WalletModel.gold = (int)updates["Wallet.gold"];
 
                 if (updates.ContainsKey("Record.win"))
+                {
                     RecordModel.win = (int)updates["Record.win"];
+                    OnWinCountChanged?.Invoke(RecordModel.win);  // 승리수 변경 알림 발생
+                }
 
                 if (updates.ContainsKey("Record.draw"))
                     RecordModel.draw = (int)updates["Record.draw"];
@@ -235,14 +239,4 @@ public class UserDataManager : Singleton<UserDataManager>
             HeroManager.Instance.InitAllHeroStats(_heroesModel);
         }
     }
-
-    public async Task UpdateAccept(bool successed)
-    {
-        var updateProfile = new Dictionary<string, object>
-        {
-            { "Profile.isAgreed", successed }
-        };
-        await UpdateAll(updates: updateProfile);
-    }
-
 }

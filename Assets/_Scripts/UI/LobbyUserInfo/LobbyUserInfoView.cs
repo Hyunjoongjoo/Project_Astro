@@ -8,6 +8,7 @@ public class LobbyUserInfoView : MonoBehaviour
     [SerializeField] private TMP_Text _nickNameTxt;
     [SerializeField] private TMP_Text _levelTxt;
     [SerializeField] private TMP_Text _goldTxt;
+    [SerializeField] private TMP_Text _winCountTxt;
 
     [Header("경험치 게이지")]
     [SerializeField] private Image _expBar;
@@ -30,5 +31,12 @@ public class LobbyUserInfoView : MonoBehaviour
 
         if (_expTxt != null)
             _expTxt.text = $"{current} / {max}";
+    }
+
+    //승리수 갱신
+    public void SetWinCount(int win)
+    {
+        if (_winCountTxt != null)
+            _winCountTxt.text = $"{win}";
     }
 }
