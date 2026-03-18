@@ -182,6 +182,12 @@ public class UnitController : UnitBase
             agent.isStopped = false;
             agent.SetDestination(destination);
         }
+        if (UnitType == UnitType.Hero)
+        {
+            var hero = this as HeroController;
+            if (hero.StateMachine.CurrentState != hero.DeployState)
+                BoosterRender = true;
+        }
     }
 
     public void StopMove()
@@ -192,6 +198,8 @@ public class UnitController : UnitBase
             agent.ResetPath();
             agent.velocity = Vector3.zero;
         }
+        if (UnitType == UnitType.Hero)
+            BoosterRender = false;
     }
 
     public UnitBase FindTarget()

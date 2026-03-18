@@ -11,8 +11,7 @@ public class ChaseState : IState
 
     public void Enter()
     {
-        if (_unit.UnitType == UnitType.Hero)
-            _unit.BoosterRender = true;
+        
     }
 
     public void Update()
@@ -40,7 +39,5 @@ public class ChaseState : IState
     {
         // 추적을 끝내고 다른 상태로 넘어갈 때 멈춤
         _unit.StopMove();
-        if (_unit.UnitType == UnitType.Hero)
-            _unit.BoosterRender = false;
     }
 }
