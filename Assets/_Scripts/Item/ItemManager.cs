@@ -181,18 +181,17 @@ public class ItemManager : NetworkBehaviour
             {
                 ItemUIManager.Instance.RefreshUI();
             }
-            //3.18 여현구 수정
-            //패킷 대상이 내가 아니고, 동시에 나의 아군일 경우
-            else if (_stageManager != null &&
-                             _stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out var myData) &&
-                             _stageManager.PlayerDataMap.TryGet(targetPlayer, out var targetData) &&
-                             myData.Team == targetData.Team)
-            {
-                //내 화면에 떠 있는 아군 패널 갱신
-                _stageManager.UpdateTeammateUI(targetPlayer, targetData.OwnedHeroes);
-            }
         }
-
+        //3.18 여현구 수정
+        //패킷 대상이 내가 아니고, 동시에 나의 아군일 경우
+        else if (_stageManager != null &&
+                         _stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out var myData) &&
+                         _stageManager.PlayerDataMap.TryGet(targetPlayer, out var targetData) &&
+                         myData.Team == targetData.Team)
+        {
+            //내 화면에 떠 있는 아군 패널 갱신
+            _stageManager.UpdateTeammateUI(targetPlayer, targetData.OwnedHeroes);
+        }
     }
 
 
