@@ -470,12 +470,42 @@ public class StageManager : NetworkBehaviour
             }
             else
             {
-                // 인게임 타이머 4분이 다 됨. 
-                // 시간 종료 시 승패 규칙에 따라 승패 RPC
-                // TODO : 일단 무승부로 처리. 추후 승패 판정 로직 추가
-                RPC_GameOver(Team.None);
+                TimeOver();
             }
         }
+    }
+    private void TimeOver()
+    {
+        if (!Object.HasStateAuthority) return;
+
+        int blueTowerCount = 0;
+        int redTowerCount = 0;
+
+        foreach (var tower in Tower.AliveTowers)
+        {
+            if (tower.team == Team.Blue) blueTowerCount++;
+            else if (tower.team == Team.Red) redTowerCount++;
+        }
+
+        Debug.Log($"남은 타워 수 = Blue: {blueTowerCount}, Red: {redTowerCount}");
+
+        Team victoryTeam = Team.None;
+
+        if (blueTowerCount > redTowerCount)
+        {
+            victoryTeam = Team.Blue;
+        }
+        else if (redTowerCount > blueTowerCount)
+        {
+            victoryTeam = Team.Red;
+        }
+        else
+        {
+            victoryTeam = Team.None;
+        }
+
+        CurrentState = StageState.GameOver;
+        RPC_GameOver(victoryTeam);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -645,7 +675,7 @@ public class StageManager : NetworkBehaviour
 
         // 획득한 골드량과 함께 UI 호출
         //_stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, reward.GoldAmount, reward.UserExp); //이건 나중에 유저 경험치도 하게된다면.
-        _stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, rewardData.gold);
+        _stageUI.ShowResultPanel(resultType, resultHeroes, rewardData.gold);
 
         // UI 출력
         GameManager.Instance.ChangeState(GameState.Result);

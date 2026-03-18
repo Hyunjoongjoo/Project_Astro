@@ -28,7 +28,7 @@ public class TitleController : MonoBehaviour
             _userDataStore = UserDataStore.Instance;
 
             _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
-            _signUpController.Initialize(_authService, _userDataStore);
+            _signUpController.Initialize(_authService, _userDataStore, OnLoginComplete);
             return;
         }
 
@@ -52,7 +52,7 @@ public class TitleController : MonoBehaviour
                     _userDataStore.Initialize();
 
                     _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
-                    _signUpController.Initialize(_authService, _userDataStore);
+                    _signUpController.Initialize(_authService, _userDataStore, OnLoginComplete);
 
                     Debug.Log("[Title] Firebase 및 서비스 주입 완료");
                 }

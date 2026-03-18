@@ -235,14 +235,4 @@ public class UserDataManager : Singleton<UserDataManager>
             HeroManager.Instance.InitAllHeroStats(_heroesModel);
         }
     }
-
-    public async Task UpdateAccept(bool successed)
-    {
-        var updateProfile = new Dictionary<string, object>
-        {
-            { "Profile.isAgreed", successed }
-        };
-        await UpdateAll(updates: updateProfile);
-    }
-
 }
