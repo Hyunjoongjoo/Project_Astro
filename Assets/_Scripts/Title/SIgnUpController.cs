@@ -15,18 +15,32 @@ public class SignUpController : MonoBehaviour
     [SerializeField] private int _minNicknameLength = 2;
     [SerializeField] private int _maxNicknameLength = 8;
 
-    private Action<string> _onSignUpComplete;
+    private Action<SignUpData> _onSignUpComplete;
 
     private AuthService _authService;
     private UserDataStore _userDataStore;
     private bool _isProcessing;
     private bool _isNicknameVerified;
 
-    public void Initialize(AuthService authService, UserDataStore userDataStore, Action<string> onSignUpComplete)
+    public void Initialize(AuthService authService, UserDataStore userDataStore, Action<SignUpData> onSignUpComplete)
     {
-        _authService = authService;
-        _userDataStore = userDataStore;
-        _onSignUpComplete = onSignUpComplete;
+        this._authService = authService;
+        this._userDataStore = userDataStore;
+        this._onSignUpComplete = onSignUpComplete;
+    }
+    private void Start()
+    {
+        // 닉네임 필드 수정되면 바로 이벤트
+        _signUpView.NicknameInput.onValueChanged.AddListener(_ => OnNicknameChanged());
+    }
+
+    private void OnNicknameChanged()
+    {
+        if (_isNicknameVerified)
+        {
+            _isNicknameVerified = false;
+            _signUpView.ShowError("닉네임 중복 확인을 다시 해주세요.");
+        }
     }
 
     public void OnClickActivePanel(bool active)
@@ -152,7 +166,7 @@ public class SignUpController : MonoBehaviour
             await System.Threading.Tasks.Task.Delay(1000);
 
             // 5단계 : 바로 로그인으로 이어주기
-            _onSignUpComplete?.Invoke(input.nickname);
+            _onSignUpComplete?.Invoke(input);
         }
         catch (Firebase.FirebaseException firebaseEx)
         {

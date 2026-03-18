@@ -20,6 +20,8 @@ public class SignUpView : MonoBehaviour
 
     private bool _isGoogleSign = false;
 
+    public TMP_InputField NicknameInput => _nicknameInput;
+
     private void Start()
     {
         HideResultPanel();
