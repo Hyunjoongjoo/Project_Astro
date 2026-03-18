@@ -1,7 +1,7 @@
 ﻿using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections.Generic;
 
 public class HeroController : UnitController
 {
@@ -155,31 +155,32 @@ public class HeroController : UnitController
 
     //3.11 리팩토링
     //콘피그테이블 참조하도록 변경, 팀원 증강 중복방지 
+    //3.18 수정/ 콘피그테이블을 선택 시 체크하도록 변경
     private void ApplyAugments(PlayerNetworkData data)
     {
-        //Config 테이블 참조
-        int reinforceNum = 6; 
-        var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
-        if (config != null) reinforceNum = int.Parse(config.configValue);
 
         for (int i = 0; i < SlotData_5.Length; i++)
         {
-            string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
-            if (string.IsNullOrEmpty(augmentId))
+            string rawId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+            if (string.IsNullOrEmpty(rawId))
                 continue;
 
             //중복 방지
-            if (_appliedAugments.Contains(augmentId))
+            if (_appliedAugments.Contains(rawId))
                 continue;
 
-            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
+            //꼬리표 분리
+            string[] parts = rawId.Split('#');
+            string baseId = parts[0];
+            int tierIndex = 0;
+            if (parts.Length > 1) int.TryParse(parts[1], out tierIndex);
+
+            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(baseId);
             if (so == null)
                 continue;
 
             if (so.TargetHeroID != unitId)
                 continue;
-
-            int tierIndex = data.TotalAugmentPicks >= reinforceNum ? 1 : 0;
 
             if (tierIndex >= so.Tiers.Length)
                 continue;
@@ -189,10 +190,10 @@ public class HeroController : UnitController
             if (newSkill == null)
                 continue;
 
-            Debug.Log($"[팀 공유 스킬 증강 적용] 영웅:{unitId} <- 증강:{augmentId} (Tier: {tierIndex})");
+            Debug.Log($"[팀 공유 스킬 증강 적용] 영웅:{unitId} <- 증강:{baseId} (Tier: {tierIndex})");
 
             //적용된 증강 기록 및 실제 스킬 교체
-            _appliedAugments.Add(augmentId);
+            _appliedAugments.Add(rawId);
             ChangeSkill(newSkill);
         }
     }
