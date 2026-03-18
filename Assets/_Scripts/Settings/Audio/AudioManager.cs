@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -18,6 +19,12 @@ public sealed class AudioManager : Singleton<AudioManager>
 
     [Header("BGM Crossfade")]
     [SerializeField, Min(0f)] private float _bgmFadeSeconds = 1.5f;
+
+    [Header("Sound Stacking")]
+    [SerializeField] private float soundCooldown = 0.1f;
+
+    // 오디오 스태킹 (같은 소리가 다수 호출되어 사운드가 매우 커지는 현상) 방지를 위한 딕셔너리
+    private Dictionary<AudioClip, float> clipLastPlayTimes = new Dictionary<AudioClip, float>();
 
     private Coroutine _fadeCo;
    
@@ -119,7 +126,16 @@ public sealed class AudioManager : Singleton<AudioManager>
 
         if (_sfxTable.TryGetClip(sfx, out var clip) && clip != null)
         {
+            if (clipLastPlayTimes.TryGetValue(clip, out float lastPlayTime))
+            {
+                if (Time.time < lastPlayTime + soundCooldown) 
+                {
+                    return;
+                }
+            }
             _sfxSource.PlayOneShot(clip);
+
+            clipLastPlayTimes[clip] = Time.time;
         }
     }
     #endregion
