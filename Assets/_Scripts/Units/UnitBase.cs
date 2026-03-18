@@ -30,7 +30,7 @@ public abstract class UnitBase : NetworkBehaviour
     public Team team;
     [Networked] public Team networkedTeam { get; set; }
     public UnitType UnitType => unitType;
-    public bool IsDead { get; private set; }
+    public bool IsDead { get; protected set; }
 
     [Networked, HideInInspector, OnChangedRender(nameof(OnHealthChanged))]
     public float CurrentHealth { get; set; }
