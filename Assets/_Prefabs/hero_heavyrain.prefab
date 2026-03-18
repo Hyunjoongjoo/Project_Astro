@@ -68,7 +68,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2145861413312141642}
@@ -581,6 +581,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2456091661076443731}
     m_Modifications:
+    - target: {fileID: 186955301586085266, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: ClampVelocityModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 186955301586085266, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: InitialModule.startSpeed.scalar
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 186955301586085266, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: InitialModule.startSpeed.minScalar
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 187378902408023438, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 187378902408023438, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: InitialModule.startSpeed.scalar
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 187378902408023438, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: InitialModule.startSize.minScalar
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 448342534832510392, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -621,6 +645,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5137199134014721415, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: ClampVelocityModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137199134014721415, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: InitialModule.startSpeed.scalar
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137199134014721415, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: InitialModule.startSpeed.minScalar
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137333535377499547, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137333535377499547, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: InitialModule.startSpeed.scalar
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137333535377499547, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
+      propertyPath: InitialModule.startSize.minScalar
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 9059791950217392644, guid: 94e86e8e0146854408035e9c71460c38, type: 3}
       propertyPath: m_Name
       value: DeployThruster
@@ -647,21 +695,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2456091661076443731}
     m_Modifications:
+    - target: {fileID: 1308342128302156946, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
+      propertyPath: simulationSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1308342128302156946, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
+      propertyPath: VelocityModule.speedModifier.scalar
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4051805283624112772, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
       propertyPath: m_Name
       value: Destroyed
       objectReference: {fileID: 0}
     - target: {fileID: 7462999412968334864, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
       propertyPath: m_LocalScale.x
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7462999412968334864, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
       propertyPath: m_LocalScale.y
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7462999412968334864, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
       propertyPath: m_LocalScale.z
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8804866681676252824, guid: 22ea0c6a01ca1f34794eb6f9ff505483, type: 3}
       propertyPath: m_LocalPosition.x
