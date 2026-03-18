@@ -1,4 +1,5 @@
-﻿using Fusion;
+﻿using DG.Tweening;
+using Fusion;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -9,6 +10,7 @@ public class Projectile : MonoBehaviour
     [Header("폭발 옵션")]
     [SerializeField] private bool _isExplosion;
     [SerializeField] private float _range;
+    [SerializeField] private GameObject _explosionVFX;
 
     private bool isInitialized = false;
     
@@ -104,8 +106,18 @@ public class Projectile : MonoBehaviour
                     else
                         target.TakeDamage(_finalPower);
                 }
-                if (!_isFierce)
+                if (_isExplosion)
+                {
+                    GameObject explosion = Instantiate(_explosionVFX, target.transform.position, Quaternion.identity);
+                    explosion.transform.DOScale(0f, 0f);
+                    explosion.transform.DOScale(_range * 1.8f, 0.3f);
+                    Destroy(explosion, 0.7f);
                     Destroy(gameObject);
+                }
+                if (!_isFierce)
+                {
+                    Destroy(gameObject);
+                }
             }
         }
     }

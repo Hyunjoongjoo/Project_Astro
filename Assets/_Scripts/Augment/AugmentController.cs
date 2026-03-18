@@ -186,8 +186,13 @@ public class AugmentController : NetworkBehaviour
                 List<string> mySkills = new List<string>();
                 for (int i = 0; i < SlotData_5.Length; i++)
                 {
-                    string skillId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
-                    if (!string.IsNullOrEmpty(skillId)) mySkills.Add(skillId);
+                    string rawId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+                    if (!string.IsNullOrEmpty(rawId))
+                    {
+                        //#뒷부분 잘라내고 baseId만 덱 매니저에게 전달
+                        string baseId = rawId.Split('#')[0];
+                        mySkills.Add(baseId);
+                    }
                 }
 
                 //3.13 로직 변경

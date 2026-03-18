@@ -31,15 +31,15 @@ MonoBehaviour:
     emoticonSprite: {fileID: 0}
   - id: m5
     type: 0
-    text: "\uB124\uB188\uC744 \uCD94\uACA9\uD574 \uC8FC\uC9C0!"
+    text: "\uC6B0\uCE21\uC73C\uB85C \uC9C0\uC6D0!"
     emoticonSprite: {fileID: 0}
   - id: m6
     type: 0
-    text: "\uBE5B\uC774 \uB2F9\uC2E0\uC744 \uD0DC\uC6B8\uAC81\uB2C8\uB2E4"
+    text: "\uC88C\uCE21\uC73C\uB85C \uC9C0\uC6D0!"
     emoticonSprite: {fileID: 0}
   - id: m7
     type: 0
-    text: "\uC81C\uB9C8\uBC95\uC774 \uB2F9\uC2E0\uC744 \uBD88\uD0DC\uC6B8 \uAC81\uB2C8"
+    text: "\uC544\uC774\uD15C \uD544\uC694!"
     emoticonSprite: {fileID: 0}
   - id: e1
     type: 1
@@ -69,3 +69,11 @@ MonoBehaviour:
     type: 1
     text: 
     emoticonSprite: {fileID: 21300000, guid: 2f687d4452dc74d6489d7513e5ec2a3d, type: 3}
+  - id: m8
+    type: 0
+    text: "\uC99D\uAC15 \uC120\uD0DD \uD544\uC694!"
+    emoticonSprite: {fileID: 0}
+  - id: e8
+    type: 1
+    text: 
+    emoticonSprite: {fileID: 21300000, guid: 69fe394513a9f445e90f477f9ca10259, type: 3}

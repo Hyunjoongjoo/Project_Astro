@@ -195,6 +195,7 @@ MonoBehaviour:
   _isFierce: 0
   _isExplosion: 1
   _range: 5
+  _explosionVFX: {fileID: 6393617126741755569, guid: a3cac60d2139acb4095a6b7bdbf7e223, type: 3}
 --- !u!135 &-261796513836111599
 SphereCollider:
   m_ObjectHideFlags: 0
