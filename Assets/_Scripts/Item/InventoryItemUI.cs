@@ -42,7 +42,11 @@ public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         //빈 슬롯이면 드래그 불가
         //3.16 임시슬롯도 드래그 방어
-        if (!_iconImg.gameObject.activeSelf || InventoryIndex == 99) return;
+        if (!_iconImg.gameObject.activeSelf || InventoryIndex == 99)
+        {
+            eventData.pointerDrag = null;
+            return;
+        }
 
         //롤백용
         _originPos = _rectTransform.anchoredPosition;
@@ -57,15 +61,14 @@ public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (!_iconImg.gameObject.activeSelf) return;
+        if (!_iconImg.gameObject.activeSelf || InventoryIndex == 99) return;
 
         _rectTransform.position = eventData.position;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (!_iconImg.gameObject.activeSelf) return;
-
+        if (!_iconImg.gameObject.activeSelf || InventoryIndex == 99) return;
         _canvasGroup.blocksRaycasts = true;
 
         //타겟검사로직

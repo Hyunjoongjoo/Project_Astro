@@ -11,6 +11,9 @@ public static class AugmentExecutor
         //플레이어 데이터 가져오기
         PlayerNetworkData playerData = stageManager.PlayerDataMap.Get(player);
 
+        //3.18 카드 구매 당시의 픽 횟수를 기억
+        int currentPicks = playerData.TotalAugmentPicks;
+
         //누적 횟수 증가 => 카드확정시에만
         playerData.TotalAugmentPicks++;
 
@@ -72,6 +75,14 @@ public static class AugmentExecutor
                 //구매자의 TotalAugmentPicks 증가된 내역 덮어씌우기
                 stageManager.PlayerDataMap.Set(player, playerData);
 
+                //Config에서 요구치 가져와서 현재 픽 횟수를 기준으로 티어 계산
+                int reinforceNum = 6;
+                var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
+                if (config != null) reinforceNum = int.Parse(config.configValue);
+
+                int tierIndex = (currentPicks >= reinforceNum) ? 1 : 0;
+                string savedId = $"{refId}#{tierIndex}";
+
                 //현재 접속 중인 우리 팀원들 모두 찾기
                 List<PlayerRef> teamMembers = new List<PlayerRef>();
                 foreach (var kvp in stageManager.PlayerDataMap)
@@ -90,12 +101,13 @@ public static class AugmentExecutor
                         //빈 슬롯을 찾아 스킬 증강 상태 기록
                         if (string.IsNullOrEmpty(memberData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim()))
                         {
-                            memberData.OwnedSkillAugments = memberData.OwnedSkillAugments.Set(i, refId);
+                            //꼬리표 달기
+                            memberData.OwnedSkillAugments = memberData.OwnedSkillAugments.Set(i, savedId);
                             break;
                         }
                     }
                     stageManager.PlayerDataMap.Set(member, memberData);
-                    Debug.Log($"아군 플레이어 {member} 의 스킬 상태 갱신 (적용된 스킬: {refId})");
+                    Debug.Log($"아군 플레이어 {member} 의 스킬 상태 갱신 (적용된 스킬: {savedId})");
                 }
                 break;
         }
