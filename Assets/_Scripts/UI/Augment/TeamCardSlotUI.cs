@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TeamCardSlotUI : MonoBehaviour
 {
@@ -9,6 +10,9 @@ public class TeamCardSlotUI : MonoBehaviour
     [SerializeField] private Transform _cardSlot;
     [SerializeField] private TeamHeroCardUI _cardPrefab;
 
+    [Header("Item UI")]
+    [SerializeField] private Image[] _itemSlots;
+    [SerializeField] private ItemIconDataSO _itemIconData;
     //3.15 추가
     public PlayerRef AllyPlayerRef { get; private set; }
 
@@ -18,8 +22,6 @@ public class TeamCardSlotUI : MonoBehaviour
         _nameTxt.text = nickname;
         AllyPlayerRef = allyRef;
     }
-
-
 
     //데이터 변경시 호출
     public void Refresh(SlotData_5 heroData)
@@ -46,4 +48,30 @@ public class TeamCardSlotUI : MonoBehaviour
             }
         }
     }
+
+   //3.18
+   //매니저가 아이템 데이터를 던져주면 화면에 그리는 함수
+   public void UpdateItems(SlotData_3 inventoryData)
+   {
+       if (_itemSlots == null || _itemIconData == null) return;
+
+       for (int i = 0; i < SlotData_3.Length; i++)
+       {
+           if (i < _itemSlots.Length)
+           {
+               string itemId = inventoryData.Get(i).Replace("\0", "").Trim();
+               
+               if (!string.IsNullOrEmpty(itemId))
+               {
+                   _itemSlots[i].sprite = _itemIconData.GetIcon(itemId);
+                   _itemSlots[i].gameObject.SetActive(true);
+               }
+               else
+               {
+                   _itemSlots[i].gameObject.SetActive(false); //빈칸이면 끄기
+               }
+           }
+       }
+   }
+
 }

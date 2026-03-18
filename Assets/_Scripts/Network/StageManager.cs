@@ -739,7 +739,15 @@ public class StageManager : NetworkBehaviour
         if (_teammateUIList.TryGetValue(ownerPlayer, out var ui))
         {
             ui.Refresh(newData); // TeamCardSlotUI의 Refresh 실행
+
+            //3.18 여현구 추가
+            //맵에서 데이터 꺼내서 아이템 보관함도 갱신
+            if (PlayerDataMap.TryGet(ownerPlayer, out var data))
+            {
+                ui.UpdateItems(data.InventoryItems);
+            }
         }
+
     }
 
     //---------차단 유저 관리용 메서드들 ----------
