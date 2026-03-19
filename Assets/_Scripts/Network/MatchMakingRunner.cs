@@ -14,7 +14,7 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
     // 매치 대기 타이머 코루틴을 추적하기 위한 변수
     private Coroutine _matchTimerCoroutine;
-    private readonly float WAIT_TIME_FOR_DUMMY = 15f; // 15초 대기
+    private readonly float WAIT_TIME_FOR_DUMMY = 999f; // 15초 대기
 
     private bool _existDummy = false;
 

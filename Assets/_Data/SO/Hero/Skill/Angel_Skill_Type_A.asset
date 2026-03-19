@@ -20,8 +20,8 @@ MonoBehaviour:
   skillVFX: {fileID: 7343538280686139031, guid: 921bfdf400594b2459b6504da1d4e296, type: 3}
   skillType: 2
   initCooldown: 5
-  cooldown: 10
-  healCoefficient: 1.5
+  cooldown: 6
+  healCoefficient: 1
   range: 3
   duration: 0
   interval: 0
