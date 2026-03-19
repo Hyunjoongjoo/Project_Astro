@@ -46,7 +46,7 @@ public class UnitController : UnitBase
     public float HealPower => _unitStat.HealPower.Value;//나중에 힐스킬에 연결
     public float MoveSpeed => _unitStat.MoveSpeed.Value;
     public float DetectRange => _unitStat.DetectRange.Value;
-
+    
     public UnitBase CurrentTarget => currentTarget;
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;

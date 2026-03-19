@@ -15,7 +15,11 @@ public class HeroController : UnitController
     private Vector3 _targetPos;
     private float _deployDelay;
     private StageManager _stageManager;
+    private NetworkPrefabRef _myPrefab;
+    private float _finalCooldown;
+    private PlayerRef _ownerPlayer;
 
+    public float FinalCooldown => _finalCooldown;
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
     public ISkill CurUniqueSkill => curUniqueSkill;
@@ -68,7 +72,6 @@ public class HeroController : UnitController
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
-        _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = MoveSpeed;
 
         if (agent != null)
@@ -89,6 +92,8 @@ public class HeroController : UnitController
         DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
         ApplyEquippedItems();
+        _finalCooldown = GetFinalRespawnCooldown();
+        HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
     }
 
     private void OnDestroy()
@@ -127,12 +132,17 @@ public class HeroController : UnitController
     // --- 생성시 초기화 관련 메서드 ---
 
     // 스폰 전에 실행되는 메서드
-    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay)
+    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab, PlayerRef owner)
     {
         _targetPos = targetPos;
         _deployDelay = deployDelay;
+        _myPrefab = prefab;
+        _ownerPlayer = owner;
 
         Setup(myTeam);
+
+        HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
+        _respawnTime = statData.spawnCooldown;
     }
 
     // 스킬 타입에 맞는 VFX 프리팹 반환
@@ -230,12 +240,26 @@ public class HeroController : UnitController
         }
     }
 
+    public float GetFinalRespawnCooldown()
+    {
+        // 기본 쿨
+        float baseCooldown = _unitStat.RespawnTime.Value;
+
+        // 쿨감
+        float cooldownReduction = _unitStat.CooldownReduction.Value;
+
+        // 계산
+        float finalCooldown = baseCooldown * (1f - cooldownReduction);
+
+        return Mathf.Max(finalCooldown, 0.1f);
+    }
+
     private void ApplyEquippedItems()
     {
         if (!Object.HasStateAuthority) return;
 
         //자신의 영웅 슬롯 인덱스 찾기
-        var playerData = _stageManager.PlayerDataMap.Get(Object.StateAuthority);
+        var playerData = _stageManager.PlayerDataMap.Get(_ownerPlayer);
         int myHeroIndex = -1;
 
         for (int i = 0; i < SlotData_5.Length; i++)
