@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Tachyon_Skill_Type_B_enhance
   m_EditorClassIdentifier: Assembly-CSharp::OnHitSkillSO
   heroId: hero_tachyon
+  skillIcon: {fileID: 0}
   skillName: 
   skillDescription: 
   note: 
@@ -20,5 +21,5 @@ MonoBehaviour:
   skillType: 3
   initCooldown: 3
   cooldown: 3
-  additionalDamageRatio: 2
+  additionalDamageRatio: -0.2
   onhitPerAttack: 4
