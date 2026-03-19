@@ -69,7 +69,6 @@ public class HeroController : UnitController
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
-        //_respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = MoveSpeed;
 
         if (agent != null)
@@ -92,7 +91,6 @@ public class HeroController : UnitController
         ApplyEquippedItems();
         _finalCooldown = GetFinalRespawnCooldown();
         HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
-        Debug.Log($"[쿨 시작] owner:{_ownerPlayer.PlayerId}, finalCooldown:{_finalCooldown}");
     }
 
     private void OnDestroy()
@@ -141,8 +139,6 @@ public class HeroController : UnitController
 
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
         _respawnTime = statData.spawnCooldown;
-        //float reduction = statData.cooltimeReduce;
-        //_finalCooldown = Mathf.Max(_respawnTime * (1f - reduction), 0.1f);
     }
 
     // 스킬 타입에 맞는 VFX 프리팹 반환
@@ -257,11 +253,11 @@ public class HeroController : UnitController
     private void ApplyEquippedItems()
     {
         if (!Object.HasStateAuthority) return;
-        Debug.Log($"[PlayerDataMap] contains owner:{_ownerPlayer.PlayerId} = {_stageManager.PlayerDataMap.ContainsKey(_ownerPlayer)}");
+
         //자신의 영웅 슬롯 인덱스 찾기
         var playerData = _stageManager.PlayerDataMap.Get(_ownerPlayer);
         int myHeroIndex = -1;
-        Debug.Log($"[아이템 적용] owner:{_ownerPlayer.PlayerId}");
+
         for (int i = 0; i < SlotData_5.Length; i++)
         {
             string ownedId = playerData.OwnedHeroes.Get(i).Replace("\0", "").Trim();

@@ -28,20 +28,12 @@ public class HeroSpawner : NetworkBehaviour
     [Networked, Capacity(32)]
     private NetworkDictionary<int, CooldownData> CooldownMap => default;
 
-    // 플레이어,영웅 프리팹 기준으로 소환 쿨다운을 분리 관리
-  //  private readonly Dictionary<(PlayerRef, int), float> _endTimes
-  //= new Dictionary<(PlayerRef, int), float>();
-
-  //  private readonly Dictionary<(PlayerRef, int), float> _cooldownDurations
-  //  = new Dictionary<(PlayerRef, int), float>();
-
     public override void Spawned()
     {
         Instance = this;
     }
     private int GetPrefabId(NetworkPrefabRef prefab)
     {
-        //return _prefabs.IndexOf(prefab);
         int index = _prefabs.IndexOf(prefab);
 
         if (index < 0)
@@ -55,26 +47,9 @@ public class HeroSpawner : NetworkBehaviour
 
     private int GetKey(PlayerRef player, int prefabId)
     {
-        //return player.PlayerId * 100 + prefabId;
         return (player.PlayerId << 16) | prefabId;
     }
-    //private int GetPrefabId(NetworkPrefabRef prefab)
-    //{
-    //    return prefab.GetHashCode();
-    //}
 
-    //private bool CanSummon(PlayerRef player, NetworkPrefabRef prefab)//소환 가능한지 여부
-    //{
-    //    int prefabId = GetPrefabId(prefab);
-    //    var key = (player, prefabId);
-
-    //    if (!_endTimes.TryGetValue(key, out float endTime))
-    //    {
-    //        return true;
-    //    }
-
-    //    return Runner.SimulationTime >= endTime;
-    //}
     private bool CanSummon(PlayerRef player, NetworkPrefabRef prefab)
     {
         int prefabId = GetPrefabId(prefab);
@@ -203,17 +178,6 @@ public class HeroSpawner : NetworkBehaviour
         return Mathf.Lerp(_minDeployTime, _maxDeployTime, time);
     }
 
-    //public void StartSummonCooldown(PlayerRef player, NetworkPrefabRef prefab, float cooldown)
-    //{
-    //    int prefabId = GetPrefabId(prefab);
-    //    float endTime = Runner.SimulationTime + cooldown;
-    //    var key = (player, prefabId);
-    //    _endTimes[key] = endTime;
-    //    _cooldownDurations[key] = cooldown;
-
-    //    RPC_SyncCooldown(player, prefabId, endTime, cooldown);
-    //    Debug.Log($"[쿨타임 시작] player:{player}, prefab:{prefab}, cd:{cooldown}");
-    //}
     public void StartSummonCooldown(PlayerRef player, NetworkPrefabRef prefab, float cooldown)
     {
         if (!Object.HasStateAuthority) return;
@@ -230,35 +194,8 @@ public class HeroSpawner : NetworkBehaviour
         Debug.Log($"[쿨타임 시작] player:{player.PlayerId}, prefabId:{prefabId}, cd:{cooldown}");
     }
 
-    //[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    //private void RPC_SyncCooldown(PlayerRef player, int prefabId, float endTime, float total)
-    //{
-    //    var key = (player, prefabId);
-
-    //    _endTimes[key] = endTime;
-    //    _cooldownDurations[key] = total;
-    //}
 
     //UI에서 사용할수있도록 메서드로 지정한 플레이어와 프리팹에 대한 남은 소환 쿨타임을 반환
-    //public float GetRemainingCooldown(PlayerRef player, NetworkPrefabRef prefab)
-    //{
-    //    //Runner가 아직 준비되지 않았으면 쿨 없음으로 처리
-    //    if (Runner == null || !Runner.IsRunning)
-    //    {
-    //        return 0f;
-    //    }
-    //    int prefabId = GetPrefabId(prefab);
-    //    var key = (player, prefabId);
-
-    //    if (!_endTimes.TryGetValue(key, out float endTime))
-    //    {
-    //        return 0f;
-    //    }
-
-    //    float remaining = endTime - Runner.SimulationTime;
-
-    //    return Mathf.Max(remaining, 0f);
-    //}
     public float GetRemainingCooldown(PlayerRef player, NetworkPrefabRef prefab)
     {
         if (Runner == null || !Runner.IsRunning)
@@ -275,18 +212,7 @@ public class HeroSpawner : NetworkBehaviour
 
         return 0f;
     }
-    //public float GetTotalCooldown(PlayerRef player, NetworkPrefabRef prefab)
-    //{
-    //    int prefabId = GetPrefabId(prefab);
-    //    var key = (player, prefabId);
 
-    //    if (_cooldownDurations.TryGetValue(key, out float total))
-    //    {
-    //        return total;
-    //    }
-
-    //    return 0f;
-    //}
     public float GetTotalCooldown(PlayerRef player, NetworkPrefabRef prefab)
     {
         int prefabId = GetPrefabId(prefab);
@@ -299,8 +225,6 @@ public class HeroSpawner : NetworkBehaviour
 
         return 0f;
     }
-
-
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_SpawnUnit(NetworkPrefabRef prefab, Vector3 spawnPos, Team team, RpcInfo info = default)
@@ -329,21 +253,6 @@ public class HeroSpawner : NetworkBehaviour
              hero.Setup(team, spawnPos, deployDelay, prefab, caller);
          });
     }
-
-    //private float GetFinalCooldown(PlayerRef player, NetworkPrefabRef prefab)
-    //{
-    //    // 기본 쿨
-    //    HeroStatData data = HeroManager.Instance.GetStatusByPrefab(prefab);
-
-    //    float baseCooldown = data.spawnCooldown;
-
-    //    // TODO: 나중에 플레이어 쿨감 적용
-    //    float cooldownReduction = 0f;
-
-    //    float final = baseCooldown * (1f - cooldownReduction);
-
-    //    return Mathf.Max(final, 0.1f);
-    //}
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()
