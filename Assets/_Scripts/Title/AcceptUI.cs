@@ -10,6 +10,7 @@ public class AcceptUI : MonoBehaviour
     [Header("UI Panels & Text")]
     [SerializeField] private GameObject _acceptPanel;
     [SerializeField] private TextMeshProUGUI _noticeText;
+    [SerializeField] private AnimUI _loginSelectPanel;
 
     [Header("Toggles")]
     [SerializeField] private Toggle _allToggle;
@@ -24,7 +25,7 @@ public class AcceptUI : MonoBehaviour
     private const string DEFAULT_MSG = "게임 이용을 위해 필수 약관 동의가 필요합니다.";
     private bool _isIgnoreEvent = false;
 
-    public event Action OnAgreementComplete;
+    private Action _currentSuccessCallback;
 
     private void Start()
     {
@@ -38,9 +39,10 @@ public class AcceptUI : MonoBehaviour
     }
 
     // 조건 처리 시 완료 안됐을때 동의창 띄울 메서드
-    public void ShowPanel()
+    public void ShowPanel(Action onSuccess)
     {
         ResetUI();
+        _currentSuccessCallback = onSuccess;
         _acceptPanel.SetActive(true);
     }
 
@@ -69,31 +71,21 @@ public class AcceptUI : MonoBehaviour
     #endregion
 
     #region 버튼 액션
-    public async void OnClickStart()
+    public void OnClickStart()
     {
         // 필수 약관 처리
         bool isEssentialAgreed = _subToggles[0].isOn && _subToggles[1].isOn;
 
         if (isEssentialAgreed)
         {
-            try
-            {
-                _startBtn.interactable = false;
-                await UserDataManager.Instance.UpdateAccept(true);
+            _startBtn.interactable = false;
+            Debug.Log("필수 약관 동의 완료. 로그인 플로우 진행");
 
-                Debug.Log("필수 약관 동의 완료. 로그인 플로우 진행");
+            _startBtn.interactable = true;
+            _acceptPanel.SetActive(false);
 
-                _startBtn.interactable = true;
-                _acceptPanel.SetActive(false);
-
-                OnAgreementComplete?.Invoke();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"약관 업데이트 실패: {ex.Message}");
-                ShowText("데이터 저장에 실패했습니다. 다시 시도해주세요.");
-                _startBtn.interactable = true;
-            }
+            _currentSuccessCallback?.Invoke();
+            _currentSuccessCallback = null;            
         }
         else
         {
@@ -104,6 +96,12 @@ public class AcceptUI : MonoBehaviour
 
     public void OnClickCancel()
     {
+        // 구글 버튼을 통한 패널일 경우
+        if (AuthService.Instance.CurrentUser != null)
+        {
+            AuthService.Instance.Logout();
+            _loginSelectPanel.Open();
+        }
         ResetUI();
         _acceptPanel.SetActive(false);
     }

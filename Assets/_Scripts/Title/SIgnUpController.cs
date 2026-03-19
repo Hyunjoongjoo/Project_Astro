@@ -6,6 +6,8 @@ public class SignUpController : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private SignUpView _signUpView;
+    [SerializeField] private AcceptUI _acceptUI;
+    [SerializeField] private AnimUI _loginSelectPanel;
 
     [Header("Validation")]
     [SerializeField] private int _minPasswordLength = 8;
@@ -13,20 +15,51 @@ public class SignUpController : MonoBehaviour
     [SerializeField] private int _minNicknameLength = 2;
     [SerializeField] private int _maxNicknameLength = 8;
 
+    private Action<SignUpData> _onSignUpComplete;
+
     private AuthService _authService;
     private UserDataStore _userDataStore;
     private bool _isProcessing;
     private bool _isNicknameVerified;
 
-    public void Initialize(AuthService authService, UserDataStore userDataStore)
+    public void Initialize(AuthService authService, UserDataStore userDataStore, Action<SignUpData> onSignUpComplete)
     {
-        _authService = authService;
-        _userDataStore = userDataStore;
+        this._authService = authService;
+        this._userDataStore = userDataStore;
+        this._onSignUpComplete = onSignUpComplete;
+    }
+    private void Start()
+    {
+        // 닉네임 필드 수정되면 바로 이벤트
+        _signUpView.NicknameInput.onValueChanged.AddListener(_ => OnNicknameChanged());
+    }
+
+    private void OnNicknameChanged()
+    {
+        if (_isNicknameVerified)
+        {
+            _isNicknameVerified = false;
+            _signUpView.ShowError("닉네임 중복 확인을 다시 해주세요.");
+        }
     }
 
     public void OnClickActivePanel(bool active)
     {
-        _signUpView.gameObject.SetActive(active);
+        if (active)
+        {
+            _acceptUI.ShowPanel(() => { 
+                _signUpView.gameObject.SetActive(true); 
+            });
+        }
+        else
+        {
+            if (AuthService.Instance.CurrentUser != null)
+            {
+                AuthService.Instance.Logout();
+                _loginSelectPanel.Open();
+            }
+            _signUpView.gameObject.SetActive(false);
+        }
     }
 
     public void OnClickCheckNickname()
@@ -128,6 +161,12 @@ public class SignUpController : MonoBehaviour
 
             // 4단계: 성공 메시지 표시
             _signUpView.ShowSignUpSuccess(input.nickname);
+
+            // 4.5단계 : 글 읽을 시간 주기
+            await System.Threading.Tasks.Task.Delay(1000);
+
+            // 5단계 : 바로 로그인으로 이어주기
+            _onSignUpComplete?.Invoke(input);
         }
         catch (Firebase.FirebaseException firebaseEx)
         {

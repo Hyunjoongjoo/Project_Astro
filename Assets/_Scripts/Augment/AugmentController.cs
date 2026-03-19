@@ -186,8 +186,13 @@ public class AugmentController : NetworkBehaviour
                 List<string> mySkills = new List<string>();
                 for (int i = 0; i < SlotData_5.Length; i++)
                 {
-                    string skillId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
-                    if (!string.IsNullOrEmpty(skillId)) mySkills.Add(skillId);
+                    string rawId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+                    if (!string.IsNullOrEmpty(rawId))
+                    {
+                        //#뒷부분 잘라내고 baseId만 덱 매니저에게 전달
+                        string baseId = rawId.Split('#')[0];
+                        mySkills.Add(baseId);
+                    }
                 }
 
                 //3.13 로직 변경
@@ -257,7 +262,7 @@ public class AugmentController : NetworkBehaviour
                 string myId1 = myCards.Count > 1 ? myCards[1].targetId : ""; int myType1 = myCards.Count > 1 ? (int)myCards[1].type : -1;
                 string myId2 = myCards.Count > 2 ? myCards[2].targetId : ""; int myType2 = myCards.Count > 2 ? (int)myCards[2].type : -1;
 
-                if (teamCards != null && teamCards.Count == 3)
+                if (teamCards != null && teamCards.Count > 0)
                 {
                     string tId0 = teamCards.Count > 0 ? teamCards[0].targetId : ""; int tType0 = teamCards.Count > 0 ? (int)teamCards[0].type : -1;
                     string tId1 = teamCards.Count > 1 ? teamCards[1].targetId : ""; int tType1 = teamCards.Count > 1 ? (int)teamCards[1].type : -1;
@@ -295,7 +300,7 @@ public class AugmentController : NetworkBehaviour
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
             if (config != null) reinforceNum = int.Parse(config.configValue);
 
-            // 임시 보관소에 저장
+            //임시 보관소에 저장
             _tempMyCards = new List<AugmentData>();
             var card0 = RebuildAugmentData(id0.ToString(), (AugmentType)type0, myData, reinforceNum, "MyCard_1");
             if (card0 != null) _tempMyCards.Add(card0);
@@ -304,7 +309,7 @@ public class AugmentController : NetworkBehaviour
             var card2 = RebuildAugmentData(id2.ToString(), (AugmentType)type2, myData, reinforceNum, "MyCard_3");
             if (card2 != null) _tempMyCards.Add(card2);
 
-            // 1vs1 모드라면 더 기다릴 것 없이 바로 화면에 출력!
+            //1vs1 모드라면 더 기다릴 것 없이 바로 화면에 출력
             if (!hasTeamCards && _tempMyCards.Count > 0)
             {
                 AugmentManager.Instance.ShowAugmentWindow(_tempMyCards, null, "", isForcedOpen);
@@ -313,7 +318,7 @@ public class AugmentController : NetworkBehaviour
                 {
                     RPC_StartInGameAugmentTimer(Runner.LocalPlayer);
                 }
-                _tempMyCards = null; // 사용 후 비우기
+                _tempMyCards = null; //사용 후 비우기
             }
         }
     }

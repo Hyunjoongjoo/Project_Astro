@@ -90,7 +90,7 @@ public class UserDataStore : Singleton<UserDataStore>
                         { "nickName", nickname },
                         { "userLevel", 1 },
                         { "userExp", 0 },
-                        { "isAgreed", false },
+                        { "isAgreed", true },
                         { "createdAt", FieldValue.ServerTimestamp }
                     }
                 },

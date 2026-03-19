@@ -1,4 +1,5 @@
 using Fusion;
+using System.Collections;
 using UnityEngine;
 
 //아이템 장착, 공유 등의 가능여부를 서버가 검증하고 처리하기 위한 클래스
@@ -166,6 +167,13 @@ public class ItemManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_RefreshItemUI(PlayerRef targetPlayer)
     {
+        StartCoroutine(DelayedRefreshItemUI(targetPlayer));
+
+    }
+
+    private IEnumerator DelayedRefreshItemUI(PlayerRef targetPlayer)
+    {
+        yield return new WaitForSeconds(0.1f);
         //대상자 로컬에서만 새로고침
         if (Runner.LocalPlayer == targetPlayer)
         {
@@ -174,7 +182,19 @@ public class ItemManager : NetworkBehaviour
                 ItemUIManager.Instance.RefreshUI();
             }
         }
+        //3.18 여현구 수정
+        //패킷 대상이 내가 아니고, 동시에 나의 아군일 경우
+        else if (_stageManager != null &&
+                         _stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out var myData) &&
+                         _stageManager.PlayerDataMap.TryGet(targetPlayer, out var targetData) &&
+                         myData.Team == targetData.Team)
+        {
+            //내 화면에 떠 있는 아군 패널 갱신
+            _stageManager.UpdateTeammateUI(targetPlayer, targetData.OwnedHeroes);
+        }
     }
+
+
 
     private void OnDestroy()
     {

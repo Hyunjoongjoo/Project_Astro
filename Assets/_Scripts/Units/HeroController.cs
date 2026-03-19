@@ -1,7 +1,7 @@
 ﻿using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections.Generic;
 
 public class HeroController : UnitController
 {
@@ -15,7 +15,11 @@ public class HeroController : UnitController
     private Vector3 _targetPos;
     private float _deployDelay;
     private StageManager _stageManager;
+    private NetworkPrefabRef _myPrefab;
+    private float _finalCooldown;
+    private PlayerRef _ownerPlayer;
 
+    public float FinalCooldown => _finalCooldown;
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
     public ISkill CurUniqueSkill => curUniqueSkill;
@@ -27,7 +31,6 @@ public class HeroController : UnitController
     //이번 스폰/갱신 때 이미 적용한 스킬 증강 ID를 기억해서 중복 덮어쓰기 방지
     private HashSet<string> _appliedAugments = new HashSet<string>();
 
-
     public override void Spawned()
     {
         BaseUnitInit();
@@ -38,6 +41,10 @@ public class HeroController : UnitController
         curUniqueSkill = _standardSkillData.CreateInstance(this);
 
         _stageManager = FindFirstObjectByType<StageManager>();
+
+        HeroAnimator = GetComponent<Animator>();
+        // 부스터는 반드시 자식 오브젝트에서 첫번째에 위치한다.
+        BoosterAnimator = transform.GetChild(0).GetComponent<Animator>();
 
         if (!Object.HasStateAuthority) return;
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
@@ -65,7 +72,6 @@ public class HeroController : UnitController
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
-        _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = MoveSpeed;
 
         if (agent != null)
@@ -86,6 +92,8 @@ public class HeroController : UnitController
         DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
         ApplyEquippedItems();
+        _finalCooldown = GetFinalRespawnCooldown();
+        HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
     }
 
     private void OnDestroy()
@@ -99,10 +107,11 @@ public class HeroController : UnitController
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority) return;
-        if (IsDead) return; // 사망 시 중단 (혹은 DieState에서 처리)
 
         // 기본 스킬의 시전은 어느 상태든 상관없이 조건만 만족하면 바로 전환한다.
-        if (StateMachine.CurrentState != DeployState && StateMachine.CurrentState != CastState)
+        if (StateMachine.CurrentState != DieState &&
+            StateMachine.CurrentState != DeployState &&
+            StateMachine.CurrentState != CastState)
         {
             if (curUniqueSkill.UsingConditionCheck())
             {
@@ -123,12 +132,17 @@ public class HeroController : UnitController
     // --- 생성시 초기화 관련 메서드 ---
 
     // 스폰 전에 실행되는 메서드
-    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay)
+    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab, PlayerRef owner)
     {
         _targetPos = targetPos;
         _deployDelay = deployDelay;
+        _myPrefab = prefab;
+        _ownerPlayer = owner;
 
         Setup(myTeam);
+
+        HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
+        _respawnTime = statData.spawnCooldown;
     }
 
     // 스킬 타입에 맞는 VFX 프리팹 반환
@@ -155,31 +169,32 @@ public class HeroController : UnitController
 
     //3.11 리팩토링
     //콘피그테이블 참조하도록 변경, 팀원 증강 중복방지 
+    //3.18 수정/ 콘피그테이블을 선택 시 체크하도록 변경
     private void ApplyAugments(PlayerNetworkData data)
     {
-        //Config 테이블 참조
-        int reinforceNum = 6; 
-        var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
-        if (config != null) reinforceNum = int.Parse(config.configValue);
 
         for (int i = 0; i < SlotData_5.Length; i++)
         {
-            string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
-            if (string.IsNullOrEmpty(augmentId))
+            string rawId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+            if (string.IsNullOrEmpty(rawId))
                 continue;
 
             //중복 방지
-            if (_appliedAugments.Contains(augmentId))
+            if (_appliedAugments.Contains(rawId))
                 continue;
 
-            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
+            //꼬리표 분리
+            string[] parts = rawId.Split('#');
+            string baseId = parts[0];
+            int tierIndex = 0;
+            if (parts.Length > 1) int.TryParse(parts[1], out tierIndex);
+
+            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(baseId);
             if (so == null)
                 continue;
 
             if (so.TargetHeroID != unitId)
                 continue;
-
-            int tierIndex = data.TotalAugmentPicks >= reinforceNum ? 1 : 0;
 
             if (tierIndex >= so.Tiers.Length)
                 continue;
@@ -189,10 +204,10 @@ public class HeroController : UnitController
             if (newSkill == null)
                 continue;
 
-            Debug.Log($"[팀 공유 스킬 증강 적용] 영웅:{unitId} <- 증강:{augmentId} (Tier: {tierIndex})");
+            Debug.Log($"[팀 공유 스킬 증강 적용] 영웅:{unitId} <- 증강:{baseId} (Tier: {tierIndex})");
 
             //적용된 증강 기록 및 실제 스킬 교체
-            _appliedAugments.Add(augmentId);
+            _appliedAugments.Add(rawId);
             ChangeSkill(newSkill);
         }
     }
@@ -225,12 +240,26 @@ public class HeroController : UnitController
         }
     }
 
+    public float GetFinalRespawnCooldown()
+    {
+        // 기본 쿨
+        float baseCooldown = _unitStat.RespawnTime.Value;
+
+        // 쿨감
+        float cooldownReduction = _unitStat.CooldownReduction.Value;
+
+        // 계산
+        float finalCooldown = baseCooldown * (1f - cooldownReduction);
+
+        return Mathf.Max(finalCooldown, 0.1f);
+    }
+
     private void ApplyEquippedItems()
     {
         if (!Object.HasStateAuthority) return;
 
         //자신의 영웅 슬롯 인덱스 찾기
-        var playerData = _stageManager.PlayerDataMap.Get(Object.StateAuthority);
+        var playerData = _stageManager.PlayerDataMap.Get(_ownerPlayer);
         int myHeroIndex = -1;
 
         for (int i = 0; i < SlotData_5.Length; i++)
@@ -293,6 +322,11 @@ public class HeroController : UnitController
                 Debug.LogWarning($"{unitId} 프리팹 확인 필요,  HeroItemObserver 컴포넌트");
             }
         }
+    }
+
+    public override void Render()
+    {
+        BoosterAnimator.SetBool("isActive", BoosterRender);
     }
 
 #if UNITY_EDITOR
