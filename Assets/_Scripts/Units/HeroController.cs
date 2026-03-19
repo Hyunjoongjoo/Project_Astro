@@ -16,7 +16,10 @@ public class HeroController : UnitController
     private float _deployDelay;
     private StageManager _stageManager;
     private NetworkPrefabRef _myPrefab;
+    private float _finalCooldown;
+    private PlayerRef _ownerPlayer;
 
+    public float FinalCooldown => _finalCooldown;
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
     public ISkill CurUniqueSkill => curUniqueSkill;
@@ -87,8 +90,9 @@ public class HeroController : UnitController
         DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
         ApplyEquippedItems();
-        float finalCooldown = GetFinalRespawnCooldown();
-        HeroSpawner.Instance.StartSummonCooldown(Object.InputAuthority, _myPrefab, finalCooldown);
+        _finalCooldown = GetFinalRespawnCooldown();
+        HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
+        Debug.Log($"[쿨 시작] owner:{_ownerPlayer.PlayerId}, finalCooldown:{_finalCooldown}");
     }
 
     private void OnDestroy()
@@ -126,15 +130,19 @@ public class HeroController : UnitController
     // --- 생성시 초기화 관련 메서드 ---
 
     // 스폰 전에 실행되는 메서드
-    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab)
+    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab, PlayerRef owner)
     {
         _targetPos = targetPos;
         _deployDelay = deployDelay;
         _myPrefab = prefab;
+        _ownerPlayer = owner;
 
         Setup(myTeam);
+
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
         _respawnTime = statData.spawnCooldown;
+        //float reduction = statData.cooltimeReduce;
+        //_finalCooldown = Mathf.Max(_respawnTime * (1f - reduction), 0.1f);
     }
 
     // 스킬 타입에 맞는 VFX 프리팹 반환
@@ -249,11 +257,11 @@ public class HeroController : UnitController
     private void ApplyEquippedItems()
     {
         if (!Object.HasStateAuthority) return;
-
+        Debug.Log($"[PlayerDataMap] contains owner:{_ownerPlayer.PlayerId} = {_stageManager.PlayerDataMap.ContainsKey(_ownerPlayer)}");
         //자신의 영웅 슬롯 인덱스 찾기
-        var playerData = _stageManager.PlayerDataMap.Get(Object.StateAuthority);
+        var playerData = _stageManager.PlayerDataMap.Get(_ownerPlayer);
         int myHeroIndex = -1;
-
+        Debug.Log($"[아이템 적용] owner:{_ownerPlayer.PlayerId}");
         for (int i = 0; i < SlotData_5.Length; i++)
         {
             string ownedId = playerData.OwnedHeroes.Get(i).Replace("\0", "").Trim();

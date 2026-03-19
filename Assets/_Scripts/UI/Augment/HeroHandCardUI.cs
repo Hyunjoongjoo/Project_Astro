@@ -73,7 +73,7 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         float remaining = HeroSpawner.Instance.GetRemainingCooldown(player, prefab);
         float total = HeroSpawner.Instance.GetTotalCooldown(player, prefab);
-
+        Debug.Log($"[UI쿨] player:{player.PlayerId} prefab:{prefab}, remaining:{remaining}, total:{total}");
         UpdateCooldownUI(remaining, total);
     }
 
