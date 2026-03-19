@@ -15,6 +15,7 @@ public class HeroController : UnitController
     private Vector3 _targetPos;
     private float _deployDelay;
     private StageManager _stageManager;
+    private NetworkPrefabRef _myPrefab;
 
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
@@ -65,7 +66,7 @@ public class HeroController : UnitController
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
-        _respawnTime = _unitStat.RespawnTime.Value;
+        //_respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = MoveSpeed;
 
         if (agent != null)
@@ -86,6 +87,8 @@ public class HeroController : UnitController
         DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
         ApplyEquippedItems();
+        float finalCooldown = GetFinalRespawnCooldown();
+        HeroSpawner.Instance.StartSummonCooldown(Object.InputAuthority, _myPrefab, finalCooldown);
     }
 
     private void OnDestroy()
@@ -123,12 +126,15 @@ public class HeroController : UnitController
     // --- 생성시 초기화 관련 메서드 ---
 
     // 스폰 전에 실행되는 메서드
-    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay)
+    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab)
     {
         _targetPos = targetPos;
         _deployDelay = deployDelay;
+        _myPrefab = prefab;
 
         Setup(myTeam);
+        HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
+        _respawnTime = statData.spawnCooldown;
     }
 
     // 스킬 타입에 맞는 VFX 프리팹 반환
@@ -224,6 +230,20 @@ public class HeroController : UnitController
         {
             agent.speed = MoveSpeed;
         }
+    }
+
+    public float GetFinalRespawnCooldown()
+    {
+        // 기본 쿨
+        float baseCooldown = _unitStat.RespawnTime.Value;
+
+        // 쿨감
+        float cooldownReduction = _unitStat.CooldownReduction.Value;
+
+        // 계산
+        float finalCooldown = baseCooldown * (1f - cooldownReduction);
+
+        return Mathf.Max(finalCooldown, 0.1f);
     }
 
     private void ApplyEquippedItems()

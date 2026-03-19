@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
@@ -17,24 +18,33 @@ public class HeroSpawner : NetworkBehaviour
     [SerializeField] private float _maxDeployDistance = 14f;
 
     // 플레이어,영웅 프리팹 기준으로 소환 쿨다운을 분리 관리
-    private readonly Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer> _respawnTimers
-    = new Dictionary<(PlayerRef, NetworkPrefabRef), TickTimer>();
+    private readonly Dictionary<(PlayerRef, int), float> _endTimes
+  = new Dictionary<(PlayerRef, int), float>();
+
+    private readonly Dictionary<(PlayerRef, int), float> _cooldownDurations
+    = new Dictionary<(PlayerRef, int), float>();
 
     public override void Spawned()
     {
         Instance = this;
     }
 
+    private int GetPrefabId(NetworkPrefabRef prefab)
+    {
+        return prefab.GetHashCode();
+    }
+
     private bool CanSummon(PlayerRef player, NetworkPrefabRef prefab)//소환 가능한지 여부
     {
-        var key = (player, prefab);
+        int prefabId = GetPrefabId(prefab);
+        var key = (player, prefabId);
 
-        if (!_respawnTimers.TryGetValue(key, out TickTimer timer))
+        if (!_endTimes.TryGetValue(key, out float endTime))
         {
             return true;
         }
 
-        return timer.ExpiredOrNotRunning(Runner);
+        return Runner.SimulationTime >= endTime;
     }
     
     private int GetDestroyedTowerCount(Team team)//현재 파괴된 포탑 수
@@ -154,10 +164,25 @@ public class HeroSpawner : NetworkBehaviour
         return Mathf.Lerp(_minDeployTime, _maxDeployTime, time);
     }
 
-    private void StartSummonCooldown(PlayerRef player, NetworkPrefabRef prefab, float cooldown)
+    public void StartSummonCooldown(PlayerRef player, NetworkPrefabRef prefab, float cooldown)
     {
-        var key = (player, prefab);
-        _respawnTimers[key] = TickTimer.CreateFromSeconds(Runner, cooldown);
+        int prefabId = GetPrefabId(prefab);
+        float endTime = Runner.SimulationTime + cooldown;
+        var key = (player, prefabId);
+        _endTimes[key] = endTime;
+        _cooldownDurations[key] = cooldown;
+
+        RPC_SyncCooldown(player, prefabId, endTime, cooldown);
+        Debug.Log($"[쿨타임 시작] player:{player}, prefab:{prefab}, cd:{cooldown}");
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_SyncCooldown(PlayerRef player, int prefabId, float endTime, float total)
+    {
+        var key = (player, prefabId);
+
+        _endTimes[key] = endTime;
+        _cooldownDurations[key] = total;
     }
 
     //UI에서 사용할수있도록 메서드로 지정한 플레이어와 프리팹에 대한 남은 소환 쿨타임을 반환
@@ -168,20 +193,30 @@ public class HeroSpawner : NetworkBehaviour
         {
             return 0f;
         }
+        int prefabId = GetPrefabId(prefab);
+        var key = (player, prefabId);
 
-        var key = (player, prefab);
-
-        if (!_respawnTimers.TryGetValue(key, out TickTimer timer))
+        if (!_endTimes.TryGetValue(key, out float endTime))
         {
             return 0f;
         }
 
-        if (timer.ExpiredOrNotRunning(Runner))
+        float remaining = endTime - Runner.SimulationTime;
+
+        return Mathf.Max(remaining, 0f);
+    }
+
+    public float GetTotalCooldown(PlayerRef player, NetworkPrefabRef prefab)
+    {
+        int prefabId = GetPrefabId(prefab);
+        var key = (player, prefabId);
+
+        if (_cooldownDurations.TryGetValue(key, out float total))
         {
-            return 0f;
+            return total;
         }
 
-        return timer.RemainingTime(Runner).GetValueOrDefault();
+        return 0f;
     }
 
 
@@ -218,9 +253,7 @@ public class HeroSpawner : NetworkBehaviour
             onBeforeSpawned: (Runner, obj) =>
             {
                 HeroController hero = obj.GetComponent<HeroController>();
-                hero.Setup(team, spawnPos, deployDelay);
-                //배치 및 지연 처리는 컨트롤러가 수행
-                StartSummonCooldown(caller, prefab, hero.RespawnTime);
+                hero.Setup(team, spawnPos, deployDelay, prefab);
             });
     }
 #if UNITY_EDITOR
