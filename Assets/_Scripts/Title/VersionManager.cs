@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
@@ -7,10 +8,19 @@ using UnityEngine;
 
 public class VersionManager : Singleton<VersionManager>
 {
+    [SerializeField] private GameObject _versionResultPrefab;
+
     public struct userAttributes { }
     public struct appAttributes { }
 
     private bool _isPopupActive = false;
+
+    private Coroutine _checkRoutine;
+
+    private void Start()
+    {
+        _ = InitializeAsync();
+    }
 
     // 초기화 및 최초 버전 체크
     public async Task InitializeAsync()
@@ -35,6 +45,12 @@ public class VersionManager : Singleton<VersionManager>
             await FetchAndCheckVersion();
 
             Debug.Log("[VersionManager] 초기화 및 실시간 리스너 등록 완료");
+
+            if (_checkRoutine != null)
+            {
+                StopCoroutine(_checkRoutine);
+            }
+            _checkRoutine = StartCoroutine(Co_PeriodicVersionCheck(10f));
         }
         catch (Exception e)
         {
@@ -44,37 +60,28 @@ public class VersionManager : Singleton<VersionManager>
 
     private async Task FetchAndCheckVersion()
     {
-        // 최신 설정값 가져오기
+        // 최신 설정값 요청하기
         await RemoteConfigService.Instance.FetchConfigsAsync(new userAttributes(), new appAttributes());
     }
 
-    // ApplyRemoteConfig 방식 (데이터가 도착했을 때 실행)
+    // ApplyRemoteConfig 방식 (데이터가 도착했을 때 이벤트 실행)
     private void ApplyRemoteConfig(ConfigResponse configResponse)
     {
         // 응답 상태 확인
         if (configResponse.status != ConfigRequestStatus.Success)
         {
-            Debug.LogWarning($"[VersionManager] 데이터 로드 실패 : {configResponse.status}");
+            Debug.LogWarning($"[VersionManager] : 데이터 로드 실패 : {configResponse.status}");
             return;
         }
 
-        // 데이터 출처 로그
-        switch (configResponse.requestOrigin)
+        if(GameManager.Instance.FlowState == SceneState.Stage)
         {
-            case ConfigOrigin.Default:
-                Debug.Log("[VersionManager] 기본값 사용 중");
-                break;
-            case ConfigOrigin.Cached:
-                Debug.Log("[VersionManager] 캐시된 데이터 사용 중");
-                break;
-            case ConfigOrigin.Remote:
-                Debug.Log("[VersionManager] 서버에서 새 데이터 로드 완료");
-                break;
+            Debug.LogWarning("[VersionManager] : 현재 Stage씬이라 실패.");
+            return;
         }
 
         // 대시보드에 설정한 "MinVersion" 키값 읽기
-        string minVersionStr = RemoteConfigService.Instance.appConfig.GetString("MinVersion", "1.0.0");
-
+        string minVersionStr = RemoteConfigService.Instance.appConfig.GetString("MinVersion", "0.0.1");
         ProcessVersionCheck(minVersionStr);
     }
 
@@ -92,24 +99,57 @@ public class VersionManager : Singleton<VersionManager>
             }
             else
             {
-                Debug.Log($"[VersionManager] 버전 체크 통과 : 현재({currentVersion}) / 최소({minVersion})");
+                Debug.Log($"[VersionManager] : 버전 체크 통과 : 현재({currentVersion}) / 최소({minVersion})");
             }
         }
         catch (Exception e)
         {
-            Debug.LogError($"[VersionManager] 버전 형식 오류 ({minVersionStr}) : {e.Message}");
+            Debug.LogError($"[VersionManager] : 버전 오류 ({minVersionStr}) : {e.Message}");
         }
     }
 
     private void ShowUpdatePopup()
     {
         if (_isPopupActive) return;
-        _isPopupActive = true;
+        string updateUrl = RemoteConfigService.Instance.appConfig.GetString("UpdateURL", "https://play.google.com/");
+        Debug.Log($"[VersionManager] : {updateUrl}");
+        if (_versionResultPrefab != null)
+        {
+            _isPopupActive = true;
+            //프리팹 생성하고?
+            GameObject popup = Instantiate(_versionResultPrefab);
 
-        Debug.LogError("업데이트가 필요합니다. 팝업 띄움.");
-        // 여기에 띄울 팝업 세팅하기(전역적으로 쓸 예정이니 프리팹화 된 패널 하나, 확인버튼 시 업데이트 URL 및 앱종료)
-        // 팝업은 Panel, Text, button인데 "최신버전으로 업데이트가 필요합니다!" 일 뿐이니 따로 추가작업은 필요없을듯.
-        // 프리팹화해둔 버튼 자체에 그냥 string으로 url입력해두고 [url + 앱종료] 호출만 하는 방식으로 처리하면 될듯?
+            //컴포넌트 찾고?
+            var popupUI = popup.GetComponentInChildren<VersionPopupUI>();
+
+            //할당을 한다.
+            if (popupUI != null)
+            {
+                popupUI.Setup(updateUrl);
+            }
+        }
+        else
+        {
+            Debug.Log("[VersionManager] : 팝업 프리팹이 없슴다.");
+        }
+    }
+
+    private IEnumerator Co_PeriodicVersionCheck(float interval)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(interval);
+
+            // 매칭 플레이 중 이거나 이미 팝업이 떠 있다면 잠시 패스
+            if (GameManager.Instance.FlowState == SceneState.Stage || _isPopupActive)
+            {
+                Debug.Log("[VersionManager] 게임 진행 중 또는 팝업이 떠있어 패스.");
+                continue;
+            }
+
+            // 서버에 최신 데이터 요청
+            _ = FetchAndCheckVersion();
+        }
     }
 
     private void OnDestroy()

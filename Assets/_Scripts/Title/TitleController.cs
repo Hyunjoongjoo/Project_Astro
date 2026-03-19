@@ -12,9 +12,8 @@ public class TitleController : MonoBehaviour
     private UserDataStore _userDataStore;
     private AuthService _authService;
 
-    async void Start()
+    void Start()
     {
-        //await VersionManager.Instance.InitializeAsync();
         InitializeFirebase();
         GameManager.Instance.SetSceneState(SceneState.Title);
     }
