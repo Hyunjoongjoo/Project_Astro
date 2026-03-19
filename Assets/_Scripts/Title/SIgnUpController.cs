@@ -1,5 +1,4 @@
-﻿using Firebase.Firestore;
-using System;
+﻿using System;
 using UnityEngine;
 
 // 회원가입 비즈니스 로직
@@ -7,6 +6,8 @@ public class SignUpController : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private SignUpView _signUpView;
+    [SerializeField] private AcceptUI _acceptUI;
+    [SerializeField] private AnimUI _loginSelectPanel;
 
     [Header("Validation")]
     [SerializeField] private int _minPasswordLength = 8;
@@ -14,20 +15,51 @@ public class SignUpController : MonoBehaviour
     [SerializeField] private int _minNicknameLength = 2;
     [SerializeField] private int _maxNicknameLength = 8;
 
+    private Action<SignUpData> _onSignUpComplete;
+
     private AuthService _authService;
     private UserDataStore _userDataStore;
     private bool _isProcessing;
     private bool _isNicknameVerified;
 
-    public void Initialize(AuthService authService, UserDataStore userDataStore)
+    public void Initialize(AuthService authService, UserDataStore userDataStore, Action<SignUpData> onSignUpComplete)
     {
-        _authService = authService;
-        _userDataStore = userDataStore;
+        this._authService = authService;
+        this._userDataStore = userDataStore;
+        this._onSignUpComplete = onSignUpComplete;
+    }
+    private void Start()
+    {
+        // 닉네임 필드 수정되면 바로 이벤트
+        _signUpView.NicknameInput.onValueChanged.AddListener(_ => OnNicknameChanged());
+    }
+
+    private void OnNicknameChanged()
+    {
+        if (_isNicknameVerified)
+        {
+            _isNicknameVerified = false;
+            _signUpView.ShowError("닉네임 중복 확인을 다시 해주세요.");
+        }
     }
 
     public void OnClickActivePanel(bool active)
     {
-        _signUpView.gameObject.SetActive(active);
+        if (active)
+        {
+            _acceptUI.ShowPanel(() => { 
+                _signUpView.gameObject.SetActive(true); 
+            });
+        }
+        else
+        {
+            if (AuthService.Instance.CurrentUser != null)
+            {
+                AuthService.Instance.Logout();
+                _loginSelectPanel.Open();
+            }
+            _signUpView.gameObject.SetActive(false);
+        }
     }
 
     public void OnClickCheckNickname()
@@ -104,17 +136,37 @@ public class SignUpController : MonoBehaviour
 
         try
         {
-            // 1단계: Firebase Auth 계정 생성
-            var user = await _authService.SignUpAsync(input.email, input.password);
+            if(input.isGoogle)
+            {
+                var currentUser = _authService.CurrentUser; // 현재 로그인된 유저 정보 가져오기
 
-            // 2단계: 사용자 프로필 업데이트 (닉네임)
-            await _authService.UpdateProfileAsync(user, input.nickname);
+                if (currentUser != null)
+                {
+                    // 이미 인증은 끝났으니 프로필 업데이트와 DB 생성만 수행
+                    await _authService.UpdateProfileAsync(currentUser, input.nickname);
+                    await _userDataStore.CreateUserDataAsync(currentUser.UserId, input.nickname);
+                }
+            }
+            else
+            {
+                // 1단계: Firebase Auth 계정 생성
+                var newUser = await _authService.SignUpAsync(input.email, input.password);
 
-            // 3단계: Firestore에 유저 데이터 생성
-            await _userDataStore.CreateUserDataAsync(user.UserId, input.nickname);
+                // 2단계: 사용자 프로필 업데이트 (닉네임)
+                await _authService.UpdateProfileAsync(newUser, input.nickname);
+
+                // 3단계: Firestore에 유저 데이터 생성
+                await _userDataStore.CreateUserDataAsync(newUser.UserId, input.nickname);
+            }
 
             // 4단계: 성공 메시지 표시
             _signUpView.ShowSignUpSuccess(input.nickname);
+
+            // 4.5단계 : 글 읽을 시간 주기
+            await System.Threading.Tasks.Task.Delay(1000);
+
+            // 5단계 : 바로 로그인으로 이어주기
+            _onSignUpComplete?.Invoke(input);
         }
         catch (Firebase.FirebaseException firebaseEx)
         {
@@ -140,27 +192,39 @@ public class SignUpController : MonoBehaviour
         if (nickname.Length < _minNicknameLength || nickname.Length > _maxNicknameLength)
             return $"nickname is {_minNicknameLength}~{_maxNicknameLength} characters.";
 
+        try
+        {
+            InputValidator.ValidateOrThrow(nickname);
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
+        }
+
         return null;
     }
 
     private string ValidateSignUpInput(SignUpData input)
     {
-        // 이메일 검증
-        if (string.IsNullOrWhiteSpace(input.email))
-            return "이메일을 입력해주세요.";
+        if(!input.isGoogle)
+        {
+            // 이메일 검증
+            if (string.IsNullOrWhiteSpace(input.email))
+                return "이메일을 입력해주세요.";
 
-        if (!input.email.Contains("@"))
-            return "올바른 이메일 형식이 아닙니다.";
+            if (!input.email.Contains("@"))
+                return "올바른 이메일 형식이 아닙니다.";
 
-        // 비밀번호 검증
-        if (string.IsNullOrWhiteSpace(input.password))
-            return "비밀번호를 입력해주세요.";
+            // 비밀번호 검증
+            if (string.IsNullOrWhiteSpace(input.password))
+                return "비밀번호를 입력해주세요.";
 
-        if (input.password.Length < _minPasswordLength || input.password.Length > _maxPasswordLength)
-            return $"비밀번호는 {_minPasswordLength}~{_maxPasswordLength}자여야 합니다.";
+            if (input.password.Length < _minPasswordLength || input.password.Length > _maxPasswordLength)
+                return $"비밀번호는 {_minPasswordLength}~{_maxPasswordLength}자여야 합니다.";
 
-        if (input.password != input.passwordConfirm)
-            return "비밀번호가 일치하지 않습니다.";
+            if (input.password != input.passwordConfirm)
+                return "비밀번호가 일치하지 않습니다.";
+        }
 
         // 닉네임 검증
         var nicknameError = ValidateNickname(input.nickname);
@@ -188,6 +252,7 @@ public class SignUpController : MonoBehaviour
 // 회원가입 입력 데이터
 public struct SignUpData
 {
+    public bool isGoogle;
     public string email;
     public string password;
     public string passwordConfirm;

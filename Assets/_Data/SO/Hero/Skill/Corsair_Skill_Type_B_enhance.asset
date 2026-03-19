@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 906afe7c667c0444788587ba088d1cb0, type: 3}
+  m_Name: Corsair_Skill_Type_B_enhance
+  m_EditorClassIdentifier: Assembly-CSharp::DashSkillSO
+  heroId: hero_corsair
+  skillName: enhance_augment_name_corsair_B
+  skillDescription: 
+  note: 
+  skillVFX: {fileID: 0}
+  skillType: 3
+  initCooldown: 5
+  cooldown: 7
+  dashSpeed: 25
+  canDashMaxDistance: 7
+  canDashMinDistance: 2
+  dashCount: 3
+  dashInterval: 0.15
+  damageRatio: 3
+  areaOfEffect: 0
+  attackRange: 0

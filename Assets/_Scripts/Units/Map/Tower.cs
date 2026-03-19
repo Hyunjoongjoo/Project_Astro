@@ -1,36 +1,32 @@
-﻿using System.Collections.Generic;
-using Fusion;
+﻿using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
-
-public class Tower : Structure, IBasicAttack, ITargetFinder
+public class Tower : UnitBase
 {
-    public static List<Structure> AliveTowers = new List<Structure>();
+    public static List<Tower> AliveTowers = new List<Tower>();
 
-    [SerializeField] private float _attackPower;
-    [SerializeField] private float _attackSpeed = 1f;
-    [SerializeField] private GameObject _projectilePrefab;
+    [Header("타워 스테이터스")]
+    [SerializeField] private string _unitId;
     [SerializeField] private Transform _firePoint;
-
-    [SerializeField] private float _detectRange;
     [SerializeField] private LayerMask _targetLayer;
     [SerializeField] private float _scanInterval = 0.5f;
+
+    [Header("스킬 데이터")]
+    [Header("타워 공격")]
+    [SerializeField] protected BaseSkillSO _normalAttackData;
 
     private UnitBase _currentTarget;
 
     private TickTimer _scanTimer;
     private TickTimer _attackTimer;
-    private UnitFSM _fsm;
 
-    public float AttackPower { get => _attackPower; }
-    public float AttackSpeed { get => _attackSpeed; }
-    public float AttackRange { get => _detectRange; }
-    public float SearchRange { get => _detectRange; }
-    public LayerMask TargetLayer { get => _targetLayer; }
-    public float SearchInterval { get => _scanInterval; }
+    public float AttackPower => _unitStat.Attack.Value;
+    public float AttackSpeed => _unitStat.AttackSpeed.Value;
+    public float SearchRange => _unitStat.DetectRange.Value;
+    public LayerMask TargetLayer => _targetLayer;
+    public float SearchInterval => _scanInterval;
 
-    //[Networked] public TickTimer AttackInterval { get; set; }
 
     public override void Spawned()
     {
@@ -38,27 +34,27 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
 
         unitType = UnitType.Tower;
 
-        if (!Object.HasStateAuthority)
-        {
-            return;
-        }
+        if (!Object.HasStateAuthority) return;
+        if (_unitStat == null) _unitStat = GetComponent<UnitStat>();
 
-        _fsm = new UnitFSM();
+        UnitData data = TableManager.Instance.UnitTable.Get(_unitId);
 
-        CurrentState = UnitState.Idle;
+        _unitStat.Init(data);
+
+        MaxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = MaxHealth;
+
+        Debug.Log(
+            $"[적용된 타워 스텟]\n" +
+            $"ID : {_unitId}\n" +
+            $"HP : {MaxHealth}\n" +
+            $"Attack : {AttackPower}\n" +
+            $"AttackSpeed : {AttackSpeed}\n" +
+            $"DetectRange : {SearchRange}"
+            );
 
         _scanTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-        //if (team == Team.Blue)
-        //{
-        //    gameObject.layer = LayerMask.NameToLayer("BlueTeam");
-        //    _targetLayer = 1 << LayerMask.NameToLayer("RedTeam");
-        //}
-        //else
-        //{
-        //    gameObject.layer = LayerMask.NameToLayer("RedTeam");
-        //    _targetLayer = 1 << LayerMask.NameToLayer("BlueTeam");
-        //}
     }
 
     private void OnEnable()
@@ -76,119 +72,62 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
 
     public override void FixedUpdateNetwork()
     {
-        if (!Object.HasStateAuthority)
+        if (!Object.HasStateAuthority) return;
+        if (IsDead) return;
+        if (GameManager.Instance.IsGameStarted == false) return;
+
+        if (_currentTarget == null || _currentTarget.IsDead)
         {
-            return;
-        }
-
-        if (CurrentState == UnitState.Dead)
-        {
-            return;
-        }
-
-        if (_fsm.State == UnitAIState.Detect && _scanTimer.ExpiredOrNotRunning(Runner))
-        {
-            _currentTarget = FindTarget();
-            _scanTimer = TickTimer.CreateFromSeconds(Runner, _scanInterval);
-        }
-
-        bool hasTarget = _currentTarget != null;
-        bool inRange = hasTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= AttackRange;
-        bool isDead = CurrentState == UnitState.Dead;
-
-        _fsm.DecideState(isDead, hasTarget, inRange);
-        ApplyState(_fsm.State);
-    }
-
-    private void ApplyState(UnitAIState state)
-    {
-        switch (state)
-        {
-            case UnitAIState.Detect:
-                HandleDetect();
-                break;
-
-            case UnitAIState.Attack:
-                HandleAttack();
-                break;
-
-            case UnitAIState.Dead:
-                break;
-        }
-    }
-
-    //private void UpdateDetect()
-    //{
-    //    if (!_scanTimer.ExpiredOrNotRunning(Runner))
-    //    {
-    //        return;
-    //    }
-
-    //    _currentTarget = FindTarget();
-    //    _scanTimer = TickTimer.CreateFromSeconds(Runner, _scanInterval);
-    //}
-
-    private void HandleDetect()
-    {
-        CurrentState = UnitState.Idle;
-    }
-
-    private void HandleAttack()
-    {
-        CurrentState = UnitState.Attack;
-        UpdateAttack();
-    }
-
-    private void UpdateAttack()
-    {
-        if (_currentTarget == null)
-        {
-            return;
-        }
-
-        if (!_attackTimer.ExpiredOrNotRunning(Runner))
-        {
-            return;
-        }
-        _currentTarget.TakeDamage(_attackPower);
-
-        RPC_PlayAttackEffect(_currentTarget.transform.position);
-
-        float cooldown;
-
-        if (AttackSpeed > 0f)
-        {
-            cooldown = 1f / AttackSpeed;
+            if (_scanTimer.ExpiredOrNotRunning(Runner))
+            {
+                _currentTarget = FindTarget();
+                _scanTimer = TickTimer.CreateFromSeconds(Runner, _scanInterval);
+            }
         }
         else
         {
-            cooldown = 1f;
+            if (_attackTimer.ExpiredOrNotRunning(Runner))
+            {
+                // 공격 전 타겟과의 거리가 정말 유효한지 체크
+                if (Vector3.Distance(transform.position, _currentTarget.transform.position) > SearchRange)
+                {
+                    _currentTarget = null;
+                    return;
+                }
+                PerformAttack();
+                _attackTimer = TickTimer.CreateFromSeconds(Runner, _normalAttackData.cooldown);
+            }
         }
+    }
 
-        _attackTimer = TickTimer.CreateFromSeconds(Runner, cooldown);
+    private void PerformAttack()
+    {
+        _currentTarget.TakeDamage(AttackPower);
+        RPC_PlayAttackEffect(_currentTarget.transform.position, AttackPower);
     }
 
     //투사체(현재는 이펙트만)
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayAttackEffect(Vector3 targetPos)
+    private void RPC_PlayAttackEffect(Vector3 targetPos, float power)
     {
-        if (_projectilePrefab == null || _firePoint == null)
-        {
-            return;
-        }
+        if (_normalAttackData.skillVFX == null || _firePoint == null) return;
 
-        var projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.identity);
-        projectile.GetComponent<Projectile>()?.Fire(targetPos, team);
+        // 타겟을 향하는 기본 방향
+        Vector3 directionToTarget = (targetPos - _firePoint.position).normalized;
+        Quaternion baseRotation = Quaternion.LookRotation(directionToTarget);
+
+        GameObject projectileObj = Instantiate(_normalAttackData.skillVFX, _firePoint.position, baseRotation);
+        Projectile projectile = projectileObj.GetComponent<Projectile>();
+
+        projectile.Initialize(_normalAttackData as ProjectileSkillSO, networkedTeam, power, Runner);
+        projectile.Fire(targetPos);
     }
 
     public UnitBase FindTarget()//가까운 적 거리 기준 찾기
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, _detectRange, _targetLayer);
+        Collider[] hits = Physics.OverlapSphere(transform.position, SearchRange, _targetLayer);
 
-        if (hits.Length == 0)
-        {
-            return null;
-        }
+        if (hits.Length == 0) return null;
 
         float minDistance = float.MaxValue;
         UnitBase closest = null;
@@ -200,11 +139,6 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
             {
                 continue;
             }
-
-            //if (unit.team == this.team)
-            //{
-            //    continue;
-            //}
 
             float distance = Vector3.Distance(transform.position, unit.transform.position);
             if (distance < minDistance)
@@ -218,15 +152,29 @@ public class Tower : Structure, IBasicAttack, ITargetFinder
 
     public override void Die()
     {
-        _fsm?.ForceDead();
         base.Die();
     }
 
-#if UNITY_EDITOR
-    private void OnDrawGizmosSelected()//탐지 범위 시각화
+    //사망 이펙트
+    public override void Despawned(NetworkRunner runner, bool hasState)
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, _detectRange);
+        if (!hasState) return;
+        if (deathEffectPrefab != null)
+        {
+            GameObject deathEffectObject = Instantiate(
+                deathEffectPrefab,
+                transform.position,
+                transform.rotation
+            );
+            Vector3 offset = transform.position;
+            if (networkedTeam == Team.Blue)
+                offset.z -= 2;
+            else
+                offset.z += 2;
+
+            deathEffectObject.transform.position = offset;
+
+            Destroy(deathEffectObject, deathEffectLifeTime);
+        }
     }
-#endif
 }

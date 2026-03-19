@@ -1,147 +1,84 @@
-﻿using DG.Tweening;
-using Fusion;
+﻿using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-
-public enum UnitSize
+public class HeroController : UnitController
 {
-    Small, Medium, Large
-}
+    // === 미니언 속성에 추가로 영웅만이 가지는 필드 ===
 
-public class HeroController : MobilityUnit, IBasicAttack
-{
+    [Header("기본 스킬 (증강 미적용)")]
+    [SerializeField] private BaseSkillSO _standardSkillData;
 
-    [SerializeField] private HeroDataSO _heroData;
-    [SerializeField] private Transform _firePoint;
-
-    [Header("타워 레퍼런스")]
-    [SerializeField] private UnitBase _enemyTowerA;
-    [SerializeField] private UnitBase _enemyTowerB;
-    [SerializeField] private UnitBase _enemyBridge;
-
-    [SerializeField] private UnitStat _unitStat;
-    [SerializeField] private SkillDataSO _skillData;
-    [SerializeField] private MonoBehaviour _skillComponent;
-
-    private float _attackRange;
     private float _respawnTime;
-    private AttackType _attackType;
-    private GameObject _projectile;
+    public ISkill curUniqueSkill;
+    private Vector3 _targetPos;
+    private float _deployDelay;
+    private StageManager _stageManager;
+    private NetworkPrefabRef _myPrefab;
+    private float _finalCooldown;
+    private PlayerRef _ownerPlayer;
 
-    private UnitBase _currentTarget;
-
-    private TickTimer _searchTimer;
-    private TickTimer _attackTimer;
-    private TickTimer _skillTimer;
-    private UnitFSM _fsm;
-
-    //배치
-    private bool _isDeploying;
-    private Vector3 _deployTarget;
-    private TickTimer _deployDelayTimer;
-
-    private IHeroSkill _currentSkill;
-
-    public float AttackRange => _attackRange;
-    public UnitBase CurrentTarget => _currentTarget;
+    public float FinalCooldown => _finalCooldown;
+    public DeployState DeployState { get; private set; }
+    public CastingState CastState { get; private set; }
+    public ISkill CurUniqueSkill => curUniqueSkill;
     public float RespawnTime => _respawnTime;
-    public float AttackPower => _unitStat.Attack.Value;
-    public float AttackSpeed => _unitStat.AttackSpeed.Value;
-    public float HealPower => _unitStat.HealPower.Value;
-    public UnitStat UnitStat => _unitStat;
-    public LayerMask AllyLayer
-    {
-        get
-        {
-            return team == Team.Blue ? LayerMask.GetMask("BlueTeam") : LayerMask.GetMask("RedTeam");
-        }
-    }
 
-    public void Setup(Team myTeam)
-    {
-        team = myTeam;
-        base.Setup();
+    //아이템용 옵저버
+    [SerializeField] private HeroItemObserver _itemObserver;
 
-        UnitBase[] targetStructure = team == Team.Blue ?
-            ObjectContainer.Instance.redSideStructure :
-            ObjectContainer.Instance.blueSideStructure;
-
-        _enemyTowerA = targetStructure[0];
-        _enemyTowerB = targetStructure[1];
-        _enemyBridge = targetStructure[2];
-    }
-
-    //스포너에서 전달받은 위치와 지연 시간을 기준으로 배치 시작
-    //배치완료전 까지는 전투,FSM로직 동작x
-    public void BeginDeploy(Vector3 targetPos, float deployDelay)
-    {
-        if (!Object.HasStateAuthority)
-        {
-            return;
-        }
-
-        _deployTarget = targetPos;
-        _deployDelayTimer = TickTimer.CreateFromSeconds(Runner, deployDelay);
-        _isDeploying = true;
-    }
-
-    private void FinishDeploy()//배치완료
-    {
-        _isDeploying = false;
-        _deployDelayTimer = default;
-        //배치 직후 바로 타겟 탐색 가능하도록 초기화
-        agent.ResetPath();
-        _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-    }
+    //이번 스폰/갱신 때 이미 적용한 스킬 증강 ID를 기억해서 중복 덮어쓰기 방지
+    private HashSet<string> _appliedAugments = new HashSet<string>();
 
     public override void Spawned()
     {
-        base.Spawned();
-
-        if (Object.HasStateAuthority)
-        {
-            networkedTeam = team;
-        }
-
-        _currentSkill = _skillComponent as IHeroSkill;
+        BaseUnitInit();
 
         unitType = UnitType.Hero;
 
-        _attackRange = _heroData.AttackRange;
-        _attackType = _heroData.NormalAttack.AttackType;
-        _projectile = _heroData.NormalAttack.EffectPrefab;
+        normalAttack = _normalAttackData.CreateInstance(this);
+        curUniqueSkill = _standardSkillData.CreateInstance(this);
 
-        if (!Object.HasStateAuthority)
-        {
-            return;
-        }
+        _stageManager = FindFirstObjectByType<StageManager>();
 
-        if (_unitStat == null)
-        {
-            _unitStat = GetComponent<UnitStat>();
-        }
+        HeroAnimator = GetComponent<Animator>();
+        // 부스터는 반드시 자식 오브젝트에서 첫번째에 위치한다.
+        BoosterAnimator = transform.GetChild(0).GetComponent<Animator>();
 
-        HeroStatData statData = HeroManager.Instance.GetStatus(_heroData.HeroID);
+        if (!Object.HasStateAuthority) return;
+        // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
+
+        RefreshAugments();
+
+        // 상태 인스턴스 생성
+        StateMachine = new StateMachine();
+        DeployState = new DeployState(this);
+        DetectState = new DetectState(this);
+        ChaseState = new ChaseState(this);
+        AttackState = new AttackState(this);
+        CastState = new CastingState(this);
+        DieState = new DieState(this);
+
+        _unitStat = GetComponent<UnitStat>();
+
+        HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
 
         //UnitStat 초기화
         _unitStat.Init(statData);
-        //Stat 기반 값 적용
-        maxHealth = _unitStat.MaxHp.Value;
-        CurrentHealth = maxHealth;
-        moveSpeed = _unitStat.MoveSpeed.Value;
-        searchRange = _unitStat.DetectRange.Value;
-        _respawnTime = _unitStat.RespawnTime.Value;
-        agent.speed = moveSpeed;
 
-        //스킬
-        EquipSkill(_heroData.NormalSkill);
-        ApplySkillAugments();
+        _unitStat.OnStatChanged += RefreshStatRuntime;//이벤트 구독
+
+        //Stat 기반 값 적용
+        MaxHealth = _unitStat.MaxHp.Value;
+        CurrentHealth = MaxHealth;
+        agent.speed = MoveSpeed;
+
         if (agent != null)
         {
             agent.enabled = false;
 
-            //// 스폰 위치가 네비 밖이거나 겹쳐있을 경우 보정
+            // 스폰 위치가 네비 밖이거나 겹쳐있을 경우 보정
             if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
             {
                 transform.position = hit.position;
@@ -151,644 +88,261 @@ public class HeroController : MobilityUnit, IBasicAttack
             agent.enabled = true;
             agent.ResetPath();
         }
-
-        _fsm = new UnitFSM();
-
-        _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-
-        CurrentState = UnitState.Idle;
+        curUniqueSkill.Initialize();
+        DeployState.SetDeployData(_targetPos, _deployDelay);
+        StateMachine.ChangeState(DeployState);
+        ApplyEquippedItems();
+        _finalCooldown = GetFinalRespawnCooldown();
+        HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
     }
 
-    public void EquipSkill(SkillDataSO newSkillData)
+    private void OnDestroy()
     {
-        if (newSkillData == null)
+        if (_unitStat != null)
         {
-            return;
+            _unitStat.OnStatChanged -= RefreshStatRuntime;//이벤트 해제
         }
-
-        _skillData = newSkillData;
-
-        if (_skillComponent == null)
-        {
-            return;
-        }
-
-        _currentSkill = _skillComponent as IHeroSkill;
-
-        if (_currentSkill == null)
-        {
-            return;
-        }
-
-        _currentSkill.ChangeSkillData(_skillData);
-
-        if (_skillTimer.IsRunning)
-        {
-            return;
-        }
-
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, _skillData.InitCooldown);
     }
-
 
     public override void FixedUpdateNetwork()
     {
-        // StateAuthority가 없는 클라이언트는 서버 상태를 그대로 반영만 함
         if (!Object.HasStateAuthority) return;
 
-        _currentSkill?.TickSkill(Runner);
-
-        // 사망 상태면 행동 중단
-        if (CurrentState == UnitState.Dead) return;
-
-        if (_fsm == null)
+        // 기본 스킬의 시전은 어느 상태든 상관없이 조건만 만족하면 바로 전환한다.
+        if (StateMachine.CurrentState != DieState &&
+            StateMachine.CurrentState != DeployState &&
+            StateMachine.CurrentState != CastState)
         {
-            return;
-        }
-
-        _fsm.TickSkill(Runner);
-
-        if (_isDeploying)
-        {
-            //배치중 일때는
-            if (!_deployDelayTimer.Expired(Runner))
+            if (curUniqueSkill.UsingConditionCheck())
             {
+                StateMachine.SavePreviousState();
+                StateMachine.ChangeState(CastState);
                 return;
             }
+        }
 
-            MoveTo(_deployTarget);
+        StateMachine.Update();
 
-            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
-            {
-                FinishDeploy();
-            }
+        if (curUniqueSkill is ShieldSkill shield)
+        {
+            shield.Tick();
+        }
+    }
+
+    // --- 생성시 초기화 관련 메서드 ---
+
+    // 스폰 전에 실행되는 메서드
+    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab, PlayerRef owner)
+    {
+        _targetPos = targetPos;
+        _deployDelay = deployDelay;
+        _myPrefab = prefab;
+        _ownerPlayer = owner;
+
+        Setup(myTeam);
+
+        HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
+        _respawnTime = statData.spawnCooldown;
+    }
+
+    // 스킬 타입에 맞는 VFX 프리팹 반환
+    public GameObject GetSkillVFX(SkillType type)
+    {
+        if (curUniqueSkill != null && curUniqueSkill.Data.skillType == type)
+            return curUniqueSkill.Data.skillVFX;
+
+        if (_standardSkillData != null && _standardSkillData.skillType == type)
+            return _standardSkillData.skillVFX;
+
+        return null;
+    }
+
+    // 스킬 증강 시 스킬 교체(실제 교체)
+    private void ChangeSkill(BaseSkillSO newSkillSO)
+    {
+        if (newSkillSO != null)
+        {
+            curUniqueSkill = newSkillSO.CreateInstance(this);
+            Debug.Log($"[{unitId}] 스킬이 {newSkillSO.name}으로 교체되었습니다!");
+        }
+    }
+
+    //3.11 리팩토링
+    //콘피그테이블 참조하도록 변경, 팀원 증강 중복방지 
+    //3.18 수정/ 콘피그테이블을 선택 시 체크하도록 변경
+    private void ApplyAugments(PlayerNetworkData data)
+    {
+
+        for (int i = 0; i < SlotData_5.Length; i++)
+        {
+            string rawId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+            if (string.IsNullOrEmpty(rawId))
+                continue;
+
+            //중복 방지
+            if (_appliedAugments.Contains(rawId))
+                continue;
+
+            //꼬리표 분리
+            string[] parts = rawId.Split('#');
+            string baseId = parts[0];
+            int tierIndex = 0;
+            if (parts.Length > 1) int.TryParse(parts[1], out tierIndex);
+
+            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(baseId);
+            if (so == null)
+                continue;
+
+            if (so.TargetHeroID != unitId)
+                continue;
+
+            if (tierIndex >= so.Tiers.Length)
+                continue;
+
+            BaseSkillSO newSkill = so.Tiers[tierIndex].CombatSkillData;
+
+            if (newSkill == null)
+                continue;
+
+            Debug.Log($"[팀 공유 스킬 증강 적용] 영웅:{unitId} <- 증강:{baseId} (Tier: {tierIndex})");
+
+            //적용된 증강 기록 및 실제 스킬 교체
+            _appliedAugments.Add(rawId);
+            ChangeSkill(newSkill);
+        }
+    }
+
+    //외부에서 스킬 증강을 갱신할 것이라면...
+    public void RefreshAugments()
+    {
+        if (!Object.HasStateAuthority)
+        {
             return;
         }
 
-        //탐지 상태일 때만 타겟 재탐색
-        if (_fsm.State == UnitAIState.Detect && _searchTimer.ExpiredOrNotRunning(Runner))
+        _appliedAugments.Clear();
+
+        foreach (var player in _stageManager.PlayerDataMap)
         {
-            RefreshTarget();
-            _searchTimer = TickTimer.CreateFromSeconds(Runner, SearchInterval);
-        }
+            if (player.Value.Team != team)
+                continue;
 
-        bool hasTarget = _currentTarget != null && !_currentTarget.IsDead;
-        bool inRange = false;
-        if (hasTarget)
-        {
-            float combatDistance = GetAttackDistanceTo(_currentTarget);
-            inRange = combatDistance <= _attackRange;
-        }
-
-        bool isDead = CurrentState == UnitState.Dead;//FSM에도 사망 여부를 전달(의도치 않은 상태 전이 방지)
-
-        //FSM에 상태 전이 판단 위임
-        _fsm.DecideState(isDead, hasTarget, inRange);
-
-        //FSM 결과에 따라 행동 처리
-        ApplyState(_fsm.State);
-    }
-
-    //FSM 결과에 따라 실제 유닛 행동을 적용 (AIState : 판단, UnitState : 애니메이션 등 표현)
-    private void ApplyState(UnitAIState state)
-    {
-        switch (state)
-        {
-            case UnitAIState.Detect:
-                HandleDetect();
-                break;
-
-            case UnitAIState.Attack:
-                HandleAttack();
-                break;
-
-            case UnitAIState.Skill:
-                HandleSkill();
-                break;
-
-            case UnitAIState.Dead:
-                break;
+            ApplyAugments(player.Value);
         }
     }
 
-    private void HandleDetect()
+    //Stat 변경 시 NavMesh 갱신용 메서드 추가(이미 배치된 유닛의 이동속도 변경 시)
+    public void RefreshStatRuntime()
     {
-        // 전투 타겟이 없는 경우
-        if (_currentTarget == null)
+        if (agent != null)
         {
-            //함교가 존재하면 계속 전진
-            if (_enemyBridge != null)
+            agent.speed = MoveSpeed;
+        }
+    }
+
+    public float GetFinalRespawnCooldown()
+    {
+        // 기본 쿨
+        float baseCooldown = _unitStat.RespawnTime.Value;
+
+        // 쿨감
+        float cooldownReduction = _unitStat.CooldownReduction.Value;
+
+        // 계산
+        float finalCooldown = baseCooldown * (1f - cooldownReduction);
+
+        return Mathf.Max(finalCooldown, 0.1f);
+    }
+
+    private void ApplyEquippedItems()
+    {
+        if (!Object.HasStateAuthority) return;
+
+        //자신의 영웅 슬롯 인덱스 찾기
+        var playerData = _stageManager.PlayerDataMap.Get(_ownerPlayer);
+        int myHeroIndex = -1;
+
+        for (int i = 0; i < SlotData_5.Length; i++)
+        {
+            string ownedId = playerData.OwnedHeroes.Get(i).Replace("\0", "").Trim();
+            if (ownedId == unitId)
             {
-                MoveTo(_enemyBridge.transform.position);
-                CurrentState = UnitState.Move;
+                myHeroIndex = i;
+                break;
+            }
+        }
+
+        //덱에 없는 유닛이면 무시
+        if (myHeroIndex == -1) return;
+
+        //장착된 아이템 ID 추출 (인덱스 * 2, 인덱스 * 2 + 1)
+        int slotA = myHeroIndex * 2;
+        int slotB = myHeroIndex * 2 + 1;
+
+        string itemA = playerData.HeroEquippedItems.Get(slotA).Replace("\0", "").Trim();
+        string itemB = playerData.HeroEquippedItems.Get(slotB).Replace("\0", "").Trim();
+
+        List<string> equippedItemIds = new List<string>();
+        if (!string.IsNullOrEmpty(itemA)) equippedItemIds.Add(itemA);
+        if (!string.IsNullOrEmpty(itemB)) equippedItemIds.Add(itemB);
+
+        if (equippedItemIds.Count == 0) return; //낀 아이템이 없으면 패스
+
+        //ItemEffectData 수집
+        List<ItemEffectData> totalEffects = new List<ItemEffectData>();
+        var allEffects = TableManager.Instance.ItemEffectTable.GetAll();
+
+        foreach (string itemId in equippedItemIds)
+        {
+            var itemData = TableManager.Instance.ItemTable.Get(itemId);
+            if (itemData != null)
+            {
+                //EffectGroupId와 일치하는 효과들 전부 적ㅇ용
+                for (int i = 0; i < allEffects.Count; i++)
+                {
+                    if (allEffects[i].effectGroupId == itemData.effectGroupId)
+                    {
+                        totalEffects.Add(allEffects[i]);
+                    }
+                }
+            }
+        }
+
+        //옵저버에 데이터 주입하고 업데이트 시작
+        if (totalEffects.Count > 0)
+        {
+            if (_itemObserver != null)
+            {
+                _itemObserver.Init(this, _unitStat, totalEffects);
+                _itemObserver.enabled = true;
+                Debug.Log($"영웅 {unitId}에 {totalEffects.Count}개의 아이템 효과 부착완료");
             }
             else
             {
-                StopMove();
-                CurrentState = UnitState.Idle;
+                Debug.LogWarning($"{unitId} 프리팹 확인 필요,  HeroItemObserver 컴포넌트");
             }
-
-            return;
-        }
-
-        //타겟이 있는 경우 해당 타겟을 향해 이동
-        MoveTo(_currentTarget.transform.position);
-        CurrentState = UnitState.Move;
-    }
-
-    private void HandleAttack()
-    {
-        StopMove();
-        RotateToTarget();
-        CurrentState = UnitState.Attack;
-        HandleCombat();
-    }
-
-    private void HandleSkill()
-    {
-        StopMove();
-        CurrentState = UnitState.Skill;
-    }
-
-    private void HandleCombat()
-    {
-        if (TryUseSkill())
-        {
-            return;
-        }
-
-        //스킬 사용 불가시에 기본 공격
-        TryAttack();
-    }
-
-    private void RotateToTarget()
-    {
-        if (_currentTarget == null)
-        {
-            return;
-        }
-
-        Vector3 dir = _currentTarget.transform.position - transform.position;
-        dir.y = 0f; //수평 회전
-
-        if (dir.sqrMagnitude < 0.001f)
-        {
-            return;
-        }
-
-        Quaternion targetRotation = Quaternion.LookRotation(dir);
-
-        transform.rotation = targetRotation;
-    }
-
-    private bool TryUseSkill()//스킬 쿨타임/조건 체크 후 스킬 실행 시도
-    {
-        if (_currentSkill == null)
-        {
-            return false;
-        }
-
-        if (!_skillTimer.ExpiredOrNotRunning(Runner))
-        {
-
-            return false;
-        }
-
-        SkillRuntimeData runtime = _currentSkill.Data.CreateRuntimeData();
-
-        if (!_currentSkill.CanUse(this, runtime))
-        {
-            return false;
-        }
-
-        bool success = _currentSkill.Execute(this, runtime);
-        if (!success)
-        {
-            return false;
-        }
-        _fsm.EnterSkill(Runner, 0.15f);
-
-        float cooldownReduction = Mathf.Clamp(_unitStat?.CooldownReduction?.Value ?? 0f, 0f, 0.9f);
-        float finalCooldown = Mathf.Max(0.1f, runtime.Cooldown * (1f - cooldownReduction));
-
-        _skillTimer = TickTimer.CreateFromSeconds(Runner, finalCooldown);
-
-        return success;
-    }
-
-    private void TryAttack()
-    {
-        if (!_attackTimer.ExpiredOrNotRunning(Runner))
-        {
-            return;
-        }
-
-        if (_currentTarget == null)
-        {
-            return;
-        }
-
-        // IBasicAttack 인터페이스 기본 구현 호출 (target.TakeDamage(AttackPower))
-        if (_attackType == AttackType.Melee)
-        {
-            ((IBasicAttack)this).BaseAttack(_currentTarget);
-        }
-        else
-        {
-            AttackRanged(_currentTarget.transform.position);
-        }
-
-
-        float attackCooldown = AttackSpeed > 0f ? 1f / AttackSpeed : 1f;
-        _attackTimer = TickTimer.CreateFromSeconds(Runner, attackCooldown);
-    }
-
-    private void RefreshTarget()
-    {
-        UnitBase enemy = FindTarget(); // MobilityUnit의 ITargetFinder 구현
-
-        if (enemy != null)
-        {
-            SetTarget(enemy);
-            return;
-        }
-
-        // 적 없으면 가까운 타워 선택
-        UnitBase closestTower = GetClosestTower();
-        if (closestTower != null)
-        {
-            SetTarget(closestTower);
         }
     }
 
-    private void SetTarget(UnitBase target)
+    public override void Render()
     {
-        if (_currentTarget == target)
-        {
-            return;
-        }
-
-        // 새 목표로 교체할 때 기존 사망 이벤트 구독 해제
-        if (_currentTarget != null)
-        {
-            _currentTarget.OnDeath -= OnTargetDied;
-        }
-
-        _currentTarget = target;
-
-        if (_currentTarget != null)
-        {
-            _currentTarget.OnDeath += OnTargetDied;
-        }
-    }
-
-    private UnitBase GetClosestTower()
-    {
-        // 함교도 없으면 타겟 없음 (사실상 게임 종료)
-        if (_enemyBridge == null) return null;
-
-        // 두 타워가 모두 없으면 함교
-        if (_enemyTowerA == null && _enemyTowerB == null) return _enemyBridge;
-
-        // 타워가 하나만 남은 경우 타워나 함교 중 가까운 쪽
-        if (_enemyTowerA == null)
-        {
-            float distTower = Vector3.Distance(transform.position, _enemyTowerB.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _enemyBridge.transform.position);
-            return distBridge < distTower ? _enemyBridge : _enemyTowerB;
-        }
-
-        if (_enemyTowerB == null)
-        {
-            float distTower = Vector3.Distance(transform.position, _enemyTowerA.transform.position);
-            float distBridge = Vector3.Distance(transform.position, _enemyBridge.transform.position);
-            return distBridge < distTower ? _enemyBridge : _enemyTowerA;
-        }
-
-        // 두 타워가 모두 살아있다면 둘 중 가까운 넘
-        float distA = Vector3.Distance(transform.position, _enemyTowerA.transform.position);
-        float distB = Vector3.Distance(transform.position, _enemyTowerB.transform.position);
-        return distA <= distB ? _enemyTowerA : _enemyTowerB;
-    }
-
-    //Projectile 연출 및 기본 공격 데미지 적용
-    private void AttackRanged(Vector3 targetPos)
-    {
-        if (_projectile == null || _firePoint == null)
-        {
-            return;
-        }
-
-        if (_currentTarget == null)
-        {
-            return;
-        }
-
-        RPC_FireProjectile(Object.Id, _currentTarget.Object.Id, team, false);
-
-        ApplyBasicAttackDamage(_currentTarget);
-    }
-
-    //모든 기본 공격은 이 메서드를 통해 TakeDamage로 진입
-    private void ApplyBasicAttackDamage(UnitBase target)
-    {
-        if (!Object.HasStateAuthority)
-        {
-            return;
-        }
-
-        if (target == null || target.IsDead)
-        {
-            return;
-        }
-
-        target.TakeDamage(AttackPower);
-    }
-
-    public override void TakeDamage(float amount)
-    {
-        float reduction = _unitStat.DamageReduction.Value;
-
-        if (reduction > 0f)
-        {
-            amount *= (1f - reduction);
-        }
-
-        base.TakeDamage(amount);
-    }
-
-    public void HealUnit(UnitBase target, float healAmount)
-    {
-        if (!Object.HasStateAuthority)
-        {
-            return;
-        }
-
-        if (target == null || target.IsDead)
-        {
-            return;
-        }
-
-        target.CurrentHealth = Mathf.Min(
-            target.CurrentHealth + healAmount,
-            target.MaxHealth
-        );
-    }
-
-    //포격형 전용 데미지 진입점
-    public void ApplyBarrageSkillDamage(UnitBase target, float damageRatio)
-    {
-        if (!Object.HasStateAuthority)
-        {
-            return;
-        }
-
-        if (target == null || target.IsDead)
-        {
-            return;
-        }
-
-        float baseDamage = AttackPower;
-        float finalDamage = baseDamage * damageRatio;
-
-        target.TakeDamage(finalDamage);
-    }
-
-    //기본 공격
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_FireProjectile(NetworkId casterId, NetworkId targetId, Team team, bool isSkill)
-    {
-        if (!Runner.TryFindObject(casterId, out NetworkObject casterObj))
-        {
-            return;
-        }
-
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
-        {
-            return;
-        }
-
-        HeroController hero = casterObj.GetComponent<HeroController>();
-        if (hero == null)
-        {
-            return;
-        }
-
-        GameObject projectilePrefab = null;
-
-        if (isSkill)
-        {
-            if (hero._skillData == null)
-            {
-                return;
-            }
-
-            projectilePrefab = hero._skillData.EffectPrefab;
-        }
-        else
-        {
-            projectilePrefab = hero._projectile;
-        }
-
-        if (projectilePrefab == null)
-        {
-            return;
-        }
-
-        if (hero._firePoint == null)
-        {
-            return;
-        }
-
-        Vector3 start = hero._firePoint.position;
-        Vector3 end = targetObj.transform.position;
-
-        GameObject projectileObj = Instantiate(projectilePrefab, start, Quaternion.identity);
-
-        Projectile projectile = projectileObj.GetComponent<Projectile>();
-
-        if (projectile != null)
-        {
-            projectile.Fire(end, team);
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_PlaySkillEffect(Vector3 pos, Quaternion rot)
-    {
-        Debug.Log("RPC_PlaySkillEffect 실행됨");
-        if (_skillData == null)
-        {
-            return;
-        }
-
-        GameObject prefab = _skillData.EffectPrefab;
-
-        if (prefab == null)
-        {
-            return;
-        }
-
-        Transform parent = null;
-
-        if (_skillData.AttachType == EffectAttachType.Caster)
-        {
-            parent = transform;
-        }
-
-        GameObject fx = Instantiate(prefab, pos, rot, parent);
-
-        fx.transform.localScale = Vector3.one * _skillData.EffectScale;
-
-        Destroy(fx, _skillData.EffectLifeTime);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_PlayHealEffect(NetworkId targetId)
-    {
-        if (_skillData == null)
-        {
-            return;
-        }
-
-        Debug.Log("RPC_PlayHealEffect 실행됨");
-        if (!Runner.TryFindObject(targetId, out NetworkObject targetObj))
-        {
-            return;
-        }
-
-        GameObject prefab = _skillData.EffectPrefab;
-
-        if (prefab == null)
-        {
-            return;
-        }
-
-        Transform parent = null;
-
-        if (_skillData.AttachType == EffectAttachType.Target)
-        {
-            parent = targetObj.transform;
-        }
-
-        GameObject effects = Instantiate(prefab, targetObj.transform.position, Quaternion.identity, parent);
-
-        effects.transform.localScale = Vector3.zero;
-        effects.transform.DOScale(_skillData.EffectScale, 0.5f).SetEase(Ease.OutBack);
-
-        Destroy(effects, _skillData.EffectLifeTime);
-    }
-
-    //스킬증강에 사용될 메서드
-    private void ApplySkillAugments()
-    {
-        if (!Object.HasStateAuthority)
-        {
-            return;
-        }
-
-        StageManager stageManager = FindFirstObjectByType<StageManager>();
-
-        if (stageManager == null)
-        {
-            return;
-        }
-
-        if (!stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out PlayerNetworkData data))
-        {
-            return;
-        }
-
-        if (_heroData == null)
-        {
-            return;
-        }
-
-        //3.3 여현구
-        //배열에서 구조체로 바뀌어서 여기 수정했습니다.
-        for (int i = 0; i < SlotData_5.Length; i++)
-        {
-            string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
-
-            if (string.IsNullOrEmpty(augmentId))
-            {
-                continue;
-            }
-
-            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
-            if (so == null)
-            {
-                continue;
-            }
-
-            if (so.TargetHeroID != _heroData.HeroID)
-            {
-                continue;
-            }
-
-            int tierIndex = data.TotalAugmentPicks >= 6 ? 1 : 0;
-
-            if (tierIndex >= so.Tiers.Length)
-            {
-                continue;
-            }
-
-            SkillDataSO newSkill = so.Tiers[tierIndex].CombatSkillData;
-
-            if (newSkill == null)
-            {
-                continue;
-            }
-
-            EquipSkill(newSkill);
-        }
-    }
-
-    public void ForceStopMoveForSkill()//외부에서 StopMove를 사용가능하도록
-    {
-        StopMove();
-    }
-
-    private void OnTargetDied(UnitBase deadUnit)
-    {
-        deadUnit.OnDeath -= OnTargetDied;
-        _currentTarget = null;
-
-        // 타이머를 즉시 만료시켜 다음 틱에 바로 재탐색
-        _searchTimer = TickTimer.CreateFromSeconds(Runner, 0f);
-    }
-
-    public override void Die()
-    {
-        _fsm?.ForceDead();
-        StopMove();
-
-        // 목표 이벤트 구독 해제 후 부모 Die 호출 (Despawn)
-        if (_currentTarget != null)
-        {
-            _currentTarget.OnDeath -= OnTargetDied;
-            _currentTarget = null;
-        }
-
-        base.Die();
+        BoosterAnimator.SetBool("isActive", BoosterRender);
     }
 
 #if UNITY_EDITOR
     protected override void OnDrawGizmosSelected()
     {
-        base.OnDrawGizmosSelected(); // 탐지 범위 (노란 원)
+        base.OnDrawGizmosSelected();//기존 기즈모
 
-        // 공격 범위 (빨간 원)
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, _attackRange);
+        if (curUniqueSkill == null)
+            return;
 
-        // 현재 목표 → 미니언 연결선
-        if (_currentTarget != null)
+        if (curUniqueSkill.Data is ShieldSkillSO shieldData)
         {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawLine(transform.position, _currentTarget.transform.position);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position, shieldData.aoeRange);
         }
-
     }
 #endif
 }
+

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class HeroDetailPresenter : MonoBehaviour
 {
@@ -6,6 +7,7 @@ public class HeroDetailPresenter : MonoBehaviour
     [SerializeField] private HeroDetailView _view;
     [SerializeField] private GameObject _confirmPopupPrefab;
     [SerializeField] private GameObject _upgradeResultPrefab;
+    [SerializeField] private GameObject _toastPrefab;
 
     [Header("리소스 SO")]
     [SerializeField] private StatIconDataSO _statIcons;
@@ -13,6 +15,12 @@ public class HeroDetailPresenter : MonoBehaviour
 
     private HeroData _heroData;
     private HeroDbModel _userHeroData;
+
+
+    private void Start()
+    {
+        DBStatus.IsUpdating = false;
+    }
 
     // 외부(LobbyHeroCardUI)에서 호출하는 진입점
     public void Setup(HeroData data)
@@ -78,7 +86,7 @@ public class HeroDetailPresenter : MonoBehaviour
 
         if (levelData != null)
         {
-            _view.SetLevelInfo(_userHeroData.level, _userHeroData.exp, levelData.expRequirement);
+            _view.SetLevelInfo(_userHeroData.level.ToString(), _userHeroData.exp, levelData.expRequirement);
 
             // 버튼 텍스트 및 상태 결정 로직
             string priceText = _userHeroData.isUnlock ?
@@ -89,13 +97,13 @@ public class HeroDetailPresenter : MonoBehaviour
         }
         else
         {
+            _view.SetLevelInfo(_userHeroData.level.ToString(), 0, 0); // 0, 0을 넘겨서 "MAX"가 뜨게 함
             _view.SetUpgradeButton(true, "최고 레벨", true);
         }
 
         //스와이프 페이지 갱신
-        UpdateSkillDesPage();
-        UpdateAugmentDesPage();
-        UpdateLevelRewardDesPage();
+        UpdateSkillAndAugmentPages();
+        //UpdateLevelRewardDesPage();
         UpdateStatPage();
     }
 
@@ -108,9 +116,15 @@ public class HeroDetailPresenter : MonoBehaviour
             return;
         }
 
+        //DB 중복 처리 방어
+        if (DBStatus.IsUpdating) return;
+
         // 클릭 시점에 최신 데이터를 다시 확인
         _userHeroData = UserDataManager.Instance.HeroesModel.Find(h => h.heroId == _heroData.id);
         if (_userHeroData == null) return;
+
+        var levelData = TableManager.Instance.HeroLevelTable.Get(_userHeroData.level.ToString());
+        if (levelData == null) return;
 
         if (!_userHeroData.isUnlock)
         {
@@ -122,9 +136,26 @@ public class HeroDetailPresenter : MonoBehaviour
             popup.Setup(
                 $"{translatedName}을(를) 구매하시겠습니까?",
                 async () => {
-                    await UserDataManager.Instance.UpdateWallet(-_heroData.goldRequirement);
-                    await UserDataManager.Instance.UpdateHero(_heroData.id, 1, 0, true);
-                    RefreshAll();
+                    if (DBStatus.IsUpdating) return;
+                    DBStatus.IsUpdating = true;
+
+                    try
+                    {
+
+                        var updates = new Dictionary<string, object> { { "Wallet.gold", UserDataManager.Instance.WalletModel.gold - _heroData.goldRequirement } };
+                        var heroes = new List<HeroDbModel> { new HeroDbModel { heroId = _heroData.id, level = 1, exp = _userHeroData.exp, isUnlock = true } };
+
+                        await UserDataManager.Instance.UpdateAll(updates, heroes);
+                        RefreshAll();
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogError($"구매 실패 : {ex.Message}");
+                    }
+                    finally
+                    {
+                        DBStatus.IsUpdating = false;
+                    }
                 },
                 isBuy,
                 "골드가 부족하여 구매할 수 없습니다."
@@ -132,78 +163,143 @@ public class HeroDetailPresenter : MonoBehaviour
         }
         else
         {
-            // 현재 레벨 데이터 가져오기 (Setup용)
-            var currentLevelData = TableManager.Instance.HeroLevelTable.Get(_userHeroData.level.ToString());
-            if (currentLevelData == null) return;
+            //경험치랑 골드 조건 확인
+            bool isExpFull = _userHeroData.exp >= levelData.expRequirement;
+            bool isGoldEnough = UserDataManager.Instance.WalletModel.gold >= levelData.goldRequirement;
+            string alertMsg = !isExpFull ? "경험치가 부족하여 레벨업할 수 없습니다." : "골드가 부족하여 레벨업할 수 없습니다.";
 
             var popup = UIManager.Instance.ShowUI<ConfirmPopup>(_confirmPopupPrefab);
-
-            if (popup == null)
-            {
-                Debug.LogError("_confirmPopupPrefab이 제대로 생성되지 않았거나 ConfirmPopup 컴포넌트가 없습니다!");
-                return;
-            }
-            //레벨업 가능한지 체크
-            bool isLevelUpPossible = UserDataManager.Instance.WalletModel.gold >= currentLevelData.goldRequirement;
 
             popup.Setup(
                 "레벨업 하시겠습니까?", 
                 async () =>
                 {
-                    //데이터 매니저나 히어로 리스트가 유효한지 먼저 확인
-                    if (UserDataManager.Instance == null || UserDataManager.Instance.HeroesModel == null) return;
+                    if (DBStatus.IsUpdating) return;
+                    DBStatus.IsUpdating = true;
 
-                    Debug.Log($"Searching for ID: {_heroData.id}");
-                    //실행 시점에 최신 데이터를 찾음
-                    var userHero = UserDataManager.Instance.HeroesModel.Find(h => h.heroId == _heroData.id);
-                    Debug.Log($"Found Hero: {userHero != null}");
-                    //찾은 데이터가 null인지 반드시 확인 후 다음으로 진행
-                    if (userHero == null)
+                    try
                     {
-                        Debug.LogError($"[Upgrade] 영웅 데이터를 찾을 수 없습니다: {_heroData.id}");
-                        return;
+                        // 다시 한번 최종 데이터 확인
+                        var userHero = UserDataManager.Instance.HeroesModel.Find(h => h.heroId == _heroData.id);
+                        var costData = TableManager.Instance.HeroLevelTable.Get(userHero.level.ToString());
+
+                        // 최종 조건 체크 (이미 경험치가 찼는지 && 골드가 충분한지)
+                        if (userHero.exp >= costData.expRequirement && UserDataManager.Instance.WalletModel.gold >= costData.goldRequirement)
+                        {
+                            HeroStatData oldStatus = HeroManager.Instance.GetStatus(_heroData.id);
+
+                            var updates = new Dictionary<string, object> { { "Wallet.gold", UserDataManager.Instance.WalletModel.gold - costData.goldRequirement } };
+                            var heroes = new List<HeroDbModel>
+                            {
+                                new HeroDbModel
+                                {
+                                    heroId = _heroData.id,
+                                    level = userHero.level + 1,
+                                    exp = userHero.exp - costData.expRequirement,
+                                    isUnlock = true
+                                }
+                            };
+
+                            await UserDataManager.Instance.UpdateAll(updates, heroes);
+                            RefreshAll();
+                            ShowUpgradeResult(oldStatus);
+                        }
                     }
-
-                    //테이블 데이터 확인
-                    var costData = TableManager.Instance.HeroLevelTable.Get(userHero.level.ToString());
-                    if (costData == null)
+                    catch (System.Exception ex)
                     {
-                        Debug.LogWarning($"[Upgrade] 레벨 테이블에 데이터가 없습니다. 만렙일 가능성: {userHero.level}");
-                        return;
+                        Debug.LogError($"레벨업 실패 : {ex.Message}");
                     }
-
-                    //골드 체크 및 실행
-                    if (UserDataManager.Instance.WalletModel.gold >= costData.goldRequirement)
+                    finally
                     {
-                        HeroStatData oldStatus = HeroManager.Instance.GetStatus(_heroData.id);
-
-                        int nextLevel = userHero.level + 1;
-                        await UserDataManager.Instance.UpdateWallet(-costData.goldRequirement);
-                        await UserDataManager.Instance.UpdateHero(_heroData.id, nextLevel, userHero.exp, true);
-
-                        RefreshAll();
-                        ShowUpgradeResult(oldStatus);
+                        DBStatus.IsUpdating = false;
                     }
                 },
-                isLevelUpPossible,
-                "골드가 부족하여 레벨업할 수 없습니다."
+                isExpFull && isGoldEnough, // 버튼 활성화 조건: 경험치와 골드 모두 충족 시
+                alertMsg
             );
         }
     }
 
-    private void UpdateSkillDesPage()
+    private void UpdateSkillAndAugmentPages()
     {
-        _view.ClearDescription(DescriptionType.Skill);
+        _view.ClearSkillPage();
+        _view.ClearAugmentPage();
 
-    } 
-    private void UpdateAugmentDesPage()
-    {
-        _view.ClearDescription(DescriptionType.Augment);
+        // SO에서 해당 영웅의 스킬 데이터 리스트 가져오기
+        var skillDatas = _heroIcons.GetSkillIcons(_heroData.id);
+        if (skillDatas == null) return;
+
+        foreach (var skillSO in skillDatas)
+        {
+            if (skillSO == null) continue;
+
+            // 이름, 설명
+            string translatedName = TableManager.Instance.GetString(skillSO.skillName);
+            string translatedDesc = TableManager.Instance.GetString(skillSO.skillDescription);
+
+            //스킬 타입에 따른 분류 처리
+            if (skillSO.skillType == SkillType.AugmentSkill)
+            {
+                // 증강 페이지에 추가
+                _view.AddAugmentItem(translatedName, translatedDesc, skillSO.skillIcon);
+            }
+            else if(skillSO.skillType == SkillType.NormalSkill)
+            {
+                // 일반 스킬 페이지에 추가 (쿨타임 포함)
+                string cooltimeStr = skillSO.cooldown > 0 ? $"{skillSO.cooldown}s" : "Passive";
+                _view.AddSkillItem(translatedName, translatedDesc, cooltimeStr, skillSO.skillIcon);
+            }
+        }
     }
-    private void UpdateLevelRewardDesPage()
-    {
-        _view.ClearDescription(DescriptionType.LevelReward);
-    }
+
+    //레벨 보상 페이지
+    //private void UpdateLevelRewardDesPage()
+    //{
+    //    if (_userHeroData == null || _heroData == null) return;
+    //
+    //    //리워드 데이터 가져오기
+    //    var myRewards = TableManager.Instance.HeroLevelRewardTable.GetAll()
+    //        .FindAll(r=>r.heroId == _heroData.id);
+    //    myRewards.Sort((a,b) => a.level.CompareTo(b.level)); //레벨순 정렬 3,6,6,9
+    //
+    //    for(int i = 0; i < _view.RewardButtons.Length; i++)
+    //    {
+    //        int index = i;
+    //        _view.RewardButtons[i].onClick.RemoveAllListeners();
+    //
+    //        if (index < myRewards.Count)
+    //        {
+    //            string skillId = myRewards[index].rewardId;
+    //
+    //            // 버튼 클릭 시 해당 스킬 정보 표시
+    //            _view.RewardButtons[index].onClick.AddListener(() => ShowLevelRewardDetail(skillId,index));
+    //
+    //            // 초기 화면 설정 (첫 번째 보상인 3레벨 보상을 먼저 보여줌)
+    //            if (index == 0) ShowLevelRewardDetail(skillId, index);
+    //        }
+    //        else
+    //        {
+    //            // 데이터가 없는 버튼은 비활성화하거나 숨김 처리
+    //            _view.RewardButtons[index].gameObject.SetActive(false);
+    //        }
+    //    }
+    //}
+    //
+    //private void ShowLevelRewardDetail(string skillId,int index)
+    //{
+    //    if (string.IsNullOrEmpty(skillId)) return;
+    //
+    //    //스킬인포 테이블에서 데이터 가저오기
+    //    var skillInfo = TableManager.Instance.SkillInfoTable.Get(skillId);
+    //    if (skillInfo == null) return;
+    //
+    //    // 스트링 테이블에서 번역 텍스트 가져오기
+    //    string translatedName = TableManager.Instance.GetString(skillInfo.skillName);
+    //    string translatedDes = TableManager.Instance.GetString(skillInfo.skillDes);
+    //
+    //    //view 업데이트
+    //    _view.UpdateLevelRewardUI(_userHeroData.level, translatedName, translatedDes, index);
+    //}
 
     //스텟 페이지 갱신
     private void UpdateStatPage()
@@ -211,24 +307,43 @@ public class HeroDetailPresenter : MonoBehaviour
         _view.ClearStats();
         HeroStatData status = HeroManager.Instance.GetStatus(_heroData.id);
         HeroStatData tableBase = TableManager.Instance.HeroStatTable.Get(_heroData.heroStatId);
-        if (status == null) return;
+        if (status == null || _userHeroData == null) return;
+
+        var nextLevelData = TableManager.Instance.HeroLevelTable.Get((_userHeroData.level).ToString());
+        bool isMaxLevel = nextLevelData == null; //다음레벨 없으면 만렙
+
+        string GetStatText(float baseVal, float growthVal)
+        {
+            if (isMaxLevel) return baseVal.ToString(); // 만렙이면 기본 수치만
+            return $"{baseVal} <color=#FF0500>(+{growthVal})</color>"; // 아니면 성장 수치 포함
+        }
 
         //성장수치 보여줄 애들은 성장수치도 보여주기
-        _view.AddStatItem("체력", $"{status.BaseHp} <color=#000BFF>(+{tableBase.ipLvHp})</color>", _statIcons.GetIcon(StatType.Hp));
-        _view.AddStatItem("공격력", $"{status.baseAttackPower} <color=#000BFF>(+{tableBase.ipLvAttackPower})</color>", _statIcons.GetIcon(StatType.AttackPower));
+        _view.AddStatItem("체력", GetStatText(status.BaseHp, tableBase.ipLvHp), _statIcons.GetIcon(StatType.Hp),Color.green);
+        _view.AddStatItem("공격력", GetStatText(status.baseAttackPower, tableBase.ipLvAttackPower), _statIcons.GetIcon(StatType.AttackPower), Color.green);
 
-        if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0)
-            _view.AddStatItem("치유력", $"{status.baseHealingPower} <color=#000BFF>(+{tableBase.ipLvHealingPower})</color>", _statIcons.GetIcon(StatType.HealingPower));
+        if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0) //치유력은 있는애들만 표시
+            _view.AddStatItem("치유력", GetStatText(status.baseHealingPower, tableBase.ipLvHealingPower), _statIcons.GetIcon(StatType.HealingPower), Color.green);
 
         _view.AddStatItem("공격 속도", status.attackSpeed.ToString("F2"), _statIcons.GetIcon(StatType.AttackSpeed));
         _view.AddStatItem("이동 속도", status.moveSpeed.ToString("F1"), _statIcons.GetIcon(StatType.MoveSpeed));
-        _view.AddStatItem("공격 범위", status.detectionRange.ToString("F1"), _statIcons.GetIcon(StatType.DetectionRange));
+        _view.AddStatItem("감지 범위", status.detectionRange.ToString("F1"), _statIcons.GetIcon(StatType.DetectionRange));
         _view.AddStatItem("재소환 시간", status.spawnCooldown.ToString("F1"), _statIcons.GetIcon(StatType.RespawnTime));
         _view.AddStatItem("쿨타임 증감", status.cooltimeReduce.ToString("F1"), _statIcons.GetIcon(StatType.SkillCooldown));
         _view.AddStatItem("피해 감소량", status.damageReduce.ToString("F1"), _statIcons.GetIcon(StatType.DamageReduction));
 
         string typeKey = $"hero_movetype_{status.moveType.ToString().ToLower()}";
-        _view.AddStatItem("이동 유형", TableManager.Instance.GetString(typeKey), _statIcons.GetIcon(StatType.MoveType));
+        string typeName = TableManager.Instance.GetString(typeKey);
+
+        var moveTypeItem = _view.AddStatItem("이동 유형", typeName, _statIcons.GetIcon(StatType.MoveType));
+
+        if (moveTypeItem != null)
+        {
+            moveTypeItem.EnableToastButton(() => {
+                UIManager.Instance.ShowToast<ToastUI>(_toastPrefab);
+                Debug.Log($"{typeName} 토스트 버튼 클릭됨!");
+            });
+        }
     }
 
     private void ShowUpgradeResult(HeroStatData oldStat)

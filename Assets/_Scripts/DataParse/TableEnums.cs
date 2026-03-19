@@ -1,4 +1,4 @@
-//Table에 존재하는 Enum 정의
+﻿//Table에 존재하는 Enum 정의
 //CSV, 엑셀 데이터랑 1:1 매핑용
 
 public enum ItemType
@@ -56,6 +56,31 @@ public enum EffectType
     ImmuneCcCount           //유닛스탯제외3(CC면역횟수)
 }
 
+
+
+public enum UnitType
+{
+    Bridge, Tower, Hero, Minion
+}
+
+public enum SkillType
+{
+    NormalAttack,
+    NormalSkill,
+    AugmentSkill,
+    EnhanceAugmentSkill,
+    PassiveSkill
+}
+
+public enum ArmorType 
+{
+    Light_Armor, Medium_Armor, Heavy_Armor 
+}
+public enum MoveType 
+{
+    Small, Large, Fixed 
+}
+
 //조건 타입 정의
 public enum TriggerCondition
 {
@@ -75,4 +100,32 @@ public enum Target
     Self,
     Team, 
     NearestEnemy
+}
+
+public enum StatType
+{
+    Hp,                 // 체력
+    AttackPower,        // 공격력
+    HealingPower,       // 치유력
+    AttackSpeed,        // 공격 속도
+    MoveSpeed,          // 이동 속도
+    DamageReduction,    // 받는 피해량 감소
+    SkillCooldown,      // 스킬 쿨타임 감소
+    RespawnTime,        // 재소환 대기시간
+    DetectionRange,      // 탐지 범위
+    MoveType
+}
+
+public enum Team
+{
+    None, Blue, Red
+}
+
+//3.11 추가
+
+public enum MatchResult
+{
+    Win,
+    Draw,
+    Lose
 }

@@ -41,6 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1106181966427646340}
   - component: {fileID: 3466948477975838319}
+  - component: {fileID: -5705939493492339087}
   - component: {fileID: 7230683875294501226}
   - component: {fileID: 7371674430267400118}
   - component: {fileID: 5149516580463806982}
@@ -76,6 +77,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4505404251978042975}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &-5705939493492339087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4505404251978042975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e06afd8dba25da47828c557178535da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitStat
 --- !u!114 &7230683875294501226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88,20 +101,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a122320be5e7874a9156352a6137389, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
-  maxHealth: 100
-  deffense: 0
+  _testRange: 5
+  _MaxHealth: 0
   team: 0
+  _networkedTeam: 0
   _CurrentHealth: 0
-  _CurrentState: 0
-  _attackPower: 10
-  _attackSpeed: 1
-  _projectilePrefab: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  _unitId: unit_tower
   _firePoint: {fileID: 1234834223447836441}
-  _detectRange: 5
   _targetLayer:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 64
   _scanInterval: 0.5
+  _normalAttackData: {fileID: 11400000, guid: fec66fd344521d548b173badcd6266fd, type: 2}
 --- !u!23 &7371674430267400118
 MeshRenderer:
   m_ObjectHideFlags: 0

@@ -21,6 +21,9 @@ public class UIManager : Singleton<UIManager>
     //팝업형이랑 그외에 UI가 들어갈 컨테이너들
     private Transform _windowContainer;
     private Transform _popupContainer;
+    private Transform _topContainer;
+
+    public Transform TopContainer => _topContainer; //탑컨테이너 참조가능하게 프로퍼티로
 
     protected override void OnSingletonAwake()
     {
@@ -56,6 +59,7 @@ public class UIManager : Singleton<UIManager>
         //컨테이너 생성 (이미 있으면 찾고, 없으면 생성)
         _windowContainer = FindOrCreateContainer("Windows", _uiRoot);
         _popupContainer = FindOrCreateContainer("Popups", _uiRoot);
+        _topContainer = FindOrCreateContainer("TopLayer", _uiRoot);
     }
     private Transform FindOrCreateContainer(string name, Transform parent)
     {
@@ -93,16 +97,6 @@ public class UIManager : Singleton<UIManager>
 
         if (prefab == null) return null;
 
-        //// 중복 팝업 토글 체크
-        //if (isPopup && _popupStack.Count > 0)
-        //{
-        //    if (_popupStack.Peek() is T)
-        //    {
-        //        CloseTopPopup();
-        //        return null;
-        //    }
-        //}
-
         // 팝업이면 팝업 컨테이너에, 일반 윈도우면 윈도우 컨테이너에 생성
         Transform parent = isPopup ? _popupContainer : _windowContainer;
         GameObject obj = Instantiate(prefab, parent);
@@ -115,8 +109,6 @@ public class UIManager : Singleton<UIManager>
         }
 
         return ui;
-
-
     }
 
     public void CloseTopPopup()
@@ -136,28 +128,22 @@ public class UIManager : Singleton<UIManager>
     }
     #endregion
 
-    // 1. 로그인 성공 후 로비 진입 시 호출
-    //public void InitLobbyUI( 여기다 데이타 )
-    //{
-    //    // 여기에 계정레벨, 재화 UI 업데이트 로직 연결
-    //   
-    //}
-
-    // 2. 매칭 시작 시 UI 처리
-    public void ShowMatchingUI(bool isMatching)
+    public T ShowToast<T>(GameObject prefab,bool isTop = true ,float duration = 2.0f) where T : ToastUI
     {
-        // 매칭 취소 버튼이 포함된 UI 출력/숨김
-    }
+        EnsureContainers(); //컨테이너랑 루트있는가 확인
 
-    // 3. 인게임 증강 선택
-    public void ShowAugmentSelection()
-    {
-        // 게임 일시정지 상태에서 증강 UI 출력
-    }
+        if (prefab == null) return null;
 
-    // 4. 게임 결과창
-    public void ShowResultUI(bool isWin)
-    {
-        // 승패 결과 및 보상 UI 출력
+        
+        Transform parent = isTop ? _topContainer : _popupContainer;
+        GameObject obj = Instantiate(prefab, parent);
+        T ui = obj.GetComponent<T>();
+
+        if (ui != null)
+        {
+            ui.Show(duration);
+        }
+
+        return ui;
     }
 }

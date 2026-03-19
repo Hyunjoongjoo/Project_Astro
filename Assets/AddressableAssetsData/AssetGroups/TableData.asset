@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: TableData
   m_GUID: 8702e0d9cd5e3904b85ea4fa2f457411
   m_SerializeEntries:
+  - m_GUID: 5838f10e1a45e8b408ee3570bb144016
+    m_Address: SkillInfo
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 59129e9a7e4cb824ca3361fed3c10568
     m_Address: Item
     m_ReadOnly: 0
@@ -52,6 +57,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b00857d36164f9e47b86a4eed5b9e61c
     m_Address: HeroLevel
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d5b7ae1841b5ac342b7df5c6721c8cd2
+    m_Address: MatchReward
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

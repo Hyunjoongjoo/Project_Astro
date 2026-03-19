@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a380b5b6bec34244eb97d541666aeb18, type: 3}
+  m_Name: SkillAugment_Tachyon_A
+  m_EditorClassIdentifier: Assembly-CSharp::SkillAugmentSO
+  AugmentID: augmentSkill_tachyon_A
+  ConflictID: augmentSkill_tachyon_B
+  TargetHeroID: hero_tachyon
+  Tiers:
+  - TitleStringID: augment_name_tachyon_A
+    DescStringID: augment_desc_tachyon_A
+    Icon: {fileID: 21300000, guid: ee3d8cf348f1cdb4d8ac80626613b9d7, type: 3}
+    CombatSkillData: {fileID: 11400000, guid: 78ea71a2a7314a340af750248ef38849, type: 2}
+  - TitleStringID: enhance_augment_name_tachyon_A
+    DescStringID: enhance_augment_desc_tachyon_A
+    Icon: {fileID: 21300000, guid: f0b423e9e6d5c974ebff9dc1ab5a4f4f, type: 3}
+    CombatSkillData: {fileID: 11400000, guid: 2323b34ae70c3d64d9f6775bf8155446, type: 2}

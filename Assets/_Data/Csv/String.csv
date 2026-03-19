@@ -5,10 +5,12 @@ name_hero_corsair,커세어,커세어 영웅 이름
 name_hero_heavyrain,헤비레인,헤비레인 영웅 이름
 name_hero_tank,탱크,탱크 영웅 이름
 name_hero_angel,앤젤,앤젤 영웅 이름
-desc_hero_corsair,커세어 설명입니다,커세어 영웅 설명
-desc_hero_heavyrain,헤비레인 설명입니다,헤비레인 영웅 설명
-desc_hero_tank,탱크 설명입니다,탱크 영웅 설명
-desc_hero_angel,앤젤 설명입니다,앤젤 영웅 설명
+name_hero_tachyon,타키온,타키온
+desc_hero_corsair,압도적인 가속력으로 전선의 사각을 파고들어 적의 핵심 전력을 단숨에 무력화하는 돌격의 기수입니다,커세어 영웅 설명
+desc_hero_heavyrain,안전거리 밖에서 적의 진형을 초토화하는 원거리 화력의 정점입니다,헤비레인 영웅 설명
+desc_hero_tank,적의 파상공격을 정면으로 받아내며 아군의 진격로를 개척하는 움직이는 요새입니다,탱크 영웅 설명
+desc_hero_angel,나노-리페어 기술로 손상된 아군 유닛을 복구하는 전장의 수호천사입니다,앤젤 영웅 설명
+desc_hero_tachyon,주무기를 통해 에너지를 모은 뒤 오버클럭 탄환을 발사하여 원거리의 적을 무력화합니다.,타키온
 name_unit_minion,미니언,미니언 이름
 name_unit_superminion,강화 미니언,강화미니언 이름
 name_unit_bridge,함교,함교 이름
@@ -17,22 +19,76 @@ desc_unit_minion,미니언 설명입니다,미니언 설명
 desc_unit_superminion,강화미니언 설명입니다,강화미니언 설명
 desc_unit_bridge,함교 설명입니다,함교 설명
 desc_unit_tower,포탑 설명입니다,포탑 설명
-skill_name_hero_corsair,코로나 폭발,커세어 기본 스킬 이름
-skill_name_hero_heavyrain,일점 사격,헤비레인 기본 스킬 이름
-skill_name_hero_tank,장갑 강화,탱크 기본 스킬 이름
-skill_name_hero_angel,긴급 수리,앤젤 기본 스킬 이름
-skill_desc_hero_corsair,자신 주변에 1회의 범위 대미지를 준다,커세어 기본 스킬 설명
-skill_desc_hero_heavyrain,기본 공격을 동시에 3발 발사한다,헤비레인 기본 스킬 설명
-skill_desc_hero_tank,본인의 받는 피해량이 감소한다,탱크 기본 스킬 설명
-skill_desc_hero_angel,본인을 제외한 아군 영웅 한 명의 체력을 회복시킨다,앤젤 기본 스킬 설명
-augment1_name_hero_corsair,태양의 불꽃,커세어 증강 스킬1 이름
-augment1_name_hero_heavyrain,초토화,헤비레인 증강 스킬1 이름
-augment1_name_hero_tank,성벽,탱크 증강 스킬1 이름
-augment1_name_hero_angel,나노봇 투여,앤젤 증강 스킬1 이름
-augment1_desc_hero_corsair,스킬의 범위가 증가한다,커세어 증강 스킬1 설명
-augment1_desc_hero_heavyrain,기본 공격을 동시에 5발 발사한다,헤비레인 증강 스킬1 설명
-augment1_desc_hero_tank,본인의 받는 피해량이 대폭 감소한다,탱크 증강 스킬1 설명
-augment1_desc_hero_angel,범위 내 아군을 회복시킨다,앤젤 증강 스킬1 설명
+skill_name_corsair,소닉 스트라이크,커세어 기본 스킬 이름
+skill_name_heavyrain,포톤 레인,헤비레인 기본 스킬 이름
+skill_name_tank,포스 실드,탱크 기본 스킬 이름
+skill_name_angel,나노봇 투여,앤젤 기본 스킬 이름
+skill_name_tachyon,오버클럭 샷,타키온 기본 스킬 이름
+skill_desc_corsair,적 1명에게 돌진 후 단일 피해를 입힌다,커세어 기본 스킬 설명
+skill_desc_heavyrain,레이저를 단일 대상에게 3회 발사한다,헤비레인 기본 스킬 설명
+skill_desc_tank,5초간 본인의 받는 피해량이 20% 감소한다,탱크 기본 스킬 설명
+skill_desc_angel,본인을 제외한 아군 영웅 한 명의 체력을 회복시킨다,앤젤 기본 스킬 설명
+skill_desc_tachyon,기본 공격 5회마다 멀리 있는 적에게 강화된 공격을 발사한다,타키온 기본 스킬 설명
+augment_name_corsair_A,옴니 스트라이크,커세어 증강 스킬1 이름
+augment_name_heavyrain_A,초토화,헤비레인 증강 스킬1 이름
+augment_name_tank_A,성벽,탱크 증강 스킬1 이름
+augment_name_angel_A,나노 펄스,앤젤 증강 스킬1 이름
+augment_name_tachyon_A,철갑탄,타키온 증강 스킬1 이름
+augment_desc_corsair_A,돌진 후 추가적으로 광역 피해를 입힌다,커세어 증강 스킬1 설명
+augment_desc_heavyrain_A,레이저 발사 횟수가 5회로 증가한다,헤비레인 증강 스킬1 설명
+augment_desc_tank_A,5초간 본인의 받는 피해량이 30% 감소한다,탱크 증강 스킬1 설명
+augment_desc_angel_A,회복이 영웅 한명과 그 주변 아군에게 적용된다,앤젤 증강 스킬1 설명
+augment_desc_tachyon_A,강화 공격에 관통 효과가 추가된다,타키온 증강 스킬1 설명
+enhance_augment_name_corsair_A,옴니 스트라이크+,커세어 강화 증강 스킬1 이름
+enhance_augment_name_heavyrain_A,초토화+,헤비레인 강화 증강 스킬1 이름
+enhance_augment_name_tank_A,성벽+,탱크 강화 증강 스킬1 이름
+enhance_augment_name_angel_A,나노 펄스+,앤젤 강화 증강 스킬1 이름
+enhance_augment_name_tachyon_A,타키온 증강 스킬1 이름,타키온 강화 증강 스킬1 이름
+enhance_augment_desc_corsair_A,돌진 후 추가적으로 강력한 광역 피해를 입힌다,커세어 강화 증강 스킬1 설명
+enhance_augment_desc_heavyrain_A,레이저 발사 횟수가 7회로 증가한다,헤비레인 강화 증강 스킬1 설명
+enhance_augment_desc_tank_A,5초간 본인의 받는 피해량이 40% 감소한다,탱크 강화 증강 스킬1 설명
+enhance_augment_desc_angel_A,회복량이 증가하고 회복이 영웅 한명과 그 주변 아군에게 적용된다,앤젤 강화 증강 스킬1 설명
+enhance_augment_desc_tachyon_A,피해량이 증가하고 강화 공격에 관통 효과가 추가된다,타키온 강화 증강 스킬1 설명
+augment_name_corsair_B,팬텀 스트라이크,커세어 증강 스킬2 이름
+augment_name_heavyrain_B,멀티 샷,헤비레인 증강 스킬2 이름
+augment_name_tank_B,전자기 방출,탱크 증강 스킬2 이름
+augment_name_angel_B,긴급 수리,앤젤 증강 스킬2 이름
+augment_name_tachyon_B,작렬탄,타키온 증강 스킬2 이름
+augment_desc_corsair_B,돌진 횟수가 2회로 증가한다,커세어 증강 스킬2 설명
+augment_desc_heavyrain_B,레이저를 한번에 3발 발사한다,헤비레인 증강 스킬2 설명
+augment_desc_tank_B,스킬 지속시간 동안 주변 적에게 피해를 준다,탱크 증강 스킬2 설명
+augment_desc_angel_B,스킬의 쿨타임이 30% 감소한다,앤젤 증강 스킬2 설명
+augment_desc_tachyon_B,맞은 대상의 주변 적에게도 피해를 준다,타키온 증강 스킬2 설명
+enhance_augment_name_corsair_B,팬텀 스트라이크+,커세어 강화 증강 스킬2 이름
+enhance_augment_name_heavyrain_B,멀티 샷+,헤비레인 강화 증강 스킬2 이름
+enhance_augment_name_tank_B,전자기 방출+,탱크 강화 증강 스킬2 이름
+enhance_augment_name_angel_B,긴급 수리+,앤젤 강화 증강 스킬2 이름
+enhance_augment_name_tachyon_B,작렬탄+,타키온 강화 증강 스킬2 이름
+enhance_augment_desc_corsair_B,돌진 횟수가 3회로 증가한다,커세어 강화 증강 스킬2 설명
+enhance_augment_desc_heavyrain_B,레이저를 한번에 5발 발사한다,헤비레인 강화 증강 스킬2 설명
+enhance_augment_desc_tank_B,스킬 지속시간 동안 주변 적에게 강력한 피해를 준다,탱크 강화 증강 스킬2 설명
+enhance_augment_desc_angel_B,회복량이 증가하고 스킬의 쿨타임이 30% 감소한다,앤젤 강화 증강 스킬2 설명
+enhance_augment_desc_tachyon_B,기본 공격 4회마다 스킬을 사용한다. 맞은 대상의 주변 적에게도 피해를 준다,타키온 강화 증강 스킬2 설명
+passive_name_corsair_1,커세어 패시브 스킬1 이름,커세어 패시브 스킬1 이름
+passive_name_heavyrain_1,헤비레인 패시브 스킬1 이름,헤비레인 패시브 스킬1 이름
+passive_name_tank_1,탱크 패시브 스킬1 이름,탱크 패시브 스킬1 이름
+passive_name_angel_1,앤젤 패시브 스킬1 이름,앤젤 패시브 스킬1 이름
+passive_name_tachyon_1,타키온 패시브 스킬1 이름,타키온 패시브 스킬1 이름
+passive_desc_corsair_1,커세어 패시브 스킬1 설명,커세어 패시브 스킬1 설명
+passive_desc_heavyrain_1,헤비레인 패시브 스킬1 설명,헤비레인 패시브 스킬1 설명
+passive_desc_tank_1,탱크 패시브 스킬1 설명,탱크 패시브 스킬1 설명
+passive_desc_angel_1,앤젤 패시브 스킬1 설명,앤젤 패시브 스킬1 설명
+passive_desc_tachyon_1,타키온 패시브 스킬1 설명,타키온 패시브 스킬1 설명
+passive_name_corsair_2,커세어 패시브 스킬2 이름,커세어 패시브 스킬2 이름
+passive_name_heavyrain_2,헤비레인 패시브 스킬2 이름,헤비레인 패시브 스킬2 이름
+passive_name_tank_2,탱크 패시브 스킬2 이름,탱크 패시브 스킬2 이름
+passive_name_angel_2,앤젤 패시브 스킬2 이름,앤젤 패시브 스킬2 이름
+passive_name_tachyon_2,타키온 패시브 스킬1 설명,타키온 패시브 스킬2 이름
+passive_desc_corsair_2,커세어 패시브 스킬2 설명,커세어 패시브 스킬2 설명
+passive_desc_heavyrain_2,헤비레인 패시브 스킬2 설명,헤비레인 패시브 스킬2 설명
+passive_desc_tank_2,탱크 패시브 스킬2 설명,탱크 패시브 스킬2 설명
+passive_desc_angel_2,앤젤 패시브 스킬2 설명,앤젤 패시브 스킬2 설명
+passive_desc_tachyon_2,타키온 패시브 스킬2 설명,타키온 패시브 스킬2 설명
 hero_type_robot,전술 슈트,영웅의 heroType이 robot이면 정보창에 표시
 hero_type_spacecraft,우주 함선,영웅의 heroType이 spacecraft면 정보창에 표시
 hero_role_tank,방어형,영웅의 heroRole이 tank면 정보창에 표시
@@ -75,6 +131,8 @@ ui_augment_hero_des,영웅 {0}을/를 사용할 수 있습니다,{0}에는 Hero 
 ui_augment_hero_respawn,재소환 대기시간 : {0}초,{0}에는 HeroStat 테이블의 respawnCooldown 참조
 ui_augment_hero_skill_name,스킬 [{0}],{0}에는 영웅이 가진 기본 스킬의 이름 스트링 id 참조
 ui_augment_hero_skill_cooldown,쿨타임: {0}초,{0}에는 영웅이 가진 기본 스킬의 쿨타임 값 참조
+ui_augment_skill_des,영웅 {0}의 스킬을 강화합니다,{0}에는 해당 증강 스킬을 보유한 영웅의 heroName 참조 (여현구 작성)
+ui_augment_skill_name_format,스킬 [{0}] 업그레이드,{0}에는 해당 증강 스킬을 보유한 영웅이 가진 기본 스킬의 이름 참조  (여현구 작성)
 ui_toast_team_change_success,팀이 교체되었습니다.,팀 교체 완료 시 출력될 토스트 메시지
 ui_toast_team_change_failed,팀 교체 신청이 거절되었습니다.,팀 교체 요청 거절될 시 출력될 토스트 메시지
 ui_toast_team_change_unable,{N}초 후 팀 교체 신청 가능,{N} = 팀 교체 신청 가능하기까지 남은 시간 (단위: 초)
@@ -121,3 +179,19 @@ lobby_info,대기실 정보,
 ui_lobby_admin,방장: {0},"대기실 정보 모달창 내 출력될  화면 출력 시점 대기실 방장 닉네임, {0} = 화면 출력 시점 방장인 플레이어 계정 닉네임"
 enter,입장,
 noti_exp_exchange_reward,최대 레벨을 달성한 영웅에게 지급될 경험치는 골드로 변환되었습니다.,대체 보상 지급 시 대전 보상 화면에 출력될 알림 문구
+cur_level,레벨 {N},{N} = 영웅 현재 레벨
+hp,체력,
+attack_power,공격력,
+healing_power,치유력,
+ui_toast_need_exp,경험치가 부족합니다.,"영웅 레벨업 필요 경험치 > 영웅 현재 경험치 일 때, 영웅 레벨업 버튼 입력 시 출력될 토스트 메시지"
+ui_toast_need_gold,골드가 부족합니다.,"영웅 레벨업 필요 골드 > 계정 내 골드량 일 때, 영웅 레벨업 버튼 입력 시 출력될 토스트 메시지"
+ui_text_win,Congratulation!!! ,
+ui_title_win,You Win !!!,
+ui_text_lose,So Sad...,
+ui_title_lose,You Lose....,
+ui_text_draw,Nice Try,
+ui_title_draw,Draw ,
+btn_quit_stage,돌아가기,
+ui_unlock_levelreward,레벨 {N} 달성 시 해금,{N} = 레벨 달성 보상 해금 레벨 (HeroLevelReward 테이블 level 칼럼 참조)
+ui_toast_host_missing,호스트와의 연결이 끊겨 대기 중입니다,호스트가 홈버튼을 눌러 어플레이케이션이 내려갔을 때 -> 다른 플레이어들에게 팝업 출력
+ui_toast_player_missing,다른 플레이어와 연결이 끊겨 로비로 돌아갑니다,플레이어 중 한 명이 완전히 네트워크 끊기면 -> 다른 플레이어들에게 팝업 출력 

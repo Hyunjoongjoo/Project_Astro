@@ -17,6 +17,8 @@ public class TableManager : Singleton<TableManager>
     public TableBase<ItemEffectData> ItemEffectTable = new TableBase<ItemEffectData>();
     public TableBase<StringData> StringTable = new TableBase<StringData>();
     public TableBase<UnitData> UnitTable = new TableBase<UnitData>();
+    public TableBase<SkillInfoData> SkillInfoTable = new TableBase<SkillInfoData>();
+    public TableBase<MatchRewardData> MatchRewardTable = new TableBase<MatchRewardData>();
 
 
     protected override void Awake()
@@ -24,6 +26,7 @@ public class TableManager : Singleton<TableManager>
         base.Awake();
         //코루틴으로 변경
         StartCoroutine(LoadAllData());
+        InputValidator.InitializeBadWords();
     }
 
 

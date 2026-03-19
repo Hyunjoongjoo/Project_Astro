@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,14 +9,26 @@ public enum StageState
     WaitingForPlayers,    // 플레이어 대기 중
     AssigningTeams,       // 팀 배정 중
     ShowingPlayerInfo,    // 플레이어 정보 표시
-    AugmentSelection,     // 증강 선택 단계
+    PreGameAugment,       // 게임 시작 전 2연속 증강
     Countdown,            // 카운트다운
     Playing,              // 게임 진행 중
     GameOver              // 게임 종료
 }
 
+public struct HeroResultData
+{
+    public string HeroId;        
+    public string HeroName;        
+    public int    Level;          
+    public int    CurrentExp;     
+    public int    AddedExp;       
+    public int    MaxExp;         
+}
+
 public class StageManager : NetworkBehaviour
 {
+    public static StageManager Instance { get; private set; }
+
     [Networked, HideInInspector] public StageState CurrentState { get; set; }
     [Networked, HideInInspector] public float StateTimer { get; set; }
     [Networked, HideInInspector] public int CountdownValue { get; set; }
@@ -38,18 +51,36 @@ public class StageManager : NetworkBehaviour
 
     [SerializeField] private NetworkPrefabRef _minionSpawnerPrefab;
 
+    private UserDataManager _userDataManager;
+
     ObjectContainer _objectContainer;
     private StageUI _stageUI;
     private Camera _mainCamera;
 
-    private MatchType _curMatchType;
     private int _requiredPlayerCount;
 
-    private readonly int GAME_DURATION = 240;
+    private int GAME_DURATION;
+    private int AUGMENT_GAUGE;
     private readonly float PLAYER_INFO_DURATION = 4f;
     private readonly float COUNTDOWN_INTERVAL = 1f;
 
     private PlayerNetworkData _localPlayerMap = default;
+
+    //팀원 UI관리용 딕셔너리
+    private Dictionary<PlayerRef, TeamCardSlotUI> _teammateUIList = new Dictionary<PlayerRef, TeamCardSlotUI>();
+
+    //내가 차단한 유저 목록
+    private HashSet<PlayerRef> _myBlockedPlayers = new HashSet<PlayerRef>();
+    public PlayerRef[] PlayerIndexMap = new PlayerRef[4]; //인덱스 매핑용
+
+    //게임 시작 전 증강 g 추적 (1라운드, 2라운드)
+    [Networked, HideInInspector] public int PreGameAugmentRound { get; set; }
+    // 매치 타입 동기화
+    [Networked] private MatchType CurMatchType { get; set; }
+
+
+    //더미 클라이언트 존재 여부
+    private bool _existDummy;
 
     private void Awake()
     {
@@ -57,16 +88,33 @@ public class StageManager : NetworkBehaviour
         _stageUI = FindFirstObjectByType<StageUI>();
         if (_stageUI == null)
             Debug.Log("스테이지 UI 찾지 못함");
+
+        _userDataManager = FindFirstObjectByType<UserDataManager>();
+        if (_userDataManager == null)
+            Debug.Log("UserDataManager 찾지 못함");
+
+        DBStatus.IsUpdating = false;
     }
 
-    public void Initialize(MatchType matchType, int requiredPlayerCount)
+    private void Start()
     {
-        _curMatchType = matchType;
+        AUGMENT_GAUGE = int.Parse(TableManager.Instance.ConfigTable.Get("augment_gauge").configValue);
+        GAME_DURATION = int.Parse(TableManager.Instance.ConfigTable.Get("game_time_limit").configValue);
+
+        if (_stageUI != null)
+            _stageUI.SetMaxValueAugmentSlider(AUGMENT_GAUGE);
+    }
+
+    public void Initialize(MatchType matchType, int requiredPlayerCount, bool existDummy)
+    {
+        CurMatchType = matchType;
         _requiredPlayerCount = requiredPlayerCount;
+        _existDummy = existDummy;
     }
 
     public override void Spawned()
     {
+        Instance = this;
         GameManager.Instance.ChangeState(GameState.Ready);
         _objectContainer = ObjectContainer.Instance;
         _objectContainer.OnIncreasedAugmentGauge += IncreaseAugmentGauge;
@@ -92,7 +140,8 @@ public class StageManager : NetworkBehaviour
         var data = new PlayerNetworkData
         {
             PlayerName = nickName,
-            Team = Team.None // 아직 팀 배정 전
+            Team = Team.None,
+            UsedHeroBitmask = 0
         };
 
         PlayerDataMap.Set(playerRef, data);
@@ -115,6 +164,11 @@ public class StageManager : NetworkBehaviour
                 UpdatePlayerInfoTimer();
                 break;
 
+                //3.9 추가(증강 선택 타이머용)
+            case StageState.PreGameAugment: 
+                UpdateAugmentSelectionTimer(); 
+                break;
+
             case StageState.Countdown:
                 UpdateCountdown();
                 break;
@@ -129,8 +183,10 @@ public class StageManager : NetworkBehaviour
 
     private void CheckAllPlayersReady()
     {
-        if (Runner.ActivePlayers.Count() == _requiredPlayerCount
-            && PlayerDataMap.Count == _requiredPlayerCount)
+        // 더미가 존재하면 바로 시작
+        // 플레이어가 모두 채워져있다면 준비되었는지 확인함
+        if (_existDummy || 
+            (Runner.ActivePlayers.Count() == _requiredPlayerCount && PlayerDataMap.Count == _requiredPlayerCount))
         {
             AssignTeams();
             CurrentState = StageState.ShowingPlayerInfo;
@@ -146,8 +202,6 @@ public class StageManager : NetworkBehaviour
         // 반으로 나눔 ( 2 -> 1, 4 -> 2)
         int half = players.Count / 2;
 
-        // ============== 구조체로 시도 ==============
-
         for (int i = 0; i < players.Count; i++)
         {
             Team team = i < half ? Team.Blue : Team.Red;
@@ -158,22 +212,9 @@ public class StageManager : NetworkBehaviour
             PlayerDataMap.Set(players[i], data);
         }
 
-        // ============== 여기까지 ==============
-
-        // ============== 기존 팀 배정 ==============
-
-        // 앞 절반 블루팀, 뒤 절반 레드팀
-        //for (int i = 0; i < half; i++)
-        //    PlayerTeams.Add(players[i], Team.Blue);
-
-        //for (int i = half; i < players.Count; i++)
-        //    PlayerTeams.Add(players[i], Team.Red);
-
-        // ============== 여기까지 ==============
-
         // 팀 자원인 증강 게이지도 추가함.
-        AugmentExp.Add(Team.Blue, 100);
-        AugmentExp.Add(Team.Red, 100);
+        AugmentExp.Add(Team.Blue, 0);
+        AugmentExp.Add(Team.Red, 0);
 
         // RPC로 모든 클라이언트에 팀 배정 알림
         RPC_NotifyTeamAssignment();
@@ -196,10 +237,11 @@ public class StageManager : NetworkBehaviour
     private void ShowPlayerInfo(Team myTeam)
     {
         // 플레이어 수와 팀에 따라 각 로컬 초기화
-        _stageUI.LocalInitialize(PlayerDataMap.Count, myTeam);
+        _stageUI.LocalInitialize(CurMatchType, myTeam);
 
         PlayerNetworkData[] data = new PlayerNetworkData[PlayerDataMap.Count];
 
+        PlayerIndexMap = new PlayerRef[4]; // 매핑 초기화
 
         // 배열에 플레이어 정보를 채울건데
         // [나, 적1, 팀원, 적2] 순으로 채워짐.
@@ -207,18 +249,47 @@ public class StageManager : NetworkBehaviour
         int index = 1;
         foreach (var player in PlayerDataMap)
         {
-            if (player.Key == Runner.LocalPlayer) // 나.
+            if (player.Key == Runner.LocalPlayer) //나
+            {
                 data[0] = player.Value;
+                PlayerIndexMap[0] = player.Key;
+            }   
             else if (player.Value.Team == myTeam) // 나는 아닌데 같은 팀 -> 2:2라는 뜻
+            {
                 data[2] = player.Value;
+                PlayerIndexMap[2] = player.Key;
+                //팀원이면 UI 생성 및 등록
+                //3.15 플레이어 Ref 추가
+                var ui = _stageUI.GetTeammateSlot(player.Value.PlayerName.ToString(), player.Key);
+                RegisterTeammateUI(player.Key, ui);
+            }
             else // 나도 아니고 같은 팀도 아님 -> 적이라는 뜻
             {
                 data[index] = player.Value;
+                PlayerIndexMap[index] = player.Key;
                 index += 2;
             }  
         }
 
         _stageUI.ShowPlayerInfo(data);
+        var chatManager = FindFirstObjectByType<ChatManager>();
+        if (chatManager != null)
+        {
+            // PlayerDataMap.Count가 2이면 1:1, 4이면 2:2
+            chatManager.RefreshToggleButtons(PlayerDataMap.Count);
+        }
+    }
+
+    //타이머 깎는 함수 추가
+    private void UpdateAugmentSelectionTimer()
+    {
+        StateTimer -= Runner.DeltaTime;
+        if (StateTimer <= 0)
+        {
+            //시간 종료 시모든 클라이언트에게 강제로 픽하라고 명령
+            RPC_ForceAugmentTimeout();
+            StateTimer = 9999f; //RPC가 중복 호출 방지 9999
+        }
     }
 
     private void UpdatePlayerInfoTimer()
@@ -229,8 +300,8 @@ public class StageManager : NetworkBehaviour
         {
             // 플레이어 정보 숨기고 증강 선택 시작
             RPC_HidePlayerInfo();
-            CurrentState = StageState.AugmentSelection;
-            EnterAugmentSelection();
+            CurrentState = StageState.PreGameAugment;
+            EnterPreGameAugment();
         }
     }
 
@@ -240,41 +311,84 @@ public class StageManager : NetworkBehaviour
         _stageUI.HidePlayerInfo();
     }
 
-    private void EnterAugmentSelection()
+    //2연 증강 로직
+    private void EnterPreGameAugment()
     {
         if (Object.HasStateAuthority)
         {
-            // 모든 클라이언트에게 증강 UI를 띄우라고 알림
-            RPC_RequestAugmentSelection();
+            PreGameAugmentRound = 1; //1라운드 시작
+            StartPreGameAugmentRound();
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_RequestAugmentSelection()
+    private void StartPreGameAugmentRound()
     {
-        // 3장의 랜덤 카드를 뽑아 UI를 띄움
-        AugmentController.Instance.OpenAugmentWindow();
+        if (Object.HasStateAuthority)
+        {
+            //3.9 ConfigTable 기준 15초 세팅
+            float selectTime = 15f; //기본값
+            var config = TableManager.Instance.ConfigTable.Get("augment_select_time");
+            if (config != null) selectTime = float.Parse(config.configValue);
 
-        Debug.Log("증강 선택 시작!");
+            StateTimer = selectTime; //타이머 시작
+            _playerAugmentReady.Clear(); //레디 초기화
+            RPC_RequestPreGameAugment(PreGameAugmentRound);
+        }
+    }
+
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_RequestPreGameAugment(int round)
+    {
+        AugmentController.Instance.OpenAugmentWindow();
+        Debug.Log("게임 시작 전 증강 선택 시작!");
+    }
+
+    //타임아웃  RPC
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ForceAugmentTimeout()
+    {
+        Debug.Log("증강 제한 시간 종료되어 랜덤 픽 실행");
+        AugmentManager.Instance.ForceRandomPick();
+    }
+
+    //UI에서 본인의 남은 시간을 가져다 쓸 수 있게 해주는 헬퍼 함수
+    public float GetMyAugmentTimeLeft()
+    {
+        //인게임 로직은 분리
+        if (CurrentState == StageState.PreGameAugment)
+            return StateTimer;
+
+        return 0f;
     }
 
     // 플레이어들이 증강을 선택하면 마스터에게 알림.
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_ReportAugmentComplete(PlayerRef player)
     {
-        if (!_playerAugmentReady.ContainsKey(player))
+        if (CurrentState == StageState.PreGameAugment)
         {
-            _playerAugmentReady.Add(player, true);
-        }
+            if (!_playerAugmentReady.ContainsKey(player))
+            {
+                _playerAugmentReady.Add(player, true);
+            }
 
-        // 모든 플레이어가 선택을 완료했는지 확인
-        if (_playerAugmentReady.Count == Runner.ActivePlayers.Count())
-        {
-            Debug.Log("모든 플레이어 증강 선택 완료. 게임을 시작합니다.");
-
-            CurrentState = StageState.Countdown;
-            CountdownValue = 4;
-            StateTimer = COUNTDOWN_INTERVAL;
+            //모두가 현재 라운드 픽을 마쳤다면
+            if (_playerAugmentReady.Count == Runner.ActivePlayers.Count())
+            {
+                if (PreGameAugmentRound == 1)
+                {
+                    PreGameAugmentRound = 2; //2번째선택
+                    StartPreGameAugmentRound();
+                }
+                else
+                {
+                    Debug.Log("모든 플레이어 2회 증강 선택 완료. 게임을 시작합니다.");
+                    CurrentState = StageState.Countdown;
+                    CountdownValue = 4;
+                    StateTimer = COUNTDOWN_INTERVAL;
+                }
+            }
         }
     }
 
@@ -356,12 +470,42 @@ public class StageManager : NetworkBehaviour
             }
             else
             {
-                // 인게임 타이머 4분이 다 됨. 
-                // 시간 종료 시 승패 규칙에 따라 승패 RPC
-                // TODO : 일단 무승부로 처리. 추후 승패 판정 로직 추가
-                RPC_GameOver(Team.None);
+                TimeOver();
             }
         }
+    }
+    private void TimeOver()
+    {
+        if (!Object.HasStateAuthority) return;
+
+        int blueTowerCount = 0;
+        int redTowerCount = 0;
+
+        foreach (var tower in Tower.AliveTowers)
+        {
+            if (tower.team == Team.Blue) blueTowerCount++;
+            else if (tower.team == Team.Red) redTowerCount++;
+        }
+
+        Debug.Log($"남은 타워 수 = Blue: {blueTowerCount}, Red: {redTowerCount}");
+
+        Team victoryTeam = Team.None;
+
+        if (blueTowerCount > redTowerCount)
+        {
+            victoryTeam = Team.Blue;
+        }
+        else if (redTowerCount > blueTowerCount)
+        {
+            victoryTeam = Team.Red;
+        }
+        else
+        {
+            victoryTeam = Team.None;
+        }
+
+        CurrentState = StageState.GameOver;
+        RPC_GameOver(victoryTeam);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -386,7 +530,7 @@ public class StageManager : NetworkBehaviour
     {
         if (AugmentExp.TryGet(team, out int curExp))
         {
-            int value = AugmentExp.Set(team, curExp - amount);
+            int value = AugmentExp.Set(team, Mathf.Max(0, curExp - amount));
             RPC_UpdateAugmentGauge(team, value);
         }
 
@@ -409,6 +553,8 @@ public class StageManager : NetworkBehaviour
     // =============== 여기부터 함교 파괴 감지 ~ 게임 종료 후 로비로 복귀까지 ===============
     private void BridgeDestroyed(UnitBase unit)
     {
+        if (CurrentState == StageState.GameOver) return;
+
         Debug.Log("브릿지 파괴 이벤트 메서드에 진입 완료");
         CurrentState = StageState.GameOver;
 
@@ -426,43 +572,196 @@ public class StageManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_GameOver(Team victory)
     {
+        if(DBStatus.IsUpdating)
+        {
+            return;
+        }
+        DBStatus.IsUpdating = true;
+
         Debug.Log("게임오버 RPC 진입 성공");
         _stageUI.gameObject.SetActive(true);
-
+        _stageUI.goLobbyBtn.onClick.RemoveAllListeners();
         _stageUI.goLobbyBtn.onClick.AddListener(ShutDownAndSceneChange);
 
-        if (_localPlayerMap.Equals(default(PlayerNetworkData)))
-            _localPlayerMap = PlayerDataMap.Get(Runner.LocalPlayer);
+        _localPlayerMap = PlayerDataMap.Get(Runner.LocalPlayer);
 
         Team myTeam = _localPlayerMap.Team;
+        Debug.Log($"승리팀 : {victory}, 내 팀 : {myTeam}, 비트마스크 : {_localPlayerMap.UsedHeroBitmask}");
 
-        Debug.Log($"승리팀 : {victory}, 내 팀 : {myTeam}");
+        bool isWin = (myTeam == victory);
+        bool isDraw = (victory == Team.None);
 
-        // 일단 패널 아무거나 띄움. 나중에 UI매니저에게
-        if (victory == Team.None) // 무승부도 존재하는 것으로 보임. 승리팀이 없으면 무승부
+        // 승패 결과에 따른 리워드 세팅
+        MatchResult resultType = isDraw ? MatchResult.Draw : (isWin ? MatchResult.Win : MatchResult.Lose);
+
+        var rewardData = TableManager.Instance.MatchRewardTable.GetAll().Find(r =>
+            r.matchType == CurMatchType && r.matchResult == resultType);
+
+        if (rewardData == null)
         {
-            Debug.Log("무승부입니다.");
-            // TODO : bool 값으로 승리 또는 패배만 띄우는데 무승부 처리도 필요
-            _stageUI.ShowResultPanel(true); 
+            Debug.LogError($"[GameOver] 리워드 테이블 데이터를 찾을 수 없습니다! Type: {CurMatchType}, Result: {resultType}");
+            return;
         }
-        else if (myTeam == victory)
+
+        // DB에 업데이트 파트
+        Dictionary<string, object> updates = new Dictionary<string, object>();
+
+        int finalGold = UserDataManager.Instance.WalletModel.gold + rewardData.gold;
+        updates.Add("Wallet.gold", finalGold);
+
+        int winAdd = (resultType == MatchResult.Win) ? 1 : 0;
+        int loseAdd = (resultType == MatchResult.Lose) ? 1 : 0;
+        int drawAdd = (resultType == MatchResult.Draw) ? 1 : 0;
+
+        if (winAdd > 0)
+            updates.Add("Record.win", UserDataManager.Instance.RecordModel.win + winAdd);
+        if (loseAdd > 0)
+            updates.Add("Record.lose", UserDataManager.Instance.RecordModel.lose + loseAdd);
+        if (drawAdd > 0)
+            updates.Add("Record.draw", UserDataManager.Instance.RecordModel.draw + drawAdd);
+
+        Debug.Log("획득한 골드량 : " + rewardData.gold);
+
+        List<HeroResultData> resultHeroes = new List<HeroResultData>();
+        List<HeroDbModel> heroesToUpdate = new List<HeroDbModel>();
+
+        var allHeroTable = TableManager.Instance.HeroTable.GetAll();
+
+        for (int i = 0; i < 32; i++)
         {
-            Debug.Log("승리했습니다!!");
-            _stageUI.ShowResultPanel(true);
+            // 내 비트마스크에서 i번째 비트가 켜져 있는지 확인
+            if ((_localPlayerMap.UsedHeroBitmask & (1u << i)) != 0)
+            {
+                if (i < allHeroTable.Count)
+                {
+                    var tableData = allHeroTable[i];
+                    string heroId = tableData.id;
+
+                    // 유저의 영웅 보유 모델(레벨/경험치 정보) 가져오기
+                    var heroModel = _userDataManager.HeroesModel.Find(h => h.heroId == heroId);
+
+                    if (heroModel != null)
+                    {
+                        // 테이블에서 해당 레벨의 최대 경험치 정보 가져오기 (예시 테이블 참조)
+                        var levelData = TableManager.Instance.HeroLevelTable.Get(heroModel.level.ToString());
+                        int maxExp = (levelData != null) ? levelData.expRequirement : 10000;
+
+                        // UI 출력용 모델
+                        resultHeroes.Add(new HeroResultData
+                        {
+                            HeroId     = tableData.id,
+                            HeroName   = tableData.heroName,
+                            Level      = heroModel.level,
+                            CurrentExp = heroModel.exp,
+                            AddedExp   = rewardData.exp,
+                            MaxExp     = maxExp
+                        });
+
+                        // DB 저장용 모델 (최종 합산된 데이터)
+                        heroesToUpdate.Add(new HeroDbModel
+                        {
+                            heroId = tableData.id,
+                            level = heroModel.level,
+                            exp = heroModel.exp + rewardData.exp,
+                            isUnlock = heroModel.isUnlock
+                        });
+                    }
+                }
+            }
         }
-        else
-        {
-            Debug.Log("패배했습니다!!");
-            _stageUI.ShowResultPanel(false);
-        }
-        
+        // 4. DB 일괄 업데이트 실행 (배치 커밋)
+        string myUuid = UserDataManager.Instance.ProfileModel.uuid;
+        _ = _userDataManager.UpdateAll(updates, heroesToUpdate);
+
+        // 획득한 골드량과 함께 UI 호출
+        //_stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, reward.GoldAmount, reward.UserExp); //이건 나중에 유저 경험치도 하게된다면.
+        _stageUI.ShowResultPanel(resultType, resultHeroes, rewardData.gold);
+
+        // UI 출력
         GameManager.Instance.ChangeState(GameState.Result);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_MarkHeroUsed(PlayerRef player, string heroId)
+    {
+        MarkHeroUsed(player, heroId);
+    }
+
+    public void NetworkExceptionUiControl(bool panel, bool isWaiting)
+    {
+        _stageUI.SetNetworkExceptionPanel(panel, isWaiting);
+    }
+
+    public void MarkHeroUsed(PlayerRef unitOwner, string heroId)
+    {
+        if (!Object.HasStateAuthority) return;
+        Debug.Log("Object.HasStateAuthority가 true다.");
+        if (PlayerDataMap.TryGet(unitOwner, out var data))
+        {
+            Debug.Log("[Masking] 트라이 겟 성공해서 들어옴");
+            int index = TableManager.Instance.HeroTable.GetAll().FindIndex(h => h.id == heroId);
+
+            if (index >= 0 && index < 32)
+            {
+                uint bit = 1u << index;
+
+                // 중복 방지 (이미 저장된 비트면 리턴)
+                if ((data.UsedHeroBitmask & bit) != 0) return;
+
+                // 해당 유닛 주인(unitOwner)의 비트마스크만 갱신
+                data.UsedHeroBitmask |= bit;
+                PlayerDataMap.Set(unitOwner, data);
+
+                Debug.Log($"[HeroRecord] 플레이어 {unitOwner}의 데이터중 {index}번 비트에 {heroId} 저장.");
+            }
+        }
     }
 
     public async void ShutDownAndSceneChange()
     {
         await Runner.Shutdown();
-
+        GameManager.Instance.SetSceneState(SceneState.Lobby);
         SceneManager.LoadScene("Lobby");
+    }
+
+    //---------------------UI 로직 --------------
+
+    // UI 생성 시점에 이 메서드를 호출하여 리스트에 등록해둠
+    public void RegisterTeammateUI(PlayerRef playerRef, TeamCardSlotUI ui)
+    {
+        if (!_teammateUIList.ContainsKey(playerRef))
+            _teammateUIList.Add(playerRef, ui);
+    }
+
+    // 외부에서 RPC를 통해 호출할 메서드
+    public void UpdateTeammateUI(PlayerRef ownerPlayer, SlotData_5 newData)
+    {
+        if (_teammateUIList.TryGetValue(ownerPlayer, out var ui))
+        {
+            ui.Refresh(newData); // TeamCardSlotUI의 Refresh 실행
+
+            //3.18 여현구 추가
+            //맵에서 데이터 꺼내서 아이템 보관함도 갱신
+            if (PlayerDataMap.TryGet(ownerPlayer, out var data))
+            {
+                ui.UpdateItems(data.InventoryItems);
+            }
+        }
+
+    }
+
+    //---------차단 유저 관리용 메서드들 ----------
+    public void BlockPlayer(PlayerRef player) => _myBlockedPlayers.Add(player);
+    public void UnblockPlayer(PlayerRef player) => _myBlockedPlayers.Remove(player);
+    public bool IsBlocked(PlayerRef player) => _myBlockedPlayers.Contains(player);
+
+    //이 인덱스의 유저가 누구인지 반환
+    public PlayerRef GetPlayerRefByIndex(int index)
+    {
+        if (index >= 0 && index < PlayerIndexMap.Length)
+        {
+            return PlayerIndexMap[index];
+        }
+        return PlayerRef.None;
     }
 }
