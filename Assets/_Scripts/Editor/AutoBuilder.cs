@@ -70,6 +70,10 @@ public class AutoBuilder : EditorWindow
     }
     public static void BuildAll(string password)
     {
+        //키스토어 설정 적용
+        PlayerSettings.Android.useCustomKeystore = true;
+        PlayerSettings.Android.keystorePass = password;
+        PlayerSettings.Android.keyaliasPass = password;
 
         //어드레서블 빌드
         AddressableAssetSettings.BuildPlayerContent();
