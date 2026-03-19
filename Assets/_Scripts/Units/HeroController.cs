@@ -63,7 +63,7 @@ public class HeroController : UnitController
         _unitStat = GetComponent<UnitStat>();
 
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
-
+        moveType = statData.moveType;
         //UnitStat 초기화
         _unitStat.Init(statData);
 
@@ -73,7 +73,7 @@ public class HeroController : UnitController
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
         agent.speed = MoveSpeed;
-
+        ConfigureAreaMask();
         if (agent != null)
         {
             agent.enabled = false;
