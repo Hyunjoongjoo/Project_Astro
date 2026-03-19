@@ -1,8 +1,9 @@
-using UnityEditor;
-using UnityEngine;
-using UnityEditor.AddressableAssets.Settings;
+using System;
 using System.Linq;
+using UnityEditor;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.Build.Reporting;
+using UnityEngine;
 
 public class AutoBuilder : EditorWindow
 {
@@ -85,7 +86,8 @@ public class AutoBuilder : EditorWindow
             .ToArray();
 
         //빌드 설정
-        string buildPath = "Builds/Android_TestBuild.apk";
+        string date = DateTime.Now.ToString("MMdd_HHmm");
+        string buildPath = $"Builds/ASTRO_Build_{date}.apk";
 
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
         {
