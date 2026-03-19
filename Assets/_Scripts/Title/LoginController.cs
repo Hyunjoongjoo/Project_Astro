@@ -111,6 +111,12 @@ public class LoginController : MonoBehaviour
             var user = await _authService.SignInWithGoogleAsync();
             Debug.Log("파이어베이스 Auth 로그인 ");
 
+            if (user == null)
+            {
+                Debug.LogWarning("[Login] 구글 로그인 시도가 취소되었거나 실패했습니다.");
+                return;
+            }
+
             if (_loginSelectUI.gameObject.activeSelf)
             {
                 _loginSelectUI.DeActivate();
