@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Threading.Tasks;
+using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.RemoteConfig;
@@ -9,6 +10,7 @@ using UnityEngine;
 public class VersionManager : Singleton<VersionManager>
 {
     [SerializeField] private GameObject _versionResultPrefab;
+    [SerializeField] private TextMeshProUGUI _versionText;
 
     public struct userAttributes { }
     public struct appAttributes { }
@@ -20,6 +22,7 @@ public class VersionManager : Singleton<VersionManager>
     private void Start()
     {
         _ = InitializeAsync();
+        _versionText.text = $"v{Application.version}";
     }
 
     // 초기화 및 최초 버전 체크
