@@ -45,11 +45,22 @@ public class StageUI : MonoBehaviour
     private float _lastRecievedRPCTime = 0f;
     private const float TIMER_RPC_TIMEOUT = 3f;
     private bool _isHostPaused = false;
+    private readonly string HOST_MISSING = "ui_toast_host_missing";
+    private readonly string PLAYER_MISSING = "ui_toast_player_missing";
 
     private void Awake()
     {
         _countdownIndicator.gameObject.SetActive(false);
         _resultPanel.gameObject.SetActive(false);
+    }
+
+    private void Start()
+    {
+        _waitingHost.GetComponent<TextMeshProUGUI>().text = 
+            TableManager.Instance.GetString(HOST_MISSING);
+
+        _disconnected.GetComponent<TextMeshProUGUI>().text =
+            TableManager.Instance.GetString(PLAYER_MISSING);
     }
 
     private void Update()
