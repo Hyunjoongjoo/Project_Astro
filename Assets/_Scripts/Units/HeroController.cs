@@ -43,10 +43,7 @@ public class HeroController : UnitController
         // 부스터는 반드시 자식 오브젝트에서 첫번째에 위치한다.
         BoosterAnimator = transform.GetChild(0).GetComponent<Animator>();
 
-        if (_normalAttackData is ProjectileSkillSO)
-        {
-            attackRange = Mathf.Max((_normalAttackData as ProjectileSkillSO).range, MIN_ATTACK_RANGE);
-        }
+        InitAttackRange();
 
         if (!Object.HasStateAuthority) return;
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
@@ -165,6 +162,7 @@ public class HeroController : UnitController
         if (newSkillSO != null)
         {
             curUniqueSkill = newSkillSO.CreateInstance(this);
+            //InitAttackRange();//평타 사거리가 바뀌는 스킬이 생길경우
             Debug.Log($"[{unitId}] 스킬이 {newSkillSO.name}으로 교체되었습니다!");
         }
     }

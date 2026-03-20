@@ -70,10 +70,7 @@ public class UnitController : UnitBase
 
         normalAttack = _normalAttackData.CreateInstance(this);
 
-        if (_normalAttackData is ProjectileSkillSO)
-        {
-            attackRange = Mathf.Max((_normalAttackData as ProjectileSkillSO).range, MIN_ATTACK_RANGE);
-        }
+        InitAttackRange();
 
         if (!Object.HasStateAuthority) return;
 
@@ -178,6 +175,15 @@ public class UnitController : UnitBase
                 //MeteorZone 차단
                 agent.areaMask = NavMesh.AllAreas & ~(1 << meteorArea);
                 break;
+        }
+    }
+
+    //공격 사거리 초기화 메서드
+    protected void InitAttackRange()
+    {
+        if (_normalAttackData is ProjectileSkillSO projectileSO)
+        {
+            attackRange = Mathf.Max(projectileSO.range, MIN_ATTACK_RANGE);
         }
     }
 
