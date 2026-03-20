@@ -11,7 +11,7 @@ public class UnitController : UnitBase
     [SerializeField] protected MoveType moveType;
 
     [Header("스탯 관련")]
-    public float attackRange = 5;
+    [HideInInspector] public float attackRange;
     [SerializeField] protected string unitId;
     public Transform firePoint;
 
@@ -27,7 +27,7 @@ public class UnitController : UnitBase
     [Header("스킬 데이터")]
     [Header("평타 공격")]
     [SerializeField] protected BaseSkillSO _normalAttackData;
-
+    
     // 상태 머신과 상태 인스턴스들
     public StateMachine StateMachine { get; protected set; }
     public DetectState DetectState { get; protected set; }
@@ -59,6 +59,9 @@ public class UnitController : UnitBase
             return team == Team.Blue ? LayerMask.GetMask("BlueTeam") : LayerMask.GetMask("RedTeam");
         }
     }
+
+    protected readonly float MIN_ATTACK_RANGE = 2f;
+
     public override void Spawned()
     {
         base.Spawned();
@@ -66,6 +69,11 @@ public class UnitController : UnitBase
         unitType = UnitType.Minion;
 
         normalAttack = _normalAttackData.CreateInstance(this);
+
+        if (_normalAttackData is ProjectileSkillSO)
+        {
+            attackRange = Mathf.Min((_normalAttackData as ProjectileSkillSO).range, MIN_ATTACK_RANGE);
+        }
 
         if (!Object.HasStateAuthority) return;
 
