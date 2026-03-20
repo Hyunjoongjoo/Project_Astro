@@ -45,7 +45,7 @@ public class HeroController : UnitController
 
         if (_normalAttackData is ProjectileSkillSO)
         {
-            attackRange = Mathf.Min( (_normalAttackData as ProjectileSkillSO).range, MIN_ATTACK_RANGE);
+            attackRange = Mathf.Max((_normalAttackData as ProjectileSkillSO).range, MIN_ATTACK_RANGE);
         }
 
         if (!Object.HasStateAuthority) return;
