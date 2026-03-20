@@ -197,3 +197,4 @@ ui_toast_host_missing,호스트와의 연결이 끊겨 대기 중입니다,Conne
 ui_toast_player_missing,다른 플레이어와\n연결이 끊겨\n로비로 돌아갑니다,Connection lost with another player.\nReturning to lobby.,플레이어 중 한 명이 완전히 네트워크 끊기면 -> 다른 플레이어들에게 팝업 출력 
 equip_emote,장착된 이모티콘 ({0}/{1}),Equipped Emotes ({0}/{1}),
 ui_toast_hero_purchase_need_gold,골드가 부족합니다.,Not enough Gold to purchase hero.,
+ui_augment_item_des,영웅에게 아이템을 장착할 수 있습니다,You can equip items to heroes.,3/20 여현구 작성(아이템 증강 쪽 미작성 되어 있던 String ID 입니다)
