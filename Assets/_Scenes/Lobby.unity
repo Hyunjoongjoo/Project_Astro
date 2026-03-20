@@ -4796,6 +4796,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f78c9656b7db1440ad5fe8a94c869e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Options
+  _korBtn: {fileID: 1342629495}
+  _engBtn: {fileID: 1824638274}
 --- !u!114 &127888822
 MonoBehaviour:
   m_ObjectHideFlags: 0

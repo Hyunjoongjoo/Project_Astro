@@ -5,14 +5,11 @@ using UnityEngine.UI;
 
 public class Options : MonoBehaviour
 {
-    private Button _korBtn;
-    private Button _engBtn;
+    [SerializeField] private Button _korBtn;
+    [SerializeField] private Button _engBtn;
 
     private void Start()
     {
-        //버튼생기면 이름 수정
-        _korBtn = transform.Find("KorBtn").GetComponent<Button>();
-        _engBtn = transform.Find("EngBtn").GetComponent<Button>();
         RefreshLanguageButtons();
 
         //언어가 바뀔 때마다 버튼 상태 자동 갱신
