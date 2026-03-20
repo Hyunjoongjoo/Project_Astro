@@ -260,12 +260,19 @@ public class HeroSpawner : NetworkBehaviour
     {
         if (!Application.isPlaying) return;
 
-        Transform origin = GetDeployOrigin(Team.Blue);
+        DrawDeployGizmo(Team.Blue, Color.blue);
+
+        DrawDeployGizmo(Team.Red, Color.red);
+    }
+
+    private void DrawDeployGizmo(Team team, Color color)
+    {
+        Transform origin = GetDeployOrigin(team);
         if (origin == null) return;
 
-        float distance = GetCurrentDeployDistance(Team.Blue);
+        float distance = GetCurrentDeployDistance(team);
 
-        Gizmos.color = Color.green;
+        Gizmos.color = color;
         Gizmos.DrawWireSphere(origin.position, distance);
     }
 #endif
