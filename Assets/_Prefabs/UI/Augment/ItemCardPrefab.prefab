@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.9941945, b: 1, a: 0.2}
+  m_Color: {r: 0, g: 0.9941945, b: 1, a: 0.078431375}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -711,6 +711,9 @@ MonoBehaviour:
   _itemDescription: {fileID: 6996938851940257511}
   _selectBtn: {fileID: 7135005315365410320}
   _highlightObj: {fileID: 1065374840382445939}
+  _visualRoot: {fileID: 7542442816759294197}
+  _hoverScale: 1.1
+  _animDuration: 0.2
 --- !u!114 &2655665905610693427
 MonoBehaviour:
   m_ObjectHideFlags: 0

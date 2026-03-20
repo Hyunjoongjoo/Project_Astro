@@ -153,6 +153,9 @@ MonoBehaviour:
   _skillCoolTxt: {fileID: 3904210233936640161}
   _selectBtn: {fileID: 1448131494327005669}
   _highlightObj: {fileID: 8778802816222887558}
+  _visualRoot: {fileID: 2283405981279440640}
+  _hoverScale: 1.1
+  _animDuration: 0.2
 --- !u!222 &6553150027251201400
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1424,7 +1427,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.9941945, b: 1, a: 0.2}
+  m_Color: {r: 0, g: 0.9941945, b: 1, a: 0.078431375}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
