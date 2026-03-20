@@ -69,7 +69,8 @@ public class HeroSpawner : NetworkBehaviour
 
         foreach (var tower in Tower.AliveTowers)
         {
-            if (tower.networkedTeam == enemyTeam)
+            if (tower == null || tower.team == Team.None) continue;
+            if (tower.team == enemyTeam)
             {
                 aliveCount++;
             }
@@ -77,7 +78,7 @@ public class HeroSpawner : NetworkBehaviour
 
         return Mathf.Clamp(2 - aliveCount, 0, 2);//팀당 포탑 2개 기준
     }
-    
+
     private float GetCurrentDeployDistance(Team team)//현재 배치 가능 거리 계산
     {
         int destroyedCount = GetDestroyedTowerCount(team);

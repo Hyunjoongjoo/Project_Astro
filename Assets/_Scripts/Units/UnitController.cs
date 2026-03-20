@@ -79,7 +79,7 @@ public class UnitController : UnitBase
         _unitStat = GetComponent<UnitStat>();
 
         UnitData data = TableManager.Instance.UnitTable.Get(unitId);
-
+        moveType = data.moveType;
         //UnitStat 초기화
         _unitStat.Init(data);
 
@@ -89,7 +89,7 @@ public class UnitController : UnitBase
         //moveSpeed = _unitStat.MoveSpeed.Value;
         //searchRange = _unitStat.DetectRange.Value;
         agent.speed = MoveSpeed;
-
+        ConfigureAreaMask();
         StateMachine.ChangeState(DetectState);
     }
 
@@ -109,7 +109,7 @@ public class UnitController : UnitBase
         team = myTeam;
         agent = GetComponent<NavMeshAgent>();
 
-        ConfigureAreaMask();
+        //ConfigureAreaMask();
 
         int myLayer;
         int enemyLayer;
