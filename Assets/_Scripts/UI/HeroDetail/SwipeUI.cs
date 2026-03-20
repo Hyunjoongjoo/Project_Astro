@@ -28,7 +28,21 @@ public class SwipeUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
         for (int i = 0; i < _pageCount; i++)
         {
             _pagePositions[i] = (float)i / (_pageCount - 1);
+
+            //점에 버튼 연결
+            if (i < _dots.Length)
+            {
+                int index = i; 
+                Button btn = _dots[i].GetComponent<Button>();
+
+                // Button 컴포넌트가 없다면 자동으로 추가해줌
+                if (btn == null) btn = _dots[i].gameObject.AddComponent<Button>();
+
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() => OnDotClicked(index));
+            }
         }
+        UpdateDots(_currentPage);
     }
 
     void Update()
@@ -77,8 +91,20 @@ public class SwipeUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
             UpdateDots(_currentPage);
         }
     }
+
+    public void OnDotClicked(int index)
+    {
+        if (_isDragging) return; // 드래그 중에는 클릭 무시
+
+        _currentPage = index;
+        _scrollRect.horizontalNormalizedPosition = _pagePositions[index];
+        UpdateDots(_currentPage);
+    }
+
     private void UpdateDots(int index)
     {
+        if (_dots == null || _dots.Length == 0) return;
+
         for (int i = 0; i < _dots.Length; i++)
         {
             _dots[i].color = (i == index) ? _activeColor : _inactiveColor;
