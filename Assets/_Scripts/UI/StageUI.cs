@@ -7,7 +7,7 @@ using UnityEngine.UI;
 // Stage 씬 인게임 시퀀스에 쓰이는 UI들을 제어하는 클래스
 public class StageUI : MonoBehaviour
 {
-    [SerializeField] private GameObject _loadingPanel;
+    [SerializeField] private GameObject[] _loadingPanel;
     [SerializeField] private GameObject _vsPanel;
     [SerializeField] private GameObject[] _rotationPanel;
     [SerializeField] private TextMeshProUGUI[] _introNameLabel;
@@ -176,7 +176,9 @@ public class StageUI : MonoBehaviour
                     myTeam == Team.Blue ? RedTeamNames[1] : BlueTeamNames[1]; // 아군; // 적 2
         }
 
-        _loadingPanel.SetActive(false);
+        foreach (var obj in _loadingPanel)
+            obj.SetActive(false);
+
         _vsPanel.SetActive(true);
         Debug.Log("매칭된 플레이어 정보를 보여줌");
     }

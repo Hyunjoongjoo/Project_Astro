@@ -7881,6 +7881,7 @@ RectTransform:
   - {fileID: 1193730002}
   - {fileID: 702700511}
   - {fileID: 944970967}
+  - {fileID: 1402392276}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -26627,7 +26628,6 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1271977293}
-  - {fileID: 1402392276}
   m_Father: {fileID: 397869011}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -32881,7 +32881,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014afde5c13b1b843884adb81ba0e2a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageIntroUI
-  _loadingPanel: {fileID: 944970966}
+  _loadingPanel:
+  - {fileID: 944970966}
+  - {fileID: 1402392275}
   _vsPanel: {fileID: 1756171693}
   _rotationPanel:
   - {fileID: 158589703}
@@ -50266,18 +50268,18 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1402392275}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 74.99998}
-  m_LocalScale: {x: 0.83333325, y: 0.83333325, z: 0.83333325}
+  m_LocalPosition: {x: 0, y: 0, z: 89.99998}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1346614743}
-  m_Father: {fileID: 944970967}
+  m_Father: {fileID: 397869011}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 357, y: -879}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 192, y: 201}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 1, y: 0}
 --- !u!111 &1402392277
 Animation:
   m_ObjectHideFlags: 0
