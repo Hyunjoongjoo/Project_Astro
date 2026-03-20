@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Text;
 
 //증강 시스템의 전체 흐름을 통제하는 네트워크 컨트롤러
 //경험치 감지 => 덱 픽업 => 서버 검증
@@ -437,7 +438,7 @@ public class AugmentController : NetworkBehaviour
                 data.titleName = TableManager.Instance.GetString(itemData.name);
 
                 //설명 세팅인데 걍 스트링빌더 써야할 듯, 기획서 상 줄넘김 필요
-                System.Text.StringBuilder descBuilder = new System.Text.StringBuilder();
+                StringBuilder descBuilder = new StringBuilder();
 
                 //테이블을 순회하며 그룹아디 매칭되는 효과 찾기
                 foreach (var effect in TableManager.Instance.ItemEffectTable.GetAll())

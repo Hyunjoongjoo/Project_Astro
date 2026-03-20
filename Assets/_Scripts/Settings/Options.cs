@@ -1,8 +1,28 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
 
 public class Options : MonoBehaviour
 {
+    private Button _korBtn;
+    private Button _engBtn;
+
+    private void Start()
+    {
+        //버튼생기면 이름 수정
+        _korBtn = transform.Find("KorBtn").GetComponent<Button>();
+        _engBtn = transform.Find("EngBtn").GetComponent<Button>();
+        RefreshLanguageButtons();
+
+        //언어가 바뀔 때마다 버튼 상태 자동 갱신
+        if (TableManager.Instance != null)
+        {
+            TableManager.Instance.OnLanguageChanged += RefreshLanguageButtons;
+        }
+    }
+
+
     public void OnClickLogOut() 
     {
         AuthService.Instance.Logout();
@@ -29,6 +49,38 @@ public class Options : MonoBehaviour
             UserDataManager.Instance.ClearCache();
             GameManager.Instance.SetSceneState(SceneState.Title);
             SceneManager.LoadScene("Title");
+        }
+    }
+
+    //한국어 버튼
+    public void OnClickKorean()
+    {
+        TableManager.Instance.ChangeLanguage(LanguageType.Kor);
+    }
+
+    //영어 버튼
+    public void OnClickEnglish()
+    {
+        TableManager.Instance.ChangeLanguage(LanguageType.Eng);
+    }
+
+    //현재 선택된 언어 버튼 비활성화(겸 하이라이트 처리)
+    private void RefreshLanguageButtons()
+    {
+        if (_korBtn == null || _engBtn == null) return;
+
+        bool isKor = TableManager.Instance.CurrentLanguage == LanguageType.Kor;
+        _korBtn.interactable = !isKor; 
+        _engBtn.interactable = isKor;
+    }
+
+
+    private void OnDestroy()
+    {
+        //구취
+        if (TableManager.Instance != null)
+        {
+            TableManager.Instance.OnLanguageChanged -= RefreshLanguageButtons;
         }
     }
 }

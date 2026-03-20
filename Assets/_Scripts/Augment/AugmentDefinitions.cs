@@ -35,3 +35,9 @@ public enum StatCalcMode
     Additive    //받피감, 쿨감 => 순수 퍼센트 수치만 저장         0(Base) + 버프% - 디버프% 
 }
 
+//3.20 언어타입 추가 로컬라이징용.
+public enum LanguageType 
+{ 
+    Kor, 
+    Eng 
+}

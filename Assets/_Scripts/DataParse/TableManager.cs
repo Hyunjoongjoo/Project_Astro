@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System;
 
 //02.14 로직 변경 => 모든 테이블을 찾아서 어드레서블로 로드시키도록 변경
 public class TableManager : Singleton<TableManager>
@@ -20,10 +21,33 @@ public class TableManager : Singleton<TableManager>
     public TableBase<SkillInfoData> SkillInfoTable = new TableBase<SkillInfoData>();
     public TableBase<MatchRewardData> MatchRewardTable = new TableBase<MatchRewardData>();
 
+    //언어 설정 -> UI 출력 변경용 이벤트
+    //로컬 설정 저장은 나중에 따로 뺄 수도?
+
+    public LanguageType CurrentLanguage { get; private set; } = LanguageType.Kor;
+    public event Action OnLanguageChanged;
+    private const string LANGUAGE_PREFS_KEY = "SelectedLanguage";
+
+    //언어변경메서드
+    public void ChangeLanguage(LanguageType newLang)
+    {
+        if (CurrentLanguage == newLang) return; 
+
+        CurrentLanguage = newLang;
+        //변경된 언어 로컬에 저장
+        PlayerPrefs.SetInt(LANGUAGE_PREFS_KEY, (int)newLang);
+        PlayerPrefs.Save();
+
+        OnLanguageChanged?.Invoke();
+    }
 
     protected override void Awake()
     {
         base.Awake();
+
+        //저장된 언어 불러오기
+        CurrentLanguage = (LanguageType)PlayerPrefs.GetInt(LANGUAGE_PREFS_KEY, (int)LanguageType.Kor);
+
         //코루틴으로 변경
         StartCoroutine(LoadAllData());
         InputValidator.InitializeBadWords();
@@ -68,9 +92,13 @@ public class TableManager : Singleton<TableManager>
         Debug.Log("[TableManager] 데이터 리플렉션 완료");
     }
 
+    //3.20 리팩토링
     public string GetString(string id)
     {
         var data = StringTable.Get(id);
-        return data != null ? data.textKor : id; // 데이터가 없으면 ID라도 노출
+        if (data == null) return id; //데이터없으면 아이디리턴추가
+
+        //현재 언어에따라 출력 변경
+        return CurrentLanguage == LanguageType.Eng ? data.textEng : data.textKor; 
     }
 }
