@@ -11,6 +11,7 @@ public class ChaseState : IState
 
     public void Enter()
     {
+        
     }
 
     public void Update()

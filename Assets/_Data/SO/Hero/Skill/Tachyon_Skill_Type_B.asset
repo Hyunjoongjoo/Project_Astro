@@ -21,5 +21,5 @@ MonoBehaviour:
   skillType: 2
   initCooldown: 3
   cooldown: 3
-  additionalDamageRatio: 2
+  additionalDamageRatio: -0.2
   onhitPerAttack: 5

@@ -26,6 +26,7 @@ public class DeployState : IState
     {
         Debug.Log("Deploy 상태 진입");
         _hero.MoveTo(_deployTarget);
+        _hero.HeroAnimator.SetBool("IsDeploying", true);
     }
 
     public void Update()
@@ -49,6 +50,7 @@ public class DeployState : IState
 
     public void Exit()
     {
+        _hero.HeroAnimator.SetBool("IsDeploying", false);
         // 기존 FinishDeploy()에 있던 초기화 로직
         _hero.agent.ResetPath();
     }

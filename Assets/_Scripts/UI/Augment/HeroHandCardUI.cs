@@ -1,9 +1,10 @@
-﻿using Fusion;
+﻿using System.Collections.Generic;
+using Fusion;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using System.Collections.Generic;
+
 
 public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -30,8 +31,8 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private Image _itemSlot1;
     [SerializeField] private Image _itemSlot2;
 
-    private float _currentTimer = 0f;
-    private bool IsCooldown => _currentTimer > 0f;
+    //private float _currentTimer = 0f;
+    //private bool IsCooldown => _currentTimer > 0f;
 
     public string HeroId => _data != null ? _data.targetId : "";
 
@@ -45,45 +46,70 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         //스테이지매니저캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
 
-        UpdateCooldownUI();
+        UpdateCooldownUI(0f, 1f);
     }
     private void Update()
     {
         //쿨타임 중일 때만 매 프레임 타이머 감소
-        if (IsCooldown)
-        {
-            _currentTimer -= Time.deltaTime;
+        //if (IsCooldown)
+        //{
+        //    _currentTimer -= Time.deltaTime;
 
-            if (_currentTimer <= 0f)
-            {
-                _currentTimer = 0f;
-            }
+        //    if (_currentTimer <= 0f)
+        //    {
+        //        _currentTimer = 0f;
+        //    }
 
-            // UI 실시간 갱신
-            UpdateCooldownUI();
-        }
+        //    // UI 실시간 갱신
+        //    UpdateCooldownUI();
+        //}
+        if (HeroSpawner.Instance == null) return;
+
+        var runner = HeroSpawner.Instance.Runner;
+        if (runner == null || !runner.IsRunning) return;
+
+        PlayerRef player = runner.LocalPlayer;
+        NetworkPrefabRef prefab = GetUnitPrefab();
+
+        float remaining = HeroSpawner.Instance.GetRemainingCooldown(player, prefab);
+        float total = HeroSpawner.Instance.GetTotalCooldown(player, prefab);
+
+        UpdateCooldownUI(remaining, total);
     }
 
     //쿨타임에 맞춰 커버 텍스트 갱신
-    private void UpdateCooldownUI()
+    private void UpdateCooldownUI(float remaining, float total)
     {
         if (_cooldownCover == null || _cooldownText == null) return;
 
-        if (IsCooldown)
+        //if (remaining > 0f)
+        //{
+        //    _cooldownCover.gameObject.SetActive(true);
+
+        //    //커버 => 시간이 지날수록 위에서부터 줄어듦
+        //    _cooldownCover.fillAmount = remaining / total;
+
+        //    //텍스트는 올림 처리(기획 상엔 없음 근데 맞겠지)
+        //    int secondsLeft = Mathf.CeilToInt(remaining);
+        //    _cooldownText.text = $"{secondsLeft}초";
+        //}
+        //else
+        //{
+        //    // 쿨타임이 끝났으면 UI 비활성화
+        //    _cooldownCover.gameObject.SetActive(false);
+        //}
+        if (remaining > 0f && total > 0f)
         {
             _cooldownCover.gameObject.SetActive(true);
+            _cooldownCover.fillAmount = remaining / total;
 
-            //커버 => 시간이 지날수록 위에서부터 줄어듦
-            _cooldownCover.fillAmount = _currentTimer / _data.currentSpawnCooldown;
-
-            //텍스트는 올림 처리(기획 상엔 없음 근데 맞겠지)
-            int secondsLeft = Mathf.CeilToInt(_currentTimer);
+            int secondsLeft = Mathf.CeilToInt(remaining);
             _cooldownText.text = $"{secondsLeft}초";
         }
         else
         {
-            // 쿨타임이 끝났으면 UI 비활성화
             _cooldownCover.gameObject.SetActive(false);
+            _cooldownText.text = string.Empty;
         }
     }
 
@@ -96,10 +122,23 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             return;
         }
         //쿨타임 중이면 드래그 무시
-        if (IsCooldown)
+        //if (IsCooldown)
+        //{
+        //    eventData.pointerDrag = null;
+        //    return;
+        //}
+        if (HeroSpawner.Instance != null)
         {
-            eventData.pointerDrag = null;
-            return;
+            var runner = HeroSpawner.Instance.Runner;
+            if (runner != null && runner.IsRunning)
+            {
+                float remaining = HeroSpawner.Instance.GetRemainingCooldown(runner.LocalPlayer, GetUnitPrefab());
+                if (remaining > 0f)
+                {
+                    eventData.pointerDrag = null;
+                    return;
+                }
+            }
         }
         _originPos = transform.position;
         _iconImg.color = new Color(1, 1, 1, 0.5f);
@@ -112,7 +151,19 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (IsCooldown) return;
+        //if (IsCooldown) return;
+        var runner = HeroSpawner.Instance.Runner;
+
+        if (runner != null && runner.IsRunning)
+        {
+            float remaining = HeroSpawner.Instance.GetRemainingCooldown(runner.LocalPlayer, GetUnitPrefab());
+            if (remaining > 0f)
+            {
+                transform.position = _originPos;
+                _iconImg.color = new Color(1, 1, 1, 1f);
+                return;
+            }
+        }
         _iconImg.color = new Color(1, 1, 1, 1f);
 
         Ray ray = _mainCam.ScreenPointToRay(eventData.position);
@@ -122,8 +173,8 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         if (Physics.Raycast(ray, out hit, 100f, _groundLayer))
         {
-            Debug.Log($"소환 지점 발견: {hit.point}");
-            Debug.Log($"맞은 오브젝트: {hit.collider.name}");
+            //Debug.Log($"소환 지점 발견: {hit.point}");
+            //Debug.Log($"맞은 오브젝트: {hit.collider.name}");
 
             //03-16
             Vector3 spawnPos = hit.point;
@@ -131,7 +182,7 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
             if (!HeroSpawner.Instance.CanPreviewDeployHero(spawnPos, team))
             {
-                Debug.Log("배치 거리 초과 - 소환 불가");
+                //Debug.Log("배치 거리 초과 - 소환 불가");
                 transform.position = _originPos;
                 return;
             }
@@ -143,8 +194,8 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             );
 
             //소환 성공 시 타이머 시작 및 UI 갱신
-            _currentTimer = _data.currentSpawnCooldown;
-            UpdateCooldownUI();
+            //_currentTimer = _data.currentSpawnCooldown;
+            //UpdateCooldownUI();
         }
         else
         {

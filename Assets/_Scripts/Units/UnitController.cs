@@ -24,6 +24,10 @@ public class UnitController : UnitBase
     public ISkill normalAttack;
     [Networked] public bool networkedOnHit { get; set; }
 
+    [Header("스킬 데이터")]
+    [Header("평타 공격")]
+    [SerializeField] protected BaseSkillSO _normalAttackData;
+
     // 상태 머신과 상태 인스턴스들
     public StateMachine StateMachine { get; protected set; }
     public DetectState DetectState { get; protected set; }
@@ -31,9 +35,10 @@ public class UnitController : UnitBase
     public AttackState AttackState { get; protected set; }
     public DieState DieState { get; protected set; }
 
-    [Header("스킬 데이터")]
-    [Header("평타 공격")]
-    [SerializeField] protected BaseSkillSO _normalAttackData;
+    public Animator HeroAnimator { get; protected set; }
+    public Animator BoosterAnimator { get; protected set; }
+
+    [Networked] public bool BoosterRender { get; set; }
 
     //stat 실시간 참조
     public float AttackPower => _unitStat.Attack.Value;
@@ -41,7 +46,7 @@ public class UnitController : UnitBase
     public float HealPower => _unitStat.HealPower.Value;//나중에 힐스킬에 연결
     public float MoveSpeed => _unitStat.MoveSpeed.Value;
     public float DetectRange => _unitStat.DetectRange.Value;
-
+    
     public UnitBase CurrentTarget => currentTarget;
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
@@ -74,7 +79,7 @@ public class UnitController : UnitBase
         _unitStat = GetComponent<UnitStat>();
 
         UnitData data = TableManager.Instance.UnitTable.Get(unitId);
-
+        moveType = data.moveType;
         //UnitStat 초기화
         _unitStat.Init(data);
 
@@ -84,14 +89,13 @@ public class UnitController : UnitBase
         //moveSpeed = _unitStat.MoveSpeed.Value;
         //searchRange = _unitStat.DetectRange.Value;
         agent.speed = MoveSpeed;
-
+        ConfigureAreaMask();
         StateMachine.ChangeState(DetectState);
     }
 
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority) return;
-        if (IsDead) return; // 사망 시 중단 (혹은 DieState에서 처리)
 
         StateMachine.Update();
     }
@@ -105,7 +109,7 @@ public class UnitController : UnitBase
         team = myTeam;
         agent = GetComponent<NavMeshAgent>();
 
-        ConfigureAreaMask();
+        //ConfigureAreaMask();
 
         int myLayer;
         int enemyLayer;
@@ -178,6 +182,12 @@ public class UnitController : UnitBase
             agent.isStopped = false;
             agent.SetDestination(destination);
         }
+        if (UnitType == UnitType.Hero)
+        {
+            var hero = this as HeroController;
+            if (hero.StateMachine.CurrentState != hero.DeployState)
+                BoosterRender = true;
+        }
     }
 
     public void StopMove()
@@ -188,6 +198,8 @@ public class UnitController : UnitBase
             agent.ResetPath();
             agent.velocity = Vector3.zero;
         }
+        if (UnitType == UnitType.Hero)
+            BoosterRender = false;
     }
 
     public UnitBase FindTarget()
