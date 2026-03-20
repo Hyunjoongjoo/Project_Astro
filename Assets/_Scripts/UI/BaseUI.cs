@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using UnityEditor.Build.Pipeline;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -84,6 +85,13 @@ public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
             // 닫혀 있으면 열기
             Open();
         }
+    }
+    //오픈 유지(갱신x로직)
+    public virtual void MaintainOpen()
+    {
+        if (IsOpened) return;
+
+        Open();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
