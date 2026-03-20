@@ -1,199 +1,199 @@
-스트링 인덱스  ID,한국어 텍스트,,기획용 비고
+스트링 인덱스  ID,한국어 텍스트,영어 텍스트,기획용 비고
 id,textKor,textEng,note
 String,String,String,String
-name_hero_corsair,커세어,Test_Corsair,커세어 영웅 이름
-name_hero_heavyrain,헤비레인,,헤비레인 영웅 이름
-name_hero_tank,탱크,,탱크 영웅 이름
-name_hero_angel,앤젤,,앤젤 영웅 이름
-name_hero_tachyon,타키온,,타키온
-desc_hero_corsair,압도적인 가속력으로 전선의 사각을 파고들어 적의 핵심 전력을 단숨에 무력화하는 돌격의 기수입니다,,커세어 영웅 설명
-desc_hero_heavyrain,안전거리 밖에서 적의 진형을 초토화하는 원거리 화력의 정점입니다,,헤비레인 영웅 설명
-desc_hero_tank,적의 파상공격을 정면으로 받아내며 아군의 진격로를 개척하는 움직이는 요새입니다,,탱크 영웅 설명
-desc_hero_angel,나노-리페어 기술로 손상된 아군 유닛을 복구하는 전장의 수호천사입니다,,앤젤 영웅 설명
-desc_hero_tachyon,주무기를 통해 에너지를 모은 뒤 오버클럭 탄환을 발사하여 원거리의 적을 무력화합니다.,,타키온
-name_unit_minion,미니언,,미니언 이름
-name_unit_superminion,강화 미니언,,강화미니언 이름
-name_unit_bridge,함교,,함교 이름
-name_unit_tower,포탑,,포탑 이름
-desc_unit_minion,미니언 설명입니다,,미니언 설명
-desc_unit_superminion,강화미니언 설명입니다,,강화미니언 설명
-desc_unit_bridge,함교 설명입니다,,함교 설명
-desc_unit_tower,포탑 설명입니다,,포탑 설명
-skill_name_corsair,소닉 스트라이크,,커세어 기본 스킬 이름
-skill_name_heavyrain,포톤 레인,,헤비레인 기본 스킬 이름
-skill_name_tank,포스 실드,,탱크 기본 스킬 이름
-skill_name_angel,나노봇 투여,,앤젤 기본 스킬 이름
-skill_name_tachyon,오버클럭 샷,,타키온 기본 스킬 이름
-skill_desc_corsair,적 1명에게 돌진 후 단일 피해를 입힌다,,커세어 기본 스킬 설명
-skill_desc_heavyrain,레이저를 단일 대상에게 3회 발사한다,,헤비레인 기본 스킬 설명
-skill_desc_tank,5초간 본인의 받는 피해량이 20% 감소한다,,탱크 기본 스킬 설명
-skill_desc_angel,본인을 제외한 아군 영웅 한 명의 체력을 회복시킨다,,앤젤 기본 스킬 설명
-skill_desc_tachyon,기본 공격 5회마다 멀리 있는 적에게 강화된 공격을 발사한다,,타키온 기본 스킬 설명
-augment_name_corsair_A,옴니 스트라이크,,커세어 증강 스킬1 이름
-augment_name_heavyrain_A,초토화,,헤비레인 증강 스킬1 이름
-augment_name_tank_A,성벽,,탱크 증강 스킬1 이름
-augment_name_angel_A,나노 펄스,,앤젤 증강 스킬1 이름
-augment_name_tachyon_A,철갑탄,,타키온 증강 스킬1 이름
-augment_desc_corsair_A,돌진 후 추가적으로 광역 피해를 입힌다,,커세어 증강 스킬1 설명
-augment_desc_heavyrain_A,레이저 발사 횟수가 5회로 증가한다,,헤비레인 증강 스킬1 설명
-augment_desc_tank_A,5초간 본인의 받는 피해량이 30% 감소한다,,탱크 증강 스킬1 설명
-augment_desc_angel_A,회복이 영웅 한명과 그 주변 아군에게 적용된다,,앤젤 증강 스킬1 설명
-augment_desc_tachyon_A,강화 공격에 관통 효과가 추가된다,,타키온 증강 스킬1 설명
-enhance_augment_name_corsair_A,옴니 스트라이크+,,커세어 강화 증강 스킬1 이름
-enhance_augment_name_heavyrain_A,초토화+,,헤비레인 강화 증강 스킬1 이름
-enhance_augment_name_tank_A,성벽+,,탱크 강화 증강 스킬1 이름
-enhance_augment_name_angel_A,나노 펄스+,,앤젤 강화 증강 스킬1 이름
-enhance_augment_name_tachyon_A,타키온 증강 스킬1 이름,,타키온 강화 증강 스킬1 이름
-enhance_augment_desc_corsair_A,돌진 후 추가적으로 강력한 광역 피해를 입힌다,,커세어 강화 증강 스킬1 설명
-enhance_augment_desc_heavyrain_A,레이저 발사 횟수가 7회로 증가한다,,헤비레인 강화 증강 스킬1 설명
-enhance_augment_desc_tank_A,5초간 본인의 받는 피해량이 40% 감소한다,,탱크 강화 증강 스킬1 설명
-enhance_augment_desc_angel_A,회복량이 증가하고 회복이 영웅 한명과 그 주변 아군에게 적용된다,,앤젤 강화 증강 스킬1 설명
-enhance_augment_desc_tachyon_A,피해량이 증가하고 강화 공격에 관통 효과가 추가된다,,타키온 강화 증강 스킬1 설명
-augment_name_corsair_B,팬텀 스트라이크,,커세어 증강 스킬2 이름
-augment_name_heavyrain_B,멀티 샷,,헤비레인 증강 스킬2 이름
-augment_name_tank_B,전자기 방출,,탱크 증강 스킬2 이름
-augment_name_angel_B,긴급 수리,,앤젤 증강 스킬2 이름
-augment_name_tachyon_B,작렬탄,,타키온 증강 스킬2 이름
-augment_desc_corsair_B,돌진 횟수가 2회로 증가한다,,커세어 증강 스킬2 설명
-augment_desc_heavyrain_B,레이저를 한번에 3발 발사한다,,헤비레인 증강 스킬2 설명
-augment_desc_tank_B,스킬 지속시간 동안 주변 적에게 피해를 준다,,탱크 증강 스킬2 설명
-augment_desc_angel_B,스킬의 쿨타임이 30% 감소한다,,앤젤 증강 스킬2 설명
-augment_desc_tachyon_B,맞은 대상의 주변 적에게도 피해를 준다,,타키온 증강 스킬2 설명
-enhance_augment_name_corsair_B,팬텀 스트라이크+,,커세어 강화 증강 스킬2 이름
-enhance_augment_name_heavyrain_B,멀티 샷+,,헤비레인 강화 증강 스킬2 이름
-enhance_augment_name_tank_B,전자기 방출+,,탱크 강화 증강 스킬2 이름
-enhance_augment_name_angel_B,긴급 수리+,,앤젤 강화 증강 스킬2 이름
-enhance_augment_name_tachyon_B,작렬탄+,,타키온 강화 증강 스킬2 이름
-enhance_augment_desc_corsair_B,돌진 횟수가 3회로 증가한다,,커세어 강화 증강 스킬2 설명
-enhance_augment_desc_heavyrain_B,레이저를 한번에 5발 발사한다,,헤비레인 강화 증강 스킬2 설명
-enhance_augment_desc_tank_B,스킬 지속시간 동안 주변 적에게 강력한 피해를 준다,,탱크 강화 증강 스킬2 설명
-enhance_augment_desc_angel_B,회복량이 증가하고 스킬의 쿨타임이 30% 감소한다,,앤젤 강화 증강 스킬2 설명
-enhance_augment_desc_tachyon_B,기본 공격 4회마다 스킬을 사용한다. 맞은 대상의 주변 적에게도 피해를 준다,,타키온 강화 증강 스킬2 설명
-passive_name_corsair_1,커세어 패시브 스킬1 이름,,커세어 패시브 스킬1 이름
-passive_name_heavyrain_1,헤비레인 패시브 스킬1 이름,,헤비레인 패시브 스킬1 이름
-passive_name_tank_1,탱크 패시브 스킬1 이름,,탱크 패시브 스킬1 이름
-passive_name_angel_1,앤젤 패시브 스킬1 이름,,앤젤 패시브 스킬1 이름
-passive_name_tachyon_1,타키온 패시브 스킬1 이름,,타키온 패시브 스킬1 이름
-passive_desc_corsair_1,커세어 패시브 스킬1 설명,,커세어 패시브 스킬1 설명
-passive_desc_heavyrain_1,헤비레인 패시브 스킬1 설명,,헤비레인 패시브 스킬1 설명
-passive_desc_tank_1,탱크 패시브 스킬1 설명,,탱크 패시브 스킬1 설명
-passive_desc_angel_1,앤젤 패시브 스킬1 설명,,앤젤 패시브 스킬1 설명
-passive_desc_tachyon_1,타키온 패시브 스킬1 설명,,타키온 패시브 스킬1 설명
-passive_name_corsair_2,커세어 패시브 스킬2 이름,,커세어 패시브 스킬2 이름
-passive_name_heavyrain_2,헤비레인 패시브 스킬2 이름,,헤비레인 패시브 스킬2 이름
-passive_name_tank_2,탱크 패시브 스킬2 이름,,탱크 패시브 스킬2 이름
-passive_name_angel_2,앤젤 패시브 스킬2 이름,,앤젤 패시브 스킬2 이름
-passive_name_tachyon_2,타키온 패시브 스킬1 설명,,타키온 패시브 스킬2 이름
-passive_desc_corsair_2,커세어 패시브 스킬2 설명,,커세어 패시브 스킬2 설명
-passive_desc_heavyrain_2,헤비레인 패시브 스킬2 설명,,헤비레인 패시브 스킬2 설명
-passive_desc_tank_2,탱크 패시브 스킬2 설명,,탱크 패시브 스킬2 설명
-passive_desc_angel_2,앤젤 패시브 스킬2 설명,,앤젤 패시브 스킬2 설명
-passive_desc_tachyon_2,타키온 패시브 스킬2 설명,,타키온 패시브 스킬2 설명
-hero_type_robot,전술 슈트,,영웅의 heroType이 robot이면 정보창에 표시
-hero_type_spacecraft,우주 함선,,영웅의 heroType이 spacecraft면 정보창에 표시
-hero_role_tank,방어형,,영웅의 heroRole이 tank면 정보창에 표시
-hero_role_melee,강습형,,영웅의 heroRole이 melee면 정보창에 표시
-hero_role_ranged,포격형,,영웅의 heroRole이 ranged면 정보창에 표시
-hero_role_healer,지원형,,영웅의 heroRole이 healer면 정보창에 표시
-hero_movetype_small,소형,,영웅의 moveType이 small이면 정보창에 표시
-hero_movetype_large,대형,,영웅의 moveType이 large이면 정보창에 표시
-hero_movetype_fixed,고정형,,영웅의 moveType이 fixed이면 정보창에 표시
-name_item001,강화 철갑탄,,아이템 이름
-name_item002,생명 유지 장치,,아이템 이름
-name_item003,응급 의료 키트,,아이템 이름
-name_item004,이온 추진기,,아이템 이름
-name_item005,증폭 회로,,아이템 이름
-name_item006,고출력 렌즈,,아이템 이름
-name_item007,긴급 호출기,,아이템 이름
-name_item008,티타늄 합금,,아이템 이름
-name_item009,광전사 모듈,,아이템 이름
-name_item010,저격용 위장막,,아이템 이름
-des_effect_item001_01,공격력 20% 증가,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item002_01,최대 체력 20% 증가,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item003_01,치유력 20% 증가,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item004_01,이동 속도 20% 증가,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item005_01,체력이 40% 이하일 때 공격력 50% 증가,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item006_01,체력 70% 이상일 때 쿨타임 20% 감소,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item007_01,재소환 대기시간 20% 감소,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item007_02,최대 체력 30% 감소,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item008_01,받는 피해량 30% 감소,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item008_02,이동 속도 20% 감소,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item009_01,공격 속도 30% 증가,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item009_02,이동 속도 30% 증가,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item009_03,받는 피해량 30% 증가,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item010_01,공격력 20% 증가,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-des_effect_item010_02,공격 속도 30% 감소,,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
-ui_toast_item_equip_fail,영웅의 아이템 슬롯이 가득 찼습니다,,아이템 장착 시 아이템 슬롯 max면 토스트 메시지 출력
-ui_toast_item_share_fail,상대의 아이템 보관함이 가득 찼습니다,,아이템 전달 시 아군 보관함 max면 토스트 메시지 출력
-ui_toast_item_not_overlap,해당 아이템은 중복 장착이 불가능합니다,,아이템 장착 시 중복 불가능 아이템이면 토스트 메시지 출력
-ui_augment_hero_name,영웅 획득 : {0},,{0}에는 Hero 테이블의 heroName 참조
-ui_augment_hero_des,영웅 {0}을/를 사용할 수 있습니다,,{0}에는 Hero 테이블의 heroName 참조
-ui_augment_hero_respawn,재소환 대기시간 : {0}초,,{0}에는 HeroStat 테이블의 respawnCooldown 참조
-ui_augment_hero_skill_name,스킬 [{0}],,{0}에는 영웅이 가진 기본 스킬의 이름 스트링 id 참조
-ui_augment_hero_skill_cooldown,쿨타임: {0}초,,{0}에는 영웅이 가진 기본 스킬의 쿨타임 값 참조
-ui_augment_skill_des,영웅 {0}의 스킬을 강화합니다,,{0}에는 해당 증강 스킬을 보유한 영웅의 heroName 참조 (여현구 작성)
-ui_augment_skill_name_format,스킬 [{0}] 업그레이드,,{0}에는 해당 증강 스킬을 보유한 영웅이 가진 기본 스킬의 이름 참조  (여현구 작성)
-ui_toast_team_change_success,팀이 교체되었습니다.,,팀 교체 완료 시 출력될 토스트 메시지
-ui_toast_team_change_failed,팀 교체 신청이 거절되었습니다.,,팀 교체 요청 거절될 시 출력될 토스트 메시지
-ui_toast_team_change_unable,{N}초 후 팀 교체 신청 가능,,{N} = 팀 교체 신청 가능하기까지 남은 시간 (단위: 초)
-ui_toast_team_change_In_progress,대상이 이미 팀 교체 요청을 진행하고 있습니다.,,
-ui_toast_cancel_request,요청이 취소되었습니다.,,
-ui_kick_out_Success,{0} 님을 내보냈습니다.,,{0} = 대기실에서 내보낸 플레이어 계정 닉네임
-ui_toast_unable_enter_lobby_ban,추방당한 대기실에 다시 입장할 수 없습니다.,,내보내진 대기실 재입장 시도 시 플레이어 화면에 출력될 토스트 메시지
-ui_toast_unexecutable_request,실행할 수 없는 요청입니다.,,각종 기능 사용 중 실행할 수 없는 요청일 때 출력될 텍스트 메시지
-ui_toast_Admin_change,{0} 님에게 방장 권한을 위임했습니다.,,{0} = 방장 권한을 넘겨 받은 플레이어 계정 닉네임
-ui_admin_Assign,대기실 방장이 되었습니다.,,방장 권한을 위임 받아 새롭게 방장이 된 플레이어 화면에 출력될 토스트 메시지
-ui_toast_game_start_unable,대기실 인원이 부족해 게임을 시작할 수 없습니다.,,게임 시작 조건 만족하지 않은 상태에서 대기실 내 게임 시작 버튼 입력 시 출력될 토스트 메시지
-ui_toast_plz_typing_lobby_code,대기실 코드를 입력해주세요.,,입력값 없는 상태에서 검색 버튼 입력 시 출력될 토스트 메시지
-ui_toast_lobby_code_8_letters,대기실 코드는 8글자입니다.,,1~7 자리수 입력한 상태에서 검색 버튼 입력 시 출력될 토스트 메시지
-ui_toast_lobby_code_Invalid,입력한 대기실 코드가 유효하지 않습니다.,,입력한 값과 일치하는 대기실 코드가 없을 때 출력될 메시지
-ui_toast_lobby_full,대기실이 가득 찼습니다,,입장할 대기실 내 인원이 가득 찼을 때 출력될 메시지
-ui_toast_lobby_not_exist,존재하지 않는 대기실입니다.,,입장할 대기실이 존재하지 않을 때 출력될 메시지
-ui_toast_lobby_entry_failed,입장에 실패했습니다. 다시 시도해 주세요.,,"서버, 네트워크 오류로 인해 대기실 입장 실패 시 출력될 메시지"
-create_lobby,대기실 생성,,
-search_lobby,대기실 찾기,,
-select_game_mode,게임 모드를 선택하세요.,,대기실 생성 팝업창 내 출력될 텍스트
-basics,기본,,
-1v1_battle,1v1 전투,,
-2v2_battle,2v2 전투,,
-ui_lobby_name,{0}님의 게임,,{0} = 대기실을 생성한 플레이어의 계정 닉네임#태그
-team1,1팀,,
-team2,2팀,,
-empty,비어 있음,,빈 플레이어 슬롯 기본값
-join,참가,,
-ui_lobby_code,대기실 코드: {1},,대기실 내 출력될 대기실 코드
-game_start,게임 시작,,
-change_admin,방장 변경,,
-kick_out,내보내기,,
-notification,알림,,
-ui_check_change_admin,{0}님에게 방장권한을 위임하시겠습니까?,,"방장 변경 의사 확인 팝업창 내 출력될 텍스트, {0} = 방장 권한을 넘겨줄 대상 플레이어 닉네임"
-cancel,취소,,
-check,확인,,
-ui_check_player_kick_out,{0}님을 내보내시겠습니까?,,"내보내기 의사 확인 팝업창 화면 내 출력될 확인 문구, {0} = 대기실에서 내보낼 플레이어 계정 닉네임"
-ui_player_kicked_out,방장에 의해 대기실에서 내보내졌습니다.,,대기실에서 내보내진 플레이어 화면에 출력될 팝업창 내 문구
-close,닫기,,
-ui_plz_typed_lobby_code,대기실 코드를 입력해주세요.,,대기실 검색 모달창 내 출력될 텍스트
-ui_noti_lobby_code,※ 대기실 코드는 알파벳 대문자 8자리로 입력할 수 있습니다.,,대기실 검색 모달창 내 출력될 텍스트
-search,검색,,
-lobby_info,대기실 정보,,
-ui_lobby_admin,방장: {0},,"대기실 정보 모달창 내 출력될  화면 출력 시점 대기실 방장 닉네임, {0} = 화면 출력 시점 방장인 플레이어 계정 닉네임"
-enter,입장,,
-noti_exp_exchange_reward,최대 레벨을 달성한 영웅에게 지급될 경험치는 골드로 변환되었습니다.,,대체 보상 지급 시 대전 보상 화면에 출력될 알림 문구
-cur_level,레벨 {N},,{N} = 영웅 현재 레벨
-hp,체력,,
-attack_power,공격력,,
-healing_power,치유력,,
-ui_toast_hero_level_up_need_exp,경험치가 부족합니다.,,"영웅 레벨업 필요 경험치 > 영웅 현재 경험치 일 때, 영웅 레벨업 버튼 입력 시 출력될 토스트 메시지"
-ui_toast_hero_level_up_need_gold,골드가 부족합니다.,,"영웅 레벨업 필요 골드 > 계정 내 골드량 일 때, 영웅 레벨업 버튼 입력 시 출력될 토스트 메시지"
-ui_text_win,Congratulation!!! ,,
-ui_title_win,You Win !!!,,
-ui_text_lose,So Sad...,,
-ui_title_lose,You Lose....,,
-ui_text_draw,Nice Try,,
-ui_title_draw,Draw ,,
-btn_quit_stage,돌아가기,,
-ui_unlock_levelreward,레벨 {N} 달성 시 해금,,{N} = 레벨 달성 보상 해금 레벨 (HeroLevelReward 테이블 level 칼럼 참조)
-ui_toast_host_missing,호스트와의 연결이 끊겨 대기 중입니다,,호스트가 홈버튼을 눌러 어플레이케이션이 내려갔을 때 -> 다른 플레이어들에게 팝업 출력
-ui_toast_player_missing,다른 플레이어와\n연결이 끊겨\n로비로 돌아갑니다,,플레이어 중 한 명이 완전히 네트워크 끊기면 -> 다른 플레이어들에게 팝업 출력 
-equip_emote,장착된 이모티콘 ({0}/{1}),,
-ui_toast_hero_purchase_need_gold,골드가 부족하여 구매할 수 없습니다.,,
+name_hero_corsair,커세어,Corsair,커세어 영웅 이름
+name_hero_heavyrain,헤비레인,Heavy Rain,헤비레인 영웅 이름
+name_hero_tank,탱크,Tank,탱크 영웅 이름
+name_hero_angel,앤젤,Angel,앤젤 영웅 이름
+name_hero_tachyon,타키온,Tachyon,타키온
+desc_hero_corsair,압도적인 가속력으로 전선의 사각을 파고들어 적의 핵심 전력을 단숨에 무력화하는 돌격의 기수입니다,A vanguard of the assault who uses overwhelming acceleration to penetrate blind spots and neutralize key enemy forces instantly.,커세어 영웅 설명
+desc_hero_heavyrain,안전거리 밖에서 적의 진형을 초토화하는 원거리 화력의 정점입니다,The pinnacle of long-range firepower that devastates enemy formations from a safe distance.,헤비레인 영웅 설명
+desc_hero_tank,적의 파상공격을 정면으로 받아내며 아군의 진격로를 개척하는 움직이는 요새입니다,A moving fortress that takes enemy waves head-on while clearing a path for allies.,탱크 영웅 설명
+desc_hero_angel,나노-리페어 기술로 손상된 아군 유닛을 복구하는 전장의 수호천사입니다,A guardian angel of the battlefield who repairs damaged allied units using nano-repair technology.,앤젤 영웅 설명
+desc_hero_tachyon,주무기를 통해 에너지를 모은 뒤 오버클럭 탄환을 발사하여 원거리의 적을 무력화합니다.,Charges energy through the main weapon and fires overclocked bullets to neutralize distant enemies.,타키온
+name_unit_minion,미니언,Minion,미니언 이름
+name_unit_superminion,강화 미니언,Super Minion,강화미니언 이름
+name_unit_bridge,함교,Bridge,함교 이름
+name_unit_tower,포탑,Tower,포탑 이름
+desc_unit_minion,미니언 설명입니다,This is a description for the Minion.,미니언 설명
+desc_unit_superminion,강화미니언 설명입니다,This is a description for the Super Minion.,강화미니언 설명
+desc_unit_bridge,함교 설명입니다,This is a description for the Bridge.,함교 설명
+desc_unit_tower,포탑 설명입니다,This is a description for the Tower.,포탑 설명
+skill_name_corsair,소닉 스트라이크,Sonic Strike,커세어 기본 스킬 이름
+skill_name_heavyrain,포톤 레인,Photon Rain,헤비레인 기본 스킬 이름
+skill_name_tank,포스 실드,Force Shield,탱크 기본 스킬 이름
+skill_name_angel,나노봇 투여,Nanobot Injection,앤젤 기본 스킬 이름
+skill_name_tachyon,오버클럭 샷,Overclock Shot,타키온 기본 스킬 이름
+skill_desc_corsair,적 1명에게 돌진 후 단일 피해를 입힌다,Dashes to a single enemy and deals damage.,커세어 기본 스킬 설명
+skill_desc_heavyrain,레이저를 단일 대상에게 3회 발사한다,Fires lasers 3 times at a single target.,헤비레인 기본 스킬 설명
+skill_desc_tank,5초간 본인의 받는 피해량이 20% 감소한다,Reduces damage taken by 20% for 5 seconds.,탱크 기본 스킬 설명
+skill_desc_angel,본인을 제외한 아군 영웅 한 명의 체력을 회복시킨다,Heals one allied hero except yourself.,앤젤 기본 스킬 설명
+skill_desc_tachyon,기본 공격 5회마다 멀리 있는 적에게 강화된 공격을 발사한다,Fires an enhanced attack at a distant enemy every 5 basic attacks.,타키온 기본 스킬 설명
+augment_name_corsair_A,옴니 스트라이크,Omni Strike,커세어 증강 스킬1 이름
+augment_name_heavyrain_A,초토화,Devastation,헤비레인 증강 스킬1 이름
+augment_name_tank_A,성벽,Bulwark,탱크 증강 스킬1 이름
+augment_name_angel_A,나노 펄스,Nano Pulse,앤젤 증강 스킬1 이름
+augment_name_tachyon_A,철갑탄,Armor Piercing Shell,타키온 증강 스킬1 이름
+augment_desc_corsair_A,돌진 후 추가적으로 광역 피해를 입힌다,Deals additional AoE damage after dashing.,커세어 증강 스킬1 설명
+augment_desc_heavyrain_A,레이저 발사 횟수가 5회로 증가한다,Laser fire count increases to 5.,헤비레인 증강 스킬1 설명
+augment_desc_tank_A,5초간 본인의 받는 피해량이 30% 감소한다,Reduces damage taken by 30% for 5 seconds.,탱크 증강 스킬1 설명
+augment_desc_angel_A,회복이 영웅 한명과 그 주변 아군에게 적용된다,Healing is applied to a hero and nearby allies.,앤젤 증강 스킬1 설명
+augment_desc_tachyon_A,강화 공격에 관통 효과가 추가된다,Adds a piercing effect to enhanced attacks.,타키온 증강 스킬1 설명
+enhance_augment_name_corsair_A,옴니 스트라이크+,Omni Strike+,커세어 강화 증강 스킬1 이름
+enhance_augment_name_heavyrain_A,초토화+,Devastation+,헤비레인 강화 증강 스킬1 이름
+enhance_augment_name_tank_A,성벽+,Bulwark+,탱크 강화 증강 스킬1 이름
+enhance_augment_name_angel_A,나노 펄스+,Nano Pulse+,앤젤 강화 증강 스킬1 이름
+enhance_augment_name_tachyon_A,타키온 증강 스킬1 이름,Tachyon Augment Skill 1 Name,타키온 강화 증강 스킬1 이름
+enhance_augment_desc_corsair_A,돌진 후 추가적으로 강력한 광역 피해를 입힌다,Deals additional powerful AoE damage after dashing.,커세어 강화 증강 스킬1 설명
+enhance_augment_desc_heavyrain_A,레이저 발사 횟수가 7회로 증가한다,Laser fire count increases to 7.,헤비레인 강화 증강 스킬1 설명
+enhance_augment_desc_tank_A,5초간 본인의 받는 피해량이 40% 감소한다,Reduces damage taken by 40% for 5 seconds.,탱크 강화 증강 스킬1 설명
+enhance_augment_desc_angel_A,회복량이 증가하고 회복이 영웅 한명과 그 주변 아군에게 적용된다,Increased healing amount; healing applies to a hero and nearby allies.,앤젤 강화 증강 스킬1 설명
+enhance_augment_desc_tachyon_A,피해량이 증가하고 강화 공격에 관통 효과가 추가된다,Increased damage; adds a piercing effect to enhanced attacks.,타키온 강화 증강 스킬1 설명
+augment_name_corsair_B,팬텀 스트라이크,Phantom Strike,커세어 증강 스킬2 이름
+augment_name_heavyrain_B,멀티 샷,Multi-Shot,헤비레인 증강 스킬2 이름
+augment_name_tank_B,전자기 방출,Electromagnetic Emission,탱크 증강 스킬2 이름
+augment_name_angel_B,긴급 수리,Emergency Repair,앤젤 증강 스킬2 이름
+augment_name_tachyon_B,작렬탄,Explosive Shell,타키온 증강 스킬2 이름
+augment_desc_corsair_B,돌진 횟수가 2회로 증가한다,Dash count increases to 2.,커세어 증강 스킬2 설명
+augment_desc_heavyrain_B,레이저를 한번에 3발 발사한다,Fires 3 lasers at once.,헤비레인 증강 스킬2 설명
+augment_desc_tank_B,스킬 지속시간 동안 주변 적에게 피해를 준다,Deals damage to nearby enemies during the skill duration.,탱크 증강 스킬2 설명
+augment_desc_angel_B,스킬의 쿨타임이 30% 감소한다,Reduces skill cooldown by 30%.,앤젤 증강 스킬2 설명
+augment_desc_tachyon_B,맞은 대상의 주변 적에게도 피해를 준다,Deals damage to enemies around the hit target.,타키온 증강 스킬2 설명
+enhance_augment_name_corsair_B,팬텀 스트라이크+,Phantom Strike+,커세어 강화 증강 스킬2 이름
+enhance_augment_name_heavyrain_B,멀티 샷+,Multi-Shot+,헤비레인 강화 증강 스킬2 이름
+enhance_augment_name_tank_B,전자기 방출+,Electromagnetic Emission+,탱크 강화 증강 스킬2 이름
+enhance_augment_name_angel_B,긴급 수리+,Emergency Repair+,앤젤 강화 증강 스킬2 이름
+enhance_augment_name_tachyon_B,작렬탄+,Explosive Shell+,타키온 강화 증강 스킬2 이름
+enhance_augment_desc_corsair_B,돌진 횟수가 3회로 증가한다,Dash count increases to 3.,커세어 강화 증강 스킬2 설명
+enhance_augment_desc_heavyrain_B,레이저를 한번에 5발 발사한다,Fires 5 lasers at once.,헤비레인 강화 증강 스킬2 설명
+enhance_augment_desc_tank_B,스킬 지속시간 동안 주변 적에게 강력한 피해를 준다,Deals powerful damage to nearby enemies during the skill duration.,탱크 강화 증강 스킬2 설명
+enhance_augment_desc_angel_B,회복량이 증가하고 스킬의 쿨타임이 30% 감소한다,Increased healing amount; reduces skill cooldown by 30%.,앤젤 강화 증강 스킬2 설명
+enhance_augment_desc_tachyon_B,기본 공격 4회마다 스킬을 사용한다. 맞은 대상의 주변 적에게도 피해를 준다,Uses skill every 4 basic attacks. Deals damage to enemies around the hit target.,타키온 강화 증강 스킬2 설명
+passive_name_corsair_1,커세어 패시브 스킬1 이름,Corsair Passive Skill 1 Name,커세어 패시브 스킬1 이름
+passive_name_heavyrain_1,헤비레인 패시브 스킬1 이름,Heavy Rain Passive Skill 1 Name,헤비레인 패시브 스킬1 이름
+passive_name_tank_1,탱크 패시브 스킬1 이름,Tank Passive Skill 1 Name,탱크 패시브 스킬1 이름
+passive_name_angel_1,앤젤 패시브 스킬1 이름,Angel Passive Skill 1 Name,앤젤 패시브 스킬1 이름
+passive_name_tachyon_1,타키온 패시브 스킬1 이름,Tachyon Passive Skill 1 Name,타키온 패시브 스킬1 이름
+passive_desc_corsair_1,커세어 패시브 스킬1 설명,Description for Corsair Passive Skill 1.,커세어 패시브 스킬1 설명
+passive_desc_heavyrain_1,헤비레인 패시브 스킬1 설명,Description for Heavy Rain Passive Skill 1.,헤비레인 패시브 스킬1 설명
+passive_desc_tank_1,탱크 패시브 스킬1 설명,Description for Tank Passive Skill 1.,탱크 패시브 스킬1 설명
+passive_desc_angel_1,앤젤 패시브 스킬1 설명,Description for Angel Passive Skill 1.,앤젤 패시브 스킬1 설명
+passive_desc_tachyon_1,타키온 패시브 스킬1 설명,Description for Tachyon Passive Skill 1.,타키온 패시브 스킬1 설명
+passive_name_corsair_2,커세어 패시브 스킬2 이름,Corsair Passive Skill 2 Name,커세어 패시브 스킬2 이름
+passive_name_heavyrain_2,헤비레인 패시브 스킬2 이름,Heavy Rain Passive Skill 2 Name,헤비레인 패시브 스킬2 이름
+passive_name_tank_2,탱크 패시브 스킬2 이름,Tank Passive Skill 2 Name,탱크 패시브 스킬2 이름
+passive_name_angel_2,앤젤 패시브 스킬2 이름,Angel Passive Skill 2 Name,앤젤 패시브 스킬2 이름
+passive_name_tachyon_2,타키온 패시브 스킬1 설명,Description for Tachyon Passive Skill 1,타키온 패시브 스킬2 이름
+passive_desc_corsair_2,커세어 패시브 스킬2 설명,Description for Corsair Passive Skill 2.,커세어 패시브 스킬2 설명
+passive_desc_heavyrain_2,헤비레인 패시브 스킬2 설명,Description for Heavy Rain Passive Skill 2.,헤비레인 패시브 스킬2 설명
+passive_desc_tank_2,탱크 패시브 스킬2 설명,Description for Tank Passive Skill 2.,탱크 패시브 스킬2 설명
+passive_desc_angel_2,앤젤 패시브 스킬2 설명,Description for Angel Passive Skill 2.,앤젤 패시브 스킬2 설명
+passive_desc_tachyon_2,타키온 패시브 스킬2 설명,Description for Tachyon Passive Skill 2.,타키온 패시브 스킬2 설명
+hero_type_robot,전술 슈트,Tactical Suit,영웅의 heroType이 robot이면 정보창에 표시
+hero_type_spacecraft,우주 함선,Spacecraft,영웅의 heroType이 spacecraft면 정보창에 표시
+hero_role_tank,방어형,Defense,영웅의 heroRole이 tank면 정보창에 표시
+hero_role_melee,강습형,Assault,영웅의 heroRole이 melee면 정보창에 표시
+hero_role_ranged,포격형,Artillery,영웅의 heroRole이 ranged면 정보창에 표시
+hero_role_healer,지원형,Support,영웅의 heroRole이 healer면 정보창에 표시
+hero_movetype_small,소형,Small,영웅의 moveType이 small이면 정보창에 표시
+hero_movetype_large,대형,Large,영웅의 moveType이 large이면 정보창에 표시
+hero_movetype_fixed,고정형,Fixed,영웅의 moveType이 fixed이면 정보창에 표시
+name_item001,강화 철갑탄,Enhanced AP Shell,아이템 이름
+name_item002,생명 유지 장치,Life Support System,아이템 이름
+name_item003,응급 의료 키트,Emergency Medical Kit,아이템 이름
+name_item004,이온 추진기,Ion Thruster,아이템 이름
+name_item005,증폭 회로,Amplifier Circuit,아이템 이름
+name_item006,고출력 렌즈,High-Power Lens,아이템 이름
+name_item007,긴급 호출기,Emergency Pager,아이템 이름
+name_item008,티타늄 합금,Titanium Alloy,아이템 이름
+name_item009,광전사 모듈,Berserker Module,아이템 이름
+name_item010,저격용 위장막,Sniper Camouflage,아이템 이름
+des_effect_item001_01,공격력 20% 증가,Attack Power increased by 20%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item002_01,최대 체력 20% 증가,Max HP increased by 20%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item003_01,치유력 20% 증가,Healing Power increased by 20%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item004_01,이동 속도 20% 증가,Movement Speed increased by 20%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item005_01,체력이 40% 이하일 때 공격력 50% 증가,Attack Power increased by 50% when HP is 40% or lower,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item006_01,체력 70% 이상일 때 쿨타임 20% 감소,Cooldown reduced by 20% when HP is 70% or higher,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item007_01,재소환 대기시간 20% 감소,Respawn Cooldown reduced by 20%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item007_02,최대 체력 30% 감소,Max HP reduced by 30%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item008_01,받는 피해량 30% 감소,Damage taken reduced by 30%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item008_02,이동 속도 20% 감소,Movement Speed reduced by 20%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item009_01,공격 속도 30% 증가,Attack Speed increased by 30%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item009_02,이동 속도 30% 증가,Movement Speed increased by 30%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item009_03,받는 피해량 30% 증가,Damage taken increased by 30%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item010_01,공격력 20% 증가,Attack Power increased by 20%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+des_effect_item010_02,공격 속도 30% 감소,Attack Speed reduced by 30%,아이템 효과 // 추후 수치 부분은 {0}로 바꿔서 자동화 예정
+ui_toast_item_equip_fail,영웅의 아이템 슬롯이 가득 찼습니다,Hero's item slots are full.,아이템 장착 시 아이템 슬롯 max면 토스트 메시지 출력
+ui_toast_item_share_fail,상대의 아이템 보관함이 가득 찼습니다,The target's item storage is full.,아이템 전달 시 아군 보관함 max면 토스트 메시지 출력
+ui_toast_item_not_overlap,해당 아이템은 중복 장착이 불가능합니다,This item cannot be equipped multiple times.,아이템 장착 시 중복 불가능 아이템이면 토스트 메시지 출력
+ui_augment_hero_name,영웅 획득 : {0},Hero Acquired: {0},{0}에는 Hero 테이블의 heroName 참조
+ui_augment_hero_des,영웅 {0}을/를 사용할 수 있습니다,You can now use Hero {0}.,{0}에는 Hero 테이블의 heroName 참조
+ui_augment_hero_respawn,재소환 대기시간 : {0}초,Respawn Cooldown: {0}s,{0}에는 HeroStat 테이블의 respawnCooldown 참조
+ui_augment_hero_skill_name,스킬 [{0}],Skill [{0}],{0}에는 영웅이 가진 기본 스킬의 이름 스트링 id 참조
+ui_augment_hero_skill_cooldown,쿨타임: {0}초,Cooldown: {0}s,{0}에는 영웅이 가진 기본 스킬의 쿨타임 값 참조
+ui_augment_skill_des,영웅 {0}의 스킬을 강화합니다,Upgrades the skill of Hero {0}.,{0}에는 해당 증강 스킬을 보유한 영웅의 heroName 참조 (여현구 작성)
+ui_augment_skill_name_format,스킬 [{0}] 업그레이드,Skill [{0}] Upgrade,{0}에는 해당 증강 스킬을 보유한 영웅이 가진 기본 스킬의 이름 참조  (여현구 작성)
+ui_toast_team_change_success,팀이 교체되었습니다.,Team has been changed.,팀 교체 완료 시 출력될 토스트 메시지
+ui_toast_team_change_failed,팀 교체 신청이 거절되었습니다.,Team change request was declined.,팀 교체 요청 거절될 시 출력될 토스트 메시지
+ui_toast_team_change_unable,{N}초 후 팀 교체 신청 가능,Team change request available in {N}s.,{N} = 팀 교체 신청 가능하기까지 남은 시간 (단위: 초)
+ui_toast_team_change_In_progress,대상이 이미 팀 교체 요청을 진행하고 있습니다.,The target is already processing a team change request.,
+ui_toast_cancel_request,요청이 취소되었습니다.,Request has been cancelled.,
+ui_kick_out_Success,{0} 님을 내보냈습니다.,{0} has been kicked out.,{0} = 대기실에서 내보낸 플레이어 계정 닉네임
+ui_toast_unable_enter_lobby_ban,추방당한 대기실에 다시 입장할 수 없습니다.,You cannot re-enter a lobby you were kicked from.,내보내진 대기실 재입장 시도 시 플레이어 화면에 출력될 토스트 메시지
+ui_toast_unexecutable_request,실행할 수 없는 요청입니다.,This request cannot be executed.,각종 기능 사용 중 실행할 수 없는 요청일 때 출력될 텍스트 메시지
+ui_toast_Admin_change,{0} 님에게 방장 권한을 위임했습니다.,Transferred host permissions to {0}.,{0} = 방장 권한을 넘겨 받은 플레이어 계정 닉네임
+ui_admin_Assign,대기실 방장이 되었습니다.,You are now the lobby host.,방장 권한을 위임 받아 새롭게 방장이 된 플레이어 화면에 출력될 토스트 메시지
+ui_toast_game_start_unable,대기실 인원이 부족해 게임을 시작할 수 없습니다.,Not enough players to start the game.,게임 시작 조건 만족하지 않은 상태에서 대기실 내 게임 시작 버튼 입력 시 출력될 토스트 메시지
+ui_toast_plz_typing_lobby_code,대기실 코드를 입력해주세요.,Please enter the lobby code.,입력값 없는 상태에서 검색 버튼 입력 시 출력될 토스트 메시지
+ui_toast_lobby_code_8_letters,대기실 코드는 8글자입니다.,Lobby code must be 8 characters long.,1~7 자리수 입력한 상태에서 검색 버튼 입력 시 출력될 토스트 메시지
+ui_toast_lobby_code_Invalid,입력한 대기실 코드가 유효하지 않습니다.,The lobby code entered is invalid.,입력한 값과 일치하는 대기실 코드가 없을 때 출력될 메시지
+ui_toast_lobby_full,대기실이 가득 찼습니다,The lobby is full.,입장할 대기실 내 인원이 가득 찼을 때 출력될 메시지
+ui_toast_lobby_not_exist,존재하지 않는 대기실입니다.,This lobby does not exist.,입장할 대기실이 존재하지 않을 때 출력될 메시지
+ui_toast_lobby_entry_failed,입장에 실패했습니다. 다시 시도해 주세요.,Entry failed.\nPlease try again.,"서버, 네트워크 오류로 인해 대기실 입장 실패 시 출력될 메시지"
+create_lobby,대기실 생성,Create Lobby,
+search_lobby,대기실 찾기,Find Lobby,
+select_game_mode,게임 모드를 선택하세요.,Select Game Mode,대기실 생성 팝업창 내 출력될 텍스트
+basics,기본,Basic,
+1v1_battle,1v1 전투,1v1 Battle,
+2v2_battle,2v2 전투,2v2 Battle,
+ui_lobby_name,{0}님의 게임,{0}'s Game,{0} = 대기실을 생성한 플레이어의 계정 닉네임#태그
+team1,1팀,Team 1,
+team2,2팀,Team 2,
+empty,비어 있음,Empty,빈 플레이어 슬롯 기본값
+join,참가,Join,
+ui_lobby_code,대기실 코드: {1},Lobby Code: {1},대기실 내 출력될 대기실 코드
+game_start,게임 시작,Start Game,
+change_admin,방장 변경,Transfer Host,
+kick_out,내보내기,Kick,
+notification,알림,Notification,
+ui_check_change_admin,{0}님에게 방장권한을 위임하시겠습니까?,Would you like to transfer host permissions to {0}?,"방장 변경 의사 확인 팝업창 내 출력될 텍스트, {0} = 방장 권한을 넘겨줄 대상 플레이어 닉네임"
+cancel,취소,Cancel,
+check,확인,Confirm,
+ui_check_player_kick_out,{0}님을 내보내시겠습니까?,Would you like to kick {0}?,"내보내기 의사 확인 팝업창 화면 내 출력될 확인 문구, {0} = 대기실에서 내보낼 플레이어 계정 닉네임"
+ui_player_kicked_out,방장에 의해 대기실에서 내보내졌습니다.,You have been kicked from the lobby by the host.,대기실에서 내보내진 플레이어 화면에 출력될 팝업창 내 문구
+close,닫기,Close,
+ui_plz_typed_lobby_code,대기실 코드를 입력해주세요.,Please enter the lobby code.,대기실 검색 모달창 내 출력될 텍스트
+ui_noti_lobby_code,※ 대기실 코드는 알파벳 대문자 8자리로 입력할 수 있습니다.,* Lobby codes consist of 8 uppercase letters.,대기실 검색 모달창 내 출력될 텍스트
+search,검색,Search,
+lobby_info,대기실 정보,Lobby Info,
+ui_lobby_admin,방장: {0},Host: {0},"대기실 정보 모달창 내 출력될  화면 출력 시점 대기실 방장 닉네임, {0} = 화면 출력 시점 방장인 플레이어 계정 닉네임"
+enter,입장,Enter,
+noti_exp_exchange_reward,최대 레벨을 달성한 영웅에게 지급될 경험치는 골드로 변환되었습니다.,EXP earned by max-level heroes has been converted to Gold.,대체 보상 지급 시 대전 보상 화면에 출력될 알림 문구
+cur_level,레벨 {N},Level {N},{N} = 영웅 현재 레벨
+hp,체력,HP,
+attack_power,공격력,Attack Power,
+healing_power,치유력,Healing Power,
+ui_toast_hero_level_up_need_exp,영웅 레벨을 올리려면 경험치가 필요합니다.,Not enough EXP.,"영웅 레벨업 필요 경험치 > 영웅 현재 경험치 일 때, 영웅 레벨업 버튼 입력 시 출력될 토스트 메시지"
+ui_toast_hero_level_up_need_gold,골드가 부족합니다.,Not enough Gold.,"영웅 레벨업 필요 골드 > 계정 내 골드량 일 때, 영웅 레벨업 버튼 입력 시 출력될 토스트 메시지"
+ui_text_win,Congratulation!!! ,Congratulation!!!,
+ui_title_win,You Win !!!,You Win !!!,
+ui_text_lose,So Sad...,So Sad...,
+ui_title_lose,You Lose....,You Lose....,
+ui_text_draw,Nice Try,Nice Try,
+ui_title_draw,Draw ,Draw,
+btn_quit_stage,돌아가기,Return,
+ui_unlock_levelreward,레벨 {N} 달성 시 해금,Unlocks at Level {N},{N} = 레벨 달성 보상 해금 레벨 (HeroLevelReward 테이블 level 칼럼 참조)
+ui_toast_host_missing,호스트와의 연결이 끊겨 대기 중입니다,Connection to host lost. Waiting...,호스트가 홈버튼을 눌러 어플레이케이션이 내려갔을 때 -> 다른 플레이어들에게 팝업 출력
+ui_toast_player_missing,다른 플레이어와\n연결이 끊겨\n로비로 돌아갑니다,Connection lost with another player.\nReturning to lobby.,플레이어 중 한 명이 완전히 네트워크 끊기면 -> 다른 플레이어들에게 팝업 출력 
+equip_emote,장착된 이모티콘 ({0}/{1}),Equipped Emotes ({0}/{1}),
+ui_toast_hero_purchase_need_gold,골드가 부족합니다.,Not enough Gold to purchase hero.,
