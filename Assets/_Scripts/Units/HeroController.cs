@@ -14,7 +14,6 @@ public class HeroController : UnitController
     public ISkill curUniqueSkill;
     private Vector3 _targetPos;
     private float _deployDelay;
-    private StageManager _stageManager;
     private NetworkPrefabRef _myPrefab;
     private float _finalCooldown;
     private PlayerRef _ownerPlayer;
@@ -40,11 +39,14 @@ public class HeroController : UnitController
         normalAttack = _normalAttackData.CreateInstance(this);
         curUniqueSkill = _standardSkillData.CreateInstance(this);
 
-        _stageManager = FindFirstObjectByType<StageManager>();
-
         HeroAnimator = GetComponent<Animator>();
         // 부스터는 반드시 자식 오브젝트에서 첫번째에 위치한다.
         BoosterAnimator = transform.GetChild(0).GetComponent<Animator>();
+
+        if (_normalAttackData is ProjectileSkillSO)
+        {
+            attackRange = Mathf.Min( (_normalAttackData as ProjectileSkillSO).range, MIN_ATTACK_RANGE);
+        }
 
         if (!Object.HasStateAuthority) return;
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
@@ -222,7 +224,7 @@ public class HeroController : UnitController
 
         _appliedAugments.Clear();
 
-        foreach (var player in _stageManager.PlayerDataMap)
+        foreach (var player in StageManager.Instance.PlayerDataMap)
         {
             if (player.Value.Team != team)
                 continue;
@@ -259,7 +261,7 @@ public class HeroController : UnitController
         if (!Object.HasStateAuthority) return;
 
         //자신의 영웅 슬롯 인덱스 찾기
-        var playerData = _stageManager.PlayerDataMap.Get(_ownerPlayer);
+        var playerData = StageManager.Instance.PlayerDataMap.Get(_ownerPlayer);
         int myHeroIndex = -1;
 
         for (int i = 0; i < SlotData_5.Length; i++)
