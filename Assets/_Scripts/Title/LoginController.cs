@@ -1,5 +1,6 @@
 ﻿using Firebase.Auth;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -197,6 +198,14 @@ public class LoginController : MonoBehaviour
     {
         try
         {
+            // 세션 난수 발행 및 로컬 저장
+            string myLocalSessionId = Guid.NewGuid().ToString();
+            _authService.MyLocalSessionId = myLocalSessionId;
+
+            // 난수 DB에 저장
+            var updates = new Dictionary<string, object> { { "Profile.sessionId", myLocalSessionId } };
+            await _userDataStore.UpdateAllAsync(userId, updates);
+
             var userData = await _userDataStore.GetUserDataAsync(userId);
             var userHeroData = await _userDataStore.GetUserHeroDataAsync(userId);
 
