@@ -35,6 +35,7 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [Header("상세 정보 설정")]
     [SerializeField] private float _longPressThreshold = 3.0f;
     [SerializeField] private GameObject _detailPrefab;
+    [SerializeField] private Image _holdGauge;
     private Coroutine _longPressCoroutine;
     private bool _isPointerDown = false;
     private string _currentItemId1;
@@ -275,18 +276,38 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     {
         _isPointerDown = false;
         if (_longPressCoroutine != null) StopCoroutine(_longPressCoroutine);
+        ResetHoldGauge();
     }
     private IEnumerator CO_CheckLongPress()
     {
         float timer = 0f;
+
+        if (_holdGauge != null)
+        {
+            _holdGauge.fillAmount = 0f;
+            _holdGauge.gameObject.SetActive(true);
+        }
+
         while (timer < _longPressThreshold)
         {
             timer += Time.deltaTime;
-            if (!_isPointerDown) yield break; // 중간에 떼면 취소
+
+            if (_holdGauge != null)
+            {
+                _holdGauge.fillAmount = timer / _longPressThreshold;
+            }
+
+            if (!_isPointerDown)
+            {
+                ResetHoldGauge(); // 떼면 게이지 초기화
+                yield break;
+            }
+
             yield return null;
         }
 
         // 3초 경과 시 팝업 열기
+        ResetHoldGauge();
         OpenDetail();
     }
     private void OpenDetail()
@@ -306,6 +327,13 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             Debug.LogError("상세창 UI 생성 실패!");
         }
     }
-
+    private void ResetHoldGauge()
+    {
+        if (_holdGauge != null)
+        {
+            _holdGauge.fillAmount = 0f;
+            _holdGauge.gameObject.SetActive(false);
+        }
+    }
 
 }
