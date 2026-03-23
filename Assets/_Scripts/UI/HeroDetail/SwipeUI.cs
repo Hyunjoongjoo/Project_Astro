@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -13,6 +14,11 @@ public class SwipeUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
     [SerializeField] private Color _activeColor; // 활성화된 점 색상
     [SerializeField] private Color _inactiveColor; // 비활성화된 점 색상
     [SerializeField] private float _lerpSpeed = 10f;
+
+    [Header("탭연결")]
+    [SerializeField] private TMP_Text[] _tabs;
+    [SerializeField] private Color _actTab;
+    [SerializeField] private Color _inactTab;
 
     private float[] _pagePositions;
     private int _pageCount;
@@ -108,6 +114,7 @@ public class SwipeUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
         for (int i = 0; i < _dots.Length; i++)
         {
             _dots[i].color = (i == index) ? _activeColor : _inactiveColor;
+            _tabs[i].color = (i == index) ? _actTab : _inactTab;
         }
     }
 }
