@@ -194,6 +194,7 @@ public class AugmentManager : Singleton<AugmentManager>
             if (child.TryGetComponent(out HeroHandCardUI card))
             {
                 List<Sprite> icons = new List<Sprite>();
+                List<string> ids = new List<string>();
                 //카드별로 스킬 리스트를 처음부터 순회하며 꼬리표 확인
                 for (int i = 0; i < SlotData_5.Length; i++)
                 {
@@ -215,10 +216,11 @@ public class AugmentManager : Singleton<AugmentManager>
                         {
                             //박제된 티어에 맞는 아이콘추가
                             icons.Add(so.Tiers[savedTierIndex].Icon);
+                            ids.Add(rawId);
                         }
                     }
                 }
-                card.UpdateSkillAugmentIcons(icons);
+                card.UpdateSkillAugmentIcons(ids, icons);
             }
         }
     }

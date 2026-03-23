@@ -856,6 +856,8 @@ MonoBehaviour:
   - {fileID: 4379930532475971045}
   _itemSlot1: {fileID: 3639963581002136360}
   _itemSlot2: {fileID: 457633395502217841}
+  _longPressThreshold: 2
+  _detailPrefab: {fileID: 292972939330173462, guid: 95ac4e4c00ef68d44b557204cf24d474, type: 3}
 --- !u!114 &1857677499821193337
 MonoBehaviour:
   m_ObjectHideFlags: 0

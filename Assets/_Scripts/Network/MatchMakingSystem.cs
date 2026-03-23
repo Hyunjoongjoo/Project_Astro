@@ -27,6 +27,13 @@ public class MatchMakingSystem : MonoBehaviour
         _height = Screen.height;
     }
 
+    private void Start()
+    {
+        RectTransform panel = _matchMakingPanel.GetComponent<RectTransform>();
+        RectTransform canvas = GameObject.FindWithTag("MainCanvas").GetComponent<RectTransform>();
+        panel.sizeDelta = new Vector2(canvas.rect.width, canvas.rect.height);
+    }
+
     public async void OnClickMatchMaking(int matchType)
     {
         if (_isMatching) return; // 중복 클릭 방지
