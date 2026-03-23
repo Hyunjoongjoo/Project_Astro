@@ -7504,6 +7504,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UserDataManager
   _dontDestroyOnLoad: 1
+  _duplicateLoginPrefab: {fileID: 3302695351323867752, guid: 361fb3d48a3a9d749b9dd5484533f4e4, type: 3}
 --- !u!4 &1403576594
 Transform:
   m_ObjectHideFlags: 0
