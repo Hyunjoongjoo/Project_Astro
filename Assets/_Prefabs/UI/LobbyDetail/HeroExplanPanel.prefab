@@ -4085,7 +4085,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5724744471569154802}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
   m_Name: 
@@ -5543,6 +5543,12 @@ MonoBehaviour:
   _activeColor: {r: 1, g: 0.5321535, b: 0, a: 1}
   _inactiveColor: {r: 0.14716971, g: 0.1263438, b: 0.1263438, a: 1}
   _lerpSpeed: 10
+  _tabs:
+  - {fileID: 3367182628906353271}
+  - {fileID: 354151916125510345}
+  - {fileID: 132606813896564214}
+  _actTab: {r: 1, g: 1, b: 1, a: 1}
+  _inactTab: {r: 1, g: 1, b: 1, a: 1}
 --- !u!222 &3385311529139235370
 CanvasRenderer:
   m_ObjectHideFlags: 0

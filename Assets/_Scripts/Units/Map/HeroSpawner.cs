@@ -69,7 +69,8 @@ public class HeroSpawner : NetworkBehaviour
 
         foreach (var tower in Tower.AliveTowers)
         {
-            if (tower.networkedTeam == enemyTeam)
+            if (tower == null || tower.team == Team.None) continue;
+            if (tower.team == enemyTeam)
             {
                 aliveCount++;
             }
@@ -77,7 +78,7 @@ public class HeroSpawner : NetworkBehaviour
 
         return Mathf.Clamp(2 - aliveCount, 0, 2);//팀당 포탑 2개 기준
     }
-    
+
     private float GetCurrentDeployDistance(Team team)//현재 배치 가능 거리 계산
     {
         int destroyedCount = GetDestroyedTowerCount(team);
@@ -259,12 +260,19 @@ public class HeroSpawner : NetworkBehaviour
     {
         if (!Application.isPlaying) return;
 
-        Transform origin = GetDeployOrigin(Team.Blue);
+        DrawDeployGizmo(Team.Blue, Color.blue);
+
+        DrawDeployGizmo(Team.Red, Color.red);
+    }
+
+    private void DrawDeployGizmo(Team team, Color color)
+    {
+        Transform origin = GetDeployOrigin(team);
         if (origin == null) return;
 
-        float distance = GetCurrentDeployDistance(Team.Blue);
+        float distance = GetCurrentDeployDistance(team);
 
-        Gizmos.color = Color.green;
+        Gizmos.color = color;
         Gizmos.DrawWireSphere(origin.position, distance);
     }
 #endif

@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.9941945, b: 1, a: 0.2}
+  m_Color: {r: 0, g: 0.9941945, b: 1, a: 0.078431375}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -711,6 +711,9 @@ MonoBehaviour:
   _itemDescription: {fileID: 6996938851940257511}
   _selectBtn: {fileID: 7135005315365410320}
   _highlightObj: {fileID: 1065374840382445939}
+  _visualRoot: {fileID: 7542442816759294197}
+  _hoverScale: 1.1
+  _animDuration: 0.2
 --- !u!114 &2655665905610693427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -886,6 +889,7 @@ GameObject:
   - component: {fileID: 8273008968467023248}
   - component: {fileID: 292022094012109420}
   - component: {fileID: 1669222982324297482}
+  - component: {fileID: 5857861542538288792}
   m_Layer: 5
   m_Name: DescText
   m_TagString: Untagged
@@ -1011,3 +1015,16 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &5857861542538288792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9114553471061675058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf325530a6b9664c9987110717cb49c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _stringId: ui_augment_item_des

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Tachyon_Normal_Attack
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
   heroId: hero_tachyon
+  skillIcon: {fileID: 0}
   skillName: 
   skillDescription: 
   note: 

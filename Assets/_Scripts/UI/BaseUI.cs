@@ -85,6 +85,13 @@ public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
             Open();
         }
     }
+    //오픈 유지(갱신x로직)
+    public virtual void MaintainOpen()
+    {
+        if (IsOpened) return;
+
+        Open();
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 // Stage 씬 인게임 시퀀스에 쓰이는 UI들을 제어하는 클래스
 public class StageUI : MonoBehaviour
 {
-    [SerializeField] private GameObject _loadingPanel;
+    [SerializeField] private GameObject[] _loadingPanel;
     [SerializeField] private GameObject _vsPanel;
     [SerializeField] private GameObject[] _rotationPanel;
     [SerializeField] private TextMeshProUGUI[] _introNameLabel;
@@ -45,11 +45,22 @@ public class StageUI : MonoBehaviour
     private float _lastRecievedRPCTime = 0f;
     private const float TIMER_RPC_TIMEOUT = 3f;
     private bool _isHostPaused = false;
+    private readonly string HOST_MISSING = "ui_toast_host_missing";
+    private readonly string PLAYER_MISSING = "ui_toast_player_missing";
 
     private void Awake()
     {
         _countdownIndicator.gameObject.SetActive(false);
         _resultPanel.gameObject.SetActive(false);
+    }
+
+    private void Start()
+    {
+        _waitingHost.GetComponent<TextMeshProUGUI>().text = 
+            TableManager.Instance.GetString(HOST_MISSING);
+
+        _disconnected.GetComponent<TextMeshProUGUI>().text =
+            TableManager.Instance.GetString(PLAYER_MISSING);
     }
 
     private void Update()
@@ -165,7 +176,9 @@ public class StageUI : MonoBehaviour
                     myTeam == Team.Blue ? RedTeamNames[1] : BlueTeamNames[1]; // 아군; // 적 2
         }
 
-        _loadingPanel.SetActive(false);
+        foreach (var obj in _loadingPanel)
+            obj.SetActive(false);
+
         _vsPanel.SetActive(true);
         Debug.Log("매칭된 플레이어 정보를 보여줌");
     }

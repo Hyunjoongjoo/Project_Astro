@@ -88,7 +88,15 @@ public class ChatMacroPresenter : MonoBehaviour
         // 현재 탭에 맞는 데이터만 필터링
         var filteredMacros = _database.allMacros.FindAll(m => m.type == _currentTab);
 
-        _view.RefreshList(filteredMacros, GetCurrentEditing(), GetCurrentEquipped(), invenSize, OnMacroSlotClicked, OnRemoveEquippedMacro);
+        _view.RefreshList(
+            _currentTab,
+            filteredMacros,
+            GetCurrentEditing(),
+            GetCurrentEquipped(),
+            invenSize,
+            OnMacroSlotClicked,
+            OnRemoveEquippedMacro
+            );
     }
 
     public void SaveToPlayerPrefs()

@@ -1,8 +1,10 @@
-﻿using TMPro;
+﻿using DG.Tweening;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SkillCardUI : MonoBehaviour, IAugmentUI
+public class SkillCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("Main UI")]
     [SerializeField] private Image _skillIconImg;        //기획서 1: 스킬 아이콘
@@ -21,8 +23,27 @@ public class SkillCardUI : MonoBehaviour, IAugmentUI
     [SerializeField] private Button _selectBtn;
     [SerializeField] private GameObject _highlightObj;
 
+    [Header("Animation (DOTween)")]
+    [SerializeField] private RectTransform _visualRoot;
+    [SerializeField] private float _hoverScale = 1.1f;
+    [SerializeField] private float _animDuration = 0.2f;
+
     private AugmentData _data;
     //private bool _isClicked = false;
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        _visualRoot.DOKill();
+
+        _visualRoot.DOScale(_hoverScale, _animDuration).SetEase(Ease.OutBack);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _visualRoot.DOKill();
+        // 원래 크기로 복구
+        _visualRoot.DOScale(1f, _animDuration).SetEase(Ease.OutCubic);
+    }
 
     public void Setup(AugmentData data)
     {

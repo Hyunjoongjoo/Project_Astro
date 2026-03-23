@@ -11,7 +11,7 @@ public class UnitController : UnitBase
     [SerializeField] protected MoveType moveType;
 
     [Header("스탯 관련")]
-    public float attackRange = 5;
+    [HideInInspector] public float attackRange;
     [SerializeField] protected string unitId;
     public Transform firePoint;
 
@@ -27,7 +27,7 @@ public class UnitController : UnitBase
     [Header("스킬 데이터")]
     [Header("평타 공격")]
     [SerializeField] protected BaseSkillSO _normalAttackData;
-
+    
     // 상태 머신과 상태 인스턴스들
     public StateMachine StateMachine { get; protected set; }
     public DetectState DetectState { get; protected set; }
@@ -59,6 +59,9 @@ public class UnitController : UnitBase
             return team == Team.Blue ? LayerMask.GetMask("BlueTeam") : LayerMask.GetMask("RedTeam");
         }
     }
+
+    protected readonly float MIN_ATTACK_RANGE = 2f;
+
     public override void Spawned()
     {
         base.Spawned();
@@ -66,6 +69,8 @@ public class UnitController : UnitBase
         unitType = UnitType.Minion;
 
         normalAttack = _normalAttackData.CreateInstance(this);
+
+        InitAttackRange();
 
         if (!Object.HasStateAuthority) return;
 
@@ -79,7 +84,7 @@ public class UnitController : UnitBase
         _unitStat = GetComponent<UnitStat>();
 
         UnitData data = TableManager.Instance.UnitTable.Get(unitId);
-
+        moveType = data.moveType;
         //UnitStat 초기화
         _unitStat.Init(data);
 
@@ -89,7 +94,7 @@ public class UnitController : UnitBase
         //moveSpeed = _unitStat.MoveSpeed.Value;
         //searchRange = _unitStat.DetectRange.Value;
         agent.speed = MoveSpeed;
-
+        ConfigureAreaMask();
         StateMachine.ChangeState(DetectState);
     }
 
@@ -109,7 +114,7 @@ public class UnitController : UnitBase
         team = myTeam;
         agent = GetComponent<NavMeshAgent>();
 
-        ConfigureAreaMask();
+        //ConfigureAreaMask();
 
         int myLayer;
         int enemyLayer;
@@ -170,6 +175,15 @@ public class UnitController : UnitBase
                 //MeteorZone 차단
                 agent.areaMask = NavMesh.AllAreas & ~(1 << meteorArea);
                 break;
+        }
+    }
+
+    //공격 사거리 초기화 메서드
+    protected void InitAttackRange()
+    {
+        if (_normalAttackData is ProjectileSkillSO projectileSO)
+        {
+            attackRange = Mathf.Max(projectileSO.range, MIN_ATTACK_RANGE);
         }
     }
 
