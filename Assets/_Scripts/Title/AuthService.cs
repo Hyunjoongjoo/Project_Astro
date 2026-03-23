@@ -8,6 +8,7 @@ using UnityEngine;
 public class AuthService : Singleton<AuthService>
 {
     public FirebaseAuth Auth { get; private set; }
+    public string MyLocalSessionId {  get; set; }
 
     // 현재 로그인된 사용자 정보
     public FirebaseUser CurrentUser => Auth.CurrentUser;
@@ -110,6 +111,10 @@ public class AuthService : Singleton<AuthService>
     {
         try
         {
+            UserDataManager.Instance.StopDuplicateLoginListener();
+
+            MyLocalSessionId = null;
+
             if (GoogleSignIn.DefaultInstance != null)
             {
                 GoogleSignIn.DefaultInstance.SignOut();

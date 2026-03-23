@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class UserDataManager : Singleton<UserDataManager>
 {
+    [SerializeField] private GameObject _duplicateLoginPrefab;
+
     //옵저버 패턴용 이벤트
     public event Action<int> OnGoldChanged;
     public event Action<int> OnWinCountChanged;
@@ -16,6 +17,8 @@ public class UserDataManager : Singleton<UserDataManager>
     private RecordModel _recordModel;
     private WalletModel _walletModel;
     private List<HeroDbModel> _heroesModel = new List<HeroDbModel>();
+
+    private ListenerRegistration _sessionListener;
 
     public void SetAllUserData(ProfileDbModel profile, RecordModel record, WalletModel wallet, List<HeroDbModel> heroes)
     {
@@ -38,6 +41,7 @@ public class UserDataManager : Singleton<UserDataManager>
 
         OnGoldChanged = null;
         OnHeroDataChanged = null;
+        OnWinCountChanged = null;
 
         Debug.Log("[UserDataManager] 캐시가 초기화되었습니다.");
     }
@@ -238,5 +242,51 @@ public class UserDataManager : Singleton<UserDataManager>
             // 4. HeroManager 런타임 스텟 재초기화
             HeroManager.Instance.InitAllHeroStats(_heroesModel);
         }
+    }
+
+    // 스냅샷 리스너 
+    public void StartDuplicateLoginListener(string userId, string myLocalSessionId)
+    {
+        StopDuplicateLoginListener();
+
+        DocumentReference userDocRef = FirebaseFirestore.DefaultInstance
+            .Collection("users").Document(userId);
+
+        Debug.Log($"[Session] 중복 로그인 리스너 등록 완료. 내 ID: {myLocalSessionId}");
+
+        // 리스너 등록 (서버 값 바뀌면 자동 호출)
+        _sessionListener = userDocRef.Listen(snapshot =>
+        {
+            if (!snapshot.Exists) return;
+
+            if (snapshot.TryGetValue("Profile.sessionId", out string dbSessionId))
+            {
+                // 로컬 세션값과 서버 세션값 다르면 튕기기
+                if (!string.IsNullOrEmpty(dbSessionId) && myLocalSessionId != dbSessionId)
+                {
+                    HandleKickOut();
+                }
+            }
+        });
+    }
+
+    // 리스너 정지 (로그아웃이나 앱 종료 시 필수 호출)
+    public void StopDuplicateLoginListener()
+    {
+        if (_sessionListener != null)
+        {
+            _sessionListener.Stop();
+            _sessionListener = null;
+            Debug.Log("[Session] 리스너 해제됨");
+        }
+    }
+
+    private void HandleKickOut()
+    {
+        StopDuplicateLoginListener();
+
+        Debug.LogError("중복 로그인 확인됨");
+
+        GameObject prefab = Instantiate(_duplicateLoginPrefab);
     }
 }
