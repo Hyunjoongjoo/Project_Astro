@@ -55648,6 +55648,8 @@ MonoBehaviour:
   _canvasScaler:
   - {fileID: 1497990088}
   - {fileID: 397869009}
+  _applySafeArea:
+  - {fileID: 923284457}
 --- !u!1 &1464465850
 GameObject:
   m_ObjectHideFlags: 0
