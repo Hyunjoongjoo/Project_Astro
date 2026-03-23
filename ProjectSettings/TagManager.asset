@@ -45,6 +45,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Camera
+    uniqueID: 1902535927
+    locked: 0
   m_RenderingLayers:
   - Default
   - Light Layer 1

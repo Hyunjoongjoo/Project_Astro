@@ -8,7 +8,7 @@ public class CameraResolutionSet : MonoBehaviour
     private float _targetAspect;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         _targetAspect = _targetWidth / _targetHeight;
         ApplyLetterbox();
