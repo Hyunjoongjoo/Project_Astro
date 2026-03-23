@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class CameraResolutionSet : MonoBehaviour
 {
-    private float _targetWidth = 9f;
-    private float _targetHeight = 19.5f;
+    [SerializeField] private float _targetWidth = 9f;
+    [SerializeField] private float _targetHeight = 19.5f;
+
+    [SerializeField] private bool _applyLetterbox;
+    [SerializeField] CanvasScaler[] _canvasScaler;
 
     private float _targetAspect;
 
@@ -11,7 +15,12 @@ public class CameraResolutionSet : MonoBehaviour
     void Awake()
     {
         _targetAspect = _targetWidth / _targetHeight;
-        ApplyLetterbox();
+
+        if (_canvasScaler.Length > 0)
+            SetScaler();
+
+        if (_applyLetterbox)
+            ApplyLetterbox();
     }
 
     void ApplyLetterbox()
@@ -30,5 +39,24 @@ public class CameraResolutionSet : MonoBehaviour
         float xOffset = (1f - normalizedWidth) / 2f;
 
         Camera.main.rect = new Rect(xOffset, 0, normalizedWidth, 1);
+    }
+
+    void SetScaler()
+    {
+        float currentAspect = (float)Screen.width / Screen.height;
+
+        float matchValue = 1f;
+        // 기준보다 좁다 -> 폴드 접음 등 세로로 더 길다면
+        if (currentAspect < _targetAspect) 
+        {
+            matchValue = 0f;
+        }
+
+        foreach (var scaler in _canvasScaler)
+        {
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+
+            scaler.matchWidthOrHeight = matchValue;
+        }
     }
 }
