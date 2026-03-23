@@ -70,7 +70,7 @@ public class HandCardDetail : BaseUI
                         _augmentName.text = t;
                         _augmentIcon.sprite = tierData.Icon;
                     }
-                    _augmentDes.text += $"<color=#FFD700>• {t}</color>\n{d}\n\n"; // 가독성 위해 줄바꿈 추가
+                    _augmentDes.text += $"{d}"; // 가독성 위해 줄바꿈 추가
                 }
             }
         }
