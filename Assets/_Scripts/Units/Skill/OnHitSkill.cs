@@ -59,7 +59,8 @@ public class OnHitSkill : ISkill
 
     public void PreDelay()
     {
-        _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
+        if (_data.skillType != SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
         _phase = SkillPhase.PreDelay;
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
     }
@@ -69,6 +70,7 @@ public class OnHitSkill : ISkill
         // 스킬 시전시 평타 공격을 가져와 데이터 값을 바꿈. (투사체, 데미지 등)
         if (_duplicateSO != null && _duplicateSO is ProjectileSkillSO)
         {
+            _phase = SkillPhase.Casting;
             _projectileSO = _duplicateSO as ProjectileSkillSO;
             _originDamage = _projectileSO.damageRatio;
             _projectileSO.damageRatio += _data.additionalDamageRatio;
@@ -85,7 +87,8 @@ public class OnHitSkill : ISkill
 
     public void PostDelay()
     {
-        _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
+        if (_data.skillType != SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
         _phase = SkillPhase.PostDelay;
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
     }

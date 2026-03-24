@@ -9,6 +9,7 @@ public class ProjectileSkill : ISkill
 
     private SkillPhase _phase = SkillPhase.Idle;
     private TickTimer _phaseTimer;
+    private bool _castingEnd = false;
 
     private Coroutine _fireCoroutine;
     private TickTimer _skillCooldown;
@@ -46,7 +47,8 @@ public class ProjectileSkill : ISkill
 
     public void PreDelay() 
     {
-        _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
+        if (_data.skillType != SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
         _phase = SkillPhase.PreDelay;
         //float finalCooldown;
 
@@ -68,19 +70,18 @@ public class ProjectileSkill : ISkill
         if (_cachedUnit.currentTarget == null) return;
 
         _phase = SkillPhase.Casting;
-        Debug.Log("캐스팅 메서드 진입");
 
         // 기존 코루틴이 있다면 정지 후 새로 시작 (UnitController를 통해 실행)
         if (_fireCoroutine != null)
             _cachedUnit.StopCoroutine(_fireCoroutine);
 
         _fireCoroutine = _cachedUnit.StartCoroutine(FireRoutine());
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, 0f);
     }
 
     public void PostDelay() 
     {
-        _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
+        if (_data.skillType != SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
         _phase = SkillPhase.PostDelay;
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
     }
@@ -96,7 +97,7 @@ public class ProjectileSkill : ISkill
                 break;
 
             case SkillPhase.Casting:
-                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                if (_castingEnd)
                     PostDelay();
                 break;
 
@@ -129,5 +130,6 @@ public class ProjectileSkill : ISkill
                 yield return new WaitForSeconds(_data.interval);
             }
         }
+        _castingEnd = true;
     }
 }

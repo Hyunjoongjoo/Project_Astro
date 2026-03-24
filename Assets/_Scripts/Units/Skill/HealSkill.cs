@@ -99,7 +99,8 @@ public class HealSkill : ISkill
 
     public void PreDelay() 
     {
-        _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
+        if (_data.skillType != SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
         _phase = SkillPhase.PreDelay;
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
@@ -108,6 +109,7 @@ public class HealSkill : ISkill
     public void Casting()
     {
         float finalCooldown = _data.cooldown * _data.cooldownMultiplier;
+        _phase = SkillPhase.Casting;
 
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
 
@@ -170,7 +172,8 @@ public class HealSkill : ISkill
 
     public void PostDelay() 
     {
-        _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
+        if (_data.skillType != SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
         _phase = SkillPhase.PostDelay;
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
     }

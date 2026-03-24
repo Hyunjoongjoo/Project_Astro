@@ -192,6 +192,15 @@ public class UnitController : UnitBase
 
     // --- 유틸리티 메서드 (상태 클래스들에서 호출해서 사용) ---
 
+    public void RotateToTarget(Vector3 direction)
+    {
+        direction.y = 0f; // 수평 회전만 적용
+        if (direction.sqrMagnitude > 0.001f)
+        {
+            transform.rotation = Quaternion.LookRotation(direction);
+        }
+    }
+
     public void MoveTo(Vector3 destination)
     {
         if (agent != null && agent.enabled)

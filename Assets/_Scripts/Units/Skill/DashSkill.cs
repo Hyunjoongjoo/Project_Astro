@@ -10,6 +10,7 @@ public class DashSkill : ISkill
 
     private SkillPhase _phase = SkillPhase.Idle;
     private TickTimer _phaseTimer;
+    private bool _castingEnd = false;
 
     private TickTimer _skillCooldown;
 
@@ -60,7 +61,8 @@ public class DashSkill : ISkill
 
     public void PreDelay() 
     {
-        _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
+        if (_data.skillType != SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
         _phase = SkillPhase.PreDelay;
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
@@ -71,6 +73,7 @@ public class DashSkill : ISkill
         if (!_cachedUnit.Object.HasStateAuthority) return;
         if (_cachedUnit.currentTarget == null) return;
 
+        _phase = SkillPhase.Casting;
         // 코루틴을 통해 목표 지점까지 이동하는 로직 실행
         //_cachedUnit.StartCoroutine(DashRoutine(_cachedUnit.currentTarget));
         _cachedUnit.StartCoroutine(DashSequence());
@@ -78,7 +81,8 @@ public class DashSkill : ISkill
 
     public void PostDelay()
     {
-        _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
+        if (_data.skillType != SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
         _phase = SkillPhase.PostDelay;
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
     }
@@ -94,7 +98,7 @@ public class DashSkill : ISkill
                 break;
 
             case SkillPhase.Casting:
-                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                if (_castingEnd)
                     PostDelay();
                 break;
 
@@ -123,6 +127,7 @@ public class DashSkill : ISkill
             //돌진 사이 텀 추가
             yield return new WaitForSeconds(_data.dashInterval);
         }
+        _castingEnd = true;
     }
 
     //기획서 기준 다음 돌진 타겟 찾기 (가장 멀리 있는 적, 같은 적 제외)

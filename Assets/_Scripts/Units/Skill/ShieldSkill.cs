@@ -43,7 +43,8 @@ public class ShieldSkill : ISkill
 
     public void PreDelay() 
     {
-        _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
+        if (_data.skillType != SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
         _phase = SkillPhase.PreDelay;
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
@@ -58,7 +59,8 @@ public class ShieldSkill : ISkill
         _cachedUnit.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, modifier, _data.duration);
 
         //_cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, _cachedUnit.Object.Id, _data.skillType, true, _data.duration);
-        
+
+        _phase = SkillPhase.Casting;
         // 보호막 지속시간 설정
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.duration);
         
@@ -71,7 +73,8 @@ public class ShieldSkill : ISkill
 
     public void PostDelay() 
     {
-        _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
+        if (_data.skillType != SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
         _phase = SkillPhase.PostDelay;
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
     }
