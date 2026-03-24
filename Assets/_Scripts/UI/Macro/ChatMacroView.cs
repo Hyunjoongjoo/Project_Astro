@@ -14,6 +14,26 @@ public class ChatMacroView : MonoBehaviour
     private List<ChatMacroSlot> _equippedSlots = new List<ChatMacroSlot>();
     private List<ChatMacroSlot> _allListSlots = new List<ChatMacroSlot>();
 
+
+    private void Start()
+    {
+        if (TableManager.Instance != null)
+        {
+            TableManager.Instance.OnLanguageChanged += RequestRefresh;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (TableManager.Instance != null)
+        {
+            TableManager.Instance.OnLanguageChanged -= RequestRefresh;
+        }
+    }
+    private void RequestRefresh()
+    {
+        GetComponent<ChatMacroPresenter>()?.OnTabChanged((int)MacroType.Text);
+    }
     public void RefreshList(MacroType currentTab, List<ChatMacroData> allMacros, List<string> editingIds, List<string> equippedIds, int maxCount, Action<string> onClick, Action<string> onRemoveClick)
     {
         // 탭 종류에 따른 타이틀 결정
