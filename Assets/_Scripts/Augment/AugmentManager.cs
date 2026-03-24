@@ -156,7 +156,7 @@ public class AugmentManager : Singleton<AugmentManager>
     public void ForceRandomPick()
     {
         //창이 아직 열려있다면 (유저가 아직 카드를 안 골랐다면)
-        if (_currentWindow != null && _currentWindow.gameObject.activeInHierarchy)
+        if (_currentWindow != null)
         {
             _currentWindow.ForceRandomPick();
         }
