@@ -113,4 +113,61 @@ public class AutoBuilder : EditorWindow
             Debug.LogError("APK 빌드 중 에러 발생, 빨간 줄 확인");
         }
     }
+
+    //GitHub Actions 전용 빌드
+    public static void BuildAndroidBatch()
+    {
+        try
+        {
+            //CI/CD 서버의 환경 변수에서 Keystore 비밀번호를 가져옴
+            string keystorePass = Environment.GetEnvironmentVariable("KEYSTORE_PASS");
+            if (!string.IsNullOrEmpty(keystorePass))
+            {
+                PlayerSettings.Android.useCustomKeystore = true;
+                PlayerSettings.Android.keystorePass = keystorePass;
+                PlayerSettings.Android.keyaliasPass = keystorePass;
+            }
+            else
+            {
+            }
+
+            //어드레서블 자동 빌드
+            AddressableAssetSettings.BuildPlayerContent();
+
+            //빌드 활성화된 씬 수집
+            string[] scenes = EditorBuildSettings.scenes
+                .Where(s => s.enabled)
+                .Select(s => s.path)
+                .ToArray();
+
+            //빌드 경로 강제 고정
+            string buildPath = "Builds/Android/AstroCommanders.apk";
+
+            BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
+            {
+                scenes = scenes,
+                locationPathName = buildPath,
+                target = BuildTarget.Android,
+                options = BuildOptions.None
+            };
+
+            //APK 빌드 실행
+            BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            BuildSummary summary = report.summary;
+
+            //결과 반환
+            if (summary.result == BuildResult.Succeeded)
+            {
+                EditorApplication.Exit(0); //시스템 정상 종료
+            }
+            else
+            {
+                EditorApplication.Exit(1); //시스템 에러 종료
+            }
+        }
+        catch (Exception e)
+        {
+            EditorApplication.Exit(1);
+        }
+    }
 }
