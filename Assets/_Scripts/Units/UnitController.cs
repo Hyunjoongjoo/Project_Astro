@@ -103,6 +103,9 @@ public class UnitController : UnitBase
         if (!Object.HasStateAuthority) return;
 
         StateMachine.Update();
+
+        if (normalAttack.IsCasting)
+            normalAttack.Tick();
     }
 
     // --- 생성시 초기화 관련 메서드 ---

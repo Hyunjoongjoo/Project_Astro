@@ -6,8 +6,11 @@ using UnityEngine;
 public class HealSkill : ISkill
 {
     private HealSkillSO _data;
-    private bool _isCasting;
     private UnitController _cachedUnit;
+
+    private SkillPhase _phase = SkillPhase.Idle;
+    private TickTimer _phaseTimer;
+
     private TickTimer _skillCooldown;
 
     private UnitBase _targetAlly;
@@ -17,7 +20,7 @@ public class HealSkill : ISkill
     private List<UnitBase> _targetsToHeal = new List<UnitBase>(10);
 
     public BaseSkillSO Data => _data;
-    public bool IsCasting => _isCasting;
+    public bool IsCasting => _phase != SkillPhase.Idle;
 
     public HealSkill(HealSkillSO data, UnitController unit)
     {
@@ -96,14 +99,10 @@ public class HealSkill : ISkill
 
     public void PreDelay() 
     {
-        _cachedUnit.HeroAnimator.SetBool("IsCasting", true);
-        _isCasting = true; 
-    }
-
-    public void PostDelay() 
-    {
-        _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
-        _isCasting = false; 
+        _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
+        _phase = SkillPhase.PreDelay;
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
+        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
     }
 
     public void Casting()
@@ -131,7 +130,7 @@ public class HealSkill : ISkill
                 );
             for (int i = 0; i < hitCount; i++)
             {
-                if (_hitColliders[i].TryGetComponent(out UnitBase unit) )
+                if (_hitColliders[i].TryGetComponent(out UnitBase unit))
                 {
                     if (unit == _cachedUnit)//시전자 제외
                     {
@@ -169,7 +168,36 @@ public class HealSkill : ISkill
         }
     }
 
-    public void Tick() { }
+    public void PostDelay() 
+    {
+        _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
+        _phase = SkillPhase.PostDelay;
+        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
+    }
+
+    public void Tick() 
+    {
+        // FSM 기반으로 선딜레이 -> 캐스팅 -> 후딜레이 순으로 타이머를 설정하며 순차 실행
+        switch (_phase)
+        {
+            case SkillPhase.PreDelay:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    Casting();
+                break;
+
+            case SkillPhase.Casting:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    PostDelay();
+                break;
+
+            case SkillPhase.PostDelay:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    _phase = SkillPhase.Idle;
+                break;
+        }
+    }
+
+    
 
     // 단발 힐 처리 로직
     private void InstantHeal(List<UnitBase> targets)

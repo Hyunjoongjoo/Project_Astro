@@ -35,7 +35,6 @@ public class ShieldSkill : ISkill
         if (_cachedUnit.currentTarget != null &&
             _skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner))
         {
-            _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
             return true;
         }
 
@@ -44,8 +43,9 @@ public class ShieldSkill : ISkill
 
     public void PreDelay() 
     {
-        _cachedUnit.HeroAnimator.SetBool("IsCasting", true);
+        _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
         _phase = SkillPhase.PreDelay;
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
     }
 
@@ -71,7 +71,7 @@ public class ShieldSkill : ISkill
 
     public void PostDelay() 
     {
-        _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
+        _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
         _phase = SkillPhase.PostDelay;
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
     }

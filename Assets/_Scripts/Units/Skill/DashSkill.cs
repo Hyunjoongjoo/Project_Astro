@@ -6,15 +6,18 @@ using UnityEngine;
 public class DashSkill : ISkill
 {
     private DashSkillSO _data;
-    private bool _isCasting;
     private UnitController _cachedUnit;
+
+    private SkillPhase _phase = SkillPhase.Idle;
+    private TickTimer _phaseTimer;
+
     private TickTimer _skillCooldown;
 
     private Collider[] _hitColliders;
     private Collider[] _searchColliders = new Collider[20];//타겟 검색용 배열
 
     public BaseSkillSO Data => _data;
-    public bool IsCasting => _isCasting;
+    public bool IsCasting => _phase != SkillPhase.Idle;
 
     public DashSkill(DashSkillSO data, UnitController unit)
     {
@@ -55,9 +58,13 @@ public class DashSkill : ISkill
         return false;
     }
 
-    public void PreDelay() { _isCasting = true; }
-
-    public void PostDelay() { _isCasting = false; }
+    public void PreDelay() 
+    {
+        _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
+        _phase = SkillPhase.PreDelay;
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
+        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
+    }
 
     public void Casting()
     {
@@ -66,11 +73,37 @@ public class DashSkill : ISkill
 
         // 코루틴을 통해 목표 지점까지 이동하는 로직 실행
         //_cachedUnit.StartCoroutine(DashRoutine(_cachedUnit.currentTarget));
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _cachedUnit.StartCoroutine(DashSequence());
     }
 
-    public void Tick() { }
+    public void PostDelay()
+    {
+        _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
+        _phase = SkillPhase.PostDelay;
+        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
+    }
+
+    public void Tick() 
+    {
+        // FSM 기반으로 선딜레이 -> 캐스팅 -> 후딜레이 순으로 타이머를 설정하며 순차 실행
+        switch (_phase)
+        {
+            case SkillPhase.PreDelay:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    Casting();
+                break;
+
+            case SkillPhase.Casting:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    PostDelay();
+                break;
+
+            case SkillPhase.PostDelay:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    _phase = SkillPhase.Idle;
+                break;
+        }
+    }
 
     //여러 번 돌진을 관리하는 코루틴
     private IEnumerator DashSequence()

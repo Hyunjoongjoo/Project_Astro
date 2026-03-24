@@ -122,6 +122,9 @@ public class HeroController : UnitController
 
         StateMachine.Update();
 
+        if (normalAttack.IsCasting)
+            normalAttack.Tick();
+
         if (curUniqueSkill.IsCasting)
             curUniqueSkill.Tick();
     }
