@@ -20,6 +20,7 @@ public class TableManager : Singleton<TableManager>
     public TableBase<UnitData> UnitTable = new TableBase<UnitData>();
     public TableBase<SkillInfoData> SkillInfoTable = new TableBase<SkillInfoData>();
     public TableBase<MatchRewardData> MatchRewardTable = new TableBase<MatchRewardData>();
+    public TableBase<HelpData> HelpTable = new TableBase<HelpData>();
 
     //언어 설정 -> UI 출력 변경용 이벤트
     //로컬 설정 저장은 나중에 따로 뺄 수도?

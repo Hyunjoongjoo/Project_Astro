@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: TableData
   m_GUID: 8702e0d9cd5e3904b85ea4fa2f457411
   m_SerializeEntries:
+  - m_GUID: 25114f61a0d49674b8e8be80b1458b80
+    m_Address: Help
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5838f10e1a45e8b408ee3570bb144016
     m_Address: SkillInfo
     m_ReadOnly: 0
