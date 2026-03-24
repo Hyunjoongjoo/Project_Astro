@@ -36,6 +36,11 @@ public class ChatManager : NetworkBehaviour
     private void Start()
     {
         ApplySavedMacros();
+
+        if (TableManager.Instance != null)
+        {
+            TableManager.Instance.OnLanguageChanged += ApplySavedMacros;
+        }
     }
     private void OnEnable()
     {
@@ -45,6 +50,14 @@ public class ChatManager : NetworkBehaviour
     private void OnDisable()
     {
         _pingAction.performed -= OnPingPerformed;
+    }
+
+    private void OnDestroy()
+    {
+        if (TableManager.Instance != null)
+        {
+            TableManager.Instance.OnLanguageChanged -= ApplySavedMacros;
+        }
     }
 
     // 텍스트 패널을 여는 메서드
@@ -140,7 +153,10 @@ public class ChatManager : NetworkBehaviour
         var txt = btn.GetComponentInChildren<TextMeshProUGUI>();
         var iconImg = btn.transform.Find("EmoticonIcon")?.GetComponent<Image>();
 
-        if (data.type == MacroType.Text) txt.text = data.text;
+        if (data.type == MacroType.Text)
+        {
+            if (txt != null) txt.text = data.GetText();
+        }
         else iconImg.sprite = data.emoticonSprite;
 
         btn.onClick.RemoveAllListeners();
@@ -241,7 +257,9 @@ public class ChatManager : NetworkBehaviour
     {
         _isTeamChat = !_isTeamChat;
 
-        _toggleTxt.text = _isTeamChat ? "팀원" : "전체";
+        _toggleTxt.text = _isTeamChat
+        ? (TableManager.Instance.CurrentLanguage == LanguageType.Kor ? "팀원" : "Team")
+        : (TableManager.Instance.CurrentLanguage == LanguageType.Kor ? "전체" : "All");
     }
     private bool IsTeamChatMode()
     {

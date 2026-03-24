@@ -129,3 +129,11 @@ public enum MatchResult
     Draw,
     Lose
 }
+
+public enum Category
+{
+    play,
+    augment,
+    item,
+    hero
+}

@@ -26,6 +26,6 @@ public class CastingState : IState
 
     public void Exit()
     {
-        Debug.Log("Casting 상태 탈출");
+        
     }
 }

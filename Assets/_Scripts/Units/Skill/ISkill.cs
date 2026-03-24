@@ -33,4 +33,6 @@ public interface ISkill
     bool UsingConditionCheck();
 
     void ChangeData(BaseSkillSO newData);
+
+    void Tick();
 }

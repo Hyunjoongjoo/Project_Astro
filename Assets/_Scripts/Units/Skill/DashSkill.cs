@@ -70,6 +70,8 @@ public class DashSkill : ISkill
         _cachedUnit.StartCoroutine(DashSequence());
     }
 
+    public void Tick() { }
+
     //여러 번 돌진을 관리하는 코루틴
     private IEnumerator DashSequence()
     {
