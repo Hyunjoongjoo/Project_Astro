@@ -51,7 +51,18 @@ public class ProjectileSkill : ISkill
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return;
         if (_cachedUnit.currentTarget == null) return;
 
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
+        float finalCooldown;
+
+        if (_data.skillType == SkillType.NormalAttack)
+        {
+            finalCooldown = _cachedUnit.AttackSpeed;
+        }
+        else
+        {
+            finalCooldown = _data.cooldown;
+        }
+
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
 
         // 기존 코루틴이 있다면 정지 후 새로 시작 (UnitController를 통해 실행)
         if (_fireCoroutine != null)
@@ -59,6 +70,8 @@ public class ProjectileSkill : ISkill
 
         _fireCoroutine = _cachedUnit.StartCoroutine(FireRoutine());
     }
+
+    public void Tick() { }
 
     private IEnumerator FireRoutine()
     {

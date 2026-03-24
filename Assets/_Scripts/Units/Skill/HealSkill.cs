@@ -94,9 +94,17 @@ public class HealSkill : ISkill
         return canCast;
     }
 
-    public void PreDelay() { _isCasting = true; }
+    public void PreDelay() 
+    {
+        _cachedUnit.HeroAnimator.SetBool("IsCasting", true);
+        _isCasting = true; 
+    }
 
-    public void PostDelay() { _isCasting = false; }
+    public void PostDelay() 
+    {
+        _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
+        _isCasting = false; 
+    }
 
     public void Casting()
     {
@@ -160,6 +168,8 @@ public class HealSkill : ISkill
             InstantHeal(_targetsToHeal);
         }
     }
+
+    public void Tick() { }
 
     // 단발 힐 처리 로직
     private void InstantHeal(List<UnitBase> targets)

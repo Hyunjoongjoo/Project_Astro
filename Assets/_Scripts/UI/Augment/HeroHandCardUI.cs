@@ -126,6 +126,15 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        //드래그중에는 롱 프레스 체크 중단하게
+        _isPointerDown = false;
+        if (_longPressCoroutine != null)
+        {
+            StopCoroutine(_longPressCoroutine);
+            _longPressCoroutine = null;
+        }
+        ResetHoldGauge();
+
         //게임 playing(카운트다운끝) 상태 아니면 드래그 막기
         if (_stageManager != null && _stageManager.CurrentState != StageState.Playing)
         {

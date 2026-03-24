@@ -1,0 +1,25 @@
+도움말 기본키,카테고리,페이지,이미지,설명,기획용 비고
+id,category,page,image,des,note
+String,Category,int,String,String,String
+help_play_1,play,1,help_play_1,help_play_1,로비에서 [1VS1] 또는 [2VS2] 버튼을 눌러 원하는 게임에 입장할 수 있습니다.
+help_play_2,play,2,help_play_2,help_play_2,"게임 시간 4분 이내에 상대의 메인 함교를 파괴하면 승리합니다.
+시간 종료 이후에도 함교가 파괴되지 않았다면 포탑 파괴 갯수가 더 많은 진영이 승리합니다."
+help_play_3,play,3,help_play_3,help_play_3,"증강에서 영웅을 선택하면 슬롯에 등록됩니다. 
+슬롯에 등록된 영웅은 화면에 드래그하는 것으로 출격시킬 수 있습니다.
+출격한 영웅은 일정 시간동안 다시 출격할 수 없습니다."
+help_augment_1,augment,1,help_augment_1,help_augment_1,전투 중 [증강]을 통해 영웅들의 능력을 강화할 수 있습니다.
+help_augment_2,augment,2,help_augment_2,help_augment_2,"상대 미니언과 영웅을 처치하면 증강 게이지를 획득합니다.
+증강 게이지가 가득차면 증강 버튼을 눌러 증강을 선택할 수 있습니다."
+help_augment_3,augment,3,help_augment_3,help_augment_3,영웅을 선택하면 영웅 슬롯에 배치됩니다.
+help_augment_4,augment,4,help_augment_4,help_augment_4,스킬 증강을 선택하면 영웅의 스킬이 변화합니다.
+help_augment_5,augment,5,help_augment_5,help_augment_5,아이템 증강을 선택하면 아이템 슬롯에 보관됩니다.
+help_item_1,item,1,help_item_1,help_item_1,아이템 보관함에서 아이템을 드래그하여 영웅에게 장착가능합니다.
+help_item_2,item,2,help_item_2,help_item_2,아이템은 각 영웅별로 최대2개씩 장착 가능합니다
+help_item_3,item,3,help_item_3,help_item_3,아이템을 팀원 슬롯에 드래그하면 팀원에게 전달이 가능합니다
+help_item_4,item,4,help_item_4,help_item_4,아이템 슬롯은 최대 3칸이며 임시 보관함이 존재합니다.
+help_item_5,item,5,help_item_5,help_item_5,임시 보관함 아이템은 기존 아이템을 먼저 사용하기 전까지 사용 불가합니다.
+help_hero_1,hero,1,help_hero_1,help_hero_1,"[내 영웅]을 눌러 영웅 정보, 스킬 정보, 증강 정보에 대해 알 수 있습니다."
+help_hero_2,hero,2,help_hero_2,help_hero_2,골드를 소모하여 영웅을 구매 가능합니다.
+help_hero_3,hero,3,help_hero_3,help_hero_3,영웅은 레벨이 존재하며 경험치가 가득차면 골드를 소모해 레벨업이 가능합니다.
+help_hero_4,hero,4,help_hero_4,help_hero_4,"구매한 영웅만 레벨업이 가능하며, 구매하지 않은 영웅도 경험치는 획득 가능합니다."
+help_hero_5,hero,5,help_hero_5,help_hero_5,전투 종료 후 해당 전투에서 사용한 영웅만 경험치를 획득합니다.

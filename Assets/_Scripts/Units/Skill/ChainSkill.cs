@@ -12,6 +12,9 @@ public class ChainSkill : ISkill
     private HashSet<UnitBase> _visited = new HashSet<UnitBase>();
     private Collider[] _overlapResults = new Collider[20];
 
+    //디버그용(기획 확인용)
+    public List<UnitBase> debugChainTargets = new List<UnitBase>();
+
     public BaseSkillSO Data => _data;
     public bool IsCasting => _isCasting;
 
@@ -50,15 +53,30 @@ public class ChainSkill : ISkill
         if (_cachedUnit.currentTarget == null) return;
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _visited.Clear();
+        debugChainTargets.Clear();
         _visited.Add(_cachedUnit.currentTarget);
         Debug.Log($"[체인스킬] 시작 위치: {_cachedUnit.currentTarget.name}");
         Chain(_cachedUnit.currentTarget, null, 0);
 
     }
 
+    public void Tick() { }
+
     private void Chain(UnitBase current, UnitBase prev, int chainCount)
     {
-        if (current == null || current.IsDead) return;        
+        if (prev != null)//첫타격
+        {
+            Debug.DrawRay(
+                prev.transform.position,
+                current.transform.position - prev.transform.position,
+                Color.cyan,
+                0.3f
+            );
+        }
+
+        if (current == null || current.IsDead) return;
+
+        debugChainTargets.Add(current);
 
         bool isChained = chainCount > 0;
 
@@ -75,6 +93,12 @@ public class ChainSkill : ISkill
         UnitBase next = FindNextTarget(current);
 
         if (next == null) return;
+
+        Vector3 start = current.transform.position;
+        Vector3 dir = next.transform.position - start;
+
+        Debug.DrawRay(start, dir, Color.yellow, 0.3f);
+
 
         Chain(next, current, chainCount + 1);
     }
@@ -151,5 +175,6 @@ public class ChainSkill : ISkill
         //heroOnly false : 영웅 우선
         return closestHero != null ? closestHero : closestOther;
     }
+
 
 }
