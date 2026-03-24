@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 //3.3 여현구
 //증강 관련 UI연출, 클라이언트 조작만 담당하도록 분리.
+//3.25test
+
 
 public class AugmentManager : Singleton<AugmentManager>
 {
