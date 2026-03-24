@@ -23,6 +23,8 @@ public sealed class AudioManager : Singleton<AudioManager>
     [Header("Sound Stacking")]
     [SerializeField] private float soundCooldown = 0.1f;
 
+    private Coroutine _playListCo;
+
     // 오디오 스태킹 (같은 소리가 다수 호출되어 사운드가 매우 커지는 현상) 방지를 위한 딕셔너리
     private Dictionary<AudioClip, float> clipLastPlayTimes = new Dictionary<AudioClip, float>();
 
@@ -52,9 +54,17 @@ public sealed class AudioManager : Singleton<AudioManager>
 
     public void PlayBgm(SceneState state)
     {
+        if (_playListCo != null)
+        {
+            StopCoroutine(_playListCo);
+            _playListCo = null;
+        }
+
         if (_bgmTable == null) return;
         if (!_bgmTable.TryGetClip(state, out var clip) || clip == null) return;
+
         CrossFadeTo(clip);
+        _playListCo = StartCoroutine(CoBgmLoop(state));
     }
 
     private void CrossFadeTo(AudioClip clip)
@@ -65,7 +75,7 @@ public sealed class AudioManager : Singleton<AudioManager>
         var to = (from == _bgmA) ? _bgmB : _bgmA;
 
         if (from.isPlaying && from.clip == clip) return;
-
+        Debug.Log($"[Audio] : {clip.name}");
         if (to.isPlaying) to.Stop();
         to.clip = clip;
         to.volume = 0f;
@@ -117,6 +127,28 @@ public sealed class AudioManager : Singleton<AudioManager>
         _fadeCo = null;
     }
 
+    private IEnumerator CoBgmLoop(SceneState state)
+    {
+        while (true)
+        {
+            var currentSource = GetDominantSource();
+
+            if (currentSource.clip != null)
+            {
+                float waitTime = currentSource.clip.length - _bgmFadeSeconds;
+                yield return new WaitForSecondsRealtime(Mathf.Max(0, waitTime));
+            }
+            else
+            {
+                yield return new WaitForSeconds(1f); // 클립이 없으면 잠시 대기
+            }
+
+            if (_bgmTable.TryGetClip(state, out var nextClip) && nextClip != null)
+            {
+                CrossFadeTo(nextClip);
+            }
+        }
+    }
     #endregion
 
     #region SFX
