@@ -122,10 +122,8 @@ public class HeroController : UnitController
 
         StateMachine.Update();
 
-        if (curUniqueSkill is ShieldSkill shield)
-        {
-            shield.Tick();
-        }
+        if (curUniqueSkill.IsCasting)
+            curUniqueSkill.Tick();
     }
 
     // --- 생성시 초기화 관련 메서드 ---

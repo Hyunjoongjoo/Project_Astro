@@ -76,6 +76,8 @@ public class OnHitSkill : ISkill
             Debug.Log("OnHit 스킬 시전 실패");
     }
 
+    public void Tick() { }
+
     private void NormalAttackCount() 
     {
         // 스킬 시전 조건이 true가 되고 다음 평타를 쏘면 아래 메서드로 들어간다.

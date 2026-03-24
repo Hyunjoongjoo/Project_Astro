@@ -46,7 +46,8 @@ public class ShieldSkill : ISkill
         _isCasting = true; 
     }
 
-    public void PostDelay() { _isCasting = false; }
+    public void PostDelay() 
+    {  }
 
     public void Casting()
     {
@@ -67,12 +68,14 @@ public class ShieldSkill : ISkill
         // 스킬이 시작되지 않았으면 실행 안함
         if (!_durationTimer.IsRunning || _durationTimer.Expired(_cachedUnit.Runner))
         {
+            _isCasting = false;
             _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
             return;
         }
         // 스킬 종료
         if (_durationTimer.Expired(_cachedUnit.Runner))
         {
+            _isCasting = false;
             _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
             return;
         }

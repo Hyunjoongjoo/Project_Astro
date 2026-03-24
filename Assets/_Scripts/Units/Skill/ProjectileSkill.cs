@@ -71,6 +71,8 @@ public class ProjectileSkill : ISkill
         _fireCoroutine = _cachedUnit.StartCoroutine(FireRoutine());
     }
 
+    public void Tick() { }
+
     private IEnumerator FireRoutine()
     {
         // 연발 횟수 (최소 1번)

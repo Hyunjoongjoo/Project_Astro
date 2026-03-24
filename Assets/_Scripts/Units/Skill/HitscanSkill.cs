@@ -19,7 +19,29 @@ public class HitscanSkill : ISkill
         _cooldown = TickTimer.CreateFromSeconds(_unit.Runner, _data.initCooldown);
     }
 
+    public void ChangeData(BaseSkillSO newData)
+    {
+        _data = newData as HitscanSkillSO;
+    }
+
+    public bool UsingConditionCheck()
+    {
+        if (!_cooldown.ExpiredOrNotRunning(_unit.Runner)) return false;
+        if (_unit.currentTarget == null) return false;
+        if (_unit.currentTarget.IsDead) return false;
+        if (_unit.IsDead) return false;
+
+        Vector3 dir = _unit.currentTarget.transform.position - _unit.transform.position;
+
+        if (dir.sqrMagnitude > _data.range * _data.range)
+            return false;
+
+        return true;
+    }
+
     public void Initialize() { }
+
+    public void PreDelay() { }
 
     public void PostDelay() { }
 
@@ -70,25 +92,5 @@ public class HitscanSkill : ISkill
         Execute(_unit.currentTarget);
     }
 
-    public void PreDelay() { }
-
-    public bool UsingConditionCheck()
-    {
-        if (!_cooldown.ExpiredOrNotRunning(_unit.Runner)) return false;
-        if (_unit.currentTarget == null) return false;
-        if (_unit.currentTarget.IsDead) return false;
-        if (_unit.IsDead) return false;
-
-        Vector3 dir = _unit.currentTarget.transform.position - _unit.transform.position;
-
-        if (dir.sqrMagnitude > _data.range * _data.range)
-            return false;
-
-        return true;
-    }
-
-    public void ChangeData(BaseSkillSO newData)
-    {
-        _data = newData as HitscanSkillSO;
-    }
+    public void Tick() { }
 }

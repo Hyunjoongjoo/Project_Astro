@@ -60,6 +60,8 @@ public class ChainSkill : ISkill
 
     }
 
+    public void Tick() { }
+
     private void Chain(UnitBase current, UnitBase prev, int chainCount)
     {
         if (prev != null)//첫타격
