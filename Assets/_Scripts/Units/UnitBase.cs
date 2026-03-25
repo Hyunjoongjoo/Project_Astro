@@ -123,9 +123,6 @@ public abstract class UnitBase : NetworkBehaviour
         IsDead = true;
         OnDeath?.Invoke(this);
 
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySfx(SfxList.DestroySound);
-
         if (Object.HasStateAuthority == true)
             ObjectContainer.Instance.IncreaseAugmentGauge(team, unitType);
     }

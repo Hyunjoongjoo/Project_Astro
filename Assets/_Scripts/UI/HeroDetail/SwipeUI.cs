@@ -105,6 +105,7 @@ public class SwipeUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
         _currentPage = index;
         _scrollRect.horizontalNormalizedPosition = _pagePositions[index];
         UpdateDots(_currentPage);
+        AudioManager.Instance.PlayUISfx(UISfxList.Ping);
     }
 
     private void UpdateDots(int index)

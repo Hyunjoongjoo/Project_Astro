@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - develop
-  workflow_dispatch: {}
 
 jobs:
   buildForAndroid:
@@ -17,25 +16,51 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 빌드 목적지 폴더 강제 생성
+      # 프라이빗에서 에셋 가져오기
+      - name: Checkout Private Assets
+        uses: actions/checkout@v4
+        with:
+          repository: 'firedHouse/Astro-Assets'
+          token: ${{ secrets.ASSET_TOKEN }}
+          path: 'TempAssets'
+          lfs: true # 대용량파일 LFS 처리
+
+      # 에셋 조립 및 json 생성
+      - name: Assemble Assets & Decode Key
+        run: |
+          # 프라이빗 Assets 폴더 내용을 현재 프로젝트 Assets로 강제 복사 
+          cp -Rf TempAssets/Assets/* Assets/
+          
+          # 파이어베이스 JSON 파일 복원
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_B64 }}" | base64 --decode > Assets/google-services.json
+          
+          # Keystore 파일을 암호문에서 진짜 파일로 복원
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > ${{ github.workspace }}/user.keystore
+          
+          # 임시 폴더 삭제
+          rm -rf TempAssets
+
+      # 빌드 결과물이 담길 폴더 생성
       - name: Create Build Directory
         run: mkdir -p Builds/Android
 
-      # GameCI를 통한 유니티 헤드리스 빌드 실행
+      # GameCI 기반 유니티 빌드 시작
       - name: Build with GameCI
         uses: game-ci/unity-builder@v4
         env:
-          # 금고에서 꺼내서 GameCI 컨테이너에 주입
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }} # AutoBuilder에서 Environment.GetEnvironmentVariable로 받음
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          KEYSTORE_PATH: ${{ github.workspace }}/user.keystore
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         with:
           targetPlatform: Android
           unityVersion: 6000.2.10f1
-          buildMethod: AutoBuilder.BuildAndroidBatch # C# 진입점 타겟팅
+          buildMethod: AutoBuilder.BuildAndroidBatch
+          allowDirtyBuild: true
 
-      # 빌드 완료된 APK 파일을 GitHub Actions 결과물로 업로드
+      # 생성된 APK 파일 업로드
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
