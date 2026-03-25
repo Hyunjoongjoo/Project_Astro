@@ -59,6 +59,9 @@ jobs:
           unityVersion: 6000.2.10f1
           buildMethod: AutoBuilder.BuildAndroidBatch
           allowDirtyBuild: true
+          androidKeystorePass: ${{ secrets.KEYSTORE_PASS }}
+          androidKeyaliasName: ${{ secrets.KEY_ALIAS }}
+          androidKeyaliasPass: ${{ secrets.KEYSTORE_PASS }}
 
       # 생성된 APK 파일 업로드
       - name: Upload APK Artifact
