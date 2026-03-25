@@ -2604,11 +2604,11 @@ Transform:
   m_LocalScale: {x: 0.35, y: 0.35, z: 0.35}
   m_ConstrainProportionsScale: 1
   m_Children:
+  - {fileID: 7603948852505023228}
   - {fileID: 474325425018256501}
   - {fileID: 3735122091842047156}
   - {fileID: 6820821639993572642}
   - {fileID: 1605853063813156585}
-  - {fileID: 7603948852505023228}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &8349679357406424711
@@ -2620,7 +2620,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 745130202400753345}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 2.5
+  m_Radius: 1.5
   m_Speed: 8
   m_Acceleration: 8
   avoidancePriority: 50
@@ -2660,10 +2660,10 @@ MonoBehaviour:
   moveType: 0
   attackRange: 0
   unitId: hero_corsair
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 5809499524673346740}
   currentTarget: {fileID: 0}
   _networkedOnHit: 0
-  _normalAttackData: {fileID: 11400000, guid: 89f94905cbae4f24c8059307e39563c6, type: 2}
+  _normalAttackData: {fileID: 11400000, guid: 1eda0784ad35dfb46afe69f001332443, type: 2}
   _BoosterRender: 0
   _standardSkillData: {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
   _itemObserver: {fileID: -1049799989734644490}
@@ -22215,6 +22215,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5809499524673346740}
     m_Modifications:
+    - target: {fileID: 6512184943251106900, guid: cb51b452b3b2435439735864b3a7ecac, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7063322614575174354, guid: cb51b452b3b2435439735864b3a7ecac, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7063322614575174354, guid: cb51b452b3b2435439735864b3a7ecac, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 7063322614575174354, guid: cb51b452b3b2435439735864b3a7ecac, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -22261,7 +22273,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8547673942373913639, guid: cb51b452b3b2435439735864b3a7ecac, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
