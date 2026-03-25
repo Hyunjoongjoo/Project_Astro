@@ -31,19 +31,31 @@ public abstract class BaseSkill<T> : ISkill where T : BaseSkillSO
 
     public virtual void PreDelay()
     {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
         _phase = SkillPhase.PreDelay;
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
+
+        // 이 아래는 애니메이터 제어
+        if (_cachedUnit.UnitType != UnitType.Hero) return;
+
+        if (_data.skillType == SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsAttacking", true);
+        else
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
     }
 
     public virtual void PostDelay()
     {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
         _phase = SkillPhase.PostDelay;
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
+
+        // 이 아래는 애니메이터 제어
+        if (_cachedUnit.UnitType != UnitType.Hero) return;
+
+        if (_data.skillType == SkillType.NormalAttack)
+            _cachedUnit.HeroAnimator?.SetBool("IsAttacking", false);
+        else
+            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
     }
 
     public virtual void Tick()
