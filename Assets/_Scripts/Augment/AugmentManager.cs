@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 //3.3 여현구
 //증강 관련 UI연출, 클라이언트 조작만 담당하도록 분리.
+//3.25test
+
 
 public class AugmentManager : Singleton<AugmentManager>
 {
@@ -156,7 +158,7 @@ public class AugmentManager : Singleton<AugmentManager>
     public void ForceRandomPick()
     {
         //창이 아직 열려있다면 (유저가 아직 카드를 안 골랐다면)
-        if (_currentWindow != null && _currentWindow.gameObject.activeInHierarchy)
+        if (_currentWindow != null)
         {
             _currentWindow.ForceRandomPick();
         }

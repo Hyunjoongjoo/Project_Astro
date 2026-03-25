@@ -2,38 +2,18 @@
 using Fusion;
 using UnityEngine;
 
-public class ProjectileSkill : ISkill
+public class ProjectileSkill : BaseSkill<ProjectileSkillSO>
 {
-    private ProjectileSkillSO _data;
-    private UnitController _cachedUnit;
-
-    private SkillPhase _phase = SkillPhase.Idle;
-    private TickTimer _phaseTimer;
     private bool _castingEnd = false;
 
     private Coroutine _fireCoroutine;
-    private TickTimer _skillCooldown;
 
-    public BaseSkillSO Data => _data;
-    public bool IsCasting => _phase != SkillPhase.Idle;
-
-    public ProjectileSkill(ProjectileSkillSO data, UnitController unit)
+    public ProjectileSkill(ProjectileSkillSO data, UnitController unit) : base(data, unit)
     {
         string heroId = unit.HeroId;
-        _data = data;
-        _cachedUnit = unit;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
     }
 
-    public void ChangeData(BaseSkillSO newData)
-    {
-        if (newData is ProjectileSkillSO projectileData)
-            _data = projectileData;
-        else
-            Debug.LogWarning($"[ProjectileSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
-    }
-
-    public bool UsingConditionCheck()
+    public override bool UsingConditionCheck()
     {
         if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return false;
@@ -45,26 +25,7 @@ public class ProjectileSkill : ISkill
         return true;
     }
 
-    public void PreDelay() 
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
-        _phase = SkillPhase.PreDelay;
-        //float finalCooldown;
-
-        //if (_data.skillType == SkillType.NormalAttack)
-        //{
-        //    finalCooldown = _cachedUnit.AttackSpeed;
-        //}
-        //else
-        //{
-        //    finalCooldown = _data.cooldown;
-        //}
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
-    }
-
-    public void Casting()
+    public override void Casting()
     {
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return;
         if (_cachedUnit.currentTarget == null) return;
@@ -78,15 +39,7 @@ public class ProjectileSkill : ISkill
         _fireCoroutine = _cachedUnit.StartCoroutine(FireRoutine());
     }
 
-    public void PostDelay() 
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
-        _phase = SkillPhase.PostDelay;
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
-    }
-
-    public void Tick() 
+    public override void Tick() 
     {
         // FSM 기반으로 선딜레이 -> 캐스팅 -> 후딜레이 순으로 타이머를 설정하며 순차 실행
         switch (_phase)

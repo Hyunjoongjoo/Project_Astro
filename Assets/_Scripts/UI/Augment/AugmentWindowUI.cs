@@ -49,6 +49,15 @@ public class AugmentWindowUI : BaseUI
     //아군 확정 여부 추적 프로퍼티
     public bool IsTeammateConfirmed { get; set; } = false;
 
+
+    //3.24 추가
+    private void OnEnable()
+    {
+        //창이 켜지는 순간 Update가 돌기 전이라도 즉시 시간 표시
+        UpdateTimerUI();
+    }
+
+
     //3.10 리팩토링
     //아군 데이터와 이름도 받을 수 있도록 매개변수 추가 (아군 데이터는 없을 수도 있으므로 null 허용)
     //3.12 리팩토링
@@ -143,8 +152,16 @@ public class AugmentWindowUI : BaseUI
         }
     }
 
+
+
+    //3.24 수정, Update 아닌 별도의 메서드로 변경
     //매 프레임 남은 시간 UI 갱신
     private void Update()
+    {
+        UpdateTimerUI();
+    }
+
+    private void UpdateTimerUI()
     {
         if (_stageManager != null && _timerTxt != null && !_isForcePicked)
         {
@@ -168,6 +185,7 @@ public class AugmentWindowUI : BaseUI
             if (timeLeft > 0 || _stageManager.CurrentState == StageState.PreGameAugment)
             {
                 int displayTime = Mathf.Max(0, Mathf.CeilToInt(timeLeft));
+                //콘피그 테이블 생기면 이 포맷 하드코딩 한 거 없애야함!(3.24 여현구)
                 _timerTxt.text = $"제한 시간: {displayTime}초";
             }
         }

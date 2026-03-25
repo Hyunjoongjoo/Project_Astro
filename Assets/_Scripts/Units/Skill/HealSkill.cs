@@ -3,41 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HealSkill : ISkill
+public class HealSkill : BaseSkill<HealSkillSO>
 {
-    private HealSkillSO _data;
-    private UnitController _cachedUnit;
-
-    private SkillPhase _phase = SkillPhase.Idle;
-    private TickTimer _phaseTimer;
-
-    private TickTimer _skillCooldown;
-
     private UnitBase _targetAlly;
     // 물리 탐색 시 메모리 할당(GC)을 줄이기 위한 NonAlloc 배열
     private Collider[] _hitColliders = new Collider[20];
 
     private List<UnitBase> _targetsToHeal = new List<UnitBase>(10);
 
-    public BaseSkillSO Data => _data;
-    public bool IsCasting => _phase != SkillPhase.Idle;
+    public HealSkill(HealSkillSO data, UnitController unit) : base(data, unit) { }
 
-    public HealSkill(HealSkillSO data, UnitController unit)
-    {
-        _data = data;
-        _cachedUnit = unit;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
-    }
-
-    public void ChangeData(BaseSkillSO newData)
-    {
-        if (newData is HealSkillSO healData)
-            _data = healData;
-        else
-            Debug.LogWarning($"[HealSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
-    }
-
-    public bool UsingConditionCheck()
+    public override bool UsingConditionCheck()
     {
         if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner))
             return false;
@@ -97,16 +73,7 @@ public class HealSkill : ISkill
         return canCast;
     }
 
-    public void PreDelay() 
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
-        _phase = SkillPhase.PreDelay;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
-    }
-
-    public void Casting()
+    public override void Casting()
     {
         float finalCooldown = _data.cooldown * _data.cooldownMultiplier;
         _phase = SkillPhase.Casting;
@@ -168,39 +135,7 @@ public class HealSkill : ISkill
         {
             InstantHeal(_targetsToHeal);
         }
-    }
-
-    public void PostDelay() 
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
-        _phase = SkillPhase.PostDelay;
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
-    }
-
-    public void Tick() 
-    {
-        // FSM 기반으로 선딜레이 -> 캐스팅 -> 후딜레이 순으로 타이머를 설정하며 순차 실행
-        switch (_phase)
-        {
-            case SkillPhase.PreDelay:
-                if (_phaseTimer.Expired(_cachedUnit.Runner))
-                    Casting();
-                break;
-
-            case SkillPhase.Casting:
-                if (_phaseTimer.Expired(_cachedUnit.Runner))
-                    PostDelay();
-                break;
-
-            case SkillPhase.PostDelay:
-                if (_phaseTimer.Expired(_cachedUnit.Runner))
-                    _phase = SkillPhase.Idle;
-                break;
-        }
-    }
-
-    
+    }   
 
     // 단발 힐 처리 로직
     private void InstantHeal(List<UnitBase> targets)
