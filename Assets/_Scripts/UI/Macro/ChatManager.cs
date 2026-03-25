@@ -24,6 +24,8 @@ public class ChatManager : NetworkBehaviour
     [SerializeField] private GameObject _pingPrefab;
     [SerializeField] private string _targetTag = "AugmentPanel";
     [SerializeField] private PlayerInput _playerInput;
+    [SerializeField] private float _pingCombineDistance = 50f;
+    private List<PingIcon> _activePings = new List<PingIcon>();
     private InputAction _pingAction;
 
     private bool _isTeamChat = false; //기본 전체 채팅
@@ -178,7 +180,7 @@ public class ChatManager : NetworkBehaviour
             return;
         }
 
-        // 2. StageManager.Instance 체크
+        // StageManager.Instance 체크
         if (StageManager.Instance == null)
         {
             Debug.LogError("ChatManager: StageManager.Instance가 null입니다! 씬에 StageManager가 있는지 확인하세요.");
@@ -313,7 +315,7 @@ public class ChatManager : NetworkBehaviour
 
     private void OnPingPerformed(InputAction.CallbackContext context)
     {
-        // 1. 현재 포인터(마우스 혹은 터치)의 위치 가져오기
+        // 현재 포인터(마우스 혹은 터치)의 위치 가져오기
         Vector2 pointerPos = Vector2.zero;
 
         if (context.control.device is Touchscreen)
@@ -321,7 +323,7 @@ public class ChatManager : NetworkBehaviour
         else
             pointerPos = Mouse.current.position.ReadValue();
 
-        // 2. 해당 위치로 UI 레이캐스트 시도
+        // 해당 위치로 UI 레이캐스트 시도
         TryUIPing(pointerPos);
     }
 
@@ -355,17 +357,43 @@ public class ChatManager : NetworkBehaviour
         // 팀원 체크 및 차단 체크
         if (senderData.Team == myData.Team && !stageManager.IsBlocked(sender))
         {
-            CreatePingEffect(screenPos);
+            ProcessPing(screenPos, sender);
         }
     }
 
-    private void CreatePingEffect(Vector2 pos)
+    private void ProcessPing(Vector2 pos, PlayerRef sender)
+    {
+        // 리스트에서 이미 파괴된 핑 제거
+        _activePings.RemoveAll(p => p == null);
+
+        // 현재 찍힌 위치 근처에 이미 핑이 있는지 확인
+        PingIcon existingPing = _activePings.Find(p => Vector2.Distance(p.Position, pos) < _pingCombineDistance);
+
+        if (existingPing != null && !existingPing.IsOwner(sender)) //핑 존재, 핑 주인이 내가 아닐때
+        {
+            // 근처에 이미 핑이 있다면 체크 표시 활성화
+            existingPing.ActivateCheckMark();
+        }
+        else if (existingPing == null)
+        {
+            CreatePingEffect(pos, sender); // sender 전달
+        }
+    }
+
+    private void CreatePingEffect(Vector2 pos, PlayerRef sender)
     {
         // UIManager의 TopContainer(최상단 레이어)에 생성
         if (UIManager.Instance != null && UIManager.Instance.TopContainer != null)
         {
-            GameObject ping = Instantiate(_pingPrefab, UIManager.Instance.TopContainer);
-            ping.transform.position = pos;
+            GameObject pingObj = Instantiate(_pingPrefab, UIManager.Instance.TopContainer);
+            pingObj.transform.position = pos;
+
+            PingIcon pingIcon = pingObj.GetComponent<PingIcon>();
+            if (pingIcon != null)
+            {
+                pingIcon.Init(sender); //핑 주인 설정
+                _activePings.Add(pingIcon);
+            }
         }
     }
 }
