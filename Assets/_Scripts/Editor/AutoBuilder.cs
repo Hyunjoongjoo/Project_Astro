@@ -120,10 +120,15 @@ public class AutoBuilder : EditorWindow
         try
         {
             //CI/CD 서버의 환경 변수에서 Keystore 비밀번호를 가져옴
+            //3.25 추가 경로, 별명까지
             string keystorePass = Environment.GetEnvironmentVariable("KEYSTORE_PASS");
+            string keystorePath = Environment.GetEnvironmentVariable("KEYSTORE_PATH"); 
+            string keyAlias = Environment.GetEnvironmentVariable("KEY_ALIAS");
             if (!string.IsNullOrEmpty(keystorePass))
             {
                 PlayerSettings.Android.useCustomKeystore = true;
+                PlayerSettings.Android.keystoreName = keystorePath;
+                PlayerSettings.Android.keyaliasName = keyAlias;
                 PlayerSettings.Android.keystorePass = keystorePass;
                 PlayerSettings.Android.keyaliasPass = keystorePass;
             }
