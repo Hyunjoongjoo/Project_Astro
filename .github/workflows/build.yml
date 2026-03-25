@@ -49,6 +49,8 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }} 
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}         
         with:
           targetPlatform: Android
           unityVersion: 6000.2.10f1

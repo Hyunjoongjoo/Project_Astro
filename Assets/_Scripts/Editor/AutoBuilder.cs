@@ -120,10 +120,15 @@ public class AutoBuilder : EditorWindow
         try
         {
             //CI/CD 서버의 환경 변수에서 Keystore 비밀번호를 가져옴
+            //3.25 추가 경로, 별명까지
             string keystorePass = Environment.GetEnvironmentVariable("KEYSTORE_PASS");
+            string keystorePath = Environment.GetEnvironmentVariable("KEYSTORE_PATH"); 
+            string keyAlias = Environment.GetEnvironmentVariable("KEY_ALIAS");
             if (!string.IsNullOrEmpty(keystorePass))
             {
                 PlayerSettings.Android.useCustomKeystore = true;
+                PlayerSettings.Android.keystoreName = keystorePath;
+                PlayerSettings.Android.keyaliasName = keyAlias;
                 PlayerSettings.Android.keystorePass = keystorePass;
                 PlayerSettings.Android.keyaliasPass = keystorePass;
             }
@@ -158,15 +163,21 @@ public class AutoBuilder : EditorWindow
             //결과 반환
             if (summary.result == BuildResult.Succeeded)
             {
+                Debug.Log("빌드성공");
                 EditorApplication.Exit(0); //시스템 정상 종료
             }
             else
             {
+                Debug.Log($"빌드실패 결과: {summary.result}");
+                Debug.LogError($"에러 개수: {summary.totalErrors}");
                 EditorApplication.Exit(1); //시스템 에러 종료
             }
         }
         catch (Exception e)
         {
+            Debug.LogError($"오류 발생");
+            Debug.LogError($"Message: {e.Message}");
+            Debug.LogError($"Stack Trace: {e.StackTrace}");
             EditorApplication.Exit(1);
         }
     }
