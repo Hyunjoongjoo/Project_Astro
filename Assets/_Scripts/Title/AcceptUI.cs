@@ -46,6 +46,12 @@ public class AcceptUI : MonoBehaviour
         _acceptPanel.SetActive(true);
     }
 
+    public void OnClickCancel()
+    {
+        _currentSuccessCallback = null;
+        _acceptPanel.SetActive(false);
+    }
+
     #region 체크박스 로직
     private void OnAllToggleChanged(bool check)
     {
@@ -85,25 +91,13 @@ public class AcceptUI : MonoBehaviour
             _acceptPanel.SetActive(false);
 
             _currentSuccessCallback?.Invoke();
-            _currentSuccessCallback = null;            
+            _currentSuccessCallback = null;
         }
         else
         {
             ShowText("[필수 항목]을 전부 확인해주세요.");
             _startBtn.interactable = true;
         }
-    }
-
-    public void OnClickCancel()
-    {
-        // 구글 버튼을 통한 패널일 경우
-        if (AuthService.Instance.CurrentUser != null)
-        {
-            AuthService.Instance.Logout();
-            _loginSelectPanel.Open();
-        }
-        ResetUI();
-        _acceptPanel.SetActive(false);
     }
 
     public void OnClickURL(int value)
