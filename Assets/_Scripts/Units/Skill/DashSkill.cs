@@ -3,34 +3,21 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class DashSkill : ISkill
+public class DashSkill : BaseSkill<DashSkillSO>
 {
-    private DashSkillSO _data;
-    private UnitController _cachedUnit;
-
-    private SkillPhase _phase = SkillPhase.Idle;
-    private TickTimer _phaseTimer;
     private bool _castingEnd = false;
-
-    private TickTimer _skillCooldown;
 
     private Collider[] _hitColliders;
     private Collider[] _searchColliders = new Collider[20];//타겟 검색용 배열
 
-    public BaseSkillSO Data => _data;
-    public bool IsCasting => _phase != SkillPhase.Idle;
-
-    public DashSkill(DashSkillSO data, UnitController unit)
+    public DashSkill(DashSkillSO data, UnitController unit) : base (data, unit)
     {
-        _data = data;
-        _cachedUnit = unit;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
         // 광역화 옵션 켜져있다면 배열 미리 할당
         if (data.areaOfEffect)
             _hitColliders = new Collider[20];
     }
 
-    public void ChangeData(BaseSkillSO newData)
+    public override void ChangeData(BaseSkillSO newData)
     {
         if (newData is DashSkillSO dashData)
         {
@@ -42,7 +29,7 @@ public class DashSkill : ISkill
             Debug.LogWarning($"[DashSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
     }
 
-    public bool UsingConditionCheck()
+    public override bool UsingConditionCheck()
     {
         if (_cachedUnit.currentTarget == null) return false;
         if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
@@ -59,16 +46,7 @@ public class DashSkill : ISkill
         return false;
     }
 
-    public void PreDelay() 
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
-        _phase = SkillPhase.PreDelay;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
-    }
-
-    public void Casting()
+    public override void Casting()
     {
         if (!_cachedUnit.Object.HasStateAuthority) return;
         if (_cachedUnit.currentTarget == null) return;
@@ -79,15 +57,7 @@ public class DashSkill : ISkill
         _cachedUnit.StartCoroutine(DashSequence());
     }
 
-    public void PostDelay()
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
-        _phase = SkillPhase.PostDelay;
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
-    }
-
-    public void Tick() 
+    public override void Tick() 
     {
         // FSM 기반으로 선딜레이 -> 캐스팅 -> 후딜레이 순으로 타이머를 설정하며 순차 실행
         switch (_phase)

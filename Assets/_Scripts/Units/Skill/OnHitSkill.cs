@@ -2,14 +2,8 @@
 using Fusion;
 using UnityEngine;
 
-public class OnHitSkill : ISkill
+public class OnHitSkill : BaseSkill<OnHitSkillSO>
 {
-    private OnHitSkillSO _data;
-    private UnitController _cachedUnit;
-
-    private SkillPhase _phase = SkillPhase.Idle;
-    private TickTimer _phaseTimer;
-
     private int _normalAttackCounter = 0;
     private bool _onReady = false;
     private bool _yetShoot = false;
@@ -18,19 +12,13 @@ public class OnHitSkill : ISkill
     private ProjectileSkillSO _projectileSO;
     private BaseSkillSO _duplicateSO;
 
-    public BaseSkillSO Data => _data;
-
-    public bool IsCasting => _phase != SkillPhase.Idle;
-
-    public OnHitSkill(OnHitSkillSO data, UnitController unit)
+    public OnHitSkill(OnHitSkillSO data, UnitController unit) : base(data, unit)
     {
-        _data = data;
-        _cachedUnit = unit;
         _duplicateSO = ScriptableObject.Instantiate(_cachedUnit.normalAttack.Data);
         _cachedUnit.normalAttack.ChangeData(_duplicateSO);
     }
 
-    public void Initialize() 
+    public override void Initialize() 
     {
         if (_cachedUnit.AttackState != null)
         {
@@ -39,15 +27,7 @@ public class OnHitSkill : ISkill
         }
     }
 
-    public void ChangeData(BaseSkillSO newData)
-    {
-        if (newData is OnHitSkillSO onHitData)
-            _data = onHitData;
-        else
-            Debug.LogWarning($"[OnHitSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
-    }
-
-    public bool UsingConditionCheck()
+    public override bool UsingConditionCheck()
     {
         if (_onReady == true && _yetShoot == false)
         {
@@ -57,15 +37,7 @@ public class OnHitSkill : ISkill
         else return false;
     }
 
-    public void PreDelay()
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
-        _phase = SkillPhase.PreDelay;
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
-    }
-
-    public void Casting()
+    public override void Casting()
     {
         // 스킬 시전시 평타 공격을 가져와 데이터 값을 바꿈. (투사체, 데미지 등)
         if (_duplicateSO != null && _duplicateSO is ProjectileSkillSO)
@@ -83,36 +55,6 @@ public class OnHitSkill : ISkill
             Debug.Log("OnHit 스킬 시전 실패");
 
         _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, 0f);
-    }
-
-    public void PostDelay()
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
-        _phase = SkillPhase.PostDelay;
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
-    }
-
-    public void Tick() 
-    {
-        // FSM 기반으로 선딜레이 -> 캐스팅 -> 후딜레이 순으로 타이머를 설정하며 순차 실행
-        switch (_phase)
-        {
-            case SkillPhase.PreDelay:
-                if (_phaseTimer.Expired(_cachedUnit.Runner))
-                    Casting();
-                break;
-
-            case SkillPhase.Casting:
-                if (_phaseTimer.Expired(_cachedUnit.Runner))
-                    PostDelay();
-                break;
-
-            case SkillPhase.PostDelay:
-                if (_phaseTimer.Expired(_cachedUnit.Runner))
-                    _phase = SkillPhase.Idle;
-                break;
-        }
     }
 
     private void NormalAttackCount() 

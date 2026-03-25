@@ -1,36 +1,13 @@
 ﻿using Fusion;
 using UnityEngine;
 
-public class ShieldSkill : ISkill
+public class ShieldSkill : BaseSkill<ShieldSkillSO>
 {
-    private ShieldSkillSO _data;
-    private UnitController _cachedUnit;
-
-    private SkillPhase _phase = SkillPhase.Idle;
-    private TickTimer _phaseTimer;
-
-    private TickTimer _skillCooldown;
     private TickTimer _aoeTimer;
 
-    public BaseSkillSO Data => _data;
-    public bool IsCasting => _phase != SkillPhase.Idle;
+    public ShieldSkill(ShieldSkillSO data, UnitController unit) : base(data, unit) { }
 
-    public ShieldSkill(ShieldSkillSO data, UnitController unit)
-    {
-        _data = data;
-        _cachedUnit = unit;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);        
-    }
-
-    public void ChangeData(BaseSkillSO newData)
-    {
-        if (newData is ShieldSkillSO shieldData)
-            _data = shieldData;
-        else
-            Debug.LogWarning($"[ShieldSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
-    }
-
-    public virtual bool UsingConditionCheck()
+    public override bool UsingConditionCheck()
     {
         if (_cachedUnit.currentTarget != null &&
             _skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner))
@@ -41,16 +18,7 @@ public class ShieldSkill : ISkill
         return false;
     }
 
-    public void PreDelay() 
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", true);
-        _phase = SkillPhase.PreDelay;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.preDelay);
-    }
-
-    public void Casting()
+    public override void Casting()
     {
         //_skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
 
@@ -71,15 +39,7 @@ public class ShieldSkill : ISkill
         }
     }
 
-    public void PostDelay() 
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            _cachedUnit.HeroAnimator?.SetBool("IsCasting", false);
-        _phase = SkillPhase.PostDelay;
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.postDelay);
-    }
-
-    public void Tick()
+    public override void Tick()
     {
         // FSM 기반으로 선딜레이 -> 캐스팅 -> 후딜레이 순으로 타이머를 설정하며 순차 실행
         switch (_phase)
@@ -111,19 +71,8 @@ public class ShieldSkill : ISkill
                     _phase = SkillPhase.Idle;
                 break;
         }
-
-        //if (!_phaseTimer.IsRunning || _phaseTimer.Expired(_cachedUnit.Runner))
-        //{
-        //    _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
-        //    return;
-        //}
-        // 스킬 종료
-        //if (_phaseTimer.Expired(_cachedUnit.Runner))
-        //{
-        //    _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
-        //    return;
-        //}
     }
+
     private void DoAOEDamage()
     {
         if (!_cachedUnit.Object.HasStateAuthority)
