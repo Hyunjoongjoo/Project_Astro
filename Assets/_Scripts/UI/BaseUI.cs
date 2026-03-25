@@ -37,11 +37,14 @@ public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
 
         _canvasGroup.DOFade(1, _fadeDuration).SetEase(Ease.OutCubic);
         transform.DOScale(1, _scaleDuration).SetEase(Ease.OutBack);
+
+        AudioManager.Instance.PlayUISfx(UISfxList.BtnOpen);
     }
     //비활성화 닫기 애니메이션용
     public virtual void DeActivate()
     {
         if (_isClosing) return;
+        
         _isClosing = true;
 
         _canvasGroup.DOFade(0, _fadeDuration).SetEase(Ease.InCubic);
@@ -50,6 +53,8 @@ public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
             gameObject.SetActive(false);
             _isClosing = false;
         });
+
+        AudioManager.Instance.PlayUISfx(UISfxList.BtnClose);
     }
 
     //팝업창용 닫힐 때
@@ -63,6 +68,8 @@ public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
         {
             Destroy(gameObject);
         });
+
+        AudioManager.Instance.PlayUISfx(UISfxList.BtnClose);
     }
 
     //뒤로가기 버튼용

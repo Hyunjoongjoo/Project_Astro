@@ -122,8 +122,21 @@ public class AutoBuilder : EditorWindow
             //CI/CD 서버의 환경 변수에서 Keystore 비밀번호를 가져옴
             //3.25 추가 경로, 별명까지
             string keystorePass = Environment.GetEnvironmentVariable("KEYSTORE_PASS");
-            string keystorePath = Environment.GetEnvironmentVariable("KEYSTORE_PATH"); 
+            string keystorePath = Environment.GetEnvironmentVariable("KEYSTORE_PATH");
             string keyAlias = Environment.GetEnvironmentVariable("KEY_ALIAS");
+
+            //변수가 실제로 들어왔는지 체크 (보안상 글자수만 출력)
+            Debug.Log($"Pass 체크: {(string.IsNullOrEmpty(keystorePass) ? "비었음" : "OK (" + keystorePass.Length + "자)")}");
+            Debug.Log($"Path 체크: {(string.IsNullOrEmpty(keystorePath) ? "비었음" : keystorePath)}");
+            Debug.Log($"Alias 체크: {(string.IsNullOrEmpty(keyAlias) ? "비었음" : keyAlias)}");
+
+            //파일이 실제로 그 경로에 있는지 체크
+            if (!string.IsNullOrEmpty(keystorePath))
+            {
+                bool fileExists = System.IO.File.Exists(keystorePath);
+                Debug.Log($"파일 존재 여부: {(fileExists ? "파일 찾음" : "파일 없음")}");
+            }
+
             if (!string.IsNullOrEmpty(keystorePass))
             {
                 PlayerSettings.Android.useCustomKeystore = true;
@@ -134,6 +147,7 @@ public class AutoBuilder : EditorWindow
             }
             else
             {
+                Debug.LogError("비번 없음");
             }
 
             //어드레서블 자동 빌드
