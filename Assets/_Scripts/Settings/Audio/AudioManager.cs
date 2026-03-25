@@ -29,7 +29,7 @@ public sealed class AudioManager : Singleton<AudioManager>
     private Dictionary<AudioClip, float> clipLastPlayTimes = new Dictionary<AudioClip, float>();
 
     private Coroutine _fadeCo;
-   
+
     protected override void OnSingletonAwake()
     {
         PrepareBgm(_bgmA);
@@ -152,6 +152,7 @@ public sealed class AudioManager : Singleton<AudioManager>
     #endregion
 
     #region SFX
+    // 공통 사운드 용도(SfxList.SO 관리)
     public void PlaySfx(SfxList sfx)
     {
         if (_sfxTable == null || _sfxSource == null) return;
@@ -160,7 +161,7 @@ public sealed class AudioManager : Singleton<AudioManager>
         {
             if (clipLastPlayTimes.TryGetValue(clip, out float lastPlayTime))
             {
-                if (Time.time < lastPlayTime + soundCooldown) 
+                if (Time.time < lastPlayTime + soundCooldown)
                 {
                     return;
                 }
@@ -170,6 +171,23 @@ public sealed class AudioManager : Singleton<AudioManager>
             clipLastPlayTimes[clip] = Time.time;
         }
     }
+
+    // 개별 사운드 용도(개별 Clip 관리)
+    public void PlaySfx(AudioClip clip)
+    {
+        if (clip == null || _sfxSource == null) return;
+
+        if (clipLastPlayTimes.TryGetValue(clip, out float lastPlayTime))
+        {
+            if (Time.time < lastPlayTime + soundCooldown)
+            {
+                return;
+            }
+        }
+        _sfxSource.PlayOneShot(clip);
+
+        clipLastPlayTimes[clip] = Time.time;
+    }
     #endregion
 
     #region Volume
@@ -177,8 +195,8 @@ public sealed class AudioManager : Singleton<AudioManager>
     public void LoadAndApplySavedVolumes()
     {
         SetVolume(AudioBus.Master, PlayerPrefs.GetFloat(AudioParam.MASTER_KEY, 1f));
-        SetVolume(AudioBus.BGM, PlayerPrefs.GetFloat(AudioParam.BGM_KEY, 1f));
-        SetVolume(AudioBus.SFX, PlayerPrefs.GetFloat(AudioParam.SFX_KEY, 1f));
+        SetVolume(AudioBus.BGM,    PlayerPrefs.GetFloat(AudioParam.BGM_KEY, 1f));
+        SetVolume(AudioBus.SFX,    PlayerPrefs.GetFloat(AudioParam.SFX_KEY, 1f));
     }
 
     public void SetVolume(AudioBus bus, float normalized01)
