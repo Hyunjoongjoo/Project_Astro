@@ -1,96 +1,76 @@
 ﻿using Fusion;
 using UnityEngine;
 
-public class HitscanSkill : ISkill
+public class HitscanSkill : BaseSkill<HitscanSkillSO>
 {
-    private HitscanSkillSO _data;
-    private UnitController _unit;
-
-    private TickTimer _cooldown;
-
-    public BaseSkillSO Data => _data;
-
-    public bool IsCasting => false;
-
-    public HitscanSkill(HitscanSkillSO data, UnitController unit)
+    public HitscanSkill(HitscanSkillSO data, UnitController unit) : base(data, unit)
     {
-        _data = data;
-        _unit = unit;
-        _cooldown = TickTimer.CreateFromSeconds(_unit.Runner, _data.initCooldown);
+
     }
-
-    public void ChangeData(BaseSkillSO newData)
+    public override bool UsingConditionCheck()
     {
-        _data = newData as HitscanSkillSO;
-    }
-
-    public bool UsingConditionCheck()
-    {
-        if (!_cooldown.ExpiredOrNotRunning(_unit.Runner)) return false;
-        if (_unit.currentTarget == null) return false;
-        if (_unit.currentTarget.IsDead) return false;
-        if (_unit.IsDead) return false;
-
-        Vector3 dir = _unit.currentTarget.transform.position - _unit.transform.position;
-
-        if (dir.sqrMagnitude > _data.range * _data.range)
-            return false;
+        if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
 
         return true;
     }
 
-    public void Initialize() { }
-
-    public void PreDelay() { }
-
-    public void PostDelay() { }
-
-    public void Execute(UnitBase target)
+    public override void Casting()
     {
-        if (_unit == null || target == null) return;
-        if (target.Object == null) return;
-        if (target.IsDead) return;
-        if (_unit.IsDead) return;
+        if (!_cachedUnit.HasStateAuthority) return;
 
-        float damage = _unit.AttackPower * _data.damageRatio;
+        UnitBase target = _cachedUnit.currentTarget;
 
-        if (_unit.HasStateAuthority)
+        if (target == null || target.IsDead || target.Object == null)
         {
-            target.TakeDamage(damage);
+            return;
         }
 
-        Vector3 start = _unit.transform.position;
-        Vector3 dir = (target.transform.position - start).normalized;
-        float distance = Vector3.Distance(start, target.transform.position);
+        _phase = SkillPhase.Casting;
 
-        Debug.DrawRay(start, dir * distance, Color.cyan, 0.2f);
-
-
-        _unit.RPC_PlayChildSkillEffect(
-            _unit.Object.Id,
-            target.Object.Id,
-            _data.skillType,
-            true,
-            1f
-        );
-    }
-
-    public void Casting()
-    {
-        if (!_unit.HasStateAuthority) return;
-        if (_unit.currentTarget == null) return;
         float finalCooldown;
         if (_data.skillType == SkillType.NormalAttack)
         {
-            finalCooldown = _unit.AttackSpeed;
+            finalCooldown = _cachedUnit.AttackSpeed;
         }
         else
         {
             finalCooldown = _data.cooldown;
         }
-        _cooldown = TickTimer.CreateFromSeconds(_unit.Runner, finalCooldown);
-        Execute(_unit.currentTarget);
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
+        ApplyDamage(target);
+        PostDelay();
     }
 
-    public void Tick() { }
+    private void ApplyDamage(UnitBase target)
+    {
+        if (_cachedUnit == null || target == null) return;
+        if (target.Object == null) return;
+        if (target.IsDead) return;
+        if (_cachedUnit.IsDead) return;
+
+        float damage = _cachedUnit.AttackPower * _data.damageRatio;
+        Debug.Log($"[히트스캔] → {target.name} / dmg:{damage}");
+        if (_cachedUnit.HasStateAuthority)
+        {
+            target.TakeDamage(damage);
+
+            //이펙트 추가 예정
+            _cachedUnit.RPC_PlayHitscanEffect(_cachedUnit.Object.Id, target.Object.Id);
+        }
+
+        Vector3 start = _cachedUnit.transform.position;
+        Vector3 dir = (target.transform.position - start).normalized;
+        float distance = Vector3.Distance(start, target.transform.position);
+
+        Debug.DrawRay(start, dir * distance, Color.cyan, 0.2f);
+    }
+
+    public void Cancel()
+    {
+        if (_data.skillType != SkillType.NormalAttack)
+            return;
+
+        _phase = SkillPhase.Idle;
+        _phaseTimer = TickTimer.None;
+    }
 }

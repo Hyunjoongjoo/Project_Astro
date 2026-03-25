@@ -22,6 +22,8 @@ public class UnitController : UnitBase
     protected UnitBase _bridge;
 
     public ISkill normalAttack;
+    private static Material _lineMat;
+
     [Networked] public bool networkedOnHit { get; set; }
 
     [Header("스킬 데이터")]
@@ -37,7 +39,6 @@ public class UnitController : UnitBase
 
     public Animator HeroAnimator { get; protected set; }
     public Animator BoosterAnimator { get; protected set; }
-
     [Networked] public bool BoosterRender { get; set; }
 
     //stat 실시간 참조
@@ -187,6 +188,11 @@ public class UnitController : UnitBase
         if (_normalAttackData is ProjectileSkillSO projectileSO)
         {
             attackRange = Mathf.Max(projectileSO.range, MIN_ATTACK_RANGE);
+        }
+        else if(_normalAttackData is HitscanSkillSO hitscanSO)
+        {
+
+            attackRange = Mathf.Max(hitscanSO.range, MIN_ATTACK_RANGE);
         }
     }
 
@@ -419,5 +425,79 @@ public class UnitController : UnitBase
                 projectile.Fire(targetPos);
             }
         }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayHitscanEffect(NetworkId fromId, NetworkId toId)
+    {
+        if (!Runner.TryFindObject(fromId, out NetworkObject fromObj)) return;
+        if (!Runner.TryFindObject(toId, out NetworkObject toObj)) return;
+
+        Vector3 start = fromObj.GetComponent<UnitController>().firePoint.position;
+        Vector3 end = toObj.transform.position;
+
+        GameObject lineObj = new GameObject("HitscanLine");
+
+        LineRenderer line = lineObj.AddComponent<LineRenderer>();
+
+        line.positionCount = 2;
+        line.SetPosition(0, start);
+        line.SetPosition(1, end);
+
+        line.startWidth = 0.5f;
+        line.endWidth = 0.3f;
+
+        if (_lineMat == null)
+        {
+            _lineMat = new Material(Shader.Find("Sprites/Default"));
+        }
+
+        line.material = _lineMat;
+
+        line.startColor = Color.cyan;
+        line.endColor = Color.white;
+
+        line.textureMode = LineTextureMode.Stretch;
+
+        Destroy(lineObj, 0.2f);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayChainEffect(NetworkId fromId, NetworkId toId)
+    {
+        if (!Runner.TryFindObject(fromId, out NetworkObject fromObj)) return;
+        if (!Runner.TryFindObject(toId, out NetworkObject toObj)) return;
+
+        Vector3 start = fromObj.transform.position;
+        Vector3 end = toObj.transform.position;
+
+        GameObject lineObj = new GameObject("ChainLine");
+
+        LineRenderer line = lineObj.AddComponent<LineRenderer>();
+
+        line.positionCount = 2;
+        line.SetPosition(0, start);
+        line.SetPosition(1, end);
+
+        line.startWidth = 0.5f;
+        line.endWidth = 0.3f;
+        line.alignment = LineAlignment.View;
+        line.sortingOrder = 100;
+        line.useWorldSpace = true;
+
+        if (_lineMat == null)
+        {
+            _lineMat = new Material(Shader.Find("Sprites/Default"));
+        }
+
+        line.material = _lineMat;
+
+        line.startColor = Color.cyan;
+        line.endColor = Color.white;
+
+        line.textureMode = LineTextureMode.Stretch;
+        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        line.receiveShadows = false;
+        Destroy(lineObj, 0.3f);
     }
 }
