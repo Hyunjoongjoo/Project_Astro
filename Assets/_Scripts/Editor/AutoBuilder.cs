@@ -163,15 +163,21 @@ public class AutoBuilder : EditorWindow
             //결과 반환
             if (summary.result == BuildResult.Succeeded)
             {
+                Debug.Log("빌드성공");
                 EditorApplication.Exit(0); //시스템 정상 종료
             }
             else
             {
+                Debug.Log($"빌드실패 결과: {summary.result}");
+                Debug.LogError($"에러 개수: {summary.totalErrors}");
                 EditorApplication.Exit(1); //시스템 에러 종료
             }
         }
         catch (Exception e)
         {
+            Debug.LogError($"오류 발생");
+            Debug.LogError($"Message: {e.Message}");
+            Debug.LogError($"Stack Trace: {e.StackTrace}");
             EditorApplication.Exit(1);
         }
     }
