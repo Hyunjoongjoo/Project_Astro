@@ -4,8 +4,9 @@ using UnityEngine;
 
 public enum SfxList
 {
-    DestroySound,
-    ShotLaserSound
+    HeroDestroySound,
+    HeroNormalAttackSound,
+    HeroSpawnSound
 }
 
 [CreateAssetMenu(menuName = "Audio/SFX Table", fileName = "SfxTable")]
