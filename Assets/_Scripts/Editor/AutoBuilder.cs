@@ -122,7 +122,7 @@ public class AutoBuilder : EditorWindow
             //CI/CD 서버의 환경 변수에서 Keystore 비밀번호를 가져옴
             //3.25 추가 경로, 별명까지
             string keystorePass = Environment.GetEnvironmentVariable("KEYSTORE_PASS");
-            string keystorePath = Environment.GetEnvironmentVariable("KEYSTORE_PATH");
+            string keystorePath = "/github/workspace/user.keystore";
             string keyAlias = Environment.GetEnvironmentVariable("KEY_ALIAS");
 
             //경로지정
