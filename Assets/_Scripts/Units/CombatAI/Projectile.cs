@@ -1,9 +1,17 @@
-﻿using Fusion;
+﻿using DG.Tweening;
+using Fusion;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private Renderer _targetRenderer;
+    [Header("관통 옵션")]
+    [SerializeField] private bool _isFierce;
+    [Header("폭발 옵션")]
+    [SerializeField] private bool _isExplosion;
+    [SerializeField] private float _range;
+    [SerializeField] private GameObject _explosionVFX;
+
     private bool isInitialized = false;
     
     private float _finalPower;
@@ -31,7 +39,7 @@ public class Projectile : MonoBehaviour
         _target = targetPos;
 
         if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySfx(SfxList.ShotLaserSound);
+            AudioManager.Instance.PlaySfx(SfxList.HeroNormalAttackSound);
 
         Destroy(gameObject, 3f); // TODO : 오브젝트 풀링 해야하는 부분
     }
@@ -74,8 +82,42 @@ public class Projectile : MonoBehaviour
             if (target.networkedTeam != _team)
             {
                 if (_runner.IsSharedModeMasterClient)
-                    target.TakeDamage(_finalPower);
-                Destroy(gameObject);
+                {
+                    if (_isExplosion)
+                    {
+                        LayerMask layer;
+                        int enemyLayer;
+                        if (_team == Team.Red)
+                            enemyLayer = LayerMask.NameToLayer("BlueTeam");
+                        else
+                            enemyLayer = LayerMask.NameToLayer("RedTeam");
+
+                        layer = 1 << enemyLayer;
+
+                        Collider[] colliders = Physics.OverlapSphere(target.transform.position, _range, layer);
+                        foreach (Collider collider in colliders) 
+                        {
+                            if ( collider.TryGetComponent(out UnitBase unit) )
+                            {
+                                unit.TakeDamage(_finalPower);
+                            }
+                        }
+                    }
+                    else
+                        target.TakeDamage(_finalPower);
+                }
+                if (_isExplosion)
+                {
+                    GameObject explosion = Instantiate(_explosionVFX, target.transform.position, Quaternion.identity);
+                    explosion.transform.DOScale(0f, 0f);
+                    explosion.transform.DOScale(_range * 1.8f, 0.3f);
+                    Destroy(explosion, 0.7f);
+                    Destroy(gameObject);
+                }
+                if (!_isFierce)
+                {
+                    Destroy(gameObject);
+                }
             }
         }
     }

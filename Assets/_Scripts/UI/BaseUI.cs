@@ -1,8 +1,9 @@
-﻿using UnityEngine;
-using DG.Tweening;
+﻿using DG.Tweening;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(CanvasGroup))]
-public abstract class BaseUI : MonoBehaviour
+public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
 {
     [Header("기본 세팅")]
     [SerializeField] protected string _uiName;
@@ -36,11 +37,14 @@ public abstract class BaseUI : MonoBehaviour
 
         _canvasGroup.DOFade(1, _fadeDuration).SetEase(Ease.OutCubic);
         transform.DOScale(1, _scaleDuration).SetEase(Ease.OutBack);
+
+        AudioManager.Instance.PlayUISfx(UISfxList.BtnOpen);
     }
     //비활성화 닫기 애니메이션용
     public virtual void DeActivate()
     {
         if (_isClosing) return;
+        
         _isClosing = true;
 
         _canvasGroup.DOFade(0, _fadeDuration).SetEase(Ease.InCubic);
@@ -49,6 +53,8 @@ public abstract class BaseUI : MonoBehaviour
             gameObject.SetActive(false);
             _isClosing = false;
         });
+
+        AudioManager.Instance.PlayUISfx(UISfxList.BtnClose);
     }
 
     //팝업창용 닫힐 때
@@ -62,6 +68,8 @@ public abstract class BaseUI : MonoBehaviour
         {
             Destroy(gameObject);
         });
+
+        AudioManager.Instance.PlayUISfx(UISfxList.BtnClose);
     }
 
     //뒤로가기 버튼용
@@ -83,5 +91,17 @@ public abstract class BaseUI : MonoBehaviour
             // 닫혀 있으면 열기
             Open();
         }
+    }
+    //오픈 유지(갱신x로직)
+    public virtual void MaintainOpen()
+    {
+        if (IsOpened) return;
+
+        Open();
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        
     }
 }

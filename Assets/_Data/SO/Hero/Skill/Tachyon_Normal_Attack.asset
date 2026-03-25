@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33bf744b4e39dc04999fede7c64beeea, type: 3}
   m_Name: Tachyon_Normal_Attack
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
-  heroId: 
+  heroId: hero_tachyon
+  skillIcon: {fileID: 0}
   skillName: 
   skillDescription: 
   note: 
@@ -21,7 +22,7 @@ MonoBehaviour:
   initCooldown: 0
   cooldown: 1
   damageRatio: 1
-  range: 3
+  range: 7
   projectileSpeed: 10
   isHoming: 0
   oneShotProjectileNum: 1

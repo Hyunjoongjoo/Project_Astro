@@ -7,6 +7,7 @@ TagManager:
   - RedMain
   - BlueMain
   - MainCanvas
+  - AugmentPanel
   layers:
   - Default
   - TransparentFX
@@ -43,6 +44,9 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Camera
+    uniqueID: 1902535927
     locked: 0
   m_RenderingLayers:
   - Default

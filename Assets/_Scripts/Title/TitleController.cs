@@ -27,8 +27,7 @@ public class TitleController : MonoBehaviour
             _authService = AuthService.Instance;
             _userDataStore = UserDataStore.Instance;
 
-            _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
-            _signUpController.Initialize(_authService, _userDataStore);
+            SetupControllers();
             return;
         }
 
@@ -51,8 +50,7 @@ public class TitleController : MonoBehaviour
                     _authService.Initialize();
                     _userDataStore.Initialize();
 
-                    _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
-                    _signUpController.Initialize(_authService, _userDataStore);
+                    SetupControllers();
 
                     Debug.Log("[Title] Firebase 및 서비스 주입 완료");
                 }
@@ -63,9 +61,33 @@ public class TitleController : MonoBehaviour
             });
     }
 
+    private void SetupControllers()
+    {
+        // 공통 초기화 로직
+        _loginController.Initialize(_authService, _userDataStore, OnLoginComplete);
+        _signUpController.Initialize(_authService, _userDataStore, (data) =>
+        {
+            if (data.isGoogle)
+            {
+                _loginController.OnClickGoogleLogIn();
+            }
+            else
+            {
+                _loginController.OnClickLogin();
+            }
+        });
+    }
+
     private void OnLoginComplete(string nickname)
     {
         Debug.Log("[TitleController] 모든 로그인 로직 완료");
+
+        string userId = _authService.CurrentUser.UserId;
+        string mySesstionId = _authService.MyLocalSessionId;
+        
+        // 중복 로그인 리스너 시작
+        UserDataManager.Instance.StartDuplicateLoginListener(userId, mySesstionId);
+
         GameManager.Instance.SetSceneState(SceneState.Lobby);
         SceneManager.LoadScene("Lobby");
     }

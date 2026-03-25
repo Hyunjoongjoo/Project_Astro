@@ -153,6 +153,9 @@ MonoBehaviour:
   _skillCoolTxt: {fileID: 3904210233936640161}
   _selectBtn: {fileID: 1448131494327005669}
   _highlightObj: {fileID: 8778802816222887558}
+  _visualRoot: {fileID: 2283405981279440640}
+  _hoverScale: 1.1
+  _animDuration: 0.2
 --- !u!222 &6553150027251201400
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -302,8 +305,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC601\uC6C5 [\uBC1C\uD0A4\uB9AC]\uC758 \uC2A4\uD0AC\uC744 \uAC15\uD654\uD569\uB2C8\uB2E4"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
-  m_sharedMaterial: {fileID: -8170916087460183402, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
+  m_sharedMaterial: {fileID: 8240547230195516182, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -481,8 +484,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 327.17, y: -49.9}
-  m_SizeDelta: {x: 638.9044, y: 50}
+  m_AnchoredPosition: {x: 140.04, y: -49.9}
+  m_SizeDelta: {x: 264.64, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2167948850487718603
 CanvasRenderer:
@@ -514,8 +517,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC801\uC911\uD55C \uAE30\uCCB4 2\uCD08\uAC04 \uAE30\uC808"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
-  m_sharedMaterial: {fileID: -8170916087460183402, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
+  m_sharedMaterial: {fileID: 8240547230195516182, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -617,8 +620,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 321.76, y: -25}
-  m_SizeDelta: {x: 628.0821, y: 50}
+  m_AnchoredPosition: {x: 140.04, y: -25}
+  m_SizeDelta: {x: 264.64, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4898164044330361428
 CanvasRenderer:
@@ -650,8 +653,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC2A4\uD0AC [\uACE0\uD3ED\uD0C4] \uC5C5\uADF8\uB808\uC774\uB4DC"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
-  m_sharedMaterial: {fileID: -8170916087460183402, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
+  m_sharedMaterial: {fileID: 8240547230195516182, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -754,8 +757,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 385.33, y: -86.9879}
-  m_SizeDelta: {x: 770.66, y: 173.9758}
+  m_AnchoredPosition: {x: 136.17996, y: -86.9879}
+  m_SizeDelta: {x: 272.36, y: 173.9758}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &3406864783924353244
 GameObject:
@@ -1053,8 +1056,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 242.4, y: -75}
-  m_SizeDelta: {x: 469.355, y: 50}
+  m_AnchoredPosition: {x: 140.04, y: -75}
+  m_SizeDelta: {x: 264.64, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4719501139595550792
 CanvasRenderer:
@@ -1086,8 +1089,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "(\uCFE8\uD0C0\uC784: n\uCD08)"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
-  m_sharedMaterial: {fileID: -8170916087460183402, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
+  m_sharedMaterial: {fileID: 8240547230195516182, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1297,8 +1300,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "EMP \uD0C4\uB450"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
-  m_sharedMaterial: {fileID: -8170916087460183402, guid: 4e86bdcf4d842a948868f99c1d0e47e3, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
+  m_sharedMaterial: {fileID: 8240547230195516182, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1424,7 +1427,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.9941945, b: 1, a: 0.2}
+  m_Color: {r: 0, g: 0.9941945, b: 1, a: 0.078431375}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

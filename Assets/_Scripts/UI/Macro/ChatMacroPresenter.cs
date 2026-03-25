@@ -38,8 +38,8 @@ public class ChatMacroPresenter : MonoBehaviour
     {
         _currentTab = (MacroType)tabIndex;
 
-        _textTabBg.color = (_currentTab == MacroType.Text) ? Color.skyBlue : Color.gray;
-        _emoticonTabBg.color = (_currentTab == MacroType.Emoticon) ? Color.skyBlue : Color.gray;
+        _textTabBg.color = (_currentTab == MacroType.Text) ? Color.cyan : Color.white;
+        _emoticonTabBg.color = (_currentTab == MacroType.Emoticon) ? Color.cyan : Color.white;
 
         // 탭 변경 시 편집 리스트를 확정 데이터로부터 초기화
         _editingTextIds = new List<string>(_equippedTextIds);
@@ -88,7 +88,15 @@ public class ChatMacroPresenter : MonoBehaviour
         // 현재 탭에 맞는 데이터만 필터링
         var filteredMacros = _database.allMacros.FindAll(m => m.type == _currentTab);
 
-        _view.RefreshList(filteredMacros, GetCurrentEditing(), GetCurrentEquipped(), invenSize, OnMacroSlotClicked, OnRemoveEquippedMacro);
+        _view.RefreshList(
+            _currentTab,
+            filteredMacros,
+            GetCurrentEditing(),
+            GetCurrentEquipped(),
+            invenSize,
+            OnMacroSlotClicked,
+            OnRemoveEquippedMacro
+            );
     }
 
     public void SaveToPlayerPrefs()

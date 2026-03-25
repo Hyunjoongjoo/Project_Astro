@@ -11,6 +11,9 @@ public static class AugmentExecutor
         //플레이어 데이터 가져오기
         PlayerNetworkData playerData = stageManager.PlayerDataMap.Get(player);
 
+        //3.18 카드 구매 당시의 픽 횟수를 기억
+        int currentPicks = playerData.TotalAugmentPicks;
+
         //누적 횟수 증가 => 카드확정시에만
         playerData.TotalAugmentPicks++;
 
@@ -32,17 +35,36 @@ public static class AugmentExecutor
 
             case AugmentType.Item:
                 //아이템은 본인 보관소로
+                //3.14 꽉 찼는 지 체크용
+                bool isStored = false;
                 for (int i = 0; i < SlotData_3.Length; i++)
                 {
                     if (string.IsNullOrEmpty(playerData.InventoryItems.Get(i).Replace("\0", "").Trim()))
                     {
                         playerData.InventoryItems = playerData.InventoryItems.Set(i, refId);
+                        isStored = true;
                         break;
                     }
-
+                }
+                //인벤토리가 꽉 찼다면 임시 슬롯에 보관
+                if (!isStored)
+                {
+                    if (string.IsNullOrEmpty(playerData.TempItemSlot.ToString().Replace("\0", "").Trim()))
+                    {
+                        playerData.TempItemSlot = refId;
+                        Debug.Log($"{player} 보관함 가득참. 임시 슬롯에 아이템 {refId} 저장");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"{player} 임시 슬롯도 가득참, 그냥 로그만 => 근데 그럴 일이 있을까?");
+                    }
+                }
+                else
+                {
+                    Debug.Log($"{player} 의 데이터에 {type} : {refId} 저장");
                 }
                 stageManager.PlayerDataMap.Set(player, playerData);
-                Debug.Log($"{player} 의 데이터에 {type} : {refId} 저장");
+                ItemManager.Instance.RPC_RefreshItemUI(player);
                 break;
 
             case AugmentType.Skill:
@@ -52,6 +74,14 @@ public static class AugmentExecutor
 
                 //구매자의 TotalAugmentPicks 증가된 내역 덮어씌우기
                 stageManager.PlayerDataMap.Set(player, playerData);
+
+                //Config에서 요구치 가져와서 현재 픽 횟수를 기준으로 티어 계산
+                int reinforceNum = 6;
+                var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
+                if (config != null) reinforceNum = int.Parse(config.configValue);
+
+                int tierIndex = (currentPicks >= reinforceNum) ? 1 : 0;
+                string savedId = $"{refId}#{tierIndex}";
 
                 //현재 접속 중인 우리 팀원들 모두 찾기
                 List<PlayerRef> teamMembers = new List<PlayerRef>();
@@ -71,12 +101,13 @@ public static class AugmentExecutor
                         //빈 슬롯을 찾아 스킬 증강 상태 기록
                         if (string.IsNullOrEmpty(memberData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim()))
                         {
-                            memberData.OwnedSkillAugments = memberData.OwnedSkillAugments.Set(i, refId);
+                            //꼬리표 달기
+                            memberData.OwnedSkillAugments = memberData.OwnedSkillAugments.Set(i, savedId);
                             break;
                         }
                     }
                     stageManager.PlayerDataMap.Set(member, memberData);
-                    Debug.Log($"아군 플레이어 {member} 의 스킬 상태 갱신 (적용된 스킬: {refId})");
+                    Debug.Log($"아군 플레이어 {member} 의 스킬 상태 갱신 (적용된 스킬: {savedId})");
                 }
                 break;
         }

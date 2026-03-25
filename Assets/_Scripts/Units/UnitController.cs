@@ -6,14 +6,12 @@ public class UnitController : UnitBase
 {
     [Header("내비게이션 및 탐지")]
     public NavMeshAgent agent;
-    //public float moveSpeed;
-    //public float searchRange;
     public LayerMask targetLayer;
     public float searchInterval = 0.3f;
     [SerializeField] protected MoveType moveType;
 
     [Header("스탯 관련")]
-    public float attackRange = 5;
+    [HideInInspector] public float attackRange;
     [SerializeField] protected string unitId;
     public Transform firePoint;
 
@@ -24,7 +22,14 @@ public class UnitController : UnitBase
     protected UnitBase _bridge;
 
     public ISkill normalAttack;
+    private static Material _lineMat;
 
+    [Networked] public bool networkedOnHit { get; set; }
+
+    [Header("스킬 데이터")]
+    [Header("평타 공격")]
+    [SerializeField] protected BaseSkillSO _normalAttackData;
+    
     // 상태 머신과 상태 인스턴스들
     public StateMachine StateMachine { get; protected set; }
     public DetectState DetectState { get; protected set; }
@@ -32,9 +37,9 @@ public class UnitController : UnitBase
     public AttackState AttackState { get; protected set; }
     public DieState DieState { get; protected set; }
 
-    [Header("스킬 데이터")]
-    [Header("평타 공격")]
-    [SerializeField] protected BaseSkillSO _normalAttackData;
+    public Animator HeroAnimator { get; protected set; }
+    public Animator BoosterAnimator { get; protected set; }
+    [Networked] public bool BoosterRender { get; set; }
 
     //stat 실시간 참조
     public float AttackPower => _unitStat.Attack.Value;
@@ -42,7 +47,7 @@ public class UnitController : UnitBase
     public float HealPower => _unitStat.HealPower.Value;//나중에 힐스킬에 연결
     public float MoveSpeed => _unitStat.MoveSpeed.Value;
     public float DetectRange => _unitStat.DetectRange.Value;
-
+    
     public UnitBase CurrentTarget => currentTarget;
     public UnitStat UnitStat => _unitStat;
     public NavMeshAgent Agent => agent;
@@ -55,6 +60,9 @@ public class UnitController : UnitBase
             return team == Team.Blue ? LayerMask.GetMask("BlueTeam") : LayerMask.GetMask("RedTeam");
         }
     }
+
+    protected readonly float MIN_ATTACK_RANGE = 2f;
+
     public override void Spawned()
     {
         base.Spawned();
@@ -62,6 +70,8 @@ public class UnitController : UnitBase
         unitType = UnitType.Minion;
 
         normalAttack = _normalAttackData.CreateInstance(this);
+
+        InitAttackRange();
 
         if (!Object.HasStateAuthority) return;
 
@@ -75,7 +85,7 @@ public class UnitController : UnitBase
         _unitStat = GetComponent<UnitStat>();
 
         UnitData data = TableManager.Instance.UnitTable.Get(unitId);
-
+        moveType = data.moveType;
         //UnitStat 초기화
         _unitStat.Init(data);
 
@@ -85,16 +95,18 @@ public class UnitController : UnitBase
         //moveSpeed = _unitStat.MoveSpeed.Value;
         //searchRange = _unitStat.DetectRange.Value;
         agent.speed = MoveSpeed;
-
+        ConfigureAreaMask();
         StateMachine.ChangeState(DetectState);
     }
 
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority) return;
-        if (IsDead) return; // 사망 시 중단 (혹은 DieState에서 처리)
 
         StateMachine.Update();
+
+        if (normalAttack.IsCasting)
+            normalAttack.Tick();
     }
 
     // --- 생성시 초기화 관련 메서드 ---
@@ -106,7 +118,7 @@ public class UnitController : UnitBase
         team = myTeam;
         agent = GetComponent<NavMeshAgent>();
 
-        ConfigureAreaMask();
+        //ConfigureAreaMask();
 
         int myLayer;
         int enemyLayer;
@@ -170,7 +182,30 @@ public class UnitController : UnitBase
         }
     }
 
+    //공격 사거리 초기화 메서드
+    protected void InitAttackRange()
+    {
+        if (_normalAttackData is ProjectileSkillSO projectileSO)
+        {
+            attackRange = Mathf.Max(projectileSO.range, MIN_ATTACK_RANGE);
+        }
+        else if(_normalAttackData is HitscanSkillSO hitscanSO)
+        {
+
+            attackRange = Mathf.Max(hitscanSO.range, MIN_ATTACK_RANGE);
+        }
+    }
+
     // --- 유틸리티 메서드 (상태 클래스들에서 호출해서 사용) ---
+
+    public void RotateToTarget(Vector3 direction)
+    {
+        direction.y = 0f; // 수평 회전만 적용
+        if (direction.sqrMagnitude > 0.001f)
+        {
+            transform.rotation = Quaternion.LookRotation(direction);
+        }
+    }
 
     public void MoveTo(Vector3 destination)
     {
@@ -178,6 +213,12 @@ public class UnitController : UnitBase
         {
             agent.isStopped = false;
             agent.SetDestination(destination);
+        }
+        if (UnitType == UnitType.Hero)
+        {
+            var hero = this as HeroController;
+            if (hero.StateMachine.CurrentState != hero.DeployState)
+                BoosterRender = true;
         }
     }
 
@@ -189,6 +230,8 @@ public class UnitController : UnitBase
             agent.ResetPath();
             agent.velocity = Vector3.zero;
         }
+        if (UnitType == UnitType.Hero)
+            BoosterRender = false;
     }
 
     public UnitBase FindTarget()
@@ -338,18 +381,25 @@ public class UnitController : UnitBase
 
             // 평타 공격인가 스킬인가
             if (type == SkillType.NormalAttack)
-                projectileSO = unit._normalAttackData as ProjectileSkillSO;
+            {
+                projectileSO = unit.normalAttack.Data as ProjectileSkillSO;
+                if (networkedOnHit == true)
+                    prefab = (unit as HeroController).CurUniqueSkill.Data.skillVFX;
+                else
+                    prefab = projectileSO.skillVFX;
+            }
 
             else
             {
                 if (unit is HeroController)
+                {
                     projectileSO = ((unit as HeroController).CurUniqueSkill.Data) as ProjectileSkillSO;
+                    prefab = projectileSO.skillVFX;
+                }
             }
 
             if (projectileSO == null)
                 return;
-
-            prefab = projectileSO.skillVFX;
 
             int oneShotProjectileNum = projectileSO.oneShotProjectileNum;
             float spreadAngle = projectileSO.spreadAngle;
@@ -375,5 +425,79 @@ public class UnitController : UnitBase
                 projectile.Fire(targetPos);
             }
         }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayHitscanEffect(NetworkId fromId, NetworkId toId)
+    {
+        if (!Runner.TryFindObject(fromId, out NetworkObject fromObj)) return;
+        if (!Runner.TryFindObject(toId, out NetworkObject toObj)) return;
+
+        Vector3 start = fromObj.GetComponent<UnitController>().firePoint.position;
+        Vector3 end = toObj.transform.position;
+
+        GameObject lineObj = new GameObject("HitscanLine");
+
+        LineRenderer line = lineObj.AddComponent<LineRenderer>();
+
+        line.positionCount = 2;
+        line.SetPosition(0, start);
+        line.SetPosition(1, end);
+
+        line.startWidth = 0.5f;
+        line.endWidth = 0.3f;
+
+        if (_lineMat == null)
+        {
+            _lineMat = new Material(Shader.Find("Sprites/Default"));
+        }
+
+        line.material = _lineMat;
+
+        line.startColor = Color.cyan;
+        line.endColor = Color.white;
+
+        line.textureMode = LineTextureMode.Stretch;
+
+        Destroy(lineObj, 0.2f);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayChainEffect(NetworkId fromId, NetworkId toId)
+    {
+        if (!Runner.TryFindObject(fromId, out NetworkObject fromObj)) return;
+        if (!Runner.TryFindObject(toId, out NetworkObject toObj)) return;
+
+        Vector3 start = fromObj.transform.position;
+        Vector3 end = toObj.transform.position;
+
+        GameObject lineObj = new GameObject("ChainLine");
+
+        LineRenderer line = lineObj.AddComponent<LineRenderer>();
+
+        line.positionCount = 2;
+        line.SetPosition(0, start);
+        line.SetPosition(1, end);
+
+        line.startWidth = 0.5f;
+        line.endWidth = 0.3f;
+        line.alignment = LineAlignment.View;
+        line.sortingOrder = 100;
+        line.useWorldSpace = true;
+
+        if (_lineMat == null)
+        {
+            _lineMat = new Material(Shader.Find("Sprites/Default"));
+        }
+
+        line.material = _lineMat;
+
+        line.startColor = Color.cyan;
+        line.endColor = Color.white;
+
+        line.textureMode = LineTextureMode.Stretch;
+        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        line.receiveShadows = false;
+        Destroy(lineObj, 0.3f);
     }
 }

@@ -51,12 +51,15 @@ public class AugmentDeckManager
 
     //아이콘, 프리팹 가져올 SO
     private HeroIconDataSO _heroIconSO;
+    private ItemIconDataSO _itemIconDataSO;
 
-    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO, List<BaseSkillSO> loadedBaseSkills)
+
+    public AugmentDeckManager(List<SkillAugmentSO> loadedSkillAugments, HeroIconDataSO heroIconSO, List<BaseSkillSO> loadedBaseSkills, ItemIconDataSO itemIcons)
     {
         _allSkillAugments = loadedSkillAugments;
         _heroIconSO = heroIconSO;
         _allBaseSkills = loadedBaseSkills;
+        _itemIconDataSO = itemIcons;
     }
 
     public List<AugmentData> GenerateCards(
@@ -219,8 +222,8 @@ public class AugmentDeckManager
                     HeroData pickedHero = validHeroes[Random.Range(0, validHeroes.Count)];
                     refId = pickedHero.id;
 
-                    title = GetString(pickedHero.heroName);
-                    desc = GetString(pickedHero.heroDesc);
+                    title = TableManager.Instance.GetString(pickedHero.heroName);
+                    desc = TableManager.Instance.GetString(pickedHero.heroDesc);
 
                     hType = pickedHero.heroType;
                     hRole = pickedHero.heroRole;
@@ -268,7 +271,7 @@ public class AugmentDeckManager
                 {
                     ItemData pickedItem = validItems[Random.Range(0, validItems.Count)];
                     refId = pickedItem.id;
-                    title = GetString(pickedItem.name);
+                    title = TableManager.Instance.GetString(pickedItem.name);
                     desc = "";
                 }
                 else return null;
@@ -312,13 +315,13 @@ public class AugmentDeckManager
                     refId = pickedSkill.AugmentID;
 
                     icon = pickedSkill.Tiers[tierIndex].Icon;
-                    title = GetString(pickedSkill.Tiers[tierIndex].TitleStringID);
-                    desc = GetString(pickedSkill.Tiers[tierIndex].DescStringID);
+                    title = TableManager.Instance.GetString(pickedSkill.Tiers[tierIndex].TitleStringID);
+                    desc = TableManager.Instance.GetString(pickedSkill.Tiers[tierIndex].DescStringID);
                     bSkill = pickedSkill.Tiers[tierIndex].CombatSkillData;
 
                     //스킬 증강 카드일 때 영웅의 원본 정보들을 추적해서 채워줌
                     var heroData = TableManager.Instance.HeroTable.Get(pickedSkill.TargetHeroID);
-                    if (heroData != null) tHeroName = GetString(heroData.heroName);
+                    if (heroData != null) tHeroName = TableManager.Instance.GetString(heroData.heroName);
 
                     if (_heroIconSO != null) tHeroIcon = _heroIconSO.GetIcon(pickedSkill.TargetHeroID);
 
@@ -374,21 +377,5 @@ public class AugmentDeckManager
         }
 
         return true;
-    }
-
-    //String테이블 가져오기
-    private string GetString(string stringId)
-    {
-        if (string.IsNullOrEmpty(stringId)) return "";
-
-        var stringData = TableManager.Instance.StringTable.Get(stringId);
-
-        if (stringData != null)
-        {
-            return stringData.textKor;
-        }
-
-        //데이터가 누락되었다면 키값 띄우기
-        return stringId;
     }
 }

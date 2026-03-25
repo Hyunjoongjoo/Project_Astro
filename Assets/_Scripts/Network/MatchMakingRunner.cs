@@ -14,7 +14,7 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
     // 매치 대기 타이머 코루틴을 추적하기 위한 변수
     private Coroutine _matchTimerCoroutine;
-    private readonly float WAIT_TIME_FOR_DUMMY = 15f; // 15초 대기
+    private readonly float WAIT_TIME_FOR_DUMMY = 999f; // 15초 대기
 
     private bool _existDummy = false;
 
@@ -99,7 +99,26 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
     public void PlayerLeft(PlayerRef player)
     {
-        Debug.Log("플레이어가 떠남.");
+        // 만약 스테이지 씬 상태에서 누군가 떠났다면
+        if (GameManager.Instance != null && 
+            GameManager.Instance.FlowState == SceneState.Stage &&
+            GameManager.Instance.CurrentGameState != GameState.Result)
+        {
+
+            if (StageManager.Instance != null)
+            {
+                StartCoroutine(MomentWaitingAndExitGame());
+            }
+        }
+    }
+
+    // 플레이어 누군가가 탈주하여 게임을 더 진행할 수 없음
+    // 안내 팝업을 3초정도 띄우고 로비로 강제 이동
+    private IEnumerator MomentWaitingAndExitGame()
+    {
+        StageManager.Instance.NetworkExceptionUiControl(true, false);
+        yield return new WaitForSeconds(3f);
+        StageManager.Instance.ShutDownAndSceneChange();
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
@@ -110,6 +129,7 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
     public void OnSceneLoaded(NetworkRunner runner)
     {
         Debug.Log("씬 로드 완료 콜백 실행됨");
+        GameManager.Instance.SetSceneState(SceneState.Stage);
 
         if (runner.IsSharedModeMasterClient)
         {
@@ -120,7 +140,7 @@ public class MatchMakingRunner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
                     StageManager stageManager = obj.GetComponent<StageManager>();
                     stageManager.Initialize(_curMatchType, _requiredPlayerCount, _existDummy);
                 });
-            GameManager.Instance.SetSceneState(SceneState.Stage);
+            
             Debug.Log("마스터 클라이언트 StageManager 생성 완료");
         }
     }

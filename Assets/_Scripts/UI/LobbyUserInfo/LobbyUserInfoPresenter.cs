@@ -15,16 +15,17 @@ public class LobbyUserInfoPresenter : MonoBehaviour
         if (UserDataManager.Instance != null)
         {
             UserDataManager.Instance.OnGoldChanged += UpdateGoldView;
-            // 유저 레벨/경험치용 이벤트도 있다면 여기서 구독
+            UserDataManager.Instance.OnWinCountChanged += UpdateWinView;
         }
     }
 
     private void OnDisable()
     {
-        //이벤트 구독 해제 (메모리 누수 방지)
+        //이벤트 구독 해제
         if (UserDataManager.Instance != null)
         {
             UserDataManager.Instance.OnGoldChanged -= UpdateGoldView;
+            UserDataManager.Instance.OnWinCountChanged -= UpdateWinView;
         }
     }
 
@@ -32,23 +33,24 @@ public class LobbyUserInfoPresenter : MonoBehaviour
     {
         var profile = UserDataManager.Instance.ProfileModel;
         var wallet = UserDataManager.Instance.WalletModel;
+        var record = UserDataManager.Instance.RecordModel;
 
-        if (profile == null || wallet == null) return;
+        if (profile == null || wallet == null || record == null) return;
 
         // View에 초기값 전달
         _view.SetNickName(profile.nickName);
         _view.SetGold(wallet.gold);
         _view.SetLevel(profile.userLevel);
+        _view.SetWinCount(record.win);
 
         float maxExp = GetMaxExpForLevel(profile.userLevel);
         _view.SetExp(profile.userExp, maxExp);
     }
 
     // 골드 변경 이벤트 발생 시 실행될 콜백
-    private void UpdateGoldView(int newGold)
-    {
-        _view.SetGold(newGold);
-    }
+    private void UpdateGoldView(int newGold) => _view.SetGold(newGold);
+    // 승리수 갱신 콜백
+    private void UpdateWinView(int newWin) => _view.SetWinCount(newWin);
 
     // 계산 로직은 Presenter가 담당 (나중에 테이블 매니저 참조로 변경 가능)
     private float GetMaxExpForLevel(int level)

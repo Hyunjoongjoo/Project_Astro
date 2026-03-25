@@ -1,7 +1,7 @@
 ﻿using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections.Generic;
 
 public class HeroController : UnitController
 {
@@ -14,16 +14,21 @@ public class HeroController : UnitController
     public ISkill curUniqueSkill;
     private Vector3 _targetPos;
     private float _deployDelay;
-    private StageManager _stageManager;
+    private NetworkPrefabRef _myPrefab;
+    private float _finalCooldown;
+    private PlayerRef _ownerPlayer;
 
+    public float FinalCooldown => _finalCooldown;
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
     public ISkill CurUniqueSkill => curUniqueSkill;
     public float RespawnTime => _respawnTime;
 
+    //아이템용 옵저버
+    [SerializeField] private HeroItemObserver _itemObserver;
+
     //이번 스폰/갱신 때 이미 적용한 스킬 증강 ID를 기억해서 중복 덮어쓰기 방지
     private HashSet<string> _appliedAugments = new HashSet<string>();
-
 
     public override void Spawned()
     {
@@ -34,7 +39,11 @@ public class HeroController : UnitController
         normalAttack = _normalAttackData.CreateInstance(this);
         curUniqueSkill = _standardSkillData.CreateInstance(this);
 
-        _stageManager = FindFirstObjectByType<StageManager>();
+        HeroAnimator = GetComponent<Animator>();
+        // 부스터는 반드시 자식 오브젝트에서 첫번째에 위치한다.
+        BoosterAnimator = transform.GetChild(0).GetComponent<Animator>();
+
+        InitAttackRange();
 
         if (!Object.HasStateAuthority) return;
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
@@ -53,7 +62,7 @@ public class HeroController : UnitController
         _unitStat = GetComponent<UnitStat>();
 
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
-
+        moveType = statData.moveType;
         //UnitStat 초기화
         _unitStat.Init(statData);
 
@@ -62,9 +71,8 @@ public class HeroController : UnitController
         //Stat 기반 값 적용
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
-        _respawnTime = _unitStat.RespawnTime.Value;
         agent.speed = MoveSpeed;
-
+        ConfigureAreaMask();
         if (agent != null)
         {
             agent.enabled = false;
@@ -79,8 +87,12 @@ public class HeroController : UnitController
             agent.enabled = true;
             agent.ResetPath();
         }
+        curUniqueSkill.Initialize();
         DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
+        ApplyEquippedItems();
+        _finalCooldown = GetFinalRespawnCooldown();
+        HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
     }
 
     private void OnDestroy()
@@ -94,10 +106,11 @@ public class HeroController : UnitController
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority) return;
-        if (IsDead) return; // 사망 시 중단 (혹은 DieState에서 처리)
 
         // 기본 스킬의 시전은 어느 상태든 상관없이 조건만 만족하면 바로 전환한다.
-        if (StateMachine.CurrentState != DeployState && StateMachine.CurrentState != CastState)
+        if (StateMachine.CurrentState != DieState &&
+            StateMachine.CurrentState != DeployState &&
+            curUniqueSkill.IsCasting == false)
         {
             if (curUniqueSkill.UsingConditionCheck())
             {
@@ -109,21 +122,27 @@ public class HeroController : UnitController
 
         StateMachine.Update();
 
-        if (curUniqueSkill is ShieldSkill shield)
-        {
-            shield.Tick();
-        }
+        if (normalAttack.IsCasting)
+            normalAttack.Tick();
+
+        if (curUniqueSkill.IsCasting)
+            curUniqueSkill.Tick();
     }
 
     // --- 생성시 초기화 관련 메서드 ---
 
     // 스폰 전에 실행되는 메서드
-    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay)
+    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab, PlayerRef owner)
     {
         _targetPos = targetPos;
         _deployDelay = deployDelay;
+        _myPrefab = prefab;
+        _ownerPlayer = owner;
 
         Setup(myTeam);
+
+        HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
+        _respawnTime = statData.spawnCooldown;
     }
 
     // 스킬 타입에 맞는 VFX 프리팹 반환
@@ -144,37 +163,39 @@ public class HeroController : UnitController
         if (newSkillSO != null)
         {
             curUniqueSkill = newSkillSO.CreateInstance(this);
+            //InitAttackRange();//평타 사거리가 바뀌는 스킬이 생길경우
             Debug.Log($"[{unitId}] 스킬이 {newSkillSO.name}으로 교체되었습니다!");
         }
     }
 
     //3.11 리팩토링
     //콘피그테이블 참조하도록 변경, 팀원 증강 중복방지 
+    //3.18 수정/ 콘피그테이블을 선택 시 체크하도록 변경
     private void ApplyAugments(PlayerNetworkData data)
     {
-        //Config 테이블 참조
-        int reinforceNum = 6; 
-        var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
-        if (config != null) reinforceNum = int.Parse(config.configValue);
 
         for (int i = 0; i < SlotData_5.Length; i++)
         {
-            string augmentId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
-            if (string.IsNullOrEmpty(augmentId))
+            string rawId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+            if (string.IsNullOrEmpty(rawId))
                 continue;
 
             //중복 방지
-            if (_appliedAugments.Contains(augmentId))
+            if (_appliedAugments.Contains(rawId))
                 continue;
 
-            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(augmentId);
+            //꼬리표 분리
+            string[] parts = rawId.Split('#');
+            string baseId = parts[0];
+            int tierIndex = 0;
+            if (parts.Length > 1) int.TryParse(parts[1], out tierIndex);
+
+            SkillAugmentSO so = AugmentController.Instance.GetSkillAugmentById(baseId);
             if (so == null)
                 continue;
 
             if (so.TargetHeroID != unitId)
                 continue;
-
-            int tierIndex = data.TotalAugmentPicks >= reinforceNum ? 1 : 0;
 
             if (tierIndex >= so.Tiers.Length)
                 continue;
@@ -184,10 +205,10 @@ public class HeroController : UnitController
             if (newSkill == null)
                 continue;
 
-            Debug.Log($"[팀 공유 스킬 증강 적용] 영웅:{unitId} <- 증강:{augmentId} (Tier: {tierIndex})");
+            Debug.Log($"[팀 공유 스킬 증강 적용] 영웅:{unitId} <- 증강:{baseId} (Tier: {tierIndex})");
 
             //적용된 증강 기록 및 실제 스킬 교체
-            _appliedAugments.Add(augmentId);
+            _appliedAugments.Add(rawId);
             ChangeSkill(newSkill);
         }
     }
@@ -202,7 +223,7 @@ public class HeroController : UnitController
 
         _appliedAugments.Clear();
 
-        foreach (var player in _stageManager.PlayerDataMap)
+        foreach (var player in StageManager.Instance.PlayerDataMap)
         {
             if (player.Value.Team != team)
                 continue;
@@ -219,6 +240,96 @@ public class HeroController : UnitController
             agent.speed = MoveSpeed;
         }
     }
+
+    public float GetFinalRespawnCooldown()
+    {
+        // 기본 쿨
+        float baseCooldown = _unitStat.RespawnTime.Value;
+
+        // 쿨감
+        float cooldownReduction = _unitStat.CooldownReduction.Value;
+
+        // 계산
+        float finalCooldown = baseCooldown * (1f - cooldownReduction);
+
+        return Mathf.Max(finalCooldown, 0.1f);
+    }
+
+    private void ApplyEquippedItems()
+    {
+        if (!Object.HasStateAuthority) return;
+
+        //자신의 영웅 슬롯 인덱스 찾기
+        var playerData = StageManager.Instance.PlayerDataMap.Get(_ownerPlayer);
+        int myHeroIndex = -1;
+
+        for (int i = 0; i < SlotData_5.Length; i++)
+        {
+            string ownedId = playerData.OwnedHeroes.Get(i).Replace("\0", "").Trim();
+            if (ownedId == unitId)
+            {
+                myHeroIndex = i;
+                break;
+            }
+        }
+
+        //덱에 없는 유닛이면 무시
+        if (myHeroIndex == -1) return;
+
+        //장착된 아이템 ID 추출 (인덱스 * 2, 인덱스 * 2 + 1)
+        int slotA = myHeroIndex * 2;
+        int slotB = myHeroIndex * 2 + 1;
+
+        string itemA = playerData.HeroEquippedItems.Get(slotA).Replace("\0", "").Trim();
+        string itemB = playerData.HeroEquippedItems.Get(slotB).Replace("\0", "").Trim();
+
+        List<string> equippedItemIds = new List<string>();
+        if (!string.IsNullOrEmpty(itemA)) equippedItemIds.Add(itemA);
+        if (!string.IsNullOrEmpty(itemB)) equippedItemIds.Add(itemB);
+
+        if (equippedItemIds.Count == 0) return; //낀 아이템이 없으면 패스
+
+        //ItemEffectData 수집
+        List<ItemEffectData> totalEffects = new List<ItemEffectData>();
+        var allEffects = TableManager.Instance.ItemEffectTable.GetAll();
+
+        foreach (string itemId in equippedItemIds)
+        {
+            var itemData = TableManager.Instance.ItemTable.Get(itemId);
+            if (itemData != null)
+            {
+                //EffectGroupId와 일치하는 효과들 전부 적ㅇ용
+                for (int i = 0; i < allEffects.Count; i++)
+                {
+                    if (allEffects[i].effectGroupId == itemData.effectGroupId)
+                    {
+                        totalEffects.Add(allEffects[i]);
+                    }
+                }
+            }
+        }
+
+        //옵저버에 데이터 주입하고 업데이트 시작
+        if (totalEffects.Count > 0)
+        {
+            if (_itemObserver != null)
+            {
+                _itemObserver.Init(this, _unitStat, totalEffects);
+                _itemObserver.enabled = true;
+                Debug.Log($"영웅 {unitId}에 {totalEffects.Count}개의 아이템 효과 부착완료");
+            }
+            else
+            {
+                Debug.LogWarning($"{unitId} 프리팹 확인 필요,  HeroItemObserver 컴포넌트");
+            }
+        }
+    }
+
+    public override void Render()
+    {
+        BoosterAnimator.SetBool("isActive", BoosterRender);
+    }
+
 #if UNITY_EDITOR
     protected override void OnDrawGizmosSelected()
     {
@@ -233,6 +344,51 @@ public class HeroController : UnitController
             Gizmos.DrawWireSphere(transform.position, shieldData.aoeRange);
         }
     }
+
+    private void OnDrawGizmos()//체인스킬기즈모
+    {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        ChainSkillSO chainData = null;
+
+        if (curUniqueSkill != null && curUniqueSkill.Data is ChainSkillSO data)
+        {
+            chainData = data;
+        }
+
+        if (chainData == null) return;
+
+        //스킬 사거리
+        Gizmos.color = Color.blueViolet;
+        Gizmos.DrawWireSphere(transform.position, chainData.range);
+
+        //체인 경로 표시
+        if (curUniqueSkill is ChainSkill chain && chain.debugChainTargets != null)
+        {
+            for (int i = 0; i < chain.debugChainTargets.Count; i++)
+            {
+                var unit = chain.debugChainTargets[i];
+                if (unit == null) continue;
+
+                //각 타겟 전이 범위
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(unit.transform.position, chainData.chainRange);
+
+                //연결선
+                if (i > 0)
+                {
+                    var prev = chain.debugChainTargets[i - 1];
+                    if (prev != null)
+                    {
+                        Gizmos.color = Color.gray;
+                        Gizmos.DrawLine(prev.transform.position, unit.transform.position);
+                    }
+                }
+            }
+        }
+    }
 #endif
+
 }
 

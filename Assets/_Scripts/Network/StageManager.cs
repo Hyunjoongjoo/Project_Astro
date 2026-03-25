@@ -69,11 +69,15 @@ public class StageManager : NetworkBehaviour
     //팀원 UI관리용 딕셔너리
     private Dictionary<PlayerRef, TeamCardSlotUI> _teammateUIList = new Dictionary<PlayerRef, TeamCardSlotUI>();
 
+    //내가 차단한 유저 목록
+    private HashSet<PlayerRef> _myBlockedPlayers = new HashSet<PlayerRef>();
+    public PlayerRef[] PlayerIndexMap = new PlayerRef[4]; //인덱스 매핑용
 
     //게임 시작 전 증강 g 추적 (1라운드, 2라운드)
     [Networked, HideInInspector] public int PreGameAugmentRound { get; set; }
     // 매치 타입 동기화
     [Networked] private MatchType CurMatchType { get; set; }
+
 
     //더미 클라이언트 존재 여부
     private bool _existDummy;
@@ -237,29 +241,43 @@ public class StageManager : NetworkBehaviour
 
         PlayerNetworkData[] data = new PlayerNetworkData[PlayerDataMap.Count];
 
+        PlayerIndexMap = new PlayerRef[4]; // 매핑 초기화
+
         // 배열에 플레이어 정보를 채울건데
         // [나, 적1, 팀원, 적2] 순으로 채워짐.
         // 1:1 이면 [나, 적] 으로 채워짐.
         int index = 1;
         foreach (var player in PlayerDataMap)
         {
-            if (player.Key == Runner.LocalPlayer) // 나.
+            if (player.Key == Runner.LocalPlayer) //나
+            {
                 data[0] = player.Value;
+                PlayerIndexMap[0] = player.Key;
+            }   
             else if (player.Value.Team == myTeam) // 나는 아닌데 같은 팀 -> 2:2라는 뜻
             {
                 data[2] = player.Value;
+                PlayerIndexMap[2] = player.Key;
                 //팀원이면 UI 생성 및 등록
-                var ui = _stageUI.GetTeammateSlot(player.Value.PlayerName.ToString());
+                //3.15 플레이어 Ref 추가
+                var ui = _stageUI.GetTeammateSlot(player.Value.PlayerName.ToString(), player.Key);
                 RegisterTeammateUI(player.Key, ui);
             }
             else // 나도 아니고 같은 팀도 아님 -> 적이라는 뜻
             {
                 data[index] = player.Value;
+                PlayerIndexMap[index] = player.Key;
                 index += 2;
             }  
         }
 
         _stageUI.ShowPlayerInfo(data);
+        var chatManager = FindFirstObjectByType<ChatManager>();
+        if (chatManager != null)
+        {
+            // PlayerDataMap.Count가 2이면 1:1, 4이면 2:2
+            chatManager.RefreshToggleButtons(PlayerDataMap.Count);
+        }
     }
 
     //타이머 깎는 함수 추가
@@ -452,12 +470,42 @@ public class StageManager : NetworkBehaviour
             }
             else
             {
-                // 인게임 타이머 4분이 다 됨. 
-                // 시간 종료 시 승패 규칙에 따라 승패 RPC
-                // TODO : 일단 무승부로 처리. 추후 승패 판정 로직 추가
-                RPC_GameOver(Team.None);
+                TimeOver();
             }
         }
+    }
+    private void TimeOver()
+    {
+        if (!Object.HasStateAuthority) return;
+
+        int blueTowerCount = 0;
+        int redTowerCount = 0;
+
+        foreach (var tower in Tower.AliveTowers)
+        {
+            if (tower.team == Team.Blue) blueTowerCount++;
+            else if (tower.team == Team.Red) redTowerCount++;
+        }
+
+        Debug.Log($"남은 타워 수 = Blue: {blueTowerCount}, Red: {redTowerCount}");
+
+        Team victoryTeam = Team.None;
+
+        if (blueTowerCount > redTowerCount)
+        {
+            victoryTeam = Team.Blue;
+        }
+        else if (redTowerCount > blueTowerCount)
+        {
+            victoryTeam = Team.Red;
+        }
+        else
+        {
+            victoryTeam = Team.None;
+        }
+
+        CurrentState = StageState.GameOver;
+        RPC_GameOver(victoryTeam);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -561,13 +609,16 @@ public class StageManager : NetworkBehaviour
         int finalGold = UserDataManager.Instance.WalletModel.gold + rewardData.gold;
         updates.Add("Wallet.gold", finalGold);
 
-        if (!isDraw)
-        {
-            int winAdd = isWin ? 1 : 0;
-            int loseAdd = isWin ? 0 : 1;
+        int winAdd = (resultType == MatchResult.Win) ? 1 : 0;
+        int loseAdd = (resultType == MatchResult.Lose) ? 1 : 0;
+        int drawAdd = (resultType == MatchResult.Draw) ? 1 : 0;
+
+        if (winAdd > 0)
             updates.Add("Record.win", UserDataManager.Instance.RecordModel.win + winAdd);
+        if (loseAdd > 0)
             updates.Add("Record.lose", UserDataManager.Instance.RecordModel.lose + loseAdd);
-        }
+        if (drawAdd > 0)
+            updates.Add("Record.draw", UserDataManager.Instance.RecordModel.draw + drawAdd);
 
         Debug.Log("획득한 골드량 : " + rewardData.gold);
 
@@ -624,7 +675,7 @@ public class StageManager : NetworkBehaviour
 
         // 획득한 골드량과 함께 UI 호출
         //_stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, reward.GoldAmount, reward.UserExp); //이건 나중에 유저 경험치도 하게된다면.
-        _stageUI.ShowResultPanel(isWin || isDraw, resultHeroes, rewardData.gold);
+        _stageUI.ShowResultPanel(resultType, resultHeroes, rewardData.gold);
 
         // UI 출력
         GameManager.Instance.ChangeState(GameState.Result);
@@ -634,6 +685,11 @@ public class StageManager : NetworkBehaviour
     public void RPC_MarkHeroUsed(PlayerRef player, string heroId)
     {
         MarkHeroUsed(player, heroId);
+    }
+
+    public void NetworkExceptionUiControl(bool panel, bool isWaiting)
+    {
+        _stageUI.SetNetworkExceptionPanel(panel, isWaiting);
     }
 
     public void MarkHeroUsed(PlayerRef unitOwner, string heroId)
@@ -683,6 +739,29 @@ public class StageManager : NetworkBehaviour
         if (_teammateUIList.TryGetValue(ownerPlayer, out var ui))
         {
             ui.Refresh(newData); // TeamCardSlotUI의 Refresh 실행
+
+            //3.18 여현구 추가
+            //맵에서 데이터 꺼내서 아이템 보관함도 갱신
+            if (PlayerDataMap.TryGet(ownerPlayer, out var data))
+            {
+                ui.UpdateItems(data.InventoryItems);
+            }
         }
+
+    }
+
+    //---------차단 유저 관리용 메서드들 ----------
+    public void BlockPlayer(PlayerRef player) => _myBlockedPlayers.Add(player);
+    public void UnblockPlayer(PlayerRef player) => _myBlockedPlayers.Remove(player);
+    public bool IsBlocked(PlayerRef player) => _myBlockedPlayers.Contains(player);
+
+    //이 인덱스의 유저가 누구인지 반환
+    public PlayerRef GetPlayerRefByIndex(int index)
+    {
+        if (index >= 0 && index < PlayerIndexMap.Length)
+        {
+            return PlayerIndexMap[index];
+        }
+        return PlayerRef.None;
     }
 }

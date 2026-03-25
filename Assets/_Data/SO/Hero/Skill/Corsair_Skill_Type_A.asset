@@ -13,17 +13,23 @@ MonoBehaviour:
   m_Name: Corsair_Skill_Type_A
   m_EditorClassIdentifier: Assembly-CSharp::DashSkillSO
   heroId: hero_corsair
+  skillIcon: {fileID: 21300000, guid: 5442c288a8b011e4f89da303f3074636, type: 3}
   skillName: augment_name_corsair_A
-  skillDescription: 
+  skillDescription: augment_desc_corsair_A
   note: 
   skillVFX: {fileID: 6393617126741755569, guid: cd314f7e717ada041bb94a53b1fdff9c, type: 3}
+  skillSFX: {fileID: 0}
   skillType: 2
   initCooldown: 5
   cooldown: 7
+  preDelay: 0
+  postDelay: 0
+  blockAction: 1
   dashSpeed: 25
   canDashMaxDistance: 7
   canDashMinDistance: 2
   dashCount: 1
+  dashInterval: 0.2
   damageRatio: 1
   areaOfEffect: 1
   attackRange: 3

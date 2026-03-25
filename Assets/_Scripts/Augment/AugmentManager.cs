@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 //3.3 여현구
 //증강 관련 UI연출, 클라이언트 조작만 담당하도록 분리.
+//3.25test
+
 
 public class AugmentManager : Singleton<AugmentManager>
 {
@@ -42,8 +45,8 @@ public class AugmentManager : Singleton<AugmentManager>
             {
                 //서버에 패킷 쏘기 전에 기다린다고 표시
                 _isWaitingForServerResponse = true;
-                AugmentController.Instance.RPC_RequestAugmentCards(AugmentController.Instance.Runner.LocalPlayer);
                 ExecuteHideToggleBtn();
+                AugmentController.Instance.RPC_RequestAugmentCards(AugmentController.Instance.Runner.LocalPlayer);
             });
             _toggleBtn.gameObject.SetActive(true);
         }
@@ -130,7 +133,8 @@ public class AugmentManager : Singleton<AugmentManager>
         var go = Instantiate(_heroCardSlotPrefab, _slotContainer);
         if (go.TryGetComponent(out HeroHandCardUI card))
         {
-            card.Setup(data);
+            int myIndex = _slotContainer.childCount - 1;
+            card.Setup(data, myIndex);
         }
 
         if (_cachedStageManager == null)
@@ -145,13 +149,16 @@ public class AugmentManager : Singleton<AugmentManager>
             _cachedStageManager.RPC_MarkHeroUsed(_cachedStageManager.Runner.LocalPlayer, data.targetId);
             Debug.Log($"[Masking] 증강 선택으로 영웅 기록됨: {data.targetId}");
         }
+        //카드 새로 깔릴 때, 아군이 먹어둔 스킬증강이 있으면 아이콘 바로 반영
+        RefreshHeroSkillIcons(AugmentController.Instance.Runner.LocalPlayer);
     }
+
 
     //3.9 타임아웃 시 실행될 강제 픽 함수 추가
     public void ForceRandomPick()
     {
         //창이 아직 열려있다면 (유저가 아직 카드를 안 골랐다면)
-        if (_currentWindow != null && _currentWindow.gameObject.activeInHierarchy)
+        if (_currentWindow != null)
         {
             _currentWindow.ForceRandomPick();
         }
@@ -166,6 +173,69 @@ public class AugmentManager : Singleton<AugmentManager>
             //절 대 직 접 닫 지 마
             _currentWindow.ReceiveTeammateConfirmed();
         }
+    }
+
+
+    //3.17
+    //딜레이 호출용 헬퍼
+    public void DelayedRefreshSkillIcons()
+    {
+        if (AugmentController.Instance != null)
+            RefreshHeroSkillIcons(AugmentController.Instance.Runner.LocalPlayer);
+    }
+
+    //화면에 깔린 영웅 카드 돌고 스킬 증강 꽂아주기
+    public void RefreshHeroSkillIcons(PlayerRef player)
+    {
+        if (_cachedStageManager == null || _slotContainer == null) return;
+        if (!_cachedStageManager.PlayerDataMap.TryGet(player, out var data)) return;
+
+        //하단 덱을 순회하여 영웅 ID가 일치하는 스킬 아이콘 할당
+        foreach (Transform child in _slotContainer)
+        {
+            if (child.TryGetComponent(out HeroHandCardUI card))
+            {
+                List<Sprite> icons = new List<Sprite>();
+                List<string> ids = new List<string>();
+                //카드별로 스킬 리스트를 처음부터 순회하며 꼬리표 확인
+                for (int i = 0; i < SlotData_5.Length; i++)
+                {
+                    string rawId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+                    if (string.IsNullOrEmpty(rawId)) continue;
+
+                    //꼬리표 제거
+                    string[] parts = rawId.Split('#');
+                    string baseId = parts[0];
+                    int savedTierIndex = 0;
+                    if (parts.Length > 1) int.TryParse(parts[1], out savedTierIndex); //박제된 티어 체크
+
+                    var so = AugmentController.Instance.GetSkillAugmentById(baseId);
+
+                    //스킬의 타겟 영웅 ID가 이 카드의 영웅 ID와 일치하면 
+                    if (so != null && so.TargetHeroID == card.HeroId)
+                    {
+                        if (so.Tiers != null && so.Tiers.Length > savedTierIndex)
+                        {
+                            //박제된 티어에 맞는 아이콘추가
+                            icons.Add(so.Tiers[savedTierIndex].Icon);
+                            ids.Add(rawId);
+                        }
+                    }
+                }
+                card.UpdateSkillAugmentIcons(ids, icons);
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+        _cachedStageManager = null;
+        _currentWindow = null;
+        _isWaitingForServerResponse = false;
     }
 }
 

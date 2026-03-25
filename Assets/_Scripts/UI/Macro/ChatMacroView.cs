@@ -14,11 +14,34 @@ public class ChatMacroView : MonoBehaviour
     private List<ChatMacroSlot> _equippedSlots = new List<ChatMacroSlot>();
     private List<ChatMacroSlot> _allListSlots = new List<ChatMacroSlot>();
 
-    public void RefreshList(List<ChatMacroData> allMacros, List<string> editingIds, List<string> equippedIds, int maxCount, Action<string> onClick, Action<string> onRemoveClick)
+
+    private void Start()
     {
+        if (TableManager.Instance != null)
+        {
+            TableManager.Instance.OnLanguageChanged += RequestRefresh;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (TableManager.Instance != null)
+        {
+            TableManager.Instance.OnLanguageChanged -= RequestRefresh;
+        }
+    }
+    private void RequestRefresh()
+    {
+        GetComponent<ChatMacroPresenter>()?.OnTabChanged((int)MacroType.Text);
+    }
+    public void RefreshList(MacroType currentTab, List<ChatMacroData> allMacros, List<string> editingIds, List<string> equippedIds, int maxCount, Action<string> onClick, Action<string> onRemoveClick)
+    {
+        // 탭 종류에 따른 타이틀 결정
+        string title = (currentTab == MacroType.Text) ? "장착된 매크로" : "장착된 이모티콘";
+
         // 개수 텍스트 업데이트
         if (_countText != null)
-            _countText.text = $"장착된 매크로 ({equippedIds.Count}/{maxCount})";
+            _countText.text = $"{title} ({equippedIds.Count}/{maxCount})";
 
         //하단 보유 목록 갱신
         UpdateSlots(_allListContainer, _allListSlots, allMacros.Count, (index) => {

@@ -1,0 +1,76 @@
+﻿using Fusion;
+using UnityEngine;
+
+public class HitscanSkill : BaseSkill<HitscanSkillSO>
+{
+    public HitscanSkill(HitscanSkillSO data, UnitController unit) : base(data, unit)
+    {
+
+    }
+    public override bool UsingConditionCheck()
+    {
+        if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
+
+        return true;
+    }
+
+    public override void Casting()
+    {
+        if (!_cachedUnit.HasStateAuthority) return;
+
+        UnitBase target = _cachedUnit.currentTarget;
+
+        if (target == null || target.IsDead || target.Object == null)
+        {
+            return;
+        }
+
+        _phase = SkillPhase.Casting;
+
+        float finalCooldown;
+        if (_data.skillType == SkillType.NormalAttack)
+        {
+            finalCooldown = _cachedUnit.AttackSpeed;
+        }
+        else
+        {
+            finalCooldown = _data.cooldown;
+        }
+        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
+        ApplyDamage(target);
+        PostDelay();
+    }
+
+    private void ApplyDamage(UnitBase target)
+    {
+        if (_cachedUnit == null || target == null) return;
+        if (target.Object == null) return;
+        if (target.IsDead) return;
+        if (_cachedUnit.IsDead) return;
+
+        float damage = _cachedUnit.AttackPower * _data.damageRatio;
+        Debug.Log($"[히트스캔] → {target.name} / dmg:{damage}");
+        if (_cachedUnit.HasStateAuthority)
+        {
+            target.TakeDamage(damage);
+
+            //이펙트 추가 예정
+            _cachedUnit.RPC_PlayHitscanEffect(_cachedUnit.Object.Id, target.Object.Id);
+        }
+
+        Vector3 start = _cachedUnit.transform.position;
+        Vector3 dir = (target.transform.position - start).normalized;
+        float distance = Vector3.Distance(start, target.transform.position);
+
+        Debug.DrawRay(start, dir * distance, Color.cyan, 0.2f);
+    }
+
+    public void Cancel()
+    {
+        if (_data.skillType != SkillType.NormalAttack)
+            return;
+
+        _phase = SkillPhase.Idle;
+        _phaseTimer = TickTimer.None;
+    }
+}

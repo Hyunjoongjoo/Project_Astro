@@ -1,5 +1,4 @@
-﻿using DG.Tweening;
-using Fusion;
+﻿using Fusion;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,7 +7,7 @@ using UnityEngine.UI;
 // Stage 씬 인게임 시퀀스에 쓰이는 UI들을 제어하는 클래스
 public class StageUI : MonoBehaviour
 {
-    [SerializeField] private GameObject _loadingPanel;
+    [SerializeField] private GameObject[] _loadingPanel;
     [SerializeField] private GameObject _vsPanel;
     [SerializeField] private GameObject[] _rotationPanel;
     [SerializeField] private TextMeshProUGUI[] _introNameLabel;
@@ -23,9 +22,11 @@ public class StageUI : MonoBehaviour
     [SerializeField] private GameObject _resultPanel;
     [SerializeField] private GameObject _victoryPanel;
     [SerializeField] private GameObject _defeatPanel;
+    [SerializeField] private GameObject _drawPanel;
     [SerializeField] private GameObject _heroResultPrefab;
     [SerializeField] private Transform _heroListPanel;
     [SerializeField] private TextMeshProUGUI _resultGoldText;
+    public Button goLobbyBtn;
 
     [Header("채팅 앵커")]
     [SerializeField] private Transform _myAnchor;
@@ -33,13 +34,53 @@ public class StageUI : MonoBehaviour
     [SerializeField] private Transform _enemy1Anchor;
     [SerializeField] private Transform _enemy2Anchor;
 
-    public Button goLobbyBtn;
+    [Header("네트워크 관련 처리")]
+    [SerializeField] private GameObject _disconnectPanel;
+    [SerializeField] private GameObject _waitingHost;
+    [SerializeField] private GameObject _disconnected;
+
     private MatchType _matchType;
+
+    // 호스트가 홈으로 가서 일시정지 되었음을 감지하기 위한 변수
+    private float _lastRecievedRPCTime = 0f;
+    private const float TIMER_RPC_TIMEOUT = 3f;
+    private bool _isHostPaused = false;
+    private readonly string HOST_MISSING = "ui_toast_host_missing";
+    private readonly string PLAYER_MISSING = "ui_toast_player_missing";
 
     private void Awake()
     {
         _countdownIndicator.gameObject.SetActive(false);
         _resultPanel.gameObject.SetActive(false);
+    }
+
+    private void Start()
+    {
+        _waitingHost.GetComponent<TextMeshProUGUI>().text = 
+            TableManager.Instance.GetString(HOST_MISSING);
+
+        _disconnected.GetComponent<TextMeshProUGUI>().text =
+            TableManager.Instance.GetString(PLAYER_MISSING);
+    }
+
+    private void Update()
+    {
+        if (_lastRecievedRPCTime == 0f) return;
+        if (GameManager.Instance.CurrentGameState == GameState.Result) return;
+
+        // 마지막 RPC 받은 시간이 3초를 넘겼다면
+        bool hostUnresponsive = Time.realtimeSinceStartup - _lastRecievedRPCTime > TIMER_RPC_TIMEOUT;
+
+        if (hostUnresponsive == true && _isHostPaused == false)
+        {
+            _isHostPaused = true;
+            SetNetworkExceptionPanel(true, true);
+        }
+        else if (!hostUnresponsive && _isHostPaused)
+        {
+            _isHostPaused = false;
+            SetNetworkExceptionPanel(false, true);
+        }
     }
 
     public void SetMaxValueAugmentSlider(int value)
@@ -135,15 +176,18 @@ public class StageUI : MonoBehaviour
                     myTeam == Team.Blue ? RedTeamNames[1] : BlueTeamNames[1]; // 아군; // 적 2
         }
 
-        _loadingPanel.SetActive(false);
+        foreach (var obj in _loadingPanel)
+            obj.SetActive(false);
+
         _vsPanel.SetActive(true);
         Debug.Log("매칭된 플레이어 정보를 보여줌");
     }
 
-    public TeamCardSlotUI GetTeammateSlot(string nickname)
+    //3.15 매개변수 추가, 팀메이트 정보까지
+    public TeamCardSlotUI GetTeammateSlot(string nickname, PlayerRef allyRef)
     {
         var ui = _teamMemberSlot.GetComponent<TeamCardSlotUI>();
-        ui.Initialize(nickname);
+        ui.Initialize(nickname, allyRef);
         return ui; // 생성된 UI 컴포넌트를 반환하여 StageManager에게 전달
     }
 
@@ -170,6 +214,7 @@ public class StageUI : MonoBehaviour
 
     public void UpdateStageTimer(int timeSeconds)
     {
+        _lastRecievedRPCTime = Time.realtimeSinceStartup;
         int minute = timeSeconds / 60;
         int second = timeSeconds % 60;
         _gameTimer.text = $"{minute} : {second:D2}";
@@ -184,10 +229,20 @@ public class StageUI : MonoBehaviour
             AugmentManager.Instance.HideAugmentToggleBtn();
     }
 
-    public void ShowResultPanel(bool isVictory, List<HeroResultData> heroes, int goldAmount)
+    public void ShowResultPanel(MatchResult result, List<HeroResultData> heroes, int goldAmount)
     {
-        _victoryPanel.SetActive(isVictory);
-        _defeatPanel.SetActive(!isVictory);
+        switch (result)
+        {
+            case MatchResult.Win:
+                _victoryPanel.SetActive(true);
+                break;
+            case MatchResult.Lose:
+                _defeatPanel.SetActive(true);
+                break;
+            case MatchResult.Draw:
+                _drawPanel.SetActive(true);
+                break;
+        }
 
         // 골드 텍스트 설정
         if (_resultGoldText != null)
@@ -229,5 +284,14 @@ public class StageUI : MonoBehaviour
         }
 
         return _enemy1Anchor; // 기본값
+    }
+
+    public void SetNetworkExceptionPanel(bool panelActive, bool isWaiting)
+    {
+        _disconnectPanel.SetActive(panelActive);
+        if (isWaiting == true && _disconnected.activeSelf == true) return;
+        
+        _disconnected.SetActive(!isWaiting);
+        _waitingHost.SetActive(isWaiting);
     }
 }

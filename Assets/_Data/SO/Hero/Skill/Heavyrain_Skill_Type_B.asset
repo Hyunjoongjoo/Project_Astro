@@ -13,16 +13,21 @@ MonoBehaviour:
   m_Name: Heavyrain_Skill_Type_B
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
   heroId: hero_heavyrain
+  skillIcon: {fileID: 21300000, guid: cf769610f247b274c9d67587b1defe94, type: 3}
   skillName: augment_name_heavyrain_B
-  skillDescription: 
+  skillDescription: augment_desc_heavyrain_B
   note: 
   skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  skillSFX: {fileID: 0}
   skillType: 2
   initCooldown: 4
   cooldown: 8
+  preDelay: 1.5
+  postDelay: 1.5
+  blockAction: 1
   damageRatio: 1
   range: 5
-  projectileSpeed: 10
+  projectileSpeed: 25
   isHoming: 0
   oneShotProjectileNum: 3
   spreadAngle: 30

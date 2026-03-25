@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -14,6 +15,11 @@ public class SwipeUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
     [SerializeField] private Color _inactiveColor; // 비활성화된 점 색상
     [SerializeField] private float _lerpSpeed = 10f;
 
+    [Header("탭연결")]
+    [SerializeField] private TMP_Text[] _tabs;
+    [SerializeField] private Color _actTab;
+    [SerializeField] private Color _inactTab;
+
     private float[] _pagePositions;
     private int _pageCount;
     private int _currentPage = 0;
@@ -28,7 +34,21 @@ public class SwipeUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
         for (int i = 0; i < _pageCount; i++)
         {
             _pagePositions[i] = (float)i / (_pageCount - 1);
+
+            //점에 버튼 연결
+            if (i < _dots.Length)
+            {
+                int index = i; 
+                Button btn = _dots[i].GetComponent<Button>();
+
+                // Button 컴포넌트가 없다면 자동으로 추가해줌
+                if (btn == null) btn = _dots[i].gameObject.AddComponent<Button>();
+
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() => OnDotClicked(index));
+            }
         }
+        UpdateDots(_currentPage);
     }
 
     void Update()
@@ -77,11 +97,25 @@ public class SwipeUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
             UpdateDots(_currentPage);
         }
     }
+
+    public void OnDotClicked(int index)
+    {
+        if (_isDragging) return; // 드래그 중에는 클릭 무시
+
+        _currentPage = index;
+        _scrollRect.horizontalNormalizedPosition = _pagePositions[index];
+        UpdateDots(_currentPage);
+        AudioManager.Instance.PlayUISfx(UISfxList.Ping);
+    }
+
     private void UpdateDots(int index)
     {
+        if (_dots == null || _dots.Length == 0) return;
+
         for (int i = 0; i < _dots.Length; i++)
         {
             _dots[i].color = (i == index) ? _activeColor : _inactiveColor;
+            _tabs[i].color = (i == index) ? _actTab : _inactTab;
         }
     }
 }

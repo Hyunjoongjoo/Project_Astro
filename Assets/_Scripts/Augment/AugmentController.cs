@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Text;
 
 //증강 시스템의 전체 흐름을 통제하는 네트워크 컨트롤러
 //경험치 감지 => 덱 픽업 => 서버 검증
@@ -24,6 +25,7 @@ public class AugmentController : NetworkBehaviour
     [Header("스킬 증강 데이터베이스")]
     [SerializeField] private List<SkillAugmentSO> _allSkillAugments;
 
+
     //영웅들의 기본 스킬 SO들을 담아둘 리스트 추가
     [Header("기본 스킬 데이터베이스 (영웅 카드용)")]
     [SerializeField] private List<BaseSkillSO> _allBaseSkills;
@@ -40,6 +42,9 @@ public class AugmentController : NetworkBehaviour
     //인스펙터 직렬화 해둘 히어로 아이콘SO
     [SerializeField] private HeroIconDataSO _heroIconSO;
 
+    //아이템 아이콘 SO
+    [SerializeField] private ItemIconDataSO _itemIconDataSO;
+
     //인게임 개별 타이머용 네트워크 변수 선언
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, float> PlayerAugmentTimers => default;
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, NetworkBool> IsPlayerAugmenting => default;
@@ -54,7 +59,7 @@ public class AugmentController : NetworkBehaviour
     public override void Spawned()
     {
         //할당된 SO 데이터를 바탕으로 DeckManager 가동
-        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO, _allBaseSkills);
+        _deckManager = new AugmentDeckManager(_allSkillAugments, _heroIconSO, _allBaseSkills, _itemIconDataSO);
         //현재 씬에 있는 스테이지 매니저 찾아서 캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
     }
@@ -182,15 +187,36 @@ public class AugmentController : NetworkBehaviour
                 List<string> mySkills = new List<string>();
                 for (int i = 0; i < SlotData_5.Length; i++)
                 {
-                    string skillId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
-                    if (!string.IsNullOrEmpty(skillId)) mySkills.Add(skillId);
+                    string rawId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
+                    if (!string.IsNullOrEmpty(rawId))
+                    {
+                        //#뒷부분 잘라내고 baseId만 덱 매니저에게 전달
+                        string baseId = rawId.Split('#')[0];
+                        mySkills.Add(baseId);
+                    }
                 }
 
+                //3.13 로직 변경
+                //보관함 3칸 + 임시 슬롯 1칸 모두 꽉 찼는지 검사
                 bool isItemFull = true;
+
+                //기본 인벤토리 검사
                 for (int i = 0; i < SlotData_3.Length; i++)
                 {
-                    string itemId = myData.InventoryItems.Get(i).Replace("\0", "").Trim();
-                    if (string.IsNullOrEmpty(itemId)) { isItemFull = false; break; }
+                    if (string.IsNullOrEmpty(myData.InventoryItems.Get(i).Replace("\0", "").Trim()))
+                    {
+                        isItemFull = false;
+                        break;
+                    }
+                }
+
+                //인벤토리가 꽉 차도 임시 슬롯이 비어있다면 Full이 아님
+                if (isItemFull)
+                {
+                    if (string.IsNullOrEmpty(myData.TempItemSlot.ToString().Replace("\0", "").Trim()))
+                    {
+                        isItemFull = false;
+                    }
                 }
 
                 List<AugmentData> cards = _deckManager.GenerateCards(
@@ -237,7 +263,7 @@ public class AugmentController : NetworkBehaviour
                 string myId1 = myCards.Count > 1 ? myCards[1].targetId : ""; int myType1 = myCards.Count > 1 ? (int)myCards[1].type : -1;
                 string myId2 = myCards.Count > 2 ? myCards[2].targetId : ""; int myType2 = myCards.Count > 2 ? (int)myCards[2].type : -1;
 
-                if (teamCards != null && teamCards.Count == 3)
+                if (teamCards != null && teamCards.Count > 0)
                 {
                     string tId0 = teamCards.Count > 0 ? teamCards[0].targetId : ""; int tType0 = teamCards.Count > 0 ? (int)teamCards[0].type : -1;
                     string tId1 = teamCards.Count > 1 ? teamCards[1].targetId : ""; int tType1 = teamCards.Count > 1 ? (int)teamCards[1].type : -1;
@@ -275,7 +301,7 @@ public class AugmentController : NetworkBehaviour
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
             if (config != null) reinforceNum = int.Parse(config.configValue);
 
-            // 임시 보관소에 저장
+            //임시 보관소에 저장
             _tempMyCards = new List<AugmentData>();
             var card0 = RebuildAugmentData(id0.ToString(), (AugmentType)type0, myData, reinforceNum, "MyCard_1");
             if (card0 != null) _tempMyCards.Add(card0);
@@ -284,7 +310,7 @@ public class AugmentController : NetworkBehaviour
             var card2 = RebuildAugmentData(id2.ToString(), (AugmentType)type2, myData, reinforceNum, "MyCard_3");
             if (card2 != null) _tempMyCards.Add(card2);
 
-            // 1vs1 모드라면 더 기다릴 것 없이 바로 화면에 출력!
+            //1vs1 모드라면 더 기다릴 것 없이 바로 화면에 출력
             if (!hasTeamCards && _tempMyCards.Count > 0)
             {
                 AugmentManager.Instance.ShowAugmentWindow(_tempMyCards, null, "", isForcedOpen);
@@ -293,11 +319,11 @@ public class AugmentController : NetworkBehaviour
                 {
                     RPC_StartInGameAugmentTimer(Runner.LocalPlayer);
                 }
-                _tempMyCards = null; // 사용 후 비우기
+                _tempMyCards = null; //사용 후 비우기
             }
         }
     }
-    
+
     //아군 카드만 전달받는 후속 RPC 패킷넘치는 거 방지용
     //3.12 네트워크 매개변수 추가
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -312,7 +338,7 @@ public class AugmentController : NetworkBehaviour
         {
             Debug.Log("RPC_DeliverTeamCards 수신됨 - 1vs1인데 이게 찍히면 버그");
 
-            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer); 
+            PlayerNetworkData myData = _stageManager.PlayerDataMap.Get(Runner.LocalPlayer);
             int reinforceNum = 6;
             var config = TableManager.Instance.ConfigTable.Get("augment_reinforce_number");
             if (config != null) reinforceNum = int.Parse(config.configValue);
@@ -408,9 +434,47 @@ public class AugmentController : NetworkBehaviour
             var itemData = TableManager.Instance.ItemTable.Get(id);
             if (itemData != null)
             {
+                //이름 세팅
                 data.titleName = TableManager.Instance.GetString(itemData.name);
-                data.description = "";
+
+                //설명 세팅인데 걍 스트링빌더 써야할 듯, 기획서 상 줄넘김 필요
+                StringBuilder descBuilder = new StringBuilder();
+
+                //테이블을 순회하며 그룹아디 매칭되는 효과 찾기
+                foreach (var effect in TableManager.Instance.ItemEffectTable.GetAll())
+                {
+                    if (effect != null && effect.effectGroupId == itemData.effectGroupId)
+                    {
+                        //스트링 테이블에서 번역된 텍스트 가져오기
+                        string translatedDesc = TableManager.Instance.GetString(effect.effectDesc);
+
+                        //빌더에 이미 다른 텍스트가 있다면 줄바꿈 추가
+                        if (descBuilder.Length > 0)
+                        {
+                            descBuilder.AppendLine();
+                        }
+
+                        descBuilder.Append(translatedDesc);
+                    }
+                }
+
+                //완성된 텍스트를 data에 삽입
+                if (descBuilder.Length > 0)
+                {
+                    data.description = descBuilder.ToString();
+                }
+                else
+                {
+                    data.description = "설명을 찾을 수 없습니다.";
+                }
+
+                //아이콘 세팅
+                if (_itemIconDataSO != null)
+                {
+                    data.mainIcon = _itemIconDataSO.GetIcon(id);
+                }
             }
+
         }
 
         return data;
@@ -457,8 +521,20 @@ public class AugmentController : NetworkBehaviour
 
         //패킷이 날아오는 동안 슬롯이 꽉 찼는지 다시 한번 확인
         if (type == AugmentType.Hero && IsSlotFull5(data.OwnedHeroes)) isValid = false;
-        if (type == AugmentType.Item && IsSlotFull3(data.InventoryItems)) isValid = false;
         if (type == AugmentType.Skill && IsSlotFull5(data.OwnedSkillAugments)) isValid = false;
+
+        //3.16
+        //아이템은 인벤 3칸과 임시 슬롯 1칸이 모두 꽉 찼을 때만 반려
+        if (type == AugmentType.Item)
+        {
+            bool isInvFull = IsSlotFull3(data.InventoryItems);
+            bool isTempFull = !string.IsNullOrEmpty(data.TempItemSlot.ToString().Replace("\0", "").Trim());
+
+            if (isInvFull && isTempFull)
+            {
+                isValid = false;
+            }
+        }
 
         //검증 통과 여부에 따라 컨펌 or 리젝트
         if (isValid)
@@ -523,6 +599,22 @@ public class AugmentController : NetworkBehaviour
             //나를 포함한 모든 유저에게 갱신 알림을 보냄
             RPC_NotifyTeammateRefresh(player);
         }
+
+        //3.17 핸드카드 스킬 아이콘 UI 갱신 추가
+        //누군가 스킬 증강 사면 내 화면 스킬아이콘 갱신
+        if (type == AugmentType.Skill)
+        {
+            if (_stageManager.PlayerDataMap.TryGet(player, out var buyerData) &&
+                _stageManager.PlayerDataMap.TryGet(Runner.LocalPlayer, out var myData))
+            {
+                if (buyerData.Team == myData.Team)
+                {
+                    //동기화 에러안나게 0.1초뒤
+                    AugmentManager.Instance.Invoke("DelayedRefreshSkillIcons", 0.1f);
+                }
+            }
+        }
+
         //카드를 산 사람이 로컬이 맞다면, UI를 갱신
         if (player == Runner.LocalPlayer)
         {

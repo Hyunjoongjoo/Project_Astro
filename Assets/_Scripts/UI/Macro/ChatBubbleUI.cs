@@ -15,7 +15,7 @@ public class ChatBubbleUI : MonoBehaviour
         {
             _emoticonPanel.SetActive(false);
             _txtPanel.SetActive(true);
-            _text.text = data.text;
+            _text.text = data.GetText();
         }
         else
         {

@@ -1,9 +1,15 @@
-﻿
+﻿public enum SkillPhase
+{
+    Idle, PreDelay, Casting, PostDelay
+}
+
 public interface ISkill
 {
     BaseSkillSO Data { get; }
 
     bool IsCasting { get; } // 시전 중인 동안 캐스팅 상태에 머문다.
+
+    void Initialize() { }
 
     /// <summary>
     /// 후딜레이 메서드. Casting 다음 실행됨.
@@ -22,11 +28,11 @@ public interface ISkill
     void Execute()
     {
         PreDelay();
-        Casting();
-        PostDelay();
     }
 
     bool UsingConditionCheck();
 
     void ChangeData(BaseSkillSO newData);
+
+    void Tick();
 }

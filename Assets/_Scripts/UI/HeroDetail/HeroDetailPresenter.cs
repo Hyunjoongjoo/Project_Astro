@@ -7,6 +7,7 @@ public class HeroDetailPresenter : MonoBehaviour
     [SerializeField] private HeroDetailView _view;
     [SerializeField] private GameObject _confirmPopupPrefab;
     [SerializeField] private GameObject _upgradeResultPrefab;
+    [SerializeField] private GameObject _toastPrefab;
 
     [Header("리소스 SO")]
     [SerializeField] private StatIconDataSO _statIcons;
@@ -85,7 +86,7 @@ public class HeroDetailPresenter : MonoBehaviour
 
         if (levelData != null)
         {
-            _view.SetLevelInfo(_userHeroData.level, _userHeroData.exp, levelData.expRequirement);
+            _view.SetLevelInfo(_userHeroData.level.ToString(), _userHeroData.exp, levelData.expRequirement);
 
             // 버튼 텍스트 및 상태 결정 로직
             string priceText = _userHeroData.isUnlock ?
@@ -96,13 +97,13 @@ public class HeroDetailPresenter : MonoBehaviour
         }
         else
         {
+            _view.SetLevelInfo(_userHeroData.level.ToString(), 0, 0); // 0, 0을 넘겨서 "MAX"가 뜨게 함
             _view.SetUpgradeButton(true, "최고 레벨", true);
         }
 
         //스와이프 페이지 갱신
-        UpdateSkillDesPage();
-        UpdateAugmentDesPage();
-        UpdateLevelRewardDesPage();
+        UpdateSkillAndAugmentPages();
+        //UpdateLevelRewardDesPage();
         UpdateStatPage();
     }
 
@@ -219,106 +220,86 @@ public class HeroDetailPresenter : MonoBehaviour
         }
     }
 
-    private void UpdateSkillDesPage()
+    private void UpdateSkillAndAugmentPages()
     {
-        _view.ClearDescription(DescriptionType.Skill);
-        _view.ClearIcons(DescriptionType.Skill);
+        _view.ClearSkillPage();
+        _view.ClearAugmentPage();
 
-        var allSkills = TableManager.Instance.SkillInfoTable.GetAll();
-        var mySkills = allSkills.Find(s => s.heroId == _heroData.id && s.skillName.Contains("skill"));
+        // SO에서 해당 영웅의 스킬 데이터 리스트 가져오기
+        var skillDatas = _heroIcons.GetSkillIcons(_heroData.id);
+        if (skillDatas == null) return;
 
-        if (_heroIcons != null)
+        foreach (var skillSO in skillDatas)
         {
-            Sprite skillIcons = _heroIcons.GetSkillIconByIndex(_heroData.id,0);
+            if (skillSO == null) continue;
 
-            if (skillIcons != null)
+            // 이름, 설명
+            string translatedName = TableManager.Instance.GetString(skillSO.skillName);
+            string translatedDesc = TableManager.Instance.GetString(skillSO.skillDescription);
+
+            //스킬 타입에 따른 분류 처리
+            if (skillSO.skillType == SkillType.AugmentSkill)
             {
-                _view.AddSkillIcon(DescriptionType.Skill, skillIcons);              
+                // 증강 페이지에 추가
+                _view.AddAugmentItem(translatedName, translatedDesc, skillSO.skillIcon);
             }
-        }
-        if(mySkills != null)
-        {
-            string name = TableManager.Instance.GetString(mySkills.skillName);
-            string desc = TableManager.Instance.GetString(mySkills.skillDes);
-
-            _view.AddDescriptionItem(DescriptionType.Skill, name, desc);
-        }
-                
-    } 
-    private void UpdateAugmentDesPage()
-    {
-        _view.ClearDescription(DescriptionType.Augment);
-        _view.ClearIcons(DescriptionType.Augment);
-
-        var allSkills = TableManager.Instance.SkillInfoTable.GetAll();
-        var augmentSkill = allSkills.Find(s => s.heroId == _heroData.id && s.skillName.Contains("augment"));
-
-        if (_heroIcons != null)
-        {
-            Sprite skillIcons = _heroIcons.GetSkillIconByIndex(_heroData.id, 1);
-
-            if (skillIcons != null)
+            else if(skillSO.skillType == SkillType.NormalSkill)
             {
-                _view.AddSkillIcon(DescriptionType.Augment, skillIcons);
+                // 일반 스킬 페이지에 추가 (쿨타임 포함)
+                string cooltimeStr = skillSO.cooldown > 0 ? $"{skillSO.cooldown}s" : "Passive";
+                _view.AddSkillItem(translatedName, translatedDesc, cooltimeStr, skillSO.skillIcon);
             }
-        }
-        if(augmentSkill != null)
-        {
-            string name = TableManager.Instance.GetString(augmentSkill.skillName);
-            string desc = TableManager.Instance.GetString(augmentSkill.skillDes);
-
-            _view.AddDescriptionItem(DescriptionType.Augment, name, desc);
         }
     }
 
     //레벨 보상 페이지
-    private void UpdateLevelRewardDesPage()
-    {
-        if (_userHeroData == null || _heroData == null) return;
-
-        //리워드 데이터 가져오기
-        var myRewards = TableManager.Instance.HeroLevelRewardTable.GetAll()
-            .FindAll(r=>r.heroId == _heroData.id);
-        myRewards.Sort((a,b) => a.level.CompareTo(b.level)); //레벨순 정렬 3,6,6,9
-
-        for(int i = 0; i < _view.RewardButtons.Length; i++)
-        {
-            int index = i;
-            _view.RewardButtons[i].onClick.RemoveAllListeners();
-
-            if (index < myRewards.Count)
-            {
-                string skillId = myRewards[index].rewardId;
-
-                // 버튼 클릭 시 해당 스킬 정보 표시
-                _view.RewardButtons[index].onClick.AddListener(() => ShowLevelRewardDetail(skillId,index));
-
-                // 초기 화면 설정 (첫 번째 보상인 3레벨 보상을 먼저 보여줌)
-                if (index == 0) ShowLevelRewardDetail(skillId, index);
-            }
-            else
-            {
-                // 데이터가 없는 버튼은 비활성화하거나 숨김 처리
-                _view.RewardButtons[index].gameObject.SetActive(false);
-            }
-        }
-    }
-
-    private void ShowLevelRewardDetail(string skillId,int index)
-    {
-        if (string.IsNullOrEmpty(skillId)) return;
-
-        //스킬인포 테이블에서 데이터 가저오기
-        var skillInfo = TableManager.Instance.SkillInfoTable.Get(skillId);
-        if (skillInfo == null) return;
-
-        // 스트링 테이블에서 번역 텍스트 가져오기
-        string translatedName = TableManager.Instance.GetString(skillInfo.skillName);
-        string translatedDes = TableManager.Instance.GetString(skillInfo.skillDes);
-
-        //view 업데이트
-        _view.UpdateLevelRewardUI(_userHeroData.level, translatedName, translatedDes, index);
-    }
+    //private void UpdateLevelRewardDesPage()
+    //{
+    //    if (_userHeroData == null || _heroData == null) return;
+    //
+    //    //리워드 데이터 가져오기
+    //    var myRewards = TableManager.Instance.HeroLevelRewardTable.GetAll()
+    //        .FindAll(r=>r.heroId == _heroData.id);
+    //    myRewards.Sort((a,b) => a.level.CompareTo(b.level)); //레벨순 정렬 3,6,6,9
+    //
+    //    for(int i = 0; i < _view.RewardButtons.Length; i++)
+    //    {
+    //        int index = i;
+    //        _view.RewardButtons[i].onClick.RemoveAllListeners();
+    //
+    //        if (index < myRewards.Count)
+    //        {
+    //            string skillId = myRewards[index].rewardId;
+    //
+    //            // 버튼 클릭 시 해당 스킬 정보 표시
+    //            _view.RewardButtons[index].onClick.AddListener(() => ShowLevelRewardDetail(skillId,index));
+    //
+    //            // 초기 화면 설정 (첫 번째 보상인 3레벨 보상을 먼저 보여줌)
+    //            if (index == 0) ShowLevelRewardDetail(skillId, index);
+    //        }
+    //        else
+    //        {
+    //            // 데이터가 없는 버튼은 비활성화하거나 숨김 처리
+    //            _view.RewardButtons[index].gameObject.SetActive(false);
+    //        }
+    //    }
+    //}
+    //
+    //private void ShowLevelRewardDetail(string skillId,int index)
+    //{
+    //    if (string.IsNullOrEmpty(skillId)) return;
+    //
+    //    //스킬인포 테이블에서 데이터 가저오기
+    //    var skillInfo = TableManager.Instance.SkillInfoTable.Get(skillId);
+    //    if (skillInfo == null) return;
+    //
+    //    // 스트링 테이블에서 번역 텍스트 가져오기
+    //    string translatedName = TableManager.Instance.GetString(skillInfo.skillName);
+    //    string translatedDes = TableManager.Instance.GetString(skillInfo.skillDes);
+    //
+    //    //view 업데이트
+    //    _view.UpdateLevelRewardUI(_userHeroData.level, translatedName, translatedDes, index);
+    //}
 
     //스텟 페이지 갱신
     private void UpdateStatPage()
@@ -326,14 +307,23 @@ public class HeroDetailPresenter : MonoBehaviour
         _view.ClearStats();
         HeroStatData status = HeroManager.Instance.GetStatus(_heroData.id);
         HeroStatData tableBase = TableManager.Instance.HeroStatTable.Get(_heroData.heroStatId);
-        if (status == null) return;
+        if (status == null || _userHeroData == null) return;
+
+        var nextLevelData = TableManager.Instance.HeroLevelTable.Get((_userHeroData.level).ToString());
+        bool isMaxLevel = nextLevelData == null; //다음레벨 없으면 만렙
+
+        string GetStatText(float baseVal, float growthVal)
+        {
+            if (isMaxLevel) return baseVal.ToString(); // 만렙이면 기본 수치만
+            return $"{baseVal} <color=#FF0500>(+{growthVal})</color>"; // 아니면 성장 수치 포함
+        }
 
         //성장수치 보여줄 애들은 성장수치도 보여주기
-        _view.AddStatItem("체력", $"{status.BaseHp} <color=#FF0500>(+{tableBase.ipLvHp})</color>", _statIcons.GetIcon(StatType.Hp),Color.green);
-        _view.AddStatItem("공격력", $"{status.baseAttackPower} <color=#FF0500>(+{tableBase.ipLvAttackPower})</color>", _statIcons.GetIcon(StatType.AttackPower), Color.green);
+        _view.AddStatItem("체력", GetStatText(status.BaseHp, tableBase.ipLvHp), _statIcons.GetIcon(StatType.Hp),Color.green);
+        _view.AddStatItem("공격력", GetStatText(status.baseAttackPower, tableBase.ipLvAttackPower), _statIcons.GetIcon(StatType.AttackPower), Color.green);
 
-        if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0)
-            _view.AddStatItem("치유력", $"{status.baseHealingPower} <color=#FF0500>(+{tableBase.ipLvHealingPower})</color>", _statIcons.GetIcon(StatType.HealingPower), Color.green);
+        if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0) //치유력은 있는애들만 표시
+            _view.AddStatItem("치유력", GetStatText(status.baseHealingPower, tableBase.ipLvHealingPower), _statIcons.GetIcon(StatType.HealingPower), Color.green);
 
         _view.AddStatItem("공격 속도", status.attackSpeed.ToString("F2"), _statIcons.GetIcon(StatType.AttackSpeed));
         _view.AddStatItem("이동 속도", status.moveSpeed.ToString("F1"), _statIcons.GetIcon(StatType.MoveSpeed));
@@ -343,7 +333,17 @@ public class HeroDetailPresenter : MonoBehaviour
         _view.AddStatItem("피해 감소량", status.damageReduce.ToString("F1"), _statIcons.GetIcon(StatType.DamageReduction));
 
         string typeKey = $"hero_movetype_{status.moveType.ToString().ToLower()}";
-        _view.AddStatItem("이동 유형", TableManager.Instance.GetString(typeKey), _statIcons.GetIcon(StatType.MoveType));
+        string typeName = TableManager.Instance.GetString(typeKey);
+
+        var moveTypeItem = _view.AddStatItem("이동 유형", typeName, _statIcons.GetIcon(StatType.MoveType));
+
+        if (moveTypeItem != null)
+        {
+            moveTypeItem.EnableToastButton(() => {
+                UIManager.Instance.ShowToast<ToastUI>(_toastPrefab);
+                Debug.Log($"{typeName} 토스트 버튼 클릭됨!");
+            });
+        }
     }
 
     private void ShowUpgradeResult(HeroStatData oldStat)

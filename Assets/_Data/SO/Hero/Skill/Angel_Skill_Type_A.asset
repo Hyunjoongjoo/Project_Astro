@@ -13,15 +13,17 @@ MonoBehaviour:
   m_Name: Angel_Skill_Type_A
   m_EditorClassIdentifier: Assembly-CSharp::HealSkillSO
   heroId: hero_angel
+  skillIcon: {fileID: 21300000, guid: 352e5599f1a382f4e846b45c28329951, type: 3}
   skillName: augment_name_angel_A
-  skillDescription: 
+  skillDescription: augment_desc_angel_A
   note: 
   skillVFX: {fileID: 7343538280686139031, guid: 921bfdf400594b2459b6504da1d4e296, type: 3}
   skillType: 2
   initCooldown: 5
-  cooldown: 10
-  healCoefficient: 1.5
+  cooldown: 6
+  healCoefficient: 1
   range: 3
   duration: 0
   interval: 0
+  cooldownMultiplier: 1
   areaOfEffect: 1

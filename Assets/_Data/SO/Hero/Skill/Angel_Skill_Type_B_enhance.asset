@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Angel_Skill_Type_B_enhance
   m_EditorClassIdentifier: Assembly-CSharp::HealSkillSO
   heroId: hero_angel
+  skillIcon: {fileID: 0}
   skillName: enhance_augment_name_angel_B
   skillDescription: 
   note: 
   skillVFX: {fileID: 7343538280686139031, guid: 921bfdf400594b2459b6504da1d4e296, type: 3}
   skillType: 3
   initCooldown: 5
-  cooldown: 10
+  cooldown: 6
   healCoefficient: 2
   range: 3
   duration: 0

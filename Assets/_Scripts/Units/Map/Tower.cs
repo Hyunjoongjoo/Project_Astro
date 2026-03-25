@@ -30,7 +30,6 @@ public class Tower : UnitBase
 
     public override void Spawned()
     {
-        Debug.Log("Spawned 실행됨");
         base.Spawned();
 
         unitType = UnitType.Tower;
@@ -154,5 +153,28 @@ public class Tower : UnitBase
     public override void Die()
     {
         base.Die();
+    }
+
+    //사망 이펙트
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (!hasState) return;
+        if (deathEffectPrefab != null)
+        {
+            GameObject deathEffectObject = Instantiate(
+                deathEffectPrefab,
+                transform.position,
+                transform.rotation
+            );
+            Vector3 offset = transform.position;
+            if (networkedTeam == Team.Blue)
+                offset.z -= 2;
+            else
+                offset.z += 2;
+
+            deathEffectObject.transform.position = offset;
+
+            Destroy(deathEffectObject, deathEffectLifeTime);
+        }
     }
 }
