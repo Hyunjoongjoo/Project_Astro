@@ -70,10 +70,7 @@ public class AttackState : IState
 
     private void PerformAttack()
     {
-        //if (_unit.UnitType == UnitType.Hero)
-        //    _unit.HeroAnimator.SetTrigger("AttackTrigger");
         _unit.normalAttack.Execute();
-        //_unit.normalAttack.Casting();
         OnNormalAttack?.Invoke();
     }
 }
