@@ -28,11 +28,14 @@ jobs:
       # 에셋 조립 및 json 생성
       - name: Assemble Assets & Decode Key
         run: |
-          # 프라이빗 Assets 폴더 내용을 현재 프로젝트 Assets로 복사
-          cp -R TempAssets/Assets/* Assets/
+          # 프라이빗 Assets 폴더 내용을 현재 프로젝트 Assets로 강제 복사 
+          cp -Rf TempAssets/Assets/* Assets/
           
-          # Base64 인코딩해서 .json 파일 생성
+          # 파이어베이스 JSON 파일 복원
           echo "${{ secrets.GOOGLE_SERVICES_JSON_B64 }}" | base64 --decode > Assets/google-services.json
+          
+          # Keystore 파일을 암호문에서 진짜 파일로 복원
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > ${{ github.workspace }}/user.keystore
           
           # 임시 폴더 삭제
           rm -rf TempAssets
@@ -49,7 +52,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
-          KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }} 
+          KEYSTORE_PATH: /github/workspace/user.keystore
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}         
         with:
           targetPlatform: Android
