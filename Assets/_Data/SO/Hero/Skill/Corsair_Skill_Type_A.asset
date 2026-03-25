@@ -18,9 +18,13 @@ MonoBehaviour:
   skillDescription: augment_desc_corsair_A
   note: 
   skillVFX: {fileID: 6393617126741755569, guid: cd314f7e717ada041bb94a53b1fdff9c, type: 3}
+  skillSFX: {fileID: 0}
   skillType: 2
   initCooldown: 5
   cooldown: 7
+  preDelay: 0
+  postDelay: 0
+  blockAction: 1
   dashSpeed: 25
   canDashMaxDistance: 7
   canDashMinDistance: 2

@@ -44,7 +44,7 @@ public class AttackState : IState
         }
 
         // 타겟 바라보기
-        RotateToTarget(diff);
+        _unit.RotateToTarget(diff);
 
         // 공격 실행
         //if (_attackTimer.ExpiredOrNotRunning(_unit.Runner))
@@ -68,21 +68,12 @@ public class AttackState : IState
         
     }
 
-    private void RotateToTarget(Vector3 direction)
-    {
-        direction.y = 0f; // 수평 회전만 적용
-        if (direction.sqrMagnitude > 0.001f)
-        {
-            _unit.transform.rotation = Quaternion.LookRotation(direction);
-        }
-    }
-
     private void PerformAttack()
     {
         //if (_unit.UnitType == UnitType.Hero)
         //    _unit.HeroAnimator.SetTrigger("AttackTrigger");
-        //_unit.normalAttack.Execute();
-        _unit.normalAttack.Casting();
+        _unit.normalAttack.Execute();
+        //_unit.normalAttack.Casting();
         OnNormalAttack?.Invoke();
     }
 }

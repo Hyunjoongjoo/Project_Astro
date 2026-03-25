@@ -3,30 +3,21 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class DashSkill : ISkill
+public class DashSkill : BaseSkill<DashSkillSO>
 {
-    private DashSkillSO _data;
-    private bool _isCasting;
-    private UnitController _cachedUnit;
-    private TickTimer _skillCooldown;
+    private bool _castingEnd = false;
 
     private Collider[] _hitColliders;
     private Collider[] _searchColliders = new Collider[20];//타겟 검색용 배열
 
-    public BaseSkillSO Data => _data;
-    public bool IsCasting => _isCasting;
-
-    public DashSkill(DashSkillSO data, UnitController unit)
+    public DashSkill(DashSkillSO data, UnitController unit) : base (data, unit)
     {
-        _data = data;
-        _cachedUnit = unit;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
         // 광역화 옵션 켜져있다면 배열 미리 할당
         if (data.areaOfEffect)
             _hitColliders = new Collider[20];
     }
 
-    public void ChangeData(BaseSkillSO newData)
+    public override void ChangeData(BaseSkillSO newData)
     {
         if (newData is DashSkillSO dashData)
         {
@@ -38,7 +29,7 @@ public class DashSkill : ISkill
             Debug.LogWarning($"[DashSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
     }
 
-    public bool UsingConditionCheck()
+    public override bool UsingConditionCheck()
     {
         if (_cachedUnit.currentTarget == null) return false;
         if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
@@ -55,22 +46,38 @@ public class DashSkill : ISkill
         return false;
     }
 
-    public void PreDelay() { _isCasting = true; }
-
-    public void PostDelay() { _isCasting = false; }
-
-    public void Casting()
+    public override void Casting()
     {
         if (!_cachedUnit.Object.HasStateAuthority) return;
         if (_cachedUnit.currentTarget == null) return;
 
+        _phase = SkillPhase.Casting;
         // 코루틴을 통해 목표 지점까지 이동하는 로직 실행
         //_cachedUnit.StartCoroutine(DashRoutine(_cachedUnit.currentTarget));
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _cachedUnit.StartCoroutine(DashSequence());
     }
 
-    public void Tick() { }
+    public override void Tick() 
+    {
+        // FSM 기반으로 선딜레이 -> 캐스팅 -> 후딜레이 순으로 타이머를 설정하며 순차 실행
+        switch (_phase)
+        {
+            case SkillPhase.PreDelay:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    Casting();
+                break;
+
+            case SkillPhase.Casting:
+                if (_castingEnd)
+                    PostDelay();
+                break;
+
+            case SkillPhase.PostDelay:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    _phase = SkillPhase.Idle;
+                break;
+        }
+    }
 
     //여러 번 돌진을 관리하는 코루틴
     private IEnumerator DashSequence()
@@ -90,6 +97,7 @@ public class DashSkill : ISkill
             //돌진 사이 텀 추가
             yield return new WaitForSeconds(_data.dashInterval);
         }
+        _castingEnd = true;
     }
 
     //기획서 기준 다음 돌진 타겟 찾기 (가장 멀리 있는 적, 같은 적 제외)

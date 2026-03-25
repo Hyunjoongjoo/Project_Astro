@@ -110,7 +110,7 @@ public class HeroController : UnitController
         // 기본 스킬의 시전은 어느 상태든 상관없이 조건만 만족하면 바로 전환한다.
         if (StateMachine.CurrentState != DieState &&
             StateMachine.CurrentState != DeployState &&
-            StateMachine.CurrentState != CastState)
+            curUniqueSkill.IsCasting == false)
         {
             if (curUniqueSkill.UsingConditionCheck())
             {
@@ -121,6 +121,9 @@ public class HeroController : UnitController
         }
 
         StateMachine.Update();
+
+        if (normalAttack.IsCasting)
+            normalAttack.Tick();
 
         if (curUniqueSkill.IsCasting)
             curUniqueSkill.Tick();
