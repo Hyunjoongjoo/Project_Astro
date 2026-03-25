@@ -1,4 +1,8 @@
-﻿
+﻿public enum SkillPhase
+{
+    Idle, PreDelay, Casting, PostDelay
+}
+
 public interface ISkill
 {
     BaseSkillSO Data { get; }
@@ -24,11 +28,11 @@ public interface ISkill
     void Execute()
     {
         PreDelay();
-        Casting();
-        PostDelay();
     }
 
     bool UsingConditionCheck();
 
     void ChangeData(BaseSkillSO newData);
+
+    void Tick();
 }

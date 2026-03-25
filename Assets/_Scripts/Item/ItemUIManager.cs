@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Fusion;
 //내 보관함 UI 3개와 영웅 카드들 캐싱해두고 StageManager에서 데이터 읽어와서 아이콘 이미지 갈아끼우는 역할
 //변경된 네트워크 데이터를 감지하고 하단 패널을 새로고침하게 구현
@@ -51,7 +51,10 @@ public class ItemUIManager : Singleton<ItemUIManager>
             string itemA = myData.HeroEquippedItems.Get(index * 2).Replace("\0", "").Trim();
             string itemB = myData.HeroEquippedItems.Get(index * 2 + 1).Replace("\0", "").Trim();
 
-            card.UpdateEquippedItems(GetItemSprite(itemA), GetItemSprite(itemB));
+            Sprite iconA = GetItemSprite(itemA);
+            Sprite iconB = GetItemSprite(itemB);
+
+            card.UpdateEquippedItems(itemA, itemB, iconA, iconB);
         }
 
         Debug.Log("인벤토리 및 영웅 장착 UI 렌더링 완료");
@@ -60,7 +63,7 @@ public class ItemUIManager : Singleton<ItemUIManager>
 
 
     //Resources말고 얘도 그냥 SO 하나 만들어서 아이디와 직렬화
-    private Sprite GetItemSprite(string itemId)
+    public Sprite GetItemSprite(string itemId)
     {
         if (_itemIconData == null) return null;
         return _itemIconData.GetIcon(itemId);

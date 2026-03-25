@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using Fusion;
+﻿using Fusion;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
 {
     private StageManager _stageManager;
 
@@ -30,6 +31,16 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [Header("Equipped Items UI")]
     [SerializeField] private Image _itemSlot1;
     [SerializeField] private Image _itemSlot2;
+
+    [Header("상세 정보 설정")]
+    [SerializeField] private float _longPressThreshold = 3.0f;
+    [SerializeField] private GameObject _detailPrefab;
+    [SerializeField] private Image _holdGauge;
+    private Coroutine _longPressCoroutine;
+    private bool _isPointerDown = false;
+    private string _currentItemId1;
+    private string _currentItemId2;
+    private List<string> _currentAugmentIds = new List<string>();
 
     //private float _currentTimer = 0f;
     //private bool IsCooldown => _currentTimer > 0f;
@@ -115,6 +126,15 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        //드래그중에는 롱 프레스 체크 중단하게
+        _isPointerDown = false;
+        if (_longPressCoroutine != null)
+        {
+            StopCoroutine(_longPressCoroutine);
+            _longPressCoroutine = null;
+        }
+        ResetHoldGauge();
+
         //게임 playing(카운트다운끝) 상태 아니면 드래그 막기
         if (_stageManager != null && _stageManager.CurrentState != StageState.Playing)
         {
@@ -211,25 +231,29 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     //3.15
     //아이템갱신용
-    public void UpdateEquippedItems(Sprite itemIcon1, Sprite itemIcon2)
+    public void UpdateEquippedItems(string id1, string id2, Sprite icon1, Sprite icon2)
     {
+        _currentItemId1 = id1;
+        _currentItemId2 = id2;
+
         if (_itemSlot1 != null)
         {
-            _itemSlot1.sprite = itemIcon1;
-            _itemSlot1.gameObject.SetActive(itemIcon1 != null);
+            _itemSlot1.sprite = icon1;
+            _itemSlot1.gameObject.SetActive(icon1 != null);
         }
         if (_itemSlot2 != null)
         {
-            _itemSlot2.sprite = itemIcon2;
-            _itemSlot2.gameObject.SetActive(itemIcon2 != null);
+            _itemSlot2.sprite = icon2;
+            _itemSlot2.gameObject.SetActive(icon2 != null);
         }
     }
 
-    
     //매니저가 스킬 아이콘 리스트를 주면 슬롯에 채워주는 함수
     //3.17 부모 프레임도 같이 출력되도록(기본 비활)
-    public void UpdateSkillAugmentIcons(List<Sprite> icons)
+    public void UpdateSkillAugmentIcons(List<string> rawIds, List<Sprite> icons)
     {
+        _currentAugmentIds = new List<string>(rawIds);
+
         if (_skillAugmentImgs == null) return;
 
         for (int i = 0; i < _skillAugmentImgs.Length; i++)
@@ -249,4 +273,76 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             }
         }
     }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        _isPointerDown = true;
+        if (_longPressCoroutine != null) StopCoroutine(_longPressCoroutine);
+        _longPressCoroutine = StartCoroutine(CO_CheckLongPress());
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        _isPointerDown = false;
+        if (_longPressCoroutine != null) StopCoroutine(_longPressCoroutine);
+        ResetHoldGauge();
+    }
+    private IEnumerator CO_CheckLongPress()
+    {
+        float timer = 0f;
+
+        if (_holdGauge != null)
+        {
+            _holdGauge.fillAmount = 0f;
+            _holdGauge.gameObject.SetActive(true);
+        }
+
+        while (timer < _longPressThreshold)
+        {
+            timer += Time.deltaTime;
+
+            if (_holdGauge != null)
+            {
+                _holdGauge.fillAmount = timer / _longPressThreshold;
+            }
+
+            if (!_isPointerDown)
+            {
+                ResetHoldGauge(); // 떼면 게이지 초기화
+                yield break;
+            }
+
+            yield return null;
+        }
+
+        // 3초 경과 시 팝업 열기
+        ResetHoldGauge();
+        OpenDetail();
+    }
+    private void OpenDetail()
+    {
+        // 1. 프리팹 생성
+        var detailObj = UIManager.Instance.ShowUI<HandCardDetail>(_detailPrefab, true);
+
+        if (detailObj != null)
+        {
+            // 2. 이 함수 호출이 누락되었거나, detailObj가 null이라 실행 안 될 수 있음
+            // 여기서 SetupByIds를 반드시 호출해야 로그가 찍힙니다.
+            detailObj.SetupByIds(_data, _currentItemId1, _currentItemId2, _currentAugmentIds);
+            Debug.Log("SetupByIds 호출 시도함");
+        }
+        else
+        {
+            Debug.LogError("상세창 UI 생성 실패!");
+        }
+    }
+    private void ResetHoldGauge()
+    {
+        if (_holdGauge != null)
+        {
+            _holdGauge.fillAmount = 0f;
+            _holdGauge.gameObject.SetActive(false);
+        }
+    }
+
 }

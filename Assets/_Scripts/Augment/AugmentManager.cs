@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 //3.3 여현구
 //증강 관련 UI연출, 클라이언트 조작만 담당하도록 분리.
+//3.25test
+
 
 public class AugmentManager : Singleton<AugmentManager>
 {
@@ -156,7 +158,7 @@ public class AugmentManager : Singleton<AugmentManager>
     public void ForceRandomPick()
     {
         //창이 아직 열려있다면 (유저가 아직 카드를 안 골랐다면)
-        if (_currentWindow != null && _currentWindow.gameObject.activeInHierarchy)
+        if (_currentWindow != null)
         {
             _currentWindow.ForceRandomPick();
         }
@@ -194,6 +196,7 @@ public class AugmentManager : Singleton<AugmentManager>
             if (child.TryGetComponent(out HeroHandCardUI card))
             {
                 List<Sprite> icons = new List<Sprite>();
+                List<string> ids = new List<string>();
                 //카드별로 스킬 리스트를 처음부터 순회하며 꼬리표 확인
                 for (int i = 0; i < SlotData_5.Length; i++)
                 {
@@ -215,10 +218,11 @@ public class AugmentManager : Singleton<AugmentManager>
                         {
                             //박제된 티어에 맞는 아이콘추가
                             icons.Add(so.Tiers[savedTierIndex].Icon);
+                            ids.Add(rawId);
                         }
                     }
                 }
-                card.UpdateSkillAugmentIcons(icons);
+                card.UpdateSkillAugmentIcons(ids, icons);
             }
         }
     }

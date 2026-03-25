@@ -18,9 +18,13 @@ MonoBehaviour:
   skillDescription: skill_desc_corsair
   note: 
   skillVFX: {fileID: 0}
+  skillSFX: {fileID: 0}
   skillType: 1
   initCooldown: 5
   cooldown: 7
+  preDelay: 0
+  postDelay: 0
+  blockAction: 1
   dashSpeed: 25
   canDashMaxDistance: 7
   canDashMinDistance: 2

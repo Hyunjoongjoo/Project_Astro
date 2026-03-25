@@ -14,8 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BgmTable
   _entries:
   - state: 0
-    clip: {fileID: 8300000, guid: 9dc48cdc9aba58b488f4e2f567f3b6a0, type: 3}
+    clip:
+    - {fileID: 8300000, guid: 9dc48cdc9aba58b488f4e2f567f3b6a0, type: 3}
   - state: 1
-    clip: {fileID: 8300000, guid: 66216372e40b7b5419c0b93c2dda4cb4, type: 3}
+    clip:
+    - {fileID: 8300000, guid: b93cf94dd24ea3c4ba487299a7b1df7a, type: 3}
   - state: 2
-    clip: {fileID: 8300000, guid: b93cf94dd24ea3c4ba487299a7b1df7a, type: 3}
+    clip:
+    - {fileID: 8300000, guid: e9538b5cd51a31b408a7d8c80d3f4980, type: 3}
+    - {fileID: 8300000, guid: 534b5b089e111e54fa04f3d9ee52cf2d, type: 3}
+    - {fileID: 8300000, guid: 7d0012b2a81eeb84e9f5b6124c73b1e3, type: 3}
+    - {fileID: 8300000, guid: dce3095cf5425d74ba6c72fc264b9a4a, type: 3}
+    - {fileID: 8300000, guid: 3b0a4919d681e034b886d6f273f1381c, type: 3}
+    - {fileID: 8300000, guid: 2e2d4d092b8f78c47be6b1e5dd6db2f0, type: 3}
+    - {fileID: 8300000, guid: 73edbdbeb94333d4f87d4bd714c75bb8, type: 3}

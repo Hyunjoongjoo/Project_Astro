@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b27be7dfb0d2f6d41b4c5c36a163c309, type: 3}
+  m_Name: HelpIconDataSO
+  m_EditorClassIdentifier: Assembly-CSharp::HelpIconDataSO
+  _iconMaps:
+  - id: help_play_1
+    sprite: {fileID: 21300000, guid: 57e10c56460f9414299792e2420e66c2, type: 3}
+  - id: help_play_2
+    sprite: {fileID: 21300000, guid: a2cdc3015ddbbe0479610b7c9229b5a1, type: 3}
+  - id: help_play_3
+    sprite: {fileID: 21300000, guid: fa276edee1328f242abff7a2a84db424, type: 3}
+  - id: help_augment_1
+    sprite: {fileID: 21300000, guid: 82e200ee2e9affc4abd6392d17212fec, type: 3}
+  - id: help_augment_2
+    sprite: {fileID: 21300000, guid: bdd71b9a7d3d5df479a354c2fad5ecd0, type: 3}
+  - id: help_augment_3
+    sprite: {fileID: 21300000, guid: 00694b08e9cfed54aadf1b0d5e13a008, type: 3}
+  - id: help_augment_4
+    sprite: {fileID: 21300000, guid: 357e99cf1ef726e408e99772c637fac0, type: 3}
+  - id: help_augment_5
+    sprite: {fileID: 21300000, guid: 0726462758c529c43b63cbcd370ca935, type: 3}
+  - id: help_item_1
+    sprite: {fileID: 21300000, guid: aa41464669fd21b48839c65c8c6f9333, type: 3}
+  - id: help_item_2
+    sprite: {fileID: 21300000, guid: 5b4fea617f7e06847af4023845e72038, type: 3}
+  - id: help_item_3
+    sprite: {fileID: 21300000, guid: 734baa0db70a5b746b2022ba1ae5d730, type: 3}
+  - id: help_item_4
+    sprite: {fileID: 21300000, guid: 5aad24d1c0edb4f4d9fcbae34cecf549, type: 3}
+  - id: help_item_5
+    sprite: {fileID: 21300000, guid: 1320556b87482884aa04846e49476f78, type: 3}
+  - id: help_hero_1
+    sprite: {fileID: 21300000, guid: 6370066d2ab4200459dcac70f443de4d, type: 3}
+  - id: help_hero_2
+    sprite: {fileID: 21300000, guid: 049833d65a4b9d44f9d3156514e56fcb, type: 3}
+  - id: help_hero_3
+    sprite: {fileID: 21300000, guid: f3bae3ae5bd6f5949b9f0824277218ed, type: 3}
+  - id: help_hero_4
+    sprite: {fileID: 21300000, guid: feced17ebb419f94f81fdab8c66fc4d8, type: 3}
+  - id: help_hero_5
+    sprite: {fileID: 21300000, guid: 0ac026cd006cfda43bbaf960731ff01c, type: 3}

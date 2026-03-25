@@ -2,35 +2,18 @@
 using Fusion;
 using UnityEngine;
 
-public class ProjectileSkill : ISkill
+public class ProjectileSkill : BaseSkill<ProjectileSkillSO>
 {
-    private ProjectileSkillSO _data;
-    private bool _isCasting;
+    private bool _castingEnd = false;
 
-    private UnitController _cachedUnit;
     private Coroutine _fireCoroutine;
-    private TickTimer _skillCooldown;
 
-    public BaseSkillSO Data => _data;
-    public bool IsCasting => _isCasting;
-
-    public ProjectileSkill(ProjectileSkillSO data, UnitController unit)
+    public ProjectileSkill(ProjectileSkillSO data, UnitController unit) : base(data, unit)
     {
         string heroId = unit.HeroId;
-        _data = data;
-        _cachedUnit = unit;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
     }
 
-    public void ChangeData(BaseSkillSO newData)
-    {
-        if (newData is ProjectileSkillSO projectileData)
-            _data = projectileData;
-        else
-            Debug.LogWarning($"[ProjectileSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
-    }
-
-    public bool UsingConditionCheck()
+    public override bool UsingConditionCheck()
     {
         if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return false;
@@ -38,26 +21,44 @@ public class ProjectileSkill : ISkill
 
         if ( Vector3.Distance(_cachedUnit.transform.position, _cachedUnit.currentTarget.transform.position) > _data.range)
             return false;
-        //_skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
+
         return true;
     }
 
-    public void PreDelay() { _isCasting = true; }
-
-    public void PostDelay() { _isCasting = false; }
-
-    public void Casting()
+    public override void Casting()
     {
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return;
         if (_cachedUnit.currentTarget == null) return;
 
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
+        _phase = SkillPhase.Casting;
 
         // 기존 코루틴이 있다면 정지 후 새로 시작 (UnitController를 통해 실행)
         if (_fireCoroutine != null)
             _cachedUnit.StopCoroutine(_fireCoroutine);
 
         _fireCoroutine = _cachedUnit.StartCoroutine(FireRoutine());
+    }
+
+    public override void Tick() 
+    {
+        // FSM 기반으로 선딜레이 -> 캐스팅 -> 후딜레이 순으로 타이머를 설정하며 순차 실행
+        switch (_phase)
+        {
+            case SkillPhase.PreDelay:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    Casting();
+                break;
+
+            case SkillPhase.Casting:
+                if (_castingEnd)
+                    PostDelay();
+                break;
+
+            case SkillPhase.PostDelay:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    _phase = SkillPhase.Idle;
+                break;
+        }
     }
 
     private IEnumerator FireRoutine()
@@ -82,5 +83,6 @@ public class ProjectileSkill : ISkill
                 yield return new WaitForSeconds(_data.interval);
             }
         }
+        _castingEnd = true;
     }
 }

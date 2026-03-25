@@ -3,38 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HealSkill : ISkill
+public class HealSkill : BaseSkill<HealSkillSO>
 {
-    private HealSkillSO _data;
-    private bool _isCasting;
-    private UnitController _cachedUnit;
-    private TickTimer _skillCooldown;
-
     private UnitBase _targetAlly;
     // 물리 탐색 시 메모리 할당(GC)을 줄이기 위한 NonAlloc 배열
     private Collider[] _hitColliders = new Collider[20];
 
     private List<UnitBase> _targetsToHeal = new List<UnitBase>(10);
 
-    public BaseSkillSO Data => _data;
-    public bool IsCasting => _isCasting;
+    public HealSkill(HealSkillSO data, UnitController unit) : base(data, unit) { }
 
-    public HealSkill(HealSkillSO data, UnitController unit)
-    {
-        _data = data;
-        _cachedUnit = unit;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);
-    }
-
-    public void ChangeData(BaseSkillSO newData)
-    {
-        if (newData is HealSkillSO healData)
-            _data = healData;
-        else
-            Debug.LogWarning($"[HealSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
-    }
-
-    public bool UsingConditionCheck()
+    public override bool UsingConditionCheck()
     {
         if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner))
             return false;
@@ -94,13 +73,10 @@ public class HealSkill : ISkill
         return canCast;
     }
 
-    public void PreDelay() { _isCasting = true; }
-
-    public void PostDelay() { _isCasting = false; }
-
-    public void Casting()
+    public override void Casting()
     {
         float finalCooldown = _data.cooldown * _data.cooldownMultiplier;
+        _phase = SkillPhase.Casting;
 
         _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
 
@@ -123,7 +99,7 @@ public class HealSkill : ISkill
                 );
             for (int i = 0; i < hitCount; i++)
             {
-                if (_hitColliders[i].TryGetComponent(out UnitBase unit) )
+                if (_hitColliders[i].TryGetComponent(out UnitBase unit))
                 {
                     if (unit == _cachedUnit)//시전자 제외
                     {
@@ -159,7 +135,7 @@ public class HealSkill : ISkill
         {
             InstantHeal(_targetsToHeal);
         }
-    }
+    }   
 
     // 단발 힐 처리 로직
     private void InstantHeal(List<UnitBase> targets)

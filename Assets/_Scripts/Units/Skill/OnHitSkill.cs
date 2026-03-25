@@ -2,12 +2,8 @@
 using Fusion;
 using UnityEngine;
 
-public class OnHitSkill : ISkill
+public class OnHitSkill : BaseSkill<OnHitSkillSO>
 {
-    private OnHitSkillSO _data;
-    private bool _isCasting;
-    private UnitController _cachedUnit;
-
     private int _normalAttackCounter = 0;
     private bool _onReady = false;
     private bool _yetShoot = false;
@@ -16,19 +12,13 @@ public class OnHitSkill : ISkill
     private ProjectileSkillSO _projectileSO;
     private BaseSkillSO _duplicateSO;
 
-    public BaseSkillSO Data => _data;
-
-    public bool IsCasting => _isCasting;
-
-    public OnHitSkill(OnHitSkillSO data, UnitController unit)
+    public OnHitSkill(OnHitSkillSO data, UnitController unit) : base(data, unit)
     {
-        _data = data;
-        _cachedUnit = unit;
         _duplicateSO = ScriptableObject.Instantiate(_cachedUnit.normalAttack.Data);
         _cachedUnit.normalAttack.ChangeData(_duplicateSO);
     }
 
-    public void Initialize() 
+    public override void Initialize() 
     {
         if (_cachedUnit.AttackState != null)
         {
@@ -37,15 +27,7 @@ public class OnHitSkill : ISkill
         }
     }
 
-    public void ChangeData(BaseSkillSO newData)
-    {
-        if (newData is OnHitSkillSO onHitData)
-            _data = onHitData;
-        else
-            Debug.LogWarning($"[OnHitSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
-    }
-
-    public bool UsingConditionCheck()
+    public override bool UsingConditionCheck()
     {
         if (_onReady == true && _yetShoot == false)
         {
@@ -55,15 +37,12 @@ public class OnHitSkill : ISkill
         else return false;
     }
 
-    public void PreDelay() { _isCasting = true; }
-
-    public void PostDelay() { _isCasting = false; }
-
-    public void Casting()
+    public override void Casting()
     {
         // 스킬 시전시 평타 공격을 가져와 데이터 값을 바꿈. (투사체, 데미지 등)
         if (_duplicateSO != null && _duplicateSO is ProjectileSkillSO)
         {
+            _phase = SkillPhase.Casting;
             _projectileSO = _duplicateSO as ProjectileSkillSO;
             _originDamage = _projectileSO.damageRatio;
             _projectileSO.damageRatio += _data.additionalDamageRatio;
@@ -74,6 +53,8 @@ public class OnHitSkill : ISkill
         }
         else
             Debug.Log("OnHit 스킬 시전 실패");
+
+        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, 0f);
     }
 
     private void NormalAttackCount() 
