@@ -22,7 +22,6 @@ public class UnitController : UnitBase
     protected UnitBase _bridge;
 
     public ISkill normalAttack;
-    private static Material _lineMat;
 
     [Networked] public bool networkedOnHit { get; set; }
 
@@ -433,33 +432,66 @@ public class UnitController : UnitBase
         if (!Runner.TryFindObject(fromId, out NetworkObject fromObj)) return;
         if (!Runner.TryFindObject(toId, out NetworkObject toObj)) return;
 
-        Vector3 start = fromObj.GetComponent<UnitController>().firePoint.position;
+        UnitController unit = fromObj.GetComponent<UnitController>();
+
+        Vector3 start = unit.firePoint != null ? unit.firePoint.position : fromObj.transform.position;
         Vector3 end = toObj.transform.position;
 
-        GameObject lineObj = new GameObject("HitscanLine");
+        HitscanSkillSO hitscanSO = unit.normalAttack.Data as HitscanSkillSO;
+        if (hitscanSO == null) return;
 
-        LineRenderer line = lineObj.AddComponent<LineRenderer>();
+        GameObject prefab = hitscanSO.skillVFX;
+        if (prefab == null) return;
 
-        line.positionCount = 2;
-        line.SetPosition(0, start);
-        line.SetPosition(1, end);
+        Vector3 dir = end - start;
+        float distance = dir.magnitude;
 
-        line.startWidth = 0.5f;
-        line.endWidth = 0.3f;
-
-        if (_lineMat == null)
+        if (dir.sqrMagnitude < 0.001f)
         {
-            _lineMat = new Material(Shader.Find("Sprites/Default"));
+            dir = fromObj.transform.forward;
+        }
+        else
+        {
+            dir = dir.normalized;
         }
 
-        line.material = _lineMat;
+        float minLength = 1.5f;
 
-        line.startColor = Color.cyan;
-        line.endColor = Color.white;
+        if (distance < minLength)
+        {
+            Vector3 center = (start + end) * 0.5f;
 
-        line.textureMode = LineTextureMode.Stretch;
+            start = center - dir * (minLength * 0.5f);
+            end = center + dir * (minLength * 0.5f);
 
-        Destroy(lineObj, 0.2f);
+            distance = minLength;
+        }
+
+        GameObject fx = Instantiate(prefab);
+
+        LineRenderer lr = fx.GetComponent<LineRenderer>();
+        if (lr != null)
+        {
+            lr.useWorldSpace = true;
+
+            int count = 4;
+            lr.positionCount = count;
+
+            for (int i = 0; i < count; i++)
+            {
+                float t = i / (float)(count - 1);
+                Vector3 pos = Vector3.Lerp(start, end, t);
+
+                if (i != 0 && i != count - 1)
+                {
+                    Vector2 offset = Random.insideUnitCircle * 0.2f;
+                    pos += new Vector3(offset.x, 0f, offset.y);
+                }
+
+                lr.SetPosition(i, pos);
+            }
+        }
+        Destroy(fx, 0.3f);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -468,36 +500,75 @@ public class UnitController : UnitBase
         if (!Runner.TryFindObject(fromId, out NetworkObject fromObj)) return;
         if (!Runner.TryFindObject(toId, out NetworkObject toObj)) return;
 
-        Vector3 start = fromObj.transform.position;
+        UnitController unit = fromObj.GetComponent<UnitController>();
+
+        HeroController hero = unit as HeroController;
+        if (hero == null || hero.CurUniqueSkill == null) return;
+
+        ChainSkillSO chainSkillSO = hero.CurUniqueSkill.Data as ChainSkillSO;
+        if (chainSkillSO == null) return;
+
+        GameObject prefab = chainSkillSO.skillVFX;
+        if (prefab == null) return;
+
+        Vector3 start = unit.firePoint != null ? unit.firePoint.position : fromObj.transform.position;
+
         Vector3 end = toObj.transform.position;
-
-        GameObject lineObj = new GameObject("ChainLine");
-
-        LineRenderer line = lineObj.AddComponent<LineRenderer>();
-
-        line.positionCount = 2;
-        line.SetPosition(0, start);
-        line.SetPosition(1, end);
-
-        line.startWidth = 0.5f;
-        line.endWidth = 0.3f;
-        line.alignment = LineAlignment.View;
-        line.sortingOrder = 100;
-        line.useWorldSpace = true;
-
-        if (_lineMat == null)
+        Collider targetCollider = toObj.GetComponent<Collider>();
+        if (targetCollider != null)
         {
-            _lineMat = new Material(Shader.Find("Sprites/Default"));
+            end = targetCollider.ClosestPoint(start);
         }
 
-        line.material = _lineMat;
+        Vector3 dir = end - start;
+        float distance = dir.magnitude;
 
-        line.startColor = Color.cyan;
-        line.endColor = Color.white;
+        if (dir.sqrMagnitude < 0.001f)
+        {
+            dir = fromObj.transform.forward;
+        }
+        else
+        {
+            dir = dir.normalized;
+        }
 
-        line.textureMode = LineTextureMode.Stretch;
-        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        line.receiveShadows = false;
-        Destroy(lineObj, 0.3f);
+        float minLength = 2f;
+
+        if (distance < minLength)
+        {
+            Vector3 center = (start + end) * 0.5f;
+
+            start = center - dir * (minLength * 0.5f);
+            end = center + dir * (minLength * 0.5f);
+
+            distance = minLength;
+        }
+
+        GameObject fx = Instantiate(prefab);
+
+        LineRenderer lineRenderer = fx.GetComponent<LineRenderer>();
+        if (lineRenderer != null)
+        {
+            lineRenderer.useWorldSpace = true;
+
+            int pointCount = 5;
+            lineRenderer.positionCount = pointCount;
+
+            for (int i = 0; i < pointCount; i++)
+            {
+                float t = i / (float)(pointCount - 1);
+                Vector3 position = Vector3.Lerp(start, end, t);
+
+                if (i != 0 && i != pointCount - 1)
+                {
+                    Vector2 offset = Random.insideUnitCircle * 0.5f;
+                    position += new Vector3(offset.x, 0f, offset.y);
+                }
+
+                lineRenderer.SetPosition(i, position);
+            }
+        }
+
+        Destroy(fx, 0.6f);
     }
 }

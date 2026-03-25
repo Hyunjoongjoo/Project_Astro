@@ -17,7 +17,7 @@ MonoBehaviour:
   skillName: skill_name_tesla
   skillDescription: skill_desc_tesla
   note: 
-  skillVFX: {fileID: 0}
+  skillVFX: {fileID: 7068615036737649895, guid: 319b7f456bff6df41960de359ccbb215, type: 3}
   skillSFX: {fileID: 0}
   skillType: 1
   initCooldown: 5

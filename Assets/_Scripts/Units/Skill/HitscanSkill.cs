@@ -61,16 +61,5 @@ public class HitscanSkill : BaseSkill<HitscanSkillSO>
         Vector3 start = _cachedUnit.transform.position;
         Vector3 dir = (target.transform.position - start).normalized;
         float distance = Vector3.Distance(start, target.transform.position);
-
-        Debug.DrawRay(start, dir * distance, Color.cyan, 0.2f);
-    }
-
-    public void Cancel()
-    {
-        if (_data.skillType != SkillType.NormalAttack)
-            return;
-
-        _phase = SkillPhase.Idle;
-        _phaseTimer = TickTimer.None;
     }
 }

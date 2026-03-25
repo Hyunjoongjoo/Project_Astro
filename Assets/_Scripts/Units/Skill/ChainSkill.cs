@@ -130,8 +130,6 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
             _cachedUnit.RPC_PlayChainEffect(fromId, current.Object.Id);
         }
 
-        //SpawnChainLine(startPos, endPos);
-
         _visited.Add(current);
 
         if (chainCount >= _data.maxChainCount) return;      
