@@ -81,8 +81,8 @@ public class ChatManager : NetworkBehaviour
         }
         else
         {
-            _emoticonPanel.DeActivate(); // 반대쪽 끄기
-            _txtPanel.Open();       // 이쪽 켜기
+            _emoticonPanel.DeActivate(false); // 반대쪽 끄기
+            _txtPanel.Open(true);       // 이쪽 켜기
         }
     }
 
@@ -105,8 +105,8 @@ public class ChatManager : NetworkBehaviour
         }
         else
         {
-            _txtPanel.DeActivate(); // 반대쪽 끄기
-            _emoticonPanel.Open();       // 이쪽 켜기
+            _txtPanel.DeActivate(false); // 반대쪽 끄기
+            _emoticonPanel.Open(true);       // 이쪽 켜기
         }
     }
 
@@ -167,7 +167,7 @@ public class ChatManager : NetworkBehaviour
             SendChat(data.id);
 
             var panelUI = btn.GetComponentInParent<AnimUI>();
-            panelUI.DeActivate();
+            panelUI.DeActivate(false);
         });
     }
 
@@ -250,6 +250,8 @@ public class ChatManager : NetworkBehaviour
 
             // 내용 적용
             bubble.GetComponent<ChatBubbleUI>().Setup(macro);
+
+            AudioManager.Instance.PlayUISfx(UISfxList.Ping);
 
             // 2초 후 삭제
             Destroy(bubble, 2.0f);
