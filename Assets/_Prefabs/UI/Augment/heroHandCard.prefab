@@ -795,7 +795,6 @@ GameObject:
   - component: {fileID: -2412911222336278591}
   - component: {fileID: 1857677499821193337}
   - component: {fileID: 6319158278546269492}
-  - component: {fileID: 3839336135137635854}
   m_Layer: 5
   m_Name: heroHandCard
   m_TagString: Untagged
@@ -935,19 +934,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &3839336135137635854
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8006802584929967089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9068d62415521940b43926086eef620, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SoundSetBtn
-  _selectSound: 0
 --- !u!1 &8793613647246490747
 GameObject:
   m_ObjectHideFlags: 0

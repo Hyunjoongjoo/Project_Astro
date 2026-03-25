@@ -251,8 +251,6 @@ public class ChatManager : NetworkBehaviour
             // 내용 적용
             bubble.GetComponent<ChatBubbleUI>().Setup(macro);
 
-            AudioManager.Instance.PlayUISfx(UISfxList.Ping);
-
             // 2초 후 삭제
             Destroy(bubble, 2.0f);
         }
