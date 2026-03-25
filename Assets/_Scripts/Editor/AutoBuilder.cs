@@ -125,6 +125,9 @@ public class AutoBuilder : EditorWindow
             string keystorePath = Environment.GetEnvironmentVariable("KEYSTORE_PATH");
             string keyAlias = Environment.GetEnvironmentVariable("KEY_ALIAS");
 
+            //경로지정
+            string fullPath = System.IO.Path.Combine(System.Environment.CurrentDirectory, keystorePath);
+
             //변수가 실제로 들어왔는지 체크 (보안상 글자수만 출력)
             Debug.Log($"Pass 체크: {(string.IsNullOrEmpty(keystorePass) ? "비었음" : "OK (" + keystorePass.Length + "자)")}");
             Debug.Log($"Path 체크: {(string.IsNullOrEmpty(keystorePath) ? "비었음" : keystorePath)}");
@@ -140,7 +143,7 @@ public class AutoBuilder : EditorWindow
             if (!string.IsNullOrEmpty(keystorePass))
             {
                 PlayerSettings.Android.useCustomKeystore = true;
-                PlayerSettings.Android.keystoreName = keystorePath;
+                PlayerSettings.Android.keystoreName = fullPath;
                 PlayerSettings.Android.keyaliasName = keyAlias;
                 PlayerSettings.Android.keystorePass = keystorePass;
                 PlayerSettings.Android.keyaliasPass = keystorePass;
