@@ -22,6 +22,8 @@ public class PingIcon : MonoBehaviour
         transform.localScale = Vector3.zero;
         transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBack);
 
+        AudioManager.Instance.PlayUISfx(UISfxList.Ping);
+
         ResetDestroyTimer();
     }
 
@@ -43,6 +45,8 @@ public class PingIcon : MonoBehaviour
             _checkMark.SetActive(true);
 
             _checkMark.transform.DOPunchScale(Vector3.one * _punchStrength, 0.5f, _vibrato, 0.5f);
+
+            AudioManager.Instance.PlayUISfx(UISfxList.Ping);
 
             ResetDestroyTimer(); //상호작용 성공하면 2초정도 더 유지하게
         }
