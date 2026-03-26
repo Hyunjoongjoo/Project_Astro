@@ -111,7 +111,6 @@ public class UserDataStore : Singleton<UserDataStore>
                     }
                 }
             };
-            //await userDocRef.SetAsync(data);
             batch.Set(userDocRef, data);
             Debug.Log("유저데이터 배치 완료");
 
@@ -146,7 +145,6 @@ public class UserDataStore : Singleton<UserDataStore>
                     };
 
                     // 서브 컬렉션에 영웅들 정보 생성
-                    //await userDocRef.Collection(COLLECTION_HERO).Document(heroId).SetAsync(initHeroDbData);
                     batch.Set(userDocRef.Collection(COLLECTION_HERO).Document(heroId), initHeroDbData);
                 }
             }

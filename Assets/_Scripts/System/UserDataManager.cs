@@ -19,6 +19,9 @@ public class UserDataManager : Singleton<UserDataManager>
     private List<HeroDbModel> _heroesModel = new List<HeroDbModel>();
 
     private ListenerRegistration _sessionListener;
+    private bool _isLink = false;
+
+    public bool IsLink => _isLink;
 
     public void SetAllUserData(ProfileDbModel profile, RecordModel record, WalletModel wallet, List<HeroDbModel> heroes)
     {
@@ -253,10 +256,10 @@ public class UserDataManager : Singleton<UserDataManager>
             .Collection("users").Document(userId);
 
         Debug.Log($"[Session] 중복 로그인 리스너 등록 완료. 내 ID: {myLocalSessionId}");
-
         // 리스너 등록 (서버 값 바뀌면 자동 호출)
         _sessionListener = userDocRef.Listen(snapshot =>
         {
+            if (_isLink)  return; 
             if (!snapshot.Exists) return;
 
             if (snapshot.TryGetValue("Profile.sessionId", out string dbSessionId))
@@ -283,10 +286,87 @@ public class UserDataManager : Singleton<UserDataManager>
 
     private void HandleKickOut()
     {
+        if (_isLink)
+        {
+            Debug.Log("[Session] 연동 중이므로 킥아웃을 방어합니다.");
+            return;
+        }
         StopDuplicateLoginListener();
 
         Debug.LogError("중복 로그인 확인됨");
 
         GameObject prefab = Instantiate(_duplicateLoginPrefab);
     }
+
+    public void SetLinkMode(bool active)
+    {
+        _isLink = active;
+        if (active)
+        {
+            StopDuplicateLoginListener();
+        }
+    }
+
+    public async Task<bool> LinkDataAsync(string guestGuid, string newUid)
+    {
+        try
+        {
+            // 현재 캐시 데이터값
+            if (_profileModel == null)
+            {
+                Debug.LogError("[Migration] 현재 로드된 유저 데이터가 없습니다.");
+                return false;
+            }
+
+            // 배치 작업 시작
+            var firestore = FirebaseFirestore.DefaultInstance;
+            WriteBatch batch = firestore.StartBatch();
+
+            // 발신자 수신자 배정
+            DocumentReference oldDocRef = firestore.Collection("users").Document(guestGuid);
+            DocumentReference newDocRef = firestore.Collection("users").Document(newUid);
+
+            // Profile, Record, Wallet 복사 및 신규 세션 ID 발행
+            string currentSessionId = AuthService.Instance.MyLocalSessionId;
+            
+            _profileModel.sessionId = currentSessionId;
+            _profileModel.uuid = newUid; // 모델 내부의 UID도 변경
+
+            batch.Set(newDocRef, new Dictionary<string, object> 
+            {
+                { "Profile", _profileModel },
+                { "Record", _recordModel },
+                { "Wallet", _walletModel }
+            });
+
+            // Heroes 복사 및 기존 데이터 삭제 예약
+            if (_heroesModel != null && _heroesModel.Count > 0)
+            {
+                foreach (var hero in _heroesModel)
+                {
+                    // 새 위치에 생성
+                    DocumentReference newHeroRef = newDocRef.Collection("COL_Hero").Document(hero.heroId);
+                    batch.Set(newHeroRef, hero);
+
+                    // 기존 위치에서 삭제
+                    DocumentReference oldHeroRef = oldDocRef.Collection("COL_Hero").Document(hero.heroId);
+                    batch.Delete(oldHeroRef);
+                }
+            }
+
+            // 기존 게스트 메인 문서 삭제 및 커밋
+            batch.Delete(oldDocRef);
+            await batch.CommitAsync();
+
+            // 성공 시 AuthService의 세션 ID도 동기화
+            Debug.Log($"[Migration] 성공: {guestGuid} -> {newUid}");
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Migration] 실패: {e.Message}");
+            return false;
+        }
+    }
+
 }

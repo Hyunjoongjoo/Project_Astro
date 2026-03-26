@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SignUpView : MonoBehaviour
+public class SignUpView : BaseUI
 {
     [Header("Input Fields")]
     [SerializeField] private TMP_InputField _nicknameInput;
@@ -24,8 +24,9 @@ public class SignUpView : MonoBehaviour
 
     public TMP_InputField NicknameInput => _nicknameInput;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         TextSetting();
     }
 

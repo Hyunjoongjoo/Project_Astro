@@ -66,8 +66,8 @@ public class LoginController : MonoBehaviour
         if(!PlayerPrefs.HasKey("Guest_Email"))
         {
             _signUpView.SetMode(false);
-            _signUpView.gameObject.SetActive(true);
-            
+            _signUpView.Open();
+
             _signUpController.Initialize(_authService, _userDataStore, async (data) =>
             {
                 var user = _authService.CurrentUser;
@@ -159,7 +159,7 @@ public class LoginController : MonoBehaviour
             if (userData == null)
             {
                 // 약관 동의 성공 시에만 닉네임 설정 창 오픈
-                _signUpView.gameObject.SetActive(true);
+                _signUpView.Open();
                 _signUpView.SetMode(true);
 
                 _signUpController.Initialize(_authService, _userDataStore, async (data) =>
@@ -195,8 +195,14 @@ public class LoginController : MonoBehaviour
         try
         {
             // 세션 난수 발행 및 로컬 저장
-            string myLocalSessionId = Guid.NewGuid().ToString();
-            _authService.MyLocalSessionId = myLocalSessionId;
+            string myLocalSessionId = _authService.MyLocalSessionId;
+
+            if (string.IsNullOrEmpty(myLocalSessionId))
+            {
+                // 처음 로그인할 때만 난수 발행
+                myLocalSessionId = Guid.NewGuid().ToString();
+                _authService.MyLocalSessionId = myLocalSessionId;
+            }
 
             // 난수 DB에 저장
             var updates = new Dictionary<string, object> { { "Profile.sessionId", myLocalSessionId } };
