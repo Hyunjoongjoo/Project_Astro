@@ -49,7 +49,7 @@ public class HitscanSkill : BaseSkill<HitscanSkillSO>
         if (_cachedUnit.IsDead) return;
 
         float damage = _cachedUnit.AttackPower * _data.damageRatio;
-        Debug.Log($"[히트스캔] → {target.name} / dmg:{damage}");
+        // Debug.Log($"[히트스캔] → {target.name} / dmg:{damage}");
         if (_cachedUnit.HasStateAuthority)
         {
             target.TakeDamage(damage);

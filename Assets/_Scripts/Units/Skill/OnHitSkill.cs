@@ -12,6 +12,7 @@ public class OnHitSkill : BaseSkill<OnHitSkillSO>
     private GameObject _originVFX;
     private ProjectileSkillSO _projectileSO;
     private BaseSkillSO _duplicateSO;
+    private Collider[] _overlapResults = new Collider[20];
 
     public OnHitSkill(OnHitSkillSO data, UnitController unit) : base(data, unit)
     {
@@ -60,7 +61,17 @@ public class OnHitSkill : BaseSkill<OnHitSkillSO>
             _projectileSO.skillVFX = _data.skillVFX;
 
             _cachedUnit.networkedOnHit = true;
-            Debug.Log("평타 강화됨.");
+
+            // 가장 먼 영웅을 탐색
+            UnitBase findFarthestHero =
+                _cachedUnit.FindOnlyHeroTarget(_overlapResults, _cachedUnit.DetectRange, true);
+
+            // 영웅이 있다면 그 대상을 타겟으로 설정. 없다면 타겟 변경 없음
+            if (findFarthestHero != null)
+            {
+                Debug.Log("영웅 타겟 새로 찾았음");
+                _cachedUnit.currentTarget = findFarthestHero;
+            }
         }
         else
             Debug.Log("OnHit 스킬 시전 실패");
