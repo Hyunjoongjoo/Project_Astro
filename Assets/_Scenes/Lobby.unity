@@ -5557,6 +5557,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1397814497}
+        m_TargetAssemblyTypeName: LobbyHeroListWindow, Assembly-CSharp
+        m_MethodName: DeActivate
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &250192874
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9043,14 +9055,14 @@ MonoBehaviour:
       - m_Target: {fileID: 127888822}
         m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
         m_MethodName: DeActivate
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &398057394
 MonoBehaviour:
@@ -12591,6 +12603,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 837351988}
+        m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
+        m_MethodName: DeActivate
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &527589091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13407,14 +13431,14 @@ MonoBehaviour:
       - m_Target: {fileID: 1480682296}
         m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
         m_MethodName: Open
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &554580332
 MonoBehaviour:
@@ -39119,6 +39143,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1030832187}
   - component: {fileID: 1030832190}
+  - component: {fileID: 1030832191}
   - component: {fileID: 1030832189}
   - component: {fileID: 1030832188}
   m_Layer: 5
@@ -39245,6 +39270,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1030832186}
   m_CullTransparentMesh: 1
+--- !u!114 &1030832191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030832186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9068d62415521940b43926086eef620, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundSetBtn
+  _selectSound: 1
 --- !u!1 &1045239732
 GameObject:
   m_ObjectHideFlags: 0
@@ -45733,14 +45771,14 @@ MonoBehaviour:
       - m_Target: {fileID: 459111987}
         m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
         m_MethodName: DeActivate
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &1299297562
 MonoBehaviour:
@@ -52344,14 +52382,14 @@ MonoBehaviour:
       - m_Target: {fileID: 1480682296}
         m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
         m_MethodName: DeActivate
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &1566043460
 MonoBehaviour:
@@ -57433,6 +57471,7 @@ GameObject:
   - component: {fileID: 1815710420}
   - component: {fileID: 1815710419}
   - component: {fileID: 1815710418}
+  - component: {fileID: 1815710422}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -57555,6 +57594,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -605}
   m_SizeDelta: {x: 500, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1815710422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1815710417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9068d62415521940b43926086eef620, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundSetBtn
+  _selectSound: 2
 --- !u!1 &1817083844
 GameObject:
   m_ObjectHideFlags: 0
@@ -58305,14 +58357,14 @@ MonoBehaviour:
       - m_Target: {fileID: 459111987}
         m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
         m_MethodName: Open
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &1857213456
 MonoBehaviour:
@@ -62771,26 +62823,26 @@ MonoBehaviour:
       - m_Target: {fileID: 1397814497}
         m_TargetAssemblyTypeName: LobbyHeroListWindow, Assembly-CSharp
         m_MethodName: DeActivate
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
       - m_Target: {fileID: 837351988}
         m_TargetAssemblyTypeName: AnimUI, Assembly-CSharp
         m_MethodName: DeActivate
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &2035309914
 MonoBehaviour:
@@ -65333,6 +65385,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2136916703}
   - component: {fileID: 2136916706}
+  - component: {fileID: 2136916707}
   - component: {fileID: 2136916705}
   - component: {fileID: 2136916704}
   m_Layer: 5
@@ -65461,6 +65514,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2136916702}
   m_CullTransparentMesh: 1
+--- !u!114 &2136916707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2136916702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9068d62415521940b43926086eef620, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundSetBtn
+  _selectSound: 1
 --- !u!1 &2137649751
 GameObject:
   m_ObjectHideFlags: 0

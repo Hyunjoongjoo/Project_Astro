@@ -121,9 +121,16 @@ public class AutoBuilder : EditorWindow
         {
             //CI/CD 서버의 환경 변수에서 Keystore 비밀번호를 가져옴
             //3.25 추가 경로, 별명까지
-            string keystorePass = Environment.GetEnvironmentVariable("KEYSTORE_PASS");
-            string keystorePath = Environment.GetEnvironmentVariable("KEYSTORE_PATH");
-            string keyAlias = Environment.GetEnvironmentVariable("KEY_ALIAS");
+            string[] args = Environment.GetCommandLineArgs();
+
+            string keystorePass = GetArg(args, "-androidKeystorePass")
+                               ?? Environment.GetEnvironmentVariable("KEYSTORE_PASS");
+
+            string keystorePath = "/github/workspace/user.keystore";
+
+            string keyAlias = GetArg(args, "-androidKeyaliasName")
+                           ?? Environment.GetEnvironmentVariable("KEY_ALIAS");
+
 
             //변수가 실제로 들어왔는지 체크 (보안상 글자수만 출력)
             Debug.Log($"Pass 체크: {(string.IsNullOrEmpty(keystorePass) ? "비었음" : "OK (" + keystorePass.Length + "자)")}");
@@ -194,5 +201,12 @@ public class AutoBuilder : EditorWindow
             Debug.LogError($"Stack Trace: {e.StackTrace}");
             EditorApplication.Exit(1);
         }
+    }
+    //헬퍼메서드 추가
+    private static string GetArg(string[] args, string name)
+    {
+        for (int i = 0; i < args.Length - 1; i++)
+            if (args[i] == name) return args[i + 1];
+        return null;
     }
 }

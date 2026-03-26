@@ -8,6 +8,7 @@ public class OnHitSkill : BaseSkill<OnHitSkillSO>
     private bool _onReady = false;
     private bool _yetShoot = false;
     private float _originDamage;
+    private float _originRange;
     private GameObject _originVFX;
     private ProjectileSkillSO _projectileSO;
     private BaseSkillSO _duplicateSO;
@@ -43,11 +44,21 @@ public class OnHitSkill : BaseSkill<OnHitSkillSO>
         if (_duplicateSO != null && _duplicateSO is ProjectileSkillSO)
         {
             _phase = SkillPhase.Casting;
+
             _projectileSO = _duplicateSO as ProjectileSkillSO;
+
+            // 원래 데미지 저장하고 추가 스킬 계수 더하기
             _originDamage = _projectileSO.damageRatio;
             _projectileSO.damageRatio += _data.additionalDamageRatio;
+
+            // 원래 사거리 저장하고 추가 사거리 계수 더하기
+            _originRange = _projectileSO.range;
+            _projectileSO.range += _data.additionalRange;
+
+            // 원래 이펙트 저장하고 바뀐 이펙트 적용하기
             _originVFX = _projectileSO.skillVFX;
             _projectileSO.skillVFX = _data.skillVFX;
+
             _cachedUnit.networkedOnHit = true;
             Debug.Log("평타 강화됨.");
         }
@@ -83,8 +94,11 @@ public class OnHitSkill : BaseSkill<OnHitSkillSO>
     {
         yield return new WaitForSeconds(0.3f);
         _projectileSO.damageRatio = _originDamage;
+        _projectileSO.range = _originRange;
         _projectileSO.skillVFX = _originVFX;
         _cachedUnit.networkedOnHit = false;
+        // 탐색 모드로 전환
+        _cachedUnit.StateMachine.ChangeState(_cachedUnit.DetectState);
         Debug.Log("평타 원상복구됨.");
     }
 }
