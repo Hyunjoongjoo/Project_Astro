@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -33,18 +34,60 @@ public class Options : MonoBehaviour
 
     public void OnClickLogOut() 
     {
+        ConfirmPopup popup = UIManager.Instance.ShowUI<ConfirmPopup>(_confirmPopupPrefab, true);
+
+        // 중복 로그인 리스너 멈춤(튕기면 안대니깐)
+        if (popup != null)
+        {
+            // 2. 팝업 설정 (수정된 Setup 파라미터 반영)
+            string msg = "타이틀로 돌아가시겠습니까?";
+
+            popup.Setup(
+                msg: msg,
+                onYes: async  () => await LogOut(),
+                canConfirm: true,
+                denyMsg: "",
+                yesText: "로그아웃",
+                noText: "취소"
+            );
+        }
+    }
+    
+    private async Task LogOut()
+    {
         AuthService.Instance.Logout();
         GameManager.Instance.SetSceneState(SceneState.Title);
         UserDataManager.Instance.ClearCache();
+        await Task.Yield();
         SceneManager.LoadScene("Title");
     }
-    
+
     public void OnClickCloseGame() 
     { 
         Application.Quit();
     }
 
-    public async void OnClickDeleteUser()
+    public void OnClickDeleteUser()
+    {
+        ConfirmPopup popup = UIManager.Instance.ShowUI<ConfirmPopup>(_confirmPopupPrefab, true);
+
+        // 중복 로그인 리스너 멈춤(튕기면 안대니깐)
+        if (popup != null)
+        {
+            // 2. 팝업 설정 (수정된 Setup 파라미터 반영)
+            string msg = "계정을 삭제하시겠습니까? \r\n삭제한 계정은 복구가 불가능합니다.";
+
+            popup.Setup(
+                msg: msg,
+                onYes: async () => await DeleteUser(),
+                canConfirm: true,
+                denyMsg: "",
+                yesText: "삭제",
+                noText: "취소"
+            );
+        }
+    }
+    private async Task DeleteUser()
     {
         string uid = AuthService.Instance.CurrentUser.UserId;
 
