@@ -120,15 +120,41 @@ public class AutoBuilder : EditorWindow
         try
         {
             //CI/CD 서버의 환경 변수에서 Keystore 비밀번호를 가져옴
-            string keystorePass = Environment.GetEnvironmentVariable("KEYSTORE_PASS");
+            //3.25 추가 경로, 별명까지
+            string[] args = Environment.GetCommandLineArgs();
+
+            string keystorePass = GetArg(args, "-androidKeystorePass")
+                               ?? Environment.GetEnvironmentVariable("KEYSTORE_PASS");
+
+            string keystorePath = "/github/workspace/user.keystore";
+
+            string keyAlias = GetArg(args, "-androidKeyaliasName")
+                           ?? Environment.GetEnvironmentVariable("KEY_ALIAS");
+
+
+            //변수가 실제로 들어왔는지 체크 (보안상 글자수만 출력)
+            Debug.Log($"Pass 체크: {(string.IsNullOrEmpty(keystorePass) ? "비었음" : "OK (" + keystorePass.Length + "자)")}");
+            Debug.Log($"Path 체크: {(string.IsNullOrEmpty(keystorePath) ? "비었음" : keystorePath)}");
+            Debug.Log($"Alias 체크: {(string.IsNullOrEmpty(keyAlias) ? "비었음" : keyAlias)}");
+
+            //파일이 실제로 그 경로에 있는지 체크
+            if (!string.IsNullOrEmpty(keystorePath))
+            {
+                bool fileExists = System.IO.File.Exists(keystorePath);
+                Debug.Log($"파일 존재 여부: {(fileExists ? "파일 찾음" : "파일 없음")}");
+            }
+
             if (!string.IsNullOrEmpty(keystorePass))
             {
                 PlayerSettings.Android.useCustomKeystore = true;
+                PlayerSettings.Android.keystoreName = keystorePath;
+                PlayerSettings.Android.keyaliasName = keyAlias;
                 PlayerSettings.Android.keystorePass = keystorePass;
                 PlayerSettings.Android.keyaliasPass = keystorePass;
             }
             else
             {
+                Debug.LogError("비번 없음");
             }
 
             //어드레서블 자동 빌드
@@ -158,16 +184,29 @@ public class AutoBuilder : EditorWindow
             //결과 반환
             if (summary.result == BuildResult.Succeeded)
             {
+                Debug.Log("빌드성공");
                 EditorApplication.Exit(0); //시스템 정상 종료
             }
             else
             {
+                Debug.Log($"빌드실패 결과: {summary.result}");
+                Debug.LogError($"에러 개수: {summary.totalErrors}");
                 EditorApplication.Exit(1); //시스템 에러 종료
             }
         }
         catch (Exception e)
         {
+            Debug.LogError($"오류 발생");
+            Debug.LogError($"Message: {e.Message}");
+            Debug.LogError($"Stack Trace: {e.StackTrace}");
             EditorApplication.Exit(1);
         }
+    }
+    //헬퍼메서드 추가
+    private static string GetArg(string[] args, string name)
+    {
+        for (int i = 0; i < args.Length - 1; i++)
+            if (args[i] == name) return args[i + 1];
+        return null;
     }
 }

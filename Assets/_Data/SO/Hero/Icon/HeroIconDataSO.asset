@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HeroIconDataSO
   _iconList:
   - heroId: hero_corsair
-    iconSprite: {fileID: 21300000, guid: 2d13039d5ad7ef84198d41909fb3ae1b, type: 3}
+    iconSprite: {fileID: 21300000, guid: 0888c46a7f74d4244ba8741aa5f82341, type: 3}
     skillIcons:
     - {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
     - {fileID: 11400000, guid: 5b25317ce4b273744bf0eea99813212d, type: 2}
     - {fileID: 11400000, guid: b7f7e01423d1ee6449ba818c170b9d9f, type: 2}
     heroPrefab:
-      RawGuidValue: 44e070ac9eccb1a4f9838f1cb2cb4b46
+      RawGuidValue: c0c1fc4164e37214aa41f81d8ae5136c
   - heroId: hero_heavyrain
     iconSprite: {fileID: 21300000, guid: 42a13969511bc024892b5481ae4305fd, type: 3}
     skillIcons:

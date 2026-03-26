@@ -16,7 +16,6 @@ public class DeployState : IState
 
     public void SetDeployData(Vector3 targetPos, float deployDelay)
     {
-        Debug.Log($"SetDeployData 메서드 안, deployDelay : {deployDelay} ");
         _deployTarget = targetPos;
         _deployDelayTimer = TickTimer.CreateFromSeconds(_hero.Runner, deployDelay);
         _deployFailSafeTimer = TickTimer.CreateFromSeconds(_hero.Runner, deployDelay + 1.5f);
@@ -24,7 +23,9 @@ public class DeployState : IState
 
     public void Enter()
     {
-        Debug.Log("Deploy 상태 진입");
+        _hero.agent.speed = float.Parse(
+            TableManager.Instance.ConfigTable.Get("deployment_speed").configValue
+            );
         _hero.MoveTo(_deployTarget);
         _hero.HeroAnimator.SetBool("IsDeploying", true);
     }
@@ -50,6 +51,7 @@ public class DeployState : IState
 
     public void Exit()
     {
+        _hero.agent.speed = _hero.MoveSpeed;
         _hero.HeroAnimator.SetBool("IsDeploying", false);
         // 기존 FinishDeploy()에 있던 초기화 로직
         _hero.agent.ResetPath();

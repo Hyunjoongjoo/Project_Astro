@@ -7,6 +7,7 @@ public class ProjectileSkill : BaseSkill<ProjectileSkillSO>
     private bool _castingEnd = false;
 
     private Coroutine _fireCoroutine;
+    private Vector3 _targetPosition;
 
     public ProjectileSkill(ProjectileSkillSO data, UnitController unit) : base(data, unit)
     {
@@ -22,13 +23,14 @@ public class ProjectileSkill : BaseSkill<ProjectileSkillSO>
         if ( Vector3.Distance(_cachedUnit.transform.position, _cachedUnit.currentTarget.transform.position) > _data.range)
             return false;
 
+        // 스킬을 시전하기로 한 녀석의 위치를 저장해둠. (타겟이 사라져도 그 자리에 쏘도록 하기 위해)
+        _targetPosition = _cachedUnit.currentTarget.transform.position;
         return true;
     }
 
     public override void Casting()
     {
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return;
-        if (_cachedUnit.currentTarget == null) return;
 
         _phase = SkillPhase.Casting;
 
@@ -68,12 +70,11 @@ public class ProjectileSkill : BaseSkill<ProjectileSkillSO>
 
         for (int i = 0; i < repeatCount; i++)
         {
-            if (_cachedUnit.currentTarget == null) break; // 도중에 타겟이 사라지면 중단
 
             _cachedUnit.RPC_FireProjectile(
                 _cachedUnit.Object.Id,
                 _data.skillType,
-                _cachedUnit.currentTarget.transform.position,
+                _targetPosition,
                 _cachedUnit.AttackPower * _data.damageRatio
                 );
 

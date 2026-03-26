@@ -56,7 +56,7 @@ public class LobbyHeroListWindow : BaseUI
 
     private void HandleGoldChanged(int newGold) => RefreshHeroList();
 
-    public override void Open()
+    public override void Open(bool playSound = true)
     {
         if (!gameObject.activeSelf)
         {
