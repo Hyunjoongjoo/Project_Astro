@@ -73,7 +73,7 @@ public class TitleController : MonoBehaviour
             }
             else
             {
-                _loginController.OnClickLogin();
+                //_loginController.OnClickLogin();
             }
         });
     }
