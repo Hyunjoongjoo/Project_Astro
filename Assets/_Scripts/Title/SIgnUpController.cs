@@ -50,7 +50,7 @@ public class SignUpController : MonoBehaviour
             AuthService.Instance.Logout();
             _loginSelectPanel.Open();
         }
-        _signUpView.gameObject.SetActive(false);
+        _signUpView.DeActivate(true);
     }
 
     public void OnClickCheckNickname()

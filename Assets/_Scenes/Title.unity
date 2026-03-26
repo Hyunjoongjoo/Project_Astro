@@ -3283,6 +3283,7 @@ GameObject:
   - component: {fileID: 678791462}
   - component: {fileID: 678791461}
   - component: {fileID: 678791463}
+  - component: {fileID: 678791464}
   m_Layer: 5
   m_Name: SignUpPanel
   m_TagString: Untagged
@@ -3365,6 +3366,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78f449de93bac6947ab6456230fb4b89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SignUpView
+  _uiName: 
+  _fadeDuration: 0.25
+  _scaleDuration: 0.25
   _nicknameInput: {fileID: 1425347254}
   _checkNicknameButton: {fileID: 512468895}
   _signUpButton: {fileID: 1483625877}
@@ -3372,6 +3376,18 @@ MonoBehaviour:
   _title: {fileID: 1538149635}
   _info: {fileID: 1936649815}
   _resultText: {fileID: 160919283}
+--- !u!225 &678791464
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 678791459}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &735306085
 GameObject:
   m_ObjectHideFlags: 0

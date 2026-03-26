@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -256,6 +257,49 @@ public class UnitController : UnitBase
         return closest;
     }
 
+    // 주변에서 가장 가까운 혹은 먼 적 영웅 탐색
+    public UnitBase FindOnlyHeroTarget(Collider[] overlapResults, float range, bool isFar = false) 
+    {
+        int hitCount = Physics.OverlapSphereNonAlloc(
+            transform.position,
+            range,
+            overlapResults,
+            TargetLayer
+        );
+
+        UnitBase targetHero = null;
+
+        // isFar가 true면 가장 멀리 있는 적. false면 가까이 있는 적.
+        float bestSqrDist = isFar ? float.MinValue : float.MaxValue;
+
+        // isFar 여부에 따라 값 비교를 델리게이트로 정의
+        Func<float, float, bool> isBetter = isFar
+            ? (cur, best) => cur > best
+            : (cur, best) => cur < best;
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            Collider overlapCollider = overlapResults[i];
+            if (overlapCollider == null) continue;
+            if (!overlapCollider.TryGetComponent(out UnitBase targetUnit)) continue;
+            if (targetUnit == this) continue;
+            if (targetUnit.IsDead) continue;
+            if (targetUnit.Object == null) continue;
+            if (targetUnit.team == team) continue;
+            if (targetUnit.UnitType != UnitType.Hero) continue;
+
+            float curSqrDist = (transform.position - targetUnit.transform.position).sqrMagnitude;
+
+            if (isBetter(curSqrDist, bestSqrDist))
+            {
+                bestSqrDist = curSqrDist;
+                targetHero = targetUnit;
+            }
+        }
+
+        return targetHero;
+    }
+
     public UnitBase GetClosestTower()
     {
         // 함교가 없다면 게임이 끝난 상태니 행동 중지
@@ -491,7 +535,7 @@ public class UnitController : UnitBase
                 // 중간 포인트만 흔들림 (가시성 보정)
                 if (i != 0 && i != count - 1)
                 {
-                    Vector2 offset = Random.insideUnitCircle * 0.2f;
+                    Vector2 offset = UnityEngine.Random.insideUnitCircle * 0.2f;
                     pos += new Vector3(offset.x, 0f, offset.y);
                 }
 
@@ -574,7 +618,7 @@ public class UnitController : UnitBase
                 // 체인은 더 크게 흔들림
                 if (i != 0 && i != pointCount - 1)
                 {
-                    Vector2 offset = Random.insideUnitCircle * 0.4f;
+                    Vector2 offset = UnityEngine.Random.insideUnitCircle * 0.4f;
                     position += new Vector3(offset.x, 0f, offset.y);
                 }
 

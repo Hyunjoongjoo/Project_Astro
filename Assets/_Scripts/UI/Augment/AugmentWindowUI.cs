@@ -185,9 +185,8 @@ public class AugmentWindowUI : BaseUI
             if (timeLeft > 0 || _stageManager.CurrentState == StageState.PreGameAugment)
             {
                 int displayTime = Mathf.Max(0, Mathf.CeilToInt(timeLeft));
-                //콘피그 테이블 생기면 이 포맷 하드코딩 한 거 없애야함!(3.24 여현구)
-                //ingame_limit_time
-                _timerTxt.text = $"제한 시간: {displayTime}초";
+                string timerFormat = TableManager.Instance.GetString("ingame_limit_time");
+                _timerTxt.text = string.Format(timerFormat, displayTime);
             }
         }
     }
