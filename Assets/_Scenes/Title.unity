@@ -9177,8 +9177,6 @@ MonoBehaviour:
   _signUpView: {fileID: 678791463}
   _acceptUI: {fileID: 801088952}
   _loginSelectPanel: {fileID: 402403900}
-  _minPasswordLength: 8
-  _maxPasswordLength: 18
   _minNicknameLength: 2
   _maxNicknameLength: 8
 --- !u!114 &1782207121
