@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,6 +15,12 @@ public class Options : MonoBehaviour
     [SerializeField] private Button _korBtn;
     [SerializeField] private Button _engBtn;
     [SerializeField] private Button _LinkBtn;
+
+    [SerializeField] private TMP_InputField _nickNameText;
+    [SerializeField] private TextMeshProUGUI _resultText;
+
+    private string _verifiedNickname = string.Empty;
+    private bool _isNicknameVerified = false;
 
     private void Start()
     {
@@ -193,5 +200,62 @@ public class Options : MonoBehaviour
             btnText.text = "연동 완료";
         }
         _LinkBtn.interactable = false;
+    }
+
+    public async void OnClickCheckNickName()
+    {
+        string inputName = _nickNameText.text;
+
+        try
+        {
+            InputValidator.ValidateOrThrow(inputName);
+
+            bool isDuplicate = await UserDataStore.Instance.IsNicknameDuplicateAsync(inputName);
+
+            if (isDuplicate)
+            {
+                _isNicknameVerified = false;
+                _verifiedNickname = string.Empty;
+                _resultText.text = "이미 사용 중인 닉네임입니다.";
+                return;
+            }
+
+            // 성공 시 상태 저장
+            _isNicknameVerified = true;
+            _verifiedNickname = inputName;
+            _resultText.text = $"'{inputName}'은(는) 사용 가능한 닉네임입니다.";
+        }
+        catch (Exception ex)
+        {
+            _isNicknameVerified = false;
+            _resultText.text = "검증에 실패하였습니다.";
+            Debug.LogError($"검증 실패: {ex.Message}");
+        }
+    }
+
+    public async void OnClickNickNameEdit()
+    {
+        string currentInput = _nickNameText.text;
+
+        // 중복 확인을 아예 안 했거나, 확인받은 이름과 현재 입력창 이름이 다른 경우
+        if (!_isNicknameVerified || _verifiedNickname != currentInput)
+        {
+            _resultText.text = "닉네임 중복 확인을 다시 해주세요.";
+            return;
+        }
+
+        try
+        {
+            await UserDataManager.Instance.UpdateNicknameAsync(currentInput);
+
+            _isNicknameVerified = false;
+            _verifiedNickname = string.Empty;
+
+            _resultText.text = "닉네임 변경이 완료되었습니다.";
+        }
+        catch (Exception ex)
+        {
+            _resultText.text = "최종 변경 실패";
+        }
     }
 }
