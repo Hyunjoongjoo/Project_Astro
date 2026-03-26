@@ -252,17 +252,17 @@ public class UserDataManager : Singleton<UserDataManager>
     {
         StopDuplicateLoginListener();
 
-        DocumentReference userDocRef = FirebaseFirestore.DefaultInstance
-            .Collection("users").Document(userId);
+        DocumentReference sessionDocRef = FirebaseFirestore.DefaultInstance
+            .Collection("user_sessions").Document(userId);
 
         Debug.Log($"[Session] 중복 로그인 리스너 등록 완료. 내 ID: {myLocalSessionId}");
         // 리스너 등록 (서버 값 바뀌면 자동 호출)
-        _sessionListener = userDocRef.Listen(snapshot =>
+        _sessionListener = sessionDocRef.Listen(snapshot =>
         {
             if (_isLink)  return; 
             if (!snapshot.Exists) return;
 
-            if (snapshot.TryGetValue("Profile.sessionId", out string dbSessionId))
+            if (snapshot.TryGetValue("sessionId", out string dbSessionId))
             {
                 // 로컬 세션값과 서버 세션값 다르면 튕기기
                 if (!string.IsNullOrEmpty(dbSessionId) && myLocalSessionId != dbSessionId)
@@ -325,12 +325,18 @@ public class UserDataManager : Singleton<UserDataManager>
             // 발신자 수신자 배정
             DocumentReference oldDocRef = firestore.Collection("users").Document(guestGuid);
             DocumentReference newDocRef = firestore.Collection("users").Document(newUid);
+            DocumentReference oldSessionRef = firestore.Collection("user_sessions").Document(guestGuid);
+            DocumentReference newSessionRef = firestore.Collection("user_sessions").Document(newUid);
 
             // Profile, Record, Wallet 복사 및 신규 세션 ID 발행
             string currentSessionId = AuthService.Instance.MyLocalSessionId;
             
-            _profileModel.sessionId = currentSessionId;
             _profileModel.uuid = newUid; // 모델 내부의 UID도 변경
+            
+            batch.Set(newSessionRef, new Dictionary<string, object> 
+            {
+                 { "sessionId", AuthService.Instance.MyLocalSessionId }
+            });
 
             batch.Set(newDocRef, new Dictionary<string, object> 
             {
@@ -355,6 +361,7 @@ public class UserDataManager : Singleton<UserDataManager>
             }
 
             // 기존 게스트 메인 문서 삭제 및 커밋
+            batch.Delete(oldSessionRef);
             batch.Delete(oldDocRef);
             await batch.CommitAsync();
 

@@ -24,7 +24,6 @@ public class ProfileDbModel
     [FirestoreProperty] public int userLevel { get; set; }
     [FirestoreProperty] public int userExp { get; set; }
     [FirestoreProperty] public bool isAgreed { get; set; }
-    [FirestoreProperty] public string sessionId { get; set; }
     [FirestoreProperty] public Timestamp createdAt { get; set; }
 }
 
@@ -59,13 +58,13 @@ public class UserDataStore : Singleton<UserDataStore>
 {
     private FirebaseFirestore _firestore;
     private const string COLLECTION_NAME = "users";
+    private const string COLLECTION_SESSION = "user_sessions";
     private const string COLLECTION_HERO = "COL_Hero";
 
     public void Initialize()
     {
         _firestore = FirebaseFirestore.DefaultInstance;
         _firestore.Settings.PersistenceEnabled = false;
-        Debug.Log($"[Check] Firebase Project ID: {Firebase.FirebaseApp.DefaultInstance.Options.ProjectId}");
     }
 
     #region DB Create / Delete
@@ -74,6 +73,7 @@ public class UserDataStore : Singleton<UserDataStore>
     public async Task CreateUserDataAsync(string uuid, string nickname)
     {
         DocumentReference userDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid);
+        DocumentReference sessionDocRef = _firestore.Collection(COLLECTION_SESSION).Document(uuid);
         Debug.Log($"[Step 1] CreateUserDataAsync 진입 - UUID: {uuid}");
 
         try
@@ -92,7 +92,6 @@ public class UserDataStore : Singleton<UserDataStore>
                         { "userLevel", 1 },
                         { "userExp", 0 },
                         { "isAgreed", true },
-                        { "sessionId", "" },
                         { "createdAt", FieldValue.ServerTimestamp }
                     }
                 },
@@ -113,6 +112,13 @@ public class UserDataStore : Singleton<UserDataStore>
             };
             batch.Set(userDocRef, data);
             Debug.Log("유저데이터 배치 완료");
+
+            var sessionData = new Dictionary<string, object>
+            {
+                { "sessionId", "" },
+                { "lastLoginAt", FieldValue.ServerTimestamp }
+            };
+            batch.Set(sessionDocRef, sessionData);
 
             if (TableManager.Instance == null)
             {
@@ -153,7 +159,7 @@ public class UserDataStore : Singleton<UserDataStore>
             await batch.CommitAsync();
             Debug.Log($"[Firestore] 유저 '{nickname}' 생성 및 기본 영웅 {csvHeroDatas.Count}종 생성 완료");
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError($"[Firestore] 초기화 실패: {e.Message}");
         }
@@ -200,6 +206,7 @@ public class UserDataStore : Singleton<UserDataStore>
         {
             WriteBatch batch = _firestore.StartBatch();
             DocumentReference userDoc = _firestore.Collection(COLLECTION_NAME).Document(uuid);
+            DocumentReference sessionDoc = _firestore.Collection(COLLECTION_SESSION).Document(uuid);
 
             // 서브 컬렉션 모든 문서 조회하기
             QuerySnapshot heroSnapshot = await userDoc.Collection("COL_Hero").GetSnapshotAsync();
@@ -210,6 +217,7 @@ public class UserDataStore : Singleton<UserDataStore>
 
             // 최상위 컬렉션 삭제 배치
             batch.Delete(userDoc);
+            batch.Delete(sessionDoc);
 
             // DB 실행.
             await batch.CommitAsync();
@@ -290,7 +298,6 @@ public class UserDataStore : Singleton<UserDataStore>
                 {
                     DocumentReference userDocRef = _firestore.Collection(COLLECTION_NAME).Document(uuid);
                     batch.Update(userDocRef, updates);
-                    Debug.Log($"[Firestore] User data queued for update: {uuid}");
                 }
 
                 if (heroDatas != null)
@@ -329,6 +336,26 @@ public class UserDataStore : Singleton<UserDataStore>
             }
         }
     }
+
+    // 세션 업데이트
+    public async Task UpdateSessionIdAsync(string uuid, string sessionId)
+    {
+        try
+        {
+            DocumentReference sessionDocRef = _firestore.Collection(COLLECTION_SESSION).Document(uuid);
+            Dictionary<string, object> updates = new Dictionary<string, object>
+        {
+            { "sessionId", sessionId }, 
+        };
+            await sessionDocRef.SetAsync(updates, SetOptions.MergeAll);
+            Debug.Log($"[Firestore] 세션 업데이트 성공: {sessionId}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Firestore] 세션 업데이트 실패: {e.Message}");
+        }
+    }
+
     #endregion
 
 
