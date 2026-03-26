@@ -46,10 +46,18 @@ MonoBehaviour:
     heroPrefab:
       RawGuidValue: d09a2cf10307a4c40a977b56313018db
   - heroId: hero_tachyon
-    iconSprite: {fileID: 21300000, guid: 606ee4cd902ca664b977d49730a93663, type: 3}
+    iconSprite: {fileID: 21300000, guid: e81e3fc314c572f4f9367a4ff43d8002, type: 3}
     skillIcons:
     - {fileID: 11400000, guid: 5a3454fdb602d9240b32304b1c7baf13, type: 2}
     - {fileID: 11400000, guid: 78ea71a2a7314a340af750248ef38849, type: 2}
     - {fileID: 11400000, guid: 55713238a898192408ccd2db2ead978c, type: 2}
     heroPrefab:
       RawGuidValue: ff41938af0b79bd49a6284d700d3ec8b
+  - heroId: hero_tesla
+    iconSprite: {fileID: 21300000, guid: 606ee4cd902ca664b977d49730a93663, type: 3}
+    skillIcons:
+    - {fileID: 11400000, guid: 5a3454fdb602d9240b32304b1c7baf13, type: 2}
+    - {fileID: 11400000, guid: 78ea71a2a7314a340af750248ef38849, type: 2}
+    - {fileID: 11400000, guid: 55713238a898192408ccd2db2ead978c, type: 2}
+    heroPrefab:
+      RawGuidValue: dd1ef19167209a1469a467d4f8953665
