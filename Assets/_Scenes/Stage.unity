@@ -6996,6 +6996,7 @@ MonoBehaviour:
   _pingPrefab: {fileID: 4811987937561663124, guid: 5c1ec101fc29cf1439eaebe587378666, type: 3}
   _targetTag: AugmentPanel
   _playerInput: {fileID: 225820723}
+  _pingCombineDistance: 50
 --- !u!114 &225820722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18907,7 +18908,7 @@ MonoBehaviour:
   - RawGuidValue: d09a2cf10307a4c40a977b56313018db
   - RawGuidValue: c0c1fc4164e37214aa41f81d8ae5136c
   - RawGuidValue: 0eb4bbba84c6e6e44a600eab7ff5e833
-  - RawGuidValue: 67a85cf02e86f6147a3370f9250b4788
+  - RawGuidValue: ff41938af0b79bd49a6284d700d3ec8b
   - RawGuidValue: 1c6d38f465d89a149ac6941541862ec0
 --- !u!4 &527383477
 Transform:

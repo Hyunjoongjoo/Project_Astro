@@ -347,6 +347,9 @@ public class HeroController : UnitController
 
     private void OnDrawGizmos()//체인스킬기즈모
     {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
         ChainSkillSO chainData = null;
 
         if (curUniqueSkill != null && curUniqueSkill.Data is ChainSkillSO data)
@@ -357,7 +360,7 @@ public class HeroController : UnitController
         if (chainData == null) return;
 
         //스킬 사거리
-        Gizmos.color = Color.yellow;
+        Gizmos.color = Color.blueViolet;
         Gizmos.DrawWireSphere(transform.position, chainData.range);
 
         //체인 경로 표시
@@ -378,7 +381,7 @@ public class HeroController : UnitController
                     var prev = chain.debugChainTargets[i - 1];
                     if (prev != null)
                     {
-                        Gizmos.color = Color.cyan;
+                        Gizmos.color = Color.gray;
                         Gizmos.DrawLine(prev.transform.position, unit.transform.position);
                     }
                 }

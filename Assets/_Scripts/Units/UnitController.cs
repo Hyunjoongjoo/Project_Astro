@@ -22,6 +22,7 @@ public class UnitController : UnitBase
     protected UnitBase _bridge;
 
     public ISkill normalAttack;
+
     [Networked] public bool networkedOnHit { get; set; }
 
     [Header("스킬 데이터")]
@@ -37,7 +38,6 @@ public class UnitController : UnitBase
 
     public Animator HeroAnimator { get; protected set; }
     public Animator BoosterAnimator { get; protected set; }
-
     [Networked] public bool BoosterRender { get; set; }
 
     //stat 실시간 참조
@@ -187,6 +187,11 @@ public class UnitController : UnitBase
         if (_normalAttackData is ProjectileSkillSO projectileSO)
         {
             attackRange = Mathf.Max(projectileSO.range, MIN_ATTACK_RANGE);
+        }
+        else if(_normalAttackData is HitscanSkillSO hitscanSO)
+        {
+
+            attackRange = Mathf.Max(hitscanSO.range, MIN_ATTACK_RANGE);
         }
     }
 
@@ -419,5 +424,164 @@ public class UnitController : UnitBase
                 projectile.Fire(targetPos);
             }
         }
+    }
+
+    //-------테슬라 평타, 스킬 관련 RPC----------//
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayHitscanEffect(NetworkId fromId, NetworkId toId)
+    {
+        if (!Runner.TryFindObject(fromId, out NetworkObject fromObj)) return;
+        if (!Runner.TryFindObject(toId, out NetworkObject toObj)) return;
+
+        UnitController unit = fromObj.GetComponent<UnitController>();
+
+        // 시작 위치
+        Vector3 start = unit.firePoint != null ? unit.firePoint.position : fromObj.transform.position;
+        Vector3 end = toObj.transform.position;// 시작 위치
+
+        HitscanSkillSO hitscanSO = unit.normalAttack.Data as HitscanSkillSO;
+        if (hitscanSO == null) return;
+
+        GameObject prefab = hitscanSO.skillVFX;
+        if (prefab == null) return;
+
+        // 타겟 위치
+        Vector3 dir = end - start;
+        float distance = dir.magnitude;
+
+        if (dir.sqrMagnitude < 0.001f)
+        {
+            dir = fromObj.transform.forward;
+        }
+        else
+        {
+            dir = dir.normalized;
+        }
+
+        // 최소 길이 보정 (근거리 가시성 확보)
+        float minLength = 1.5f;
+
+        if (distance < minLength)
+        {
+            Vector3 center = (start + end) * 0.5f;
+
+            start = center - dir * (minLength * 0.5f);
+            end = center + dir * (minLength * 0.5f);
+
+            distance = minLength;
+        }
+
+        // 이펙트 생성
+        GameObject fx = Instantiate(prefab);
+        LineRenderer lr = fx.GetComponent<LineRenderer>();
+
+        if (lr != null)
+        {
+            lr.useWorldSpace = true;
+
+            int count = 4; // 포인트 개수
+            lr.positionCount = count;
+
+            for (int i = 0; i < count; i++)
+            {
+                float t = i / (float)(count - 1);
+                Vector3 pos = Vector3.Lerp(start, end, t);
+
+                // 중간 포인트만 흔들림 (가시성 보정)
+                if (i != 0 && i != count - 1)
+                {
+                    Vector2 offset = Random.insideUnitCircle * 0.2f;
+                    pos += new Vector3(offset.x, 0f, offset.y);
+                }
+
+                lr.SetPosition(i, pos);
+            }
+        }
+
+        Destroy(fx, 0.3f);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_PlayChainEffect(NetworkId fromId, NetworkId toId)
+    {
+        if (!Runner.TryFindObject(fromId, out NetworkObject fromObj)) return;
+        if (!Runner.TryFindObject(toId, out NetworkObject toObj)) return;
+
+        UnitController unit = fromObj.GetComponent<UnitController>();
+
+        HeroController hero = unit as HeroController;
+        if (hero == null || hero.CurUniqueSkill == null) return;
+
+        ChainSkillSO chainSkillSO = hero.CurUniqueSkill.Data as ChainSkillSO;
+        if (chainSkillSO == null) return;
+
+        GameObject prefab = chainSkillSO.skillVFX;
+        if (prefab == null) return;
+
+        // 시작 위치
+        Vector3 start = unit.firePoint != null ? unit.firePoint.position : fromObj.transform.position;
+
+        Vector3 end = toObj.transform.position;// 타겟 위치
+        Collider targetCollider = toObj.GetComponent<Collider>(); // 타겟 collider 기준 위치 보정
+        if (targetCollider != null)
+        {
+            end = targetCollider.ClosestPoint(start);
+        }
+
+        // 방향 / 거리 계산
+        Vector3 dir = end - start;
+        float distance = dir.magnitude;
+
+        if (dir.sqrMagnitude < 0.001f)
+        {
+            dir = fromObj.transform.forward;
+        }
+        else
+        {
+            dir = dir.normalized;
+        }
+
+        // 최소 길이 보정 (체인은 더 길게)
+        float minLength = 2f;
+
+        if (distance < minLength)
+        {
+            Vector3 center = (start + end) * 0.5f;
+
+            start = center - dir * (minLength * 0.5f);
+            end = center + dir * (minLength * 0.5f);
+
+            distance = minLength;
+        }
+
+        // 이펙트 생성
+        GameObject fx = Instantiate(prefab);
+        LineRenderer lr = fx.GetComponent<LineRenderer>();
+
+        if (lr != null)
+        {
+            lr.useWorldSpace = true;
+
+            int pointCount = 5; // 체인 포인트
+            lr.positionCount = pointCount;
+
+            for (int i = 0; i < pointCount; i++)
+            {
+                float t = i / (float)(pointCount - 1);
+                Vector3 position = Vector3.Lerp(start, end, t);
+
+                // 체인은 더 크게 흔들림
+                if (i != 0 && i != pointCount - 1)
+                {
+                    Vector2 offset = Random.insideUnitCircle * 0.4f;
+                    position += new Vector3(offset.x, 0f, offset.y);
+                }
+
+                lr.SetPosition(i, position);
+            }
+        }
+
+        Destroy(fx, 0.6f);
     }
 }

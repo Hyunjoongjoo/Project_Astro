@@ -1,8 +1,9 @@
 영웅 테이블 기본키,영웅 이름,영웅 설명,유형,영웅의 역할,영웅의 능력치,영웅 획득 시 필요 골드량,영웅 2D 아이콘 리소스,영웅 3D 모델링 리소스,기획용 비고
 id,heroName,heroDesc,heroType,heroRole,heroStatId,goldRequirement,heroIcon,heroModeling,note
 String,String,String,HeroType,HeroRole,String,Int,String,String,String
-hero_corsair,name_hero_corsair,desc_hero_corsair,spacecraft,melee,stat_hero_corsair,200,icon_hero_corsair,model_hero_corsair,강습형 우주함선 커세어
+hero_corsair,name_hero_corsair,desc_hero_corsair,robot,melee,stat_hero_corsair,200,icon_hero_corsair,model_hero_corsair,강습형 전술 슈트 커세어
 hero_heavyrain,name_hero_heavyrain,desc_hero_heavyrain,spacecraft,ranged,stat_hero_heavyrain,200,icon_hero_heavyrain,model_hero_heavyrain,포격형 우수함선 헤비레인
-hero_tank,name_hero_tank,desc_hero_tank,spacecraft,tank,stat_hero_tank,200,icon_hero_tank,model_hero_tank,방어형 우주함선 탱크
+hero_tank,name_hero_tank,desc_hero_tank,robot,tank,stat_hero_tank,200,icon_hero_tank,model_hero_tank,방어형 우주함선 탱크
 hero_angel,name_hero_angel,desc_hero_angel,spacecraft,healer,stat_hero_angel,200,icon_hero_angel,model_hero_angel,지원형 우주함선 앤젤
-hero_tachyon,name_hero_tachyon,desc_hero_tachyon,spacecraft,melee,stat_hero_tachyon,200,icon_hero_tachyon,model_hero_tachyon,강습형 우주함선 타키온
+hero_tachyon,name_hero_tachyon,desc_hero_tachyon,spacecraft,melee,stat_hero_tachyon,200,icon_hero_tachyon,model_hero_tachyon,강습형 전술 슈트 타키온
+hero_tesla,name_hero_tesla,desc_hero_tesla,spacecraft,ranged,stat_hero_tesla,200,Icon_hero_tesla,model_hero_tesla,포격형 우주함선 테슬라
