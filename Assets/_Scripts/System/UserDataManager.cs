@@ -11,6 +11,7 @@ public class UserDataManager : Singleton<UserDataManager>
     //옵저버 패턴용 이벤트
     public event Action<int> OnGoldChanged;
     public event Action<int> OnWinCountChanged;
+    public event Action<string> OnNickNameChanged;
     public event Action OnHeroDataChanged;
 
     private ProfileDbModel _profileModel;
@@ -45,6 +46,7 @@ public class UserDataManager : Singleton<UserDataManager>
         OnGoldChanged = null;
         OnHeroDataChanged = null;
         OnWinCountChanged = null;
+        OnNickNameChanged = null;
 
         Debug.Log("[UserDataManager] 캐시가 초기화되었습니다.");
     }
@@ -82,6 +84,12 @@ public class UserDataManager : Singleton<UserDataManager>
 
                 if (updates.ContainsKey("Profile.isAgreed"))
                     ProfileModel.isAgreed = (bool)updates["Profile.isAgreed"];
+
+                if (updates.ContainsKey("Profile.nickName"))
+                {
+                    ProfileModel.nickName = (string)updates["Profile.nickName"];
+                    OnNickNameChanged?.Invoke(ProfileModel.nickName);
+                }
             }
 
             // 3. 영웅 데이터 로컬 캐시 갱신
@@ -120,65 +128,6 @@ public class UserDataManager : Singleton<UserDataManager>
         }
     }
 
-    // 골드 갱신
-    public async Task UpdateWallet(int amount)
-    {
-        var updateGold = new Dictionary<string, object> 
-        {
-            { "Wallet.gold", _walletModel.gold + amount }
-        };
-        // DB 업데이트 하기
-        await UpdateAll(updates: updateGold);
-
-        // 골드 변경 알림 (구독자들에게 전파)
-        OnGoldChanged?.Invoke(_walletModel.gold);
-    }
-
-    // 영웅 갱신
-    public async Task UpdateHero(string heroId, int level, int exp, bool unlock)
-    {
-        var updataHeroList = new List<HeroDbModel>
-        {
-            new HeroDbModel 
-            { 
-                heroId = heroId,
-                level = level, 
-                exp = exp, 
-                isUnlock = unlock 
-            }
-        };
-        await UpdateAll(heroesToUpdate: updataHeroList);
-
-        // 런타임 스텟 재계산
-        HeroManager.Instance.UpdateHeroRuntimeStatus(heroId, level);
-
-        //데이터 변경됬다 구독자한테 알리기
-        OnHeroDataChanged?.Invoke();
-    }
-
-    // 프로파일 갱신
-    public async Task UpdateUserDb(int expDelta, int levelDelta = 0) 
-    {
-        var updateProfile = new Dictionary<string, object>
-        {
-            { "Profile.userLevel", _profileModel.userLevel + levelDelta },
-            { "Profile.userExp", _profileModel.userExp + expDelta }
-        };
-        await UpdateAll(updates: updateProfile);
-    }
-
-    // 전적 갱신
-    public async Task UpdateRecord(int winDelta, int loseDelta, int drawDelta) 
-    {
-        var updateRecord = new Dictionary<string, object>
-        {
-            { "Record.win", _recordModel.win + winDelta },
-            { "Record.draw", _recordModel.draw + drawDelta },
-            { "Record.lose", _recordModel.lose + loseDelta }
-        };
-        await UpdateAll(updates: updateRecord);
-    }
-
     // 신규 영웅 생성 시(CSV 기준!) DB 대조하여 가감 (DB 로드 완료 이후 호출되어야함.)
     public async Task SyncHeroDataAsync()
     {
@@ -186,7 +135,7 @@ public class UserDataManager : Singleton<UserDataManager>
 
         //CSV에 있는 모든 영웅 ID 가져오기 (최신 리스트)
         var allCsvHeroes = TableManager.Instance.HeroTable.GetAll();
-        
+
         HashSet<string> csvHeroIds = new HashSet<string>();
         foreach (var csvHero in allCsvHeroes)
         {
@@ -259,7 +208,7 @@ public class UserDataManager : Singleton<UserDataManager>
         // 리스너 등록 (서버 값 바뀌면 자동 호출)
         _sessionListener = sessionDocRef.Listen(snapshot =>
         {
-            if (_isLink)  return; 
+            if (_isLink) return;
             if (!snapshot.Exists) return;
 
             if (snapshot.TryGetValue("sessionId", out string dbSessionId))
@@ -330,15 +279,15 @@ public class UserDataManager : Singleton<UserDataManager>
 
             // Profile, Record, Wallet 복사 및 신규 세션 ID 발행
             string currentSessionId = AuthService.Instance.MyLocalSessionId;
-            
+
             _profileModel.uuid = newUid; // 모델 내부의 UID도 변경
-            
-            batch.Set(newSessionRef, new Dictionary<string, object> 
+
+            batch.Set(newSessionRef, new Dictionary<string, object>
             {
                  { "sessionId", AuthService.Instance.MyLocalSessionId }
             });
 
-            batch.Set(newDocRef, new Dictionary<string, object> 
+            batch.Set(newDocRef, new Dictionary<string, object>
             {
                 { "Profile", _profileModel },
                 { "Record", _recordModel },
@@ -376,4 +325,29 @@ public class UserDataManager : Singleton<UserDataManager>
         }
     }
 
+    // 닉네임 변경 로직
+    public async Task UpdateNicknameAsync(string newNickname)
+    {
+        try
+        {
+            string userId = _profileModel.uuid;
+
+            var updates = new Dictionary<string, object>
+            {
+                { "Profile.nickName", newNickname }
+            };
+
+            await UpdateAll(updates: updates);
+
+            _profileModel.nickName = newNickname;
+
+            Debug.Log($"[UserDataManager] 닉네임 변경 성공: {newNickname}");
+            return;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[UserDataManager] 닉네임 변경 실패: {e.Message}");
+            return;
+        }
+    }
 }
