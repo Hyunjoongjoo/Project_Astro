@@ -2,6 +2,7 @@
 using Firebase.Auth;
 using Google;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -180,6 +181,49 @@ public class AuthService : Singleton<AuthService>
             Debug.LogError($"[Auth] 알 수 없는 오류: {ex.Message}");
             return false;
         }
+    }
+
+    public async Task<bool> LinkAccountWithGoogle(UserDataManager dataManager)
+    {
+        try
+        {
+            string guestGuid = CurrentUser.UserId;
+
+            // 구글 로그인 시도
+            
+            GoogleSignInUser googleUser = await GoogleSignIn.DefaultInstance.SignIn();
+            if (googleUser == null) return false;
+
+            Credential credential = GoogleAuthProvider.GetCredential(googleUser.IdToken, null);
+
+            // 구글 계정으로 로그인 (newUID로 변경됨)
+            var authResult = await Auth.SignInWithCredentialAsync(credential);
+            string newUid = authResult.UserId;
+
+            // 데이터 매니저에게 이전 요청
+            bool success = await dataManager.LinkDataAsync(guestGuid, newUid);
+
+            if (success)
+            {
+                PlayerPrefs.DeleteKey("Guest_Email");
+                PlayerPrefs.DeleteKey("Guest_PW");
+                PlayerPrefs.SetInt("IsAutoLogin", 1);
+                PlayerPrefs.Save();
+                return true;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"연동 에러: {ex.Message}");
+            return false;
+        }
+    }
+    public bool IsGuestUser()
+    {
+        if (CurrentUser == null) return false;
+
+        return CurrentUser.Email.Contains("@guest.com");
     }
 
     private void ClearLocalUserData()
