@@ -34,7 +34,7 @@ public class ConfirmPopup : BaseUI
         {
             _yesBtn.onClick.AddListener(() => {
                 onYes?.Invoke();
-                OnBackButtonPressed();
+                OnBackButtonPressed(false);
             });
         }
 

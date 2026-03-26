@@ -111,7 +111,7 @@ public class UIManager : Singleton<UIManager>
         return ui;
     }
 
-    public void CloseTopPopup()
+    public void CloseTopPopup(bool playSound = true)
     {
         if (_popupStack.Count > 0)
         {
@@ -122,7 +122,7 @@ public class UIManager : Singleton<UIManager>
             if (_popupStack.Count > 0)
             {
                 BaseUI ui = _popupStack.Pop();
-                ui.Close();
+                ui.Close(playSound);
             }
         }
     }

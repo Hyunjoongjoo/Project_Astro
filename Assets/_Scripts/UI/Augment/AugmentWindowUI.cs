@@ -289,7 +289,7 @@ public class AugmentWindowUI : BaseUI
     }
 
     //BaseUI 오버라이드
-    public override void Close()
+    public override void Close(bool playSound = true)
     {
         //생성했던 카드 처리
         ClearCards();
