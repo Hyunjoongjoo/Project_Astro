@@ -18,9 +18,9 @@ MonoBehaviour:
   Tiers:
   - TitleStringID: augment_name_tesla_B
     DescStringID: augment_desc_tesla_B
-    Icon: {fileID: 21300000, guid: 2b6fe1acdd9b0874b83e790e632bffc0, type: 3}
+    Icon: {fileID: 21300000, guid: 141441bbb13d3c4419b4dd39fa8b88fc, type: 3}
     CombatSkillData: {fileID: 11400000, guid: 5732cff5e9c65af4e83a3d9192f3ad9f, type: 2}
   - TitleStringID: enhance_augment_name_tesla_B
     DescStringID: enhance_augment_desc_tesla_B
-    Icon: {fileID: 21300000, guid: c4d2ebadb9dd4d34ca5f534ff744babb, type: 3}
+    Icon: {fileID: 21300000, guid: 228b759a5af6f3846af46f939ba79b0b, type: 3}
     CombatSkillData: {fileID: 11400000, guid: 19668948ddb734342a7deb8dd32cebec, type: 2}
