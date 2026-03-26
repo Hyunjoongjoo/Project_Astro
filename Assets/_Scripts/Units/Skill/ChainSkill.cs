@@ -28,28 +28,6 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
     public override bool UsingConditionCheck()
     {
         if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
-        //if (_cachedUnit.currentTarget == null) return false;
-        //if (_cachedUnit.currentTarget.IsDead) return false;
-
-        //Collider myCol = _cachedUnit.GetComponent<Collider>();
-        //Collider targetCol = _cachedUnit.currentTarget.GetComponent<Collider>();
-
-        //float sqrDist;
-
-        //if (myCol == null || targetCol == null)
-        //{
-        //    sqrDist = (_cachedUnit.transform.position - _cachedUnit.currentTarget.transform.position).sqrMagnitude;
-        //    return sqrDist <= _data.range * _data.range;
-        //}
-        //else
-        //{
-        //    Vector3 myPoint = myCol.ClosestPoint(targetCol.transform.position);
-        //    Vector3 targetPoint = targetCol.ClosestPoint(myCol.transform.position);
-
-        //    sqrDist = (myPoint - targetPoint).sqrMagnitude;
-        //}
-
-        //return sqrDist <= _data.range * _data.range;
         if (_data.heroOnly)
         {
             UnitBase hero = FindNearestHeroTarget();
@@ -168,16 +146,6 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
     {
         if (current == null || current.IsDead) return;
 
-        if (prev != null)//첫타격
-        {
-            Debug.DrawRay(
-                prev.transform.position,
-                current.transform.position - prev.transform.position,
-                Color.cyan,
-                0.3f
-            );
-        }
-
         debugChainTargets.Add(current);
 
         bool isChained = chainCount > 0;
@@ -204,9 +172,6 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
 
         Vector3 start = current.transform.position;
         Vector3 dir = next.transform.position - start;
-
-        Debug.DrawRay(start, dir, Color.yellow, 0.3f);
-
 
         Chain(next, current, chainCount + 1);
     }
