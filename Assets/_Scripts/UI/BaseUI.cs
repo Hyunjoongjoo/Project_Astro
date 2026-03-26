@@ -58,7 +58,7 @@ public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
     }
 
     //팝업창용 닫힐 때
-    public virtual void Close()
+    public virtual void Close(bool playSound = true)
     {
         if (_isClosing) return;
         _isClosing = true;
@@ -69,13 +69,13 @@ public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
             Destroy(gameObject);
         });
 
-        AudioManager.Instance.PlayUISfx(UISfxList.BtnClose);
+        if (playSound) AudioManager.Instance.PlayUISfx(UISfxList.BtnClose);
     }
 
     //뒤로가기 버튼용
-    public virtual void OnBackButtonPressed()
+    public virtual void OnBackButtonPressed(bool playSound = true)
     {
-        UIManager.Instance.CloseTopPopup();
+        UIManager.Instance.CloseTopPopup(playSound);
     }
 
     // 토글 로직

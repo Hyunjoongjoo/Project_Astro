@@ -10,8 +10,8 @@ public class SignUpController : MonoBehaviour
     [SerializeField] private AnimUI _loginSelectPanel;
 
     [Header("Validation")]
-    [SerializeField] private int _minPasswordLength = 8;
-    [SerializeField] private int _maxPasswordLength = 18;
+    //[SerializeField] private int _minPasswordLength = 8;
+    //[SerializeField] private int _maxPasswordLength = 18;
     [SerializeField] private int _minNicknameLength = 2;
     [SerializeField] private int _maxNicknameLength = 8;
 
