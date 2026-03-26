@@ -146,16 +146,6 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
     {
         if (current == null || current.IsDead) return;
 
-        if (prev != null)//첫타격
-        {
-            Debug.DrawRay(
-                prev.transform.position,
-                current.transform.position - prev.transform.position,
-                Color.cyan,
-                0.3f
-            );
-        }
-
         debugChainTargets.Add(current);
 
         bool isChained = chainCount > 0;
@@ -182,9 +172,6 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
 
         Vector3 start = current.transform.position;
         Vector3 dir = next.transform.position - start;
-
-        Debug.DrawRay(start, dir, Color.yellow, 0.3f);
-
 
         Chain(next, current, chainCount + 1);
     }
