@@ -66,8 +66,8 @@ public class LoginController : MonoBehaviour
         if(!PlayerPrefs.HasKey("Guest_Email"))
         {
             _signUpView.SetMode(false);
-            _signUpView.gameObject.SetActive(true);
-            
+            _signUpView.Open();
+
             _signUpController.Initialize(_authService, _userDataStore, async (data) =>
             {
                 var user = _authService.CurrentUser;
@@ -159,7 +159,7 @@ public class LoginController : MonoBehaviour
             if (userData == null)
             {
                 // 약관 동의 성공 시에만 닉네임 설정 창 오픈
-                _signUpView.gameObject.SetActive(true);
+                _signUpView.Open();
                 _signUpView.SetMode(true);
 
                 _signUpController.Initialize(_authService, _userDataStore, async (data) =>
