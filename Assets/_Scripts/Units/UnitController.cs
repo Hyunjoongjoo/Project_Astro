@@ -426,6 +426,8 @@ public class UnitController : UnitBase
         }
     }
 
+    //-------테슬라 평타, 스킬 관련 RPC----------//
+
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_PlayHitscanEffect(NetworkId fromId, NetworkId toId)
     {
@@ -434,8 +436,9 @@ public class UnitController : UnitBase
 
         UnitController unit = fromObj.GetComponent<UnitController>();
 
+        // 시작 위치
         Vector3 start = unit.firePoint != null ? unit.firePoint.position : fromObj.transform.position;
-        Vector3 end = toObj.transform.position;
+        Vector3 end = toObj.transform.position;// 시작 위치
 
         HitscanSkillSO hitscanSO = unit.normalAttack.Data as HitscanSkillSO;
         if (hitscanSO == null) return;
@@ -443,6 +446,7 @@ public class UnitController : UnitBase
         GameObject prefab = hitscanSO.skillVFX;
         if (prefab == null) return;
 
+        // 타겟 위치
         Vector3 dir = end - start;
         float distance = dir.magnitude;
 
@@ -455,6 +459,7 @@ public class UnitController : UnitBase
             dir = dir.normalized;
         }
 
+        // 최소 길이 보정 (근거리 가시성 확보)
         float minLength = 1.5f;
 
         if (distance < minLength)
@@ -467,14 +472,15 @@ public class UnitController : UnitBase
             distance = minLength;
         }
 
+        // 이펙트 생성
         GameObject fx = Instantiate(prefab);
-
         LineRenderer lr = fx.GetComponent<LineRenderer>();
+
         if (lr != null)
         {
             lr.useWorldSpace = true;
 
-            int count = 4;
+            int count = 4; // 포인트 개수
             lr.positionCount = count;
 
             for (int i = 0; i < count; i++)
@@ -482,6 +488,7 @@ public class UnitController : UnitBase
                 float t = i / (float)(count - 1);
                 Vector3 pos = Vector3.Lerp(start, end, t);
 
+                // 중간 포인트만 흔들림 (가시성 보정)
                 if (i != 0 && i != count - 1)
                 {
                     Vector2 offset = Random.insideUnitCircle * 0.2f;
@@ -491,6 +498,7 @@ public class UnitController : UnitBase
                 lr.SetPosition(i, pos);
             }
         }
+
         Destroy(fx, 0.3f);
     }
 
@@ -511,15 +519,17 @@ public class UnitController : UnitBase
         GameObject prefab = chainSkillSO.skillVFX;
         if (prefab == null) return;
 
+        // 시작 위치
         Vector3 start = unit.firePoint != null ? unit.firePoint.position : fromObj.transform.position;
 
-        Vector3 end = toObj.transform.position;
-        Collider targetCollider = toObj.GetComponent<Collider>();
+        Vector3 end = toObj.transform.position;// 타겟 위치
+        Collider targetCollider = toObj.GetComponent<Collider>(); // 타겟 collider 기준 위치 보정
         if (targetCollider != null)
         {
             end = targetCollider.ClosestPoint(start);
         }
 
+        // 방향 / 거리 계산
         Vector3 dir = end - start;
         float distance = dir.magnitude;
 
@@ -532,6 +542,7 @@ public class UnitController : UnitBase
             dir = dir.normalized;
         }
 
+        // 최소 길이 보정 (체인은 더 길게)
         float minLength = 2f;
 
         if (distance < minLength)
@@ -544,28 +555,30 @@ public class UnitController : UnitBase
             distance = minLength;
         }
 
+        // 이펙트 생성
         GameObject fx = Instantiate(prefab);
+        LineRenderer lr = fx.GetComponent<LineRenderer>();
 
-        LineRenderer lineRenderer = fx.GetComponent<LineRenderer>();
-        if (lineRenderer != null)
+        if (lr != null)
         {
-            lineRenderer.useWorldSpace = true;
+            lr.useWorldSpace = true;
 
-            int pointCount = 5;
-            lineRenderer.positionCount = pointCount;
+            int pointCount = 5; // 체인 포인트
+            lr.positionCount = pointCount;
 
             for (int i = 0; i < pointCount; i++)
             {
                 float t = i / (float)(pointCount - 1);
                 Vector3 position = Vector3.Lerp(start, end, t);
 
+                // 체인은 더 크게 흔들림
                 if (i != 0 && i != pointCount - 1)
                 {
-                    Vector2 offset = Random.insideUnitCircle * 0.5f;
+                    Vector2 offset = Random.insideUnitCircle * 0.4f;
                     position += new Vector3(offset.x, 0f, offset.y);
                 }
 
-                lineRenderer.SetPosition(i, position);
+                lr.SetPosition(i, position);
             }
         }
 
