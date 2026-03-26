@@ -158,7 +158,8 @@ public class HeroDetailPresenter : MonoBehaviour
                     }
                 },
                 isBuy,
-                "골드가 부족하여 구매할 수 없습니다."
+                "골드가 부족하여 구매할 수 없습니다.",
+                isBuy ? "구매" : "골드 부족"
             );
         }
         else
@@ -215,7 +216,8 @@ public class HeroDetailPresenter : MonoBehaviour
                     }
                 },
                 isExpFull && isGoldEnough, // 버튼 활성화 조건: 경험치와 골드 모두 충족 시
-                alertMsg
+                alertMsg,
+                (isExpFull && isGoldEnough) ? "레벨업" : "조건 부족"
             );
         }
     }

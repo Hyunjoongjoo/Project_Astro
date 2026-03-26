@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tesla_Skill_Type_A
   m_EditorClassIdentifier: Assembly-CSharp::ChainSkillSO
   heroId: hero_tesla
-  skillIcon: {fileID: 0}
+  skillIcon: {fileID: 21300000, guid: ee3d8cf348f1cdb4d8ac80626613b9d7, type: 3}
   skillName: augment_name_tesla_A
   skillDescription: augment_desc_tesla_A
   note: 
