@@ -115,12 +115,15 @@ public class AuthService : Singleton<AuthService>
 
             MyLocalSessionId = null;
 
+            Auth.SignOut();
+            #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
             if (GoogleSignIn.DefaultInstance != null)
             {
                 GoogleSignIn.DefaultInstance.SignOut();
             }
-
-            Auth.SignOut();
+            #endif
+            PlayerPrefs.SetInt("IsAutoLogin", 0);
+            PlayerPrefs.Save();
 
             Debug.Log("[Auth] 로그아웃 성공");
         }
@@ -150,11 +153,15 @@ public class AuthService : Singleton<AuthService>
             Debug.Log("1. 구글 연동 해제 시도 (Disconnect)");
             if (isGoogleUser)
             {
+                #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
                 GoogleSignIn.DefaultInstance.Disconnect();
+                #endif
             }
 
             Debug.Log("2. 파이어베이스 계정 삭제 시도");
             await CurrentUser.DeleteAsync();
+            
+            ClearLocalUserData();
 
             Debug.Log("[Auth] 계정 삭제 및 연동 해제 완료");
             return true;
@@ -173,5 +180,16 @@ public class AuthService : Singleton<AuthService>
             Debug.LogError($"[Auth] 알 수 없는 오류: {ex.Message}");
             return false;
         }
+    }
+
+    private void ClearLocalUserData()
+    {
+        PlayerPrefs.DeleteKey("Guest_Email");
+        PlayerPrefs.DeleteKey("Guest_PW");
+        PlayerPrefs.SetInt("IsAutoLogin", 0);
+        PlayerPrefs.Save();
+
+        MyLocalSessionId = null;
+        Debug.Log("[Auth] 로컬 PlayerPrefs 데이터 삭제 완료");
     }
 }

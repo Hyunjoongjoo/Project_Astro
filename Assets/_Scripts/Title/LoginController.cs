@@ -8,7 +8,6 @@ using UnityEngine;
 public class LoginController : MonoBehaviour
 {
     [Header("UI")]
-    [SerializeField] private LoginView _loginView;
     [SerializeField] private SignUpView _signUpView;
     [SerializeField] private AcceptUI _acceptUI;
     [SerializeField] private AnimUI _loginSelectUI;
@@ -27,50 +26,81 @@ public class LoginController : MonoBehaviour
         this._onLoginSuccess = onLoginSuccess;
     }
 
-    public void OnClickLogin()
+    public async void OnClickPressScreen()
     {
-        HandleLogin();
+        if (_isProcessing) return;
+        _isProcessing = true;
+
+        bool isAutoLoginEnabled = PlayerPrefs.GetInt("IsAutoLogin", 0) == 1;
+
+        if (isAutoLoginEnabled && PlayerPrefs.HasKey("Guest_Email"))
+        {
+            string email = PlayerPrefs.GetString("Guest_Email");
+            string pw = PlayerPrefs.GetString("Guest_PW");
+
+            try
+            {
+                var user = await _authService.LoginAsync(email, pw);
+                await FinalizeLogin(user.UserId);
+                _isProcessing = false;
+                return;
+            }
+            catch (Exception ex)
+            {
+
+                Debug.LogWarning($"[AutoLogin Fail] 서버에 계정이 없거나 오류 발생: {ex.Message}");
+
+                LoginException(ex.Message);
+            }
+        }
+
+        _isProcessing = false;
+        if (!_loginSelectUI.IsOpened)
+        {
+            _loginSelectUI.Open();
+        }
     }
 
-    private async void HandleLogin()
+    public void OnClickGuestLogin()
+    {
+        if(!PlayerPrefs.HasKey("Guest_Email"))
+        {
+            _signUpView.SetMode(false);
+            _signUpView.gameObject.SetActive(true);
+            
+            _signUpController.Initialize(_authService, _userDataStore, async (data) =>
+            {
+                var user = _authService.CurrentUser;
+                if (user != null)
+                {
+                    await FinalizeLogin(user.UserId);
+                }
+            });
+        }
+        else
+        {
+            string email = PlayerPrefs.GetString("Guest_Email");
+            string password = PlayerPrefs.GetString("Guest_PW");
+
+            HandleLogin(email, password);
+        }
+    }
+
+    private async void HandleLogin(string email, string password)
     {
         if (_isProcessing) return;
 
-        // 로그인 기반 정보 입력 읽어오기
-        var credentials = _loginView.GetCredentials();
-        string email = credentials.email;
-        string password = credentials.password;
-
-        // 회원가입 기반 로그인하기 정보 입력 읽어오기
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-        {
-            var signUpData = _signUpView.GetSignUpData();
-            email = signUpData.email;
-            password = signUpData.password;
-        }
-
-        // 입력값 검증
-        if (!ValidateInput(email, password))
-            return;
-
         _isProcessing = true;
-        _loginView.SetInteractable(false);
 
         try
         {
             // 1단계: Firebase Auth 로그인
             var user = await _authService.LoginAsync(email, password);
             Debug.Log("파이어베이스 Auth 로그인 ");
+
             // 2단계: Firestore에서 유저 데이터 조회
             var userData = await _userDataStore.GetUserDataAsync(user.UserId);
-
             Debug.Log("파이어베이스 유저 데이터 조회");
-            if (userData == null)
-            {
-                // 유저 데이터가 없으면 닉네임 생성 유도하여 DB 최신화
-                _loginView.ShowNicknameCreationRequired(email);
-                return;
-            }
 
             // 약관 동의된 상태인지 체크
             if (!userData.profile.isAgreed)
@@ -86,12 +116,11 @@ public class LoginController : MonoBehaviour
         }
         catch (Exception ex)
         {
-            _loginView.ShowError(GetErrorMessage(ex));
+            LoginException(ex.Message);
         }
         finally
         {
             _isProcessing = false;
-            _loginView.SetInteractable(true);
         }
     }
 
@@ -105,7 +134,6 @@ public class LoginController : MonoBehaviour
         if (_isProcessing) return;
 
         _isProcessing = true;
-        _loginView.SetInteractable(false);
 
         try
         {
@@ -130,18 +158,13 @@ public class LoginController : MonoBehaviour
             Debug.Log("파이어베이스 유저 데이터 조회");
             if (userData == null)
             {
-                // 약관 동의 먼저띄우고 난 뒤에
-                _acceptUI.ShowPanel(() =>
-                {
-                    // 약관 동의 성공 시에만 닉네임 설정 창 오픈
-                    _loginView.ShowNicknameCreationRequired(user.UserId);
-                    _signUpView.SetNicknameOnlyMode(user.Email);
-                    _signUpView.gameObject.SetActive(true);
+                // 약관 동의 성공 시에만 닉네임 설정 창 오픈
+                _signUpView.gameObject.SetActive(true);
+                _signUpView.SetMode(true);
 
-                    _signUpController.Initialize(_authService, _userDataStore, async (data) =>
-                    {
-                        await FinalizeLogin(user.UserId);
-                    });
+                _signUpController.Initialize(_authService, _userDataStore, async (data) =>
+                {
+                    await FinalizeLogin(user.UserId);
                 });
                 return;
             }
@@ -159,39 +182,12 @@ public class LoginController : MonoBehaviour
         }
         catch (Exception ex)
         {
-            _loginView.ShowError(GetErrorMessage(ex));
+            LoginException(ex.Message);
         }
         finally
         {
             _isProcessing = false;
-            _loginView.SetInteractable(true);
         }
-    }
-
-    private bool ValidateInput(string email, string password)
-    {
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-        {
-            _loginView.ShowError("아이디와 비밀번호를 입력해주세요.");
-            return false;
-        }
-        return true;
-    }
-
-    private string GetErrorMessage(Exception ex)
-    {
-        // Firebase 예외 처리
-        return ex switch
-        {
-            Firebase.FirebaseException firebaseEx => firebaseEx.ErrorCode switch
-            {
-                (int)Firebase.Auth.AuthError.InvalidEmail => "잘못된 이메일 형식입니다.",
-                (int)Firebase.Auth.AuthError.WrongPassword => "아이디 또는 비밀번호가 틀렸습니다.",
-                (int)Firebase.Auth.AuthError.UserNotFound => "아이디 또는 비밀번호가 틀렸습니다.",
-                _ => "로그인에 실패했습니다."
-            },
-            _ => "로그인 중 오류가 발생했습니다."
-        };
     }
 
     private async Task FinalizeLogin(string userId)
@@ -213,13 +209,28 @@ public class LoginController : MonoBehaviour
             UserDataManager.Instance.SetAllUserData(userData.profile, userData.record, userData.wallet, userHeroData);
             await UserDataManager.Instance.SyncHeroDataAsync();
 
+            PlayerPrefs.SetInt("IsAutoLogin", 1);
+            PlayerPrefs.Save();
+
             // 씬 전환 콜백 호출
-            _loginView.ShowWelcomeMessage(userData.profile.nickName);
             _onLoginSuccess?.Invoke(userData.profile.nickName);
         }
         catch (Exception ex)
         {
-            Debug.LogError($"진입 프로세스 중 오류: {ex.Message}");
+            LoginException(ex.Message);
         }
+    }
+
+    private void LoginException(string ex)
+    {
+        Debug.LogError($"[Login Failed] 사유: {ex}");
+
+        // 에러 = 이 계정 정보가 쓸모없다는 뜻이므로 로컬 데이터 정리
+        PlayerPrefs.DeleteKey("Guest_Email");
+        PlayerPrefs.DeleteKey("Guest_PW");
+        PlayerPrefs.SetInt("IsAutoLogin", 0);
+        PlayerPrefs.Save();
+
+        _loginSelectUI.Open();
     }
 }
