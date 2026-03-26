@@ -205,8 +205,7 @@ public class LoginController : MonoBehaviour
             }
 
             // 난수 DB에 저장
-            var updates = new Dictionary<string, object> { { "Profile.sessionId", myLocalSessionId } };
-            await _userDataStore.UpdateAllAsync(userId, updates);
+            await _userDataStore.UpdateSessionIdAsync(userId, myLocalSessionId);
 
             var userData = await _userDataStore.GetUserDataAsync(userId);
             var userHeroData = await _userDataStore.GetUserHeroDataAsync(userId);

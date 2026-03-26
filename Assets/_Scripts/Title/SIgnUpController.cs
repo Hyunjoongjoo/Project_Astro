@@ -140,7 +140,6 @@ public class SignUpController : MonoBehaviour
                 var currentUser = _authService.CurrentUser;
                 if (currentUser != null)
                 {
-                    await _authService.UpdateProfileAsync(currentUser, input.nickname);
                     if (UserDataManager.Instance.IsLink)
                     {
                         await _authService.UpdateProfileAsync(currentUser, input.nickname);
