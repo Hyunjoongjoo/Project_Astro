@@ -195,8 +195,14 @@ public class LoginController : MonoBehaviour
         try
         {
             // 세션 난수 발행 및 로컬 저장
-            string myLocalSessionId = Guid.NewGuid().ToString();
-            _authService.MyLocalSessionId = myLocalSessionId;
+            string myLocalSessionId = _authService.MyLocalSessionId;
+
+            if (string.IsNullOrEmpty(myLocalSessionId))
+            {
+                // 처음 로그인할 때만 난수 발행
+                myLocalSessionId = Guid.NewGuid().ToString();
+                _authService.MyLocalSessionId = myLocalSessionId;
+            }
 
             // 난수 DB에 저장
             var updates = new Dictionary<string, object> { { "Profile.sessionId", myLocalSessionId } };

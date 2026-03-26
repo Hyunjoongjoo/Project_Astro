@@ -137,13 +137,24 @@ public class SignUpController : MonoBehaviour
         {
             if(input.isGoogle)
             {
-                var currentUser = _authService.CurrentUser; // 현재 로그인된 유저 정보 가져오기
-
+                var currentUser = _authService.CurrentUser;
                 if (currentUser != null)
                 {
-                    // 이미 인증은 끝났으니 프로필 업데이트와 DB 생성만 수행
                     await _authService.UpdateProfileAsync(currentUser, input.nickname);
-                    await _userDataStore.CreateUserDataAsync(currentUser.UserId, input.nickname);
+                    if (UserDataManager.Instance.IsLink)
+                    {
+                        await _authService.UpdateProfileAsync(currentUser, input.nickname);
+                        string guestGuid = PlayerPrefs.GetString("Guest_Email").Split('@')[0];
+                        bool isSuccess = await UserDataManager.Instance.LinkDataAsync(guestGuid, currentUser.UserId);
+
+                        if (!isSuccess) throw new Exception("Data Migration Failed");
+                    }
+                    else
+                    {
+                        // 기존 구글 회원가입 플로우
+                        Debug.Log("[New] 구글 신규 유저 데이터를 생성합니다.");
+                        await _userDataStore.CreateUserDataAsync(currentUser.UserId, input.nickname);
+                    }
                 }
             }
             else
