@@ -26,7 +26,7 @@ MonoBehaviour:
   postDelay: 0.5
   blockAction: 0
   damageRatio: 1
-  range: 7
+  range: 2.5
   projectileSpeed: 10
   isHoming: 0
   oneShotProjectileNum: 1
