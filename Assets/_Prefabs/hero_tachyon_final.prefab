@@ -4608,6 +4608,7 @@ Transform:
   - {fileID: 1677471541859020872}
   - {fileID: 7980414492217480412}
   - {fileID: 5444077400414371882}
+  - {fileID: 5279599886500700053}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &-7365194185478453851
@@ -4681,7 +4682,7 @@ MonoBehaviour:
   moveType: 0
   attackRange: 0
   unitId: hero_tachyon
-  firePoint: {fileID: 5498119303693422498}
+  firePoint: {fileID: 5279599886500700053}
   currentTarget: {fileID: 0}
   _networkedOnHit: 0
   _normalAttackData: {fileID: 11400000, guid: b925f460ead9092459914239589e936c, type: 2}
@@ -18473,6 +18474,37 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0031174421, y: -0.1331048, z: -0.12488443}
     m_Extent: {x: 0.363722, y: 0.3690219, z: 0.6511986}
   m_DirtyAABB: 0
+--- !u!1 &7973476332418516205
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5279599886500700053}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5279599886500700053
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7973476332418516205}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.46, y: 4.348, z: 1.94}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5498119303693422498}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7999888237975473151
 GameObject:
   m_ObjectHideFlags: 0
