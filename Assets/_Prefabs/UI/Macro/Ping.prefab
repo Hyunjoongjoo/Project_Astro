@@ -5022,8 +5022,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46e3f132f0dc65c41badfad78c77e5ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PingIcon
-  _duration: 2
+  _duration: 4
   _checkMark: {fileID: 1926912324748570361}
+  _punchStrength: 0.5
+  _vibrato: 10
 --- !u!222 &6996392056383873088
 CanvasRenderer:
   m_ObjectHideFlags: 0
