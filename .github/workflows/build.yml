@@ -1,10 +1,9 @@
 name: Android CI Build
 
 # 트리거 조건: develop 브랜치에 코드가 Push 될 때마다
+# 3.26 수정: LFS 용량 초과로 일단 앱에서 버튼 눌러서 실행으로 변경
 on:
-  push:
-    branches:
-      - develop
+  workflow_dispatch: {} 
 
 jobs:
   buildForAndroid:
