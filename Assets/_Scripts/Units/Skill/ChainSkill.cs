@@ -219,7 +219,7 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
         if (_cachedUnit.HasStateAuthority) target.TakeDamage(damage);
     }
 
-    private UnitBase FindNearestHeroTarget()
+    private UnitBase FindNearestHeroTarget()// 주변에서 가장 가까운 적 영웅 탐색
     {
         int hitCount = Physics.OverlapSphereNonAlloc(
             _cachedUnit.transform.position,
@@ -254,7 +254,7 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
         return closestHero;
     }
 
-    private UnitBase FindNextTarget(UnitBase current)
+    private UnitBase FindNextTarget(UnitBase current)// 다음 체인 대상 탐색 (영웅 우선 없으면 다른 유닛)
     {
         int hitCount = Physics.OverlapSphereNonAlloc(
            current.transform.position,
