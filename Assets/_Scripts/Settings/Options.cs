@@ -75,7 +75,7 @@ public class Options : MonoBehaviour
         if (popup != null)
         {
             // 2. 팝업 설정 (수정된 Setup 파라미터 반영)
-            string msg = "계정을 삭제하시겠습니까? \r\n삭제한 계정은 복구가 불가능합니다.";
+            string msg = "계정을 삭제하시겠습니까?";
 
             popup.Setup(
                 msg: msg,
@@ -143,15 +143,15 @@ public class Options : MonoBehaviour
         if (popup != null)
         {
             // 2. 팝업 설정 (수정된 Setup 파라미터 반영)
-            string msg = "현재 게스트 데이터를 구글 계정으로 연동하시겠습니까?\n연동 후에도 현재 데이터를 계속 사용합니다.";
+            string msg = "구글 계정으로 연동하시겠습니까?";
 
             popup.Setup(
                 msg: msg,
                 onYes: async () => await ExecuteLinkProcess(),
                 canConfirm: true,
                 denyMsg: "",
-                yesText: "연동하기",
-                noText: "나중에"
+                yesText: "확인",
+                noText: "취소"
             );
         }
     }
