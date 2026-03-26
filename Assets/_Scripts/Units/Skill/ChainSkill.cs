@@ -28,28 +28,78 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
     public override bool UsingConditionCheck()
     {
         if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
+        //if (_cachedUnit.currentTarget == null) return false;
+        //if (_cachedUnit.currentTarget.IsDead) return false;
+
+        //Collider myCol = _cachedUnit.GetComponent<Collider>();
+        //Collider targetCol = _cachedUnit.currentTarget.GetComponent<Collider>();
+
+        //float sqrDist;
+
+        //if (myCol == null || targetCol == null)
+        //{
+        //    sqrDist = (_cachedUnit.transform.position - _cachedUnit.currentTarget.transform.position).sqrMagnitude;
+        //    return sqrDist <= _data.range * _data.range;
+        //}
+        //else
+        //{
+        //    Vector3 myPoint = myCol.ClosestPoint(targetCol.transform.position);
+        //    Vector3 targetPoint = targetCol.ClosestPoint(myCol.transform.position);
+
+        //    sqrDist = (myPoint - targetPoint).sqrMagnitude;
+        //}
+
+        //return sqrDist <= _data.range * _data.range;
+        if (_data.heroOnly)
+        {
+            UnitBase hero = FindNearestHeroTarget();
+
+            if (hero == null)
+            {
+                return false;
+            }
+
+            Collider myCol = _cachedUnit.GetComponent<Collider>();
+            Collider heroCol = hero.GetComponent<Collider>();
+
+            float sqrDist;
+
+            if (myCol == null || heroCol == null)
+            {
+                sqrDist = (_cachedUnit.transform.position - hero.transform.position).sqrMagnitude;
+            }
+            else
+            {
+                Vector3 myPoint = myCol.ClosestPoint(hero.transform.position);
+                Vector3 heroPoint = heroCol.ClosestPoint(myCol.transform.position);
+
+                sqrDist = (myPoint - heroPoint).sqrMagnitude;
+            }
+
+            return sqrDist <= _data.range * _data.range;
+        }
+
         if (_cachedUnit.currentTarget == null) return false;
         if (_cachedUnit.currentTarget.IsDead) return false;
 
-        Collider myCol = _cachedUnit.GetComponent<Collider>();
+        Collider myCol2 = _cachedUnit.GetComponent<Collider>();
         Collider targetCol = _cachedUnit.currentTarget.GetComponent<Collider>();
 
-        float sqrDist;
+        float sqrDist2;
 
-        if (myCol == null || targetCol == null)
+        if (myCol2 == null || targetCol == null)
         {
-            sqrDist = (_cachedUnit.transform.position - _cachedUnit.currentTarget.transform.position).sqrMagnitude;
-            return sqrDist <= _data.range * _data.range;
+            sqrDist2 = (_cachedUnit.transform.position - _cachedUnit.currentTarget.transform.position).sqrMagnitude;
         }
         else
         {
-            Vector3 myPoint = myCol.ClosestPoint(targetCol.transform.position);
-            Vector3 targetPoint = targetCol.ClosestPoint(myCol.transform.position);
+            Vector3 myPoint = myCol2.ClosestPoint(targetCol.transform.position);
+            Vector3 targetPoint = targetCol.ClosestPoint(myCol2.transform.position);
 
-            sqrDist = (myPoint - targetPoint).sqrMagnitude;
+            sqrDist2 = (myPoint - targetPoint).sqrMagnitude;
         }
 
-        return sqrDist <= _data.range * _data.range;
+        return sqrDist2 <= _data.range * _data.range;
     }
 
     public override void PreDelay()
@@ -66,7 +116,21 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
     public override void Casting()
     {
         if (!_cachedUnit.Object.HasStateAuthority) return;
-        if (_cachedUnit.currentTarget == null) return;
+
+        UnitBase firstTarget = null;
+
+        if (_data.heroOnly)
+        {
+            firstTarget = FindNearestHeroTarget();
+        }
+        else
+        {
+            firstTarget = _cachedUnit.currentTarget;
+        }
+
+        if (firstTarget == null) return;
+        if (firstTarget.IsDead) return;
+        if (firstTarget.Object == null) return;
 
         _phase = SkillPhase.Casting;
 
@@ -75,7 +139,7 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
         _visited.Clear();
         debugChainTargets.Clear();
 
-        Chain(_cachedUnit.currentTarget, null, 0);
+        Chain(firstTarget, null, 0);
 
     }
 
@@ -155,7 +219,42 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
         if (_cachedUnit.HasStateAuthority) target.TakeDamage(damage);
     }
 
-    private UnitBase FindNextTarget(UnitBase current)
+    private UnitBase FindNearestHeroTarget()// 주변에서 가장 가까운 적 영웅 탐색
+    {
+        int hitCount = Physics.OverlapSphereNonAlloc(
+            _cachedUnit.transform.position,
+            _data.range,
+            _overlapResults,
+            _cachedUnit.TargetLayer
+        );
+
+        UnitBase closestHero = null;
+        float minSqrDist = float.MaxValue;
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            Collider overlapCollider = _overlapResults[i];
+            if (overlapCollider == null) continue;
+            if (!overlapCollider.TryGetComponent(out UnitBase targetUnit)) continue;          
+            if (targetUnit == _cachedUnit) continue;           
+            if (targetUnit.IsDead)  continue;           
+            if (targetUnit.Object == null) continue;
+            if (targetUnit.team == _cachedUnit.team) continue;          
+            if (targetUnit.UnitType != UnitType.Hero) continue;            
+
+            float sqrDist = (_cachedUnit.transform.position - targetUnit.transform.position).sqrMagnitude;
+
+            if (sqrDist < minSqrDist)
+            {
+                minSqrDist = sqrDist;
+                closestHero = targetUnit;
+            }
+        }
+
+        return closestHero;
+    }
+
+    private UnitBase FindNextTarget(UnitBase current)// 다음 체인 대상 탐색 (영웅 우선 없으면 다른 유닛)
     {
         int hitCount = Physics.OverlapSphereNonAlloc(
            current.transform.position,
@@ -182,41 +281,25 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
 
             float sqrDist = (current.transform.position - unit.transform.position).sqrMagnitude;
 
-            if (_data.heroOnly)//heroOnly = true
+            //영웅 우선 없으면 아무나(이미 맞은 유닛 제외)
+            if (unit.UnitType == UnitType.Hero)
             {
-                if (unit.UnitType != UnitType.Hero) continue;
-
                 if (sqrDist < minHeroDist)
                 {
                     minHeroDist = sqrDist;
                     closestHero = unit;
                 }
             }
-            else//heroOnly false
+            else
             {
-                if (unit.UnitType == UnitType.Hero)//영웅 우선 분리
+                if (sqrDist < minOtherDist)
                 {
-                    if (sqrDist < minHeroDist)
-                    {
-                        minHeroDist = sqrDist;
-                        closestHero = unit;
-                    }
-                }
-                else
-                {
-                    if (sqrDist < minOtherDist)
-                    {
-                        minOtherDist = sqrDist;
-                        closestOther = unit;
-                    }
+                    minOtherDist = sqrDist;
+                    closestOther = unit;
                 }
             }
         }
 
-        //heroOnly true : 영웅만
-        if (_data.heroOnly) return closestHero;
-
-        //heroOnly false : 영웅 우선
         return closestHero != null ? closestHero : closestOther;
     }
 
