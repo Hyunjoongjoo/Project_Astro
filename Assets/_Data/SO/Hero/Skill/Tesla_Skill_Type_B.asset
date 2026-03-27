@@ -15,7 +15,7 @@ MonoBehaviour:
   heroId: hero_tesla
   skillIcon: {fileID: 21300000, guid: 141441bbb13d3c4419b4dd39fa8b88fc, type: 3}
   skillName: augment_name_tesla_B
-  skillDescription: 
+  skillDescription: augment_desc_tesla_B
   note: 
   skillVFX: {fileID: 7068615036737649895, guid: 319b7f456bff6df41960de359ccbb215, type: 3}
   skillSFX: {fileID: 0}
