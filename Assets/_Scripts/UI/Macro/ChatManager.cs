@@ -194,6 +194,7 @@ public class ChatManager : NetworkBehaviour
         }
         // 서버에게 채팅 메시지 보내라고 요청 (RPC)
         RPC_SendChatMessage(Runner.LocalPlayer, macroId, IsTeamChatMode());
+        AudioManager.Instance.PlayUISfx(UISfxList.Ping);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)] // 모든 클라이언트에게 전달

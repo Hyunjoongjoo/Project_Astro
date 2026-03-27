@@ -63,5 +63,6 @@ public class ItemCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoin
     private void OnSelectClicked()
     {
         GetComponentInParent<AugmentWindowUI>().OnCardSelected(this, _data);
+        _visualRoot.DOPunchScale(new Vector3(-0.05f, -0.05f, 0), 0.1f);
     }
 }

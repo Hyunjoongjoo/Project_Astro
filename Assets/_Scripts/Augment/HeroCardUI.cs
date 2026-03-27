@@ -103,7 +103,7 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoin
 
     private void OnSelectClicked()
     {
-        _visualRoot.DOPunchScale(new Vector3(-0.05f, -0.05f, 0), 0.1f);
         GetComponentInParent<AugmentWindowUI>().OnCardSelected(this, _data);
+        _visualRoot.DOPunchScale(new Vector3(-0.05f, -0.05f, 0), 0.1f);
     }
 }
