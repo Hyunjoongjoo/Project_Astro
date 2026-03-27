@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using System.Collections;
 
@@ -41,7 +41,7 @@ public class ToastMessageUI : BaseUI
             StopCoroutine(_toastCoroutine);
         }
 
-        Open();
+        Open(false);
 
         _toastCoroutine = StartCoroutine(ToastRoutine());
     }
@@ -50,7 +50,7 @@ public class ToastMessageUI : BaseUI
     {
         yield return CoroutineManager.waitForSeconds(_displayTime);
 
-        DeActivate();
+        DeActivate(false);
 
         _toastCoroutine = null;
     }

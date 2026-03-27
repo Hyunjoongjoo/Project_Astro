@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a380b5b6bec34244eb97d541666aeb18, type: 3}
+  m_Name: SkillAugment_Tesla_B
+  m_EditorClassIdentifier: Assembly-CSharp::SkillAugmentSO
+  AugmentID: augmentSkill_tesla_B
+  ConflictID: augmentSkill_tesla_A
+  TargetHeroID: hero_tesla
+  Tiers:
+  - TitleStringID: augment_name_tesla_B
+    DescStringID: augment_desc_tesla_B
+    Icon: {fileID: 21300000, guid: 141441bbb13d3c4419b4dd39fa8b88fc, type: 3}
+    CombatSkillData: {fileID: 11400000, guid: 5732cff5e9c65af4e83a3d9192f3ad9f, type: 2}
+  - TitleStringID: enhance_augment_name_tesla_B
+    DescStringID: enhance_augment_desc_tesla_B
+    Icon: {fileID: 21300000, guid: 228b759a5af6f3846af46f939ba79b0b, type: 3}
+    CombatSkillData: {fileID: 11400000, guid: 19668948ddb734342a7deb8dd32cebec, type: 2}

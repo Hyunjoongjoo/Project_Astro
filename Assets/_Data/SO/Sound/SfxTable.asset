@@ -14,6 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SFXTable
   _entries:
   - SfxList: 0
-    clip: {fileID: 8300000, guid: 9af2ae660cb4df9448e84078798a7859, type: 3}
+    clip: {fileID: 8300000, guid: 440d28ee6c11415478e4fc63514ae17b, type: 3}
   - SfxList: 1
-    clip: {fileID: 8300000, guid: 7b83b04bff3770b46a6b3ffedfc27529, type: 3}
+    clip: {fileID: 8300000, guid: 46d5feba0efa8a6479c2612cd9a9f23a, type: 3}
+  - SfxList: 2
+    clip: {fileID: 8300000, guid: c57d27a5fd4c7514c9e5059b2024647d, type: 3}
+  _uiEntries:
+  - UISfxList: 0
+    clip: {fileID: 8300000, guid: 98ba28a8ceb005e40994f35019824fd5, type: 3}
+  - UISfxList: 1
+    clip: {fileID: 8300000, guid: d7d2f7cf541ce4745a374158741b01dd, type: 3}
+  - UISfxList: 2
+    clip: {fileID: 8300000, guid: 2d87d421504bbd245ae59132347a2dca, type: 3}

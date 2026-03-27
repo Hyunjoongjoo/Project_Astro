@@ -13,17 +13,21 @@ MonoBehaviour:
   m_Name: Tesla_Skill_Standard
   m_EditorClassIdentifier: Assembly-CSharp::ChainSkillSO
   heroId: hero_tesla
-  skillIcon: {fileID: 0}
+  skillIcon: {fileID: 21300000, guid: 020efd265afbdcf47ae5e70385ca96f1, type: 3}
   skillName: skill_name_tesla
   skillDescription: skill_desc_tesla
   note: 
-  skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  skillVFX: {fileID: 7068615036737649895, guid: 319b7f456bff6df41960de359ccbb215, type: 3}
+  skillSFX: {fileID: 0}
   skillType: 1
   initCooldown: 5
   cooldown: 8
+  preDelay: 0
+  postDelay: 0
+  blockAction: 0
   maxChainCount: 3
   range: 5
   chainRange: 3
   damageRatio: 1
   chainDamageMultiplier: 0.6
-  heroOnly: 0
+  heroOnly: 1

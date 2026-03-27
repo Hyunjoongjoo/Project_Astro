@@ -17,9 +17,14 @@ MonoBehaviour:
   skillName: 
   skillDescription: 
   note: 
-  skillVFX: {fileID: 2393817908272368249, guid: f0db7e10bba6a83488d30c87355f22b7, type: 3}
+  skillVFX: {fileID: 8597731318025692521, guid: ee01279a39536cc47a22c4870745b8e1, type: 3}
+  skillSFX: {fileID: 0}
   skillType: 3
   initCooldown: 3
   cooldown: 3
+  preDelay: 0
+  postDelay: 0
+  blockAction: 0
   additionalDamageRatio: 1.5
+  additionalRange: 3
   onhitPerAttack: 5

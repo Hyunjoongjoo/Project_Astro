@@ -2,12 +2,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SignUpView : MonoBehaviour
+public class SignUpView : BaseUI
 {
     [Header("Input Fields")]
-    [SerializeField] private TMP_InputField _emailInput;
-    [SerializeField] private TMP_InputField _passwordInput;
-    [SerializeField] private TMP_InputField _passwordConfirmInput;
     [SerializeField] private TMP_InputField _nicknameInput;
 
     [Header("Buttons")]
@@ -15,12 +12,23 @@ public class SignUpView : MonoBehaviour
     [SerializeField] private Button _signUpButton;
     [SerializeField] private Button _cancelButton;
 
-    [Header("Feedback")]
+    [Header("text")]
+    [SerializeField] private TextMeshProUGUI _title;
+    [SerializeField] private TextMeshProUGUI _info;
     [SerializeField] private TextMeshProUGUI _resultText;
 
     private bool _isGoogleSign = false;
+    private string _titleText = "회원가입";
+    private string _infoText = "게스트 계정의 경우 분실 시 복구가 불가능합니다.\r\n로비 -> 설정에서 구글 연동을 진행해주세요.";
+
 
     public TMP_InputField NicknameInput => _nicknameInput;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        TextSetting();
+    }
 
     private void Start()
     {
@@ -32,9 +40,6 @@ public class SignUpView : MonoBehaviour
         return new SignUpData
         {
             isGoogle = _isGoogleSign,
-            email = _emailInput.text,
-            password = _passwordInput.text,
-            passwordConfirm = _passwordConfirmInput.text,
             nickname = _nicknameInput.text
         };
     }
@@ -46,9 +51,6 @@ public class SignUpView : MonoBehaviour
 
     public void SetInteractable(bool interactable)
     {
-        _emailInput.interactable = interactable;
-        _passwordInput.interactable = interactable;
-        _passwordConfirmInput.interactable = interactable;
         _nicknameInput.interactable = interactable;
         _checkNicknameButton.interactable = interactable;
         _signUpButton.interactable = interactable;
@@ -81,9 +83,6 @@ public class SignUpView : MonoBehaviour
 
     public void ClearInputs()
     {
-        _emailInput.text = string.Empty;
-        _passwordInput.text = string.Empty;
-        _passwordConfirmInput.text = string.Empty;
         _nicknameInput.text = string.Empty;
     }
 
@@ -92,13 +91,15 @@ public class SignUpView : MonoBehaviour
         _resultText.gameObject.SetActive(false);
     }
 
-    // 닉네임만 입력하는 모드
-    public void SetNicknameOnlyMode(string email)
+    public void SetMode(bool mode)
     {
-        _isGoogleSign = true;
-        _emailInput.text = email;
-        _emailInput.interactable = false;
-        _passwordInput.interactable = false;
-        _passwordConfirmInput.interactable = false;
+        _isGoogleSign = mode;
+    }
+
+    // 스트링 테이블 기반으로 차후 변경 예정
+    public void TextSetting()
+    {
+        _title.text = _titleText;
+        _info.text = _infoText;
     }
 }

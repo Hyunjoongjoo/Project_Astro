@@ -68,7 +68,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.175, y: 0.175, z: 0.175}
+  m_LocalScale: {x: 0.21499999, y: 0.21499999, z: 0.21499999}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6136776830689226868}
@@ -185,7 +185,7 @@ MonoBehaviour:
   firePoint: {fileID: 6694106697435261523}
   currentTarget: {fileID: 0}
   _networkedOnHit: 0
-  _normalAttackData: {fileID: 11400000, guid: ecc13bcc1c61b3f42a7467594662facf, type: 2}
+  _normalAttackData: {fileID: 11400000, guid: 89f94905cbae4f24c8059307e39563c6, type: 2}
   _BoosterRender: 0
   _standardSkillData: {fileID: 11400000, guid: 89f6a0933d3985d45b01ceda93971bd1, type: 2}
   _itemObserver: {fileID: 7510330726489026033}

@@ -6996,6 +6996,7 @@ MonoBehaviour:
   _pingPrefab: {fileID: 4811987937561663124, guid: 5c1ec101fc29cf1439eaebe587378666, type: 3}
   _targetTag: AugmentPanel
   _playerInput: {fileID: 225820723}
+  _pingCombineDistance: 50
 --- !u!114 &225820722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18905,10 +18906,11 @@ MonoBehaviour:
   _maxDeployDistance: 15
   _prefabs:
   - RawGuidValue: d09a2cf10307a4c40a977b56313018db
-  - RawGuidValue: 44e070ac9eccb1a4f9838f1cb2cb4b46
+  - RawGuidValue: c0c1fc4164e37214aa41f81d8ae5136c
   - RawGuidValue: 0eb4bbba84c6e6e44a600eab7ff5e833
-  - RawGuidValue: 67a85cf02e86f6147a3370f9250b4788
+  - RawGuidValue: ff41938af0b79bd49a6284d700d3ec8b
   - RawGuidValue: 1c6d38f465d89a149ac6941541862ec0
+  - RawGuidValue: dd1ef19167209a1469a467d4f8953665
 --- !u!4 &527383477
 Transform:
   m_ObjectHideFlags: 0
@@ -58809,12 +58811,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 024c7cd4a4066014e84fe4b5bbf9c560, type: 2}
   - {fileID: 11400000, guid: e6a44efe39920a94c87bff59487e808a, type: 2}
   - {fileID: 11400000, guid: 4f4da78988462894380af05c0d256dcb, type: 2}
+  - {fileID: 11400000, guid: 9ac0852980d5b3f41bf00a4fc44b8b27, type: 2}
+  - {fileID: 11400000, guid: e17ad44a76982344fa9072f7ec19d6c3, type: 2}
   _allBaseSkills:
   - {fileID: 11400000, guid: d6dd206c7bea98c44acb6c53c617a268, type: 2}
   - {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
   - {fileID: 11400000, guid: 4cd053f36a047424babc7a75bd69c41c, type: 2}
   - {fileID: 11400000, guid: b0fad8a3236bb7e4597f6d58c11cc918, type: 2}
   - {fileID: 11400000, guid: 5a3454fdb602d9240b32304b1c7baf13, type: 2}
+  - {fileID: 11400000, guid: 89f6a0933d3985d45b01ceda93971bd1, type: 2}
   _heroIconSO: {fileID: 11400000, guid: 59f5c354744c3014e8112428c930f6a4, type: 2}
   _itemIconDataSO: {fileID: 11400000, guid: 836b9461e790b0c419b9873f779da732, type: 2}
   _PlayerAugmentTimers:

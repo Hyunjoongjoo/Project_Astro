@@ -10,8 +10,8 @@ public class SignUpController : MonoBehaviour
     [SerializeField] private AnimUI _loginSelectPanel;
 
     [Header("Validation")]
-    [SerializeField] private int _minPasswordLength = 8;
-    [SerializeField] private int _maxPasswordLength = 18;
+    //[SerializeField] private int _minPasswordLength = 8;
+    //[SerializeField] private int _maxPasswordLength = 18;
     [SerializeField] private int _minNicknameLength = 2;
     [SerializeField] private int _maxNicknameLength = 8;
 
@@ -43,23 +43,14 @@ public class SignUpController : MonoBehaviour
         }
     }
 
-    public void OnClickActivePanel(bool active)
-    {
-        if (active)
+    public void OnClickCancel()
+    {   
+        if (AuthService.Instance.CurrentUser != null)
         {
-            _acceptUI.ShowPanel(() => { 
-                _signUpView.gameObject.SetActive(true); 
-            });
+            AuthService.Instance.Logout();
+            _loginSelectPanel.Open();
         }
-        else
-        {
-            if (AuthService.Instance.CurrentUser != null)
-            {
-                AuthService.Instance.Logout();
-                _loginSelectPanel.Open();
-            }
-            _signUpView.gameObject.SetActive(false);
-        }
+        _signUpView.DeActivate(true);
     }
 
     public void OnClickCheckNickname()
@@ -69,7 +60,15 @@ public class SignUpController : MonoBehaviour
 
     public void OnClickSignUp()
     {
-        HandleSignUp();
+        if(!_isNicknameVerified)
+        {
+            _signUpView.ShowError("닉네임 중복 체크를 해주세요.");
+            return;
+        }
+        _acceptUI.ShowPanel(() =>
+        {
+            HandleSignUp();
+        });
     }
 
     private async void HandleCheckNickname()
@@ -138,24 +137,44 @@ public class SignUpController : MonoBehaviour
         {
             if(input.isGoogle)
             {
-                var currentUser = _authService.CurrentUser; // 현재 로그인된 유저 정보 가져오기
-
+                var currentUser = _authService.CurrentUser;
                 if (currentUser != null)
                 {
-                    // 이미 인증은 끝났으니 프로필 업데이트와 DB 생성만 수행
-                    await _authService.UpdateProfileAsync(currentUser, input.nickname);
-                    await _userDataStore.CreateUserDataAsync(currentUser.UserId, input.nickname);
+                    if (UserDataManager.Instance.IsLink)
+                    {
+                        await _authService.UpdateProfileAsync(currentUser, input.nickname);
+                        string guestGuid = PlayerPrefs.GetString("Guest_Email").Split('@')[0];
+                        bool isSuccess = await UserDataManager.Instance.LinkDataAsync(guestGuid, currentUser.UserId);
+
+                        if (!isSuccess) throw new Exception("Data Migration Failed");
+                    }
+                    else
+                    {
+                        // 기존 구글 회원가입 플로우
+                        Debug.Log("[New] 구글 신규 유저 데이터를 생성합니다.");
+                        await _userDataStore.CreateUserDataAsync(currentUser.UserId, input.nickname);
+                    }
                 }
             }
             else
             {
-                // 1단계: Firebase Auth 계정 생성
-                var newUser = await _authService.SignUpAsync(input.email, input.password);
+                // GUID 생성
+                string guestGuid = Guid.NewGuid().ToString("N");
+                string guestEmail = $"{guestGuid}@guest.com";
+                string guestPassword = guestGuid;
 
-                // 2단계: 사용자 프로필 업데이트 (닉네임)
+                // Firebase Auth 계정 생성
+                var newUser = await _authService.SignUpAsync(guestEmail, guestPassword);
+                
+                // 기기에 GUID 저장
+                PlayerPrefs.SetString("Guest_Email", guestEmail);
+                PlayerPrefs.SetString("Guest_PW", guestPassword);
+                PlayerPrefs.Save();
+                
+                // 사용자 프로필 업데이트 (닉네임)
                 await _authService.UpdateProfileAsync(newUser, input.nickname);
 
-                // 3단계: Firestore에 유저 데이터 생성
+                // Firestore에 유저 데이터 생성
                 await _userDataStore.CreateUserDataAsync(newUser.UserId, input.nickname);
             }
 
@@ -206,26 +225,6 @@ public class SignUpController : MonoBehaviour
 
     private string ValidateSignUpInput(SignUpData input)
     {
-        if(!input.isGoogle)
-        {
-            // 이메일 검증
-            if (string.IsNullOrWhiteSpace(input.email))
-                return "이메일을 입력해주세요.";
-
-            if (!input.email.Contains("@"))
-                return "올바른 이메일 형식이 아닙니다.";
-
-            // 비밀번호 검증
-            if (string.IsNullOrWhiteSpace(input.password))
-                return "비밀번호를 입력해주세요.";
-
-            if (input.password.Length < _minPasswordLength || input.password.Length > _maxPasswordLength)
-                return $"비밀번호는 {_minPasswordLength}~{_maxPasswordLength}자여야 합니다.";
-
-            if (input.password != input.passwordConfirm)
-                return "비밀번호가 일치하지 않습니다.";
-        }
-
         // 닉네임 검증
         var nicknameError = ValidateNickname(input.nickname);
         if (nicknameError != null)
@@ -253,8 +252,5 @@ public class SignUpController : MonoBehaviour
 public struct SignUpData
 {
     public bool isGoogle;
-    public string email;
-    public string password;
-    public string passwordConfirm;
     public string nickname;
 }
