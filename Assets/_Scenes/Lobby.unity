@@ -5023,6 +5023,7 @@ GameObject:
   - component: {fileID: 203557591}
   - component: {fileID: 203557593}
   - component: {fileID: 203557592}
+  - component: {fileID: 203557594}
   m_Layer: 5
   m_Name: Text_Sub
   m_TagString: Untagged
@@ -5148,6 +5149,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 203557590}
   m_CullTransparentMesh: 0
+--- !u!114 &203557594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203557590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf325530a6b9664c9987110717cb49c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _stringId: btn_macro_emoticon
 --- !u!1 &203674431
 GameObject:
   m_ObjectHideFlags: 0
@@ -11165,6 +11179,7 @@ GameObject:
   - component: {fileID: 460936672}
   - component: {fileID: 460936674}
   - component: {fileID: 460936673}
+  - component: {fileID: 460936675}
   m_Layer: 5
   m_Name: Text (TMP) (1)
   m_TagString: Untagged
@@ -11291,6 +11306,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 460936671}
   m_CullTransparentMesh: 1
+--- !u!114 &460936675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 460936671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf325530a6b9664c9987110717cb49c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _stringId: macro_ownlist
 --- !u!1 &461539484
 GameObject:
   m_ObjectHideFlags: 0
@@ -12652,6 +12680,7 @@ GameObject:
   - component: {fileID: 508452408}
   - component: {fileID: 508452410}
   - component: {fileID: 508452409}
+  - component: {fileID: 508452411}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -12777,6 +12806,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 508452407}
   m_CullTransparentMesh: 1
+--- !u!114 &508452411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 508452407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf325530a6b9664c9987110717cb49c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _stringId: hero_collection
 --- !u!1 &511708048
 GameObject:
   m_ObjectHideFlags: 0
@@ -30991,6 +31033,7 @@ GameObject:
   - component: {fileID: 830577715}
   - component: {fileID: 830577717}
   - component: {fileID: 830577716}
+  - component: {fileID: 830577718}
   m_Layer: 5
   m_Name: Text_Sub
   m_TagString: Untagged
@@ -31116,6 +31159,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 830577714}
   m_CullTransparentMesh: 0
+--- !u!114 &830577718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 830577714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf325530a6b9664c9987110717cb49c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _stringId: btn_macro_save
 --- !u!1 &837351986
 GameObject:
   m_ObjectHideFlags: 0
@@ -42842,6 +42898,7 @@ GameObject:
   - component: {fileID: 1118454460}
   - component: {fileID: 1118454462}
   - component: {fileID: 1118454461}
+  - component: {fileID: 1118454463}
   m_Layer: 5
   m_Name: Text_Sub
   m_TagString: Untagged
@@ -42967,6 +43024,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1118454459}
   m_CullTransparentMesh: 0
+--- !u!114 &1118454463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118454459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf325530a6b9664c9987110717cb49c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _stringId: btn_macro_text
 --- !u!1 &1125588280
 GameObject:
   m_ObjectHideFlags: 0
