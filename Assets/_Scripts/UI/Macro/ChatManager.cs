@@ -44,10 +44,11 @@ public class ChatManager : NetworkBehaviour
     private void Start()
     {
         ApplySavedMacros();
-
+        RefreshToggleText();
         if (TableManager.Instance != null)
         {
             TableManager.Instance.OnLanguageChanged += ApplySavedMacros;
+            TableManager.Instance.OnLanguageChanged += RefreshToggleText;
         }
     }
     private void OnEnable()
@@ -65,6 +66,7 @@ public class ChatManager : NetworkBehaviour
         if (TableManager.Instance != null)
         {
             TableManager.Instance.OnLanguageChanged -= ApplySavedMacros;
+            TableManager.Instance.OnLanguageChanged -= RefreshToggleText;
         }
     }
 
@@ -266,10 +268,25 @@ public class ChatManager : NetworkBehaviour
     {
         _isTeamChat = !_isTeamChat;
 
-        _toggleTxt.text = _isTeamChat
-        ? (TableManager.Instance.CurrentLanguage == LanguageType.Kor ? "팀원" : "Team")
-        : (TableManager.Instance.CurrentLanguage == LanguageType.Kor ? "전체" : "All");
+        RefreshToggleText();
     }
+
+    private void RefreshToggleText()
+    {
+        if (_toggleTxt == null) return;
+
+        bool isKor = TableManager.Instance.CurrentLanguage == LanguageType.Kor;
+
+        if (_isTeamChat)
+        {
+            _toggleTxt.text = isKor ? "팀원" : "Team";
+        }
+        else
+        {
+            _toggleTxt.text = isKor ? "전체" : "All";
+        }
+    }
+
     private bool IsTeamChatMode()
     {
         // 여기서 현재 토글 버튼 상태를 반환
