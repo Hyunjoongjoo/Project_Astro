@@ -651,7 +651,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC2A4\uD0AC [\uACE0\uD3ED\uD0C4] \uC5C5\uADF8\uB808\uC774\uB4DC"
+  m_text: '[Nanobot Injection+] Upgrade'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
   m_sharedMaterial: {fileID: 8240547230195516182, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
