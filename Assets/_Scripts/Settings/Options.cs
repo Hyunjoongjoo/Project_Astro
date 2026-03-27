@@ -258,4 +258,20 @@ public class Options : MonoBehaviour
             _resultText.text = "최종 변경 실패";
         }
     }
+
+    //운영정책 사이트 연결
+    public void OnClickOpenInfoSite()
+    {
+        string url = "https://sites.google.com/view/astrocommandersinfo/%ED%99%88";
+
+        try
+        {
+            Application.OpenURL(url);
+            Debug.Log($"[Options] URL 열기 시도: {url}");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[Options] URL을 열 수 없습니다: {ex.Message}");
+        }
+    }
 }
