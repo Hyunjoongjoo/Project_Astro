@@ -40,8 +40,8 @@ public class HandCardDetail : BaseUI
         _augmentDes.text = "";
         if (augIds == null || augIds.Count == 0)
         {
-            _augmentName.text = "증강 없음";
-            _augmentDes.text = "적용된 증강이 없습니다.";
+            _augmentName.text = TableManager.Instance.GetString("ingame_augment_empty");
+            _augmentDes.text = TableManager.Instance.GetString("ingame_augment_des_empty");
             _augmentIcon.gameObject.SetActive(false); // 아이콘도 꺼주기
         }
         else
@@ -83,7 +83,7 @@ public class HandCardDetail : BaseUI
         {
             icon.gameObject.SetActive(false);
             nameTxt.text = "";
-            desTxt.text = "장착 아이템 없음"; // 명시적으로 표시
+            desTxt.text = TableManager.Instance.GetString("ingame_item_empty");
             return;
         }
 
