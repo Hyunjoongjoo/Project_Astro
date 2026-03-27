@@ -45,7 +45,6 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoin
     public void OnPointerExit(PointerEventData eventData)
     {
         _visualRoot.DOKill();
-        // 원래 크기로 복구
         _visualRoot.DOScale(1f, _animDuration).SetEase(Ease.OutCubic);
     }
 
@@ -54,7 +53,6 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoin
     public void Setup(AugmentData data)
     {
         _data = data;
-        //_isClicked = false;
         _selectBtn.interactable = true;
 
 
@@ -70,7 +68,7 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoin
 
         //4. 타입 정보 세팅
         if (_heroTypeTxt != null)
-            _heroTypeTxt.text = TableManager.Instance.GetString($"hero_type_{data.heroType.ToString().ToLower()}");
+            _heroTypeTxt.text = TableManager.Instance.GetString($"hero_type_{data.heroType.ToString().ToLower()}_ingame");
 
         if (_heroRoleTxt != null)
             _heroRoleTxt.text = TableManager.Instance.GetString($"hero_role_{data.heroRole.ToString().ToLower()}");
@@ -107,11 +105,5 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoin
     {
         _visualRoot.DOPunchScale(new Vector3(-0.05f, -0.05f, 0), 0.1f);
         GetComponentInParent<AugmentWindowUI>().OnCardSelected(this, _data);
-        //if (_isClicked) return;
-        //_isClicked = true;
-        //_selectBtn.interactable = false;
-
-        //AugmentManager.Instance.SelectAugment(_data);
-        //GetComponentInParent<AugmentWindowUI>().Close();
     }
 }
