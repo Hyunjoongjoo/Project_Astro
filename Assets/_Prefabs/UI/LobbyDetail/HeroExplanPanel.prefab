@@ -303,6 +303,7 @@ GameObject:
   - component: {fileID: 5020864544278045223}
   - component: {fileID: 5317681859799224720}
   - component: {fileID: 132606813896564214}
+  - component: {fileID: 6159363509396291304}
   m_Layer: 5
   m_Name: title
   m_TagString: Untagged
@@ -429,6 +430,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &6159363509396291304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1326888406943727755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf325530a6b9664c9987110717cb49c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _stringId: hero_augment_information
 --- !u!1 &1483672429882615921
 GameObject:
   m_ObjectHideFlags: 0
@@ -651,6 +665,7 @@ GameObject:
   - component: {fileID: 1718671080257303987}
   - component: {fileID: 4619562077327620850}
   - component: {fileID: 354151916125510345}
+  - component: {fileID: 2104002576369546631}
   m_Layer: 5
   m_Name: title
   m_TagString: Untagged
@@ -777,6 +792,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2104002576369546631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2560137682615010366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf325530a6b9664c9987110717cb49c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _stringId: hero_skill_information
 --- !u!1 &2697990770256279844
 GameObject:
   m_ObjectHideFlags: 0
@@ -2106,6 +2134,7 @@ GameObject:
   - component: {fileID: 133894007983770782}
   - component: {fileID: 2544189066568701921}
   - component: {fileID: 3367182628906353271}
+  - component: {fileID: 2707499830790621754}
   m_Layer: 5
   m_Name: title
   m_TagString: Untagged
@@ -2232,6 +2261,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2707499830790621754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4984697874393223401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf325530a6b9664c9987110717cb49c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _stringId: hero_stat
 --- !u!1 &5268054697605601039
 GameObject:
   m_ObjectHideFlags: 0
