@@ -21849,6 +21849,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 5275214595176061787}
     m_Modifications:
     - target: {fileID: 6993033897640933565, guid: e732766fcdf6604428f1addfa0f7cc2f, type: 3}
+      propertyPath: simulationSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6993033897640933565, guid: e732766fcdf6604428f1addfa0f7cc2f, type: 3}
       propertyPath: InitialModule.startSize.scalar
       value: 0.5
       objectReference: {fileID: 0}
