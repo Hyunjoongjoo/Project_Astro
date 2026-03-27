@@ -13,13 +13,18 @@ MonoBehaviour:
   m_Name: Minion_Normal_Attack
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
   heroId: 
+  skillIcon: {fileID: 0}
   skillName: 
   skillDescription: 
   note: 
   skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  skillSFX: {fileID: 8300000, guid: 8ce54c3fe796e2f40b02eb92a7b81d24, type: 3}
   skillType: 0
   initCooldown: 0
   cooldown: 1
+  preDelay: 0
+  postDelay: 0
+  blockAction: 0
   damageRatio: 1
   range: 3
   projectileSpeed: 10

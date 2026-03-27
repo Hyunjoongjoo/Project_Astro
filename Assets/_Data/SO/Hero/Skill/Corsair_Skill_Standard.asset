@@ -18,7 +18,7 @@ MonoBehaviour:
   skillDescription: skill_desc_corsair
   note: 
   skillVFX: {fileID: 0}
-  skillSFX: {fileID: 0}
+  skillSFX: {fileID: 8300000, guid: ea479fe4eab6a70499dd80a356b72ef0, type: 3}
   skillType: 1
   initCooldown: 5
   cooldown: 7

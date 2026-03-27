@@ -13,6 +13,12 @@ public class ObjectContainer : Singleton<ObjectContainer>
     public UnitBase[] blueSideStructure;
     public UnitBase[] redSideStructure;
 
+    [Header("공용 오디오 클립")]
+    public AudioClip heroDeploySound;
+    public AudioClip heroDestroySound;
+    public AudioClip towerDestroySound;
+
+
     public int BridgeIndex {  get; private set; }
 
     public event Action<Team, int> OnIncreasedAugmentGauge;
@@ -24,6 +30,19 @@ public class ObjectContainer : Singleton<ObjectContainer>
         MINION_AUGMENT_EXP = int.Parse(TableManager.Instance.ConfigTable.Get("augment_exp_minion").configValue);
         SUPER_MINION_AUGMENT_EXP = int.Parse(TableManager.Instance.ConfigTable.Get("augment_exp_superminion").configValue);
         HERO_AUGMENT_EXP = int.Parse(TableManager.Instance.ConfigTable.Get("augment_exp_hero").configValue);
+    }
+
+    public AudioClip GetDestroySound(UnitType type)
+    {
+        if (type == UnitType.Hero)
+        {
+            return heroDestroySound;
+        }
+        else if (type == UnitType.Tower)
+        {
+            return towerDestroySound;
+        }
+        return null;
     }
 
     public void IncreaseAugmentGauge(Team diedUnitTeam, UnitType type)

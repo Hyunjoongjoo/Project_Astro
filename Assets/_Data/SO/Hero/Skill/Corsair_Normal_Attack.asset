@@ -9,22 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33bf744b4e39dc04999fede7c64beeea, type: 3}
+  m_Script: {fileID: 11500000, guid: b605f38811daa0247b5ac5bda4750cdd, type: 3}
   m_Name: Corsair_Normal_Attack
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
+  m_EditorClassIdentifier: Assembly-CSharp::HitscanSkillSO
   heroId: hero_corsair
+  skillIcon: {fileID: 0}
   skillName: 
   skillDescription: 
   note: 
-  skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  skillVFX: {fileID: 0}
+  skillSFX: {fileID: 8300000, guid: 3bc96b7b5c99cb0448d988cf6bc4095a, type: 3}
   skillType: 0
   initCooldown: 0
-  cooldown: 1
+  cooldown: 1.2
+  preDelay: 0.3
+  postDelay: 0.3
+  blockAction: 0
   damageRatio: 1
   range: 2
-  projectileSpeed: 10
-  isHoming: 0
-  oneShotProjectileNum: 1
-  spreadAngle: 0
-  repeatingFire: 1
-  interval: 0

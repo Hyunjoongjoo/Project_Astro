@@ -194,43 +194,6 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
         if (_cachedUnit.HasStateAuthority) target.TakeDamage(damage);
     }
 
-    // === 이 메서드는 유닛 컨트롤러로 옮김. 동작 문제 없으면 제거 ===
-
-    //public UnitBase FindNearestHeroTarget()// 주변에서 가장 가까운 적 영웅 탐색
-    //{
-    //    int hitCount = Physics.OverlapSphereNonAlloc(
-    //        _cachedUnit.transform.position,
-    //        _data.range,
-    //        _overlapResults,
-    //        _cachedUnit.TargetLayer
-    //    );
-
-    //    UnitBase closestHero = null;
-    //    float minSqrDist = float.MaxValue;
-
-    //    for (int i = 0; i < hitCount; i++)
-    //    {
-    //        Collider overlapCollider = _overlapResults[i];
-    //        if (overlapCollider == null) continue;
-    //        if (!overlapCollider.TryGetComponent(out UnitBase targetUnit)) continue;          
-    //        if (targetUnit == _cachedUnit) continue;           
-    //        if (targetUnit.IsDead)  continue;           
-    //        if (targetUnit.Object == null) continue;
-    //        if (targetUnit.team == _cachedUnit.team) continue;          
-    //        if (targetUnit.UnitType != UnitType.Hero) continue;            
-
-    //        float sqrDist = (_cachedUnit.transform.position - targetUnit.transform.position).sqrMagnitude;
-
-    //        if (sqrDist < minSqrDist)
-    //        {
-    //            minSqrDist = sqrDist;
-    //            closestHero = targetUnit;
-    //        }
-    //    }
-
-    //    return closestHero;
-    //}
-
     private UnitBase FindNextTarget(UnitBase current)// 다음 체인 대상 탐색 (영웅 우선 없으면 다른 유닛)
     {
         int hitCount = Physics.OverlapSphereNonAlloc(

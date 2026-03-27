@@ -32,7 +32,7 @@ skill_desc_heavyrain,레이저를 단일 대상에게 3회 발사한다,Fires la
 skill_desc_tank,5초간 본인의 받는 피해량이 20% 감소한다,Reduces damage taken by 20% for 5 seconds.,탱크 기본 스킬 설명
 skill_desc_angel,본인을 제외한 아군 영웅 한 명의 체력을 회복시킨다,Heals one allied hero except yourself.,앤젤 기본 스킬 설명
 skill_desc_tachyon,기본 공격 5회마다 멀리 있는 적에게 강화된 공격을 발사한다,Fires an enhanced attack at a distant enemy every 5 basic attacks.,타키온 기본 스킬 설명
-skill_desc_tesla,적 영웅 1명을 전기로 공격한다. 전기는 주변의 적에게 최대 4번까지 전이되며 최초 전이 시 피해량이 감소한다.,Attacks one enemy hero with an electric attack. Electricity is transferred to nearby enemies up to 4 times. damage decreases with the first transfer.,테슬라 기본 스킬 설명
+skill_desc_tesla,적 영웅 1명을 전기로 공격한다. 전기는 주변의 적에게 최대 3번까지 전이되며 최초 전이 시 피해량이 감소한다.,Attacks with an electric attack. Electricity is transferred to 3 times. damage decreases from first transfer.,테슬라 기본 스킬 설명
 augment_name_corsair_A,옴니 스트라이크,Omni Strike,커세어 증강 스킬1 이름
 augment_name_heavyrain_A,초토화,Devastation,헤비레인 증강 스킬1 이름
 augment_name_tank_A,성벽,Bulwark,탱크 증강 스킬1 이름
@@ -107,6 +107,8 @@ passive_desc_tachyon_2,타키온 패시브 스킬2 설명,Description for Tachyo
 passive_desc_tesla_2,테슬라 패시브 스킬2 설명,테슬라 패시브 스킬2 설명,테슬라 패시브 스킬2 설명
 hero_type_robot,전술 슈트,Tactical Suit,영웅의 heroType이 robot이면 정보창에 표시
 hero_type_spacecraft,우주 함선,Spacecraft,영웅의 heroType이 spacecraft면 정보창에 표시
+hero_type_robot_ingame,전술 슈트,T.S,인게임 증강 출력용 
+hero_type_spacecraft_ingame,우주 함선,S.C,인게임 증강 출력용 
 hero_role_tank,방어형,Defense,영웅의 heroRole이 tank면 정보창에 표시
 hero_role_melee,강습형,Assault,영웅의 heroRole이 melee면 정보창에 표시
 hero_role_ranged,포격형,Artillery,영웅의 heroRole이 ranged면 정보창에 표시
@@ -148,7 +150,7 @@ ui_augment_hero_respawn,재소환 대기시간 : {0}초,Respawn Cooldown: {0}s,{
 ui_augment_hero_skill_name,스킬 [{0}],Skill [{0}],{0}에는 영웅이 가진 기본 스킬의 이름 스트링 id 참조
 ui_augment_hero_skill_cooldown,쿨타임: {0}초,Cooldown: {0}s,{0}에는 영웅이 가진 기본 스킬의 쿨타임 값 참조
 ui_augment_skill_des,영웅 {0}의 스킬을 강화합니다,Upgrades the skill of Hero {0}.,{0}에는 해당 증강 스킬을 보유한 영웅의 heroName 참조 (여현구 작성)
-ui_augment_skill_name_format,스킬 [{0}] 업그레이드,Skill [{0}] Upgrade,{0}에는 해당 증강 스킬을 보유한 영웅이 가진 기본 스킬의 이름 참조  (여현구 작성)
+ui_augment_skill_name_format,[{0}] 업그레이드,Upgrade [{0}],{0}에는 해당 증강 스킬을 보유한 영웅이 가진 기본 스킬의 이름 참조  (여현구 작성)
 ui_toast_team_change_success,팀이 교체되었습니다.,Team has been changed.,팀 교체 완료 시 출력될 토스트 메시지
 ui_toast_team_change_failed,팀 교체 신청이 거절되었습니다.,Team change request was declined.,팀 교체 요청 거절될 시 출력될 토스트 메시지
 ui_toast_team_change_unable,{N}초 후 팀 교체 신청 가능,Team change request available in {N}s.,{N} = 팀 교체 신청 가능하기까지 남은 시간 (단위: 초)
@@ -250,8 +252,8 @@ signup_required_agree_privacy,[필수] 개인 정보 처리방침 동의,[Requir
 signup_details,상세보기,View Details,
 signup_agree_start,동의하고 시작,Agree and Start,
 ui_toast_account_not_found,계정을 찾을 수 없습니다.,Account could not be found.,
-btn_1vs1_match,1:1 매칭,1 vs 1,로비 버튼
-btn_2vs2_match,2:2 매칭,2 vs 2,로비 버튼
+btn_1vs1_match,1vs1 매칭,1 vs 1,로비 버튼
+btn_2vs2_match,2vs2 매칭,2 vs 2,로비 버튼
 btn_macro,매크로,Macro,로비 버튼
 btn_robby,로비,Lobby,로비 버튼
 btn_myhero,내 영웅,Heroes,로비 버튼
@@ -298,8 +300,8 @@ hero_des_movetype,소형 유닛은 운석지대를 통과할 수 있습니다.\n
 hero_skill_information,영웅 스킬 정보,Skill Info,영웅 스킬 관련 id 참고
 hero_skill_normal,기본 스킬,Basic Skill,
 hero_augment_information,영웅 증강 정보,Augment Info,영웅 증강 관련 id 참고
-matching_find,상대를 찾는중....,Finding Opponent...,
-btn_matching_cancel,매칭 취소,Cancel Matchmaking,
+matching_find,상대를 찾는중....,Finding...,
+btn_matching_cancel,매칭 취소,Cancel,
 ingame_touchholding,터치 홀드 시 핑 전송 가능,Hold touch to send a ping.,
 ingame_augment_select_upgrade,업그레이드 선택,Select Upgrade,
 ingame_limit_time,제한 시간: {0}초,Time Limit: {0} sec,
@@ -311,7 +313,7 @@ ingame_augment_des_empty,적용된 증강이 없습니다.,No augments applied.,
 ingame_item_empty,장착 아이템이 없습니다.,No items equipped.,
 signup_check_name,닉네임 중복 체크를 해주세요,Please check for duplicate nicknames.,
 signup_check_word_detected,부적절한 단어가 포함되어있습니다: {0},Inappropriate word detected: {0},
-signup_check_unsupported_characters,허용되지 않는 문자(이모지&특수문자 등)만 포함되어 있습니다.,Contains only unsupported characters (emojis & special characters & etc.).,
+signup_check_unsupported_characters,허용되지 않는 문자(이모지&특수문자 등)만 포함되어 있습니다.,Contains only unsupported characters (emojis & special characters & etc.),
 hero_buy_not_enough_gold,골드 부족,Not enough gold,
 hero_max_level,최고 레벨,Max Level,
 hero_lvup_not_enough_exp,경험치가 부족하여 레벨업할 수 없습니다.,Not enough EXP to level up.,
@@ -320,6 +322,8 @@ popup_hero_lvup,레벨업 하시겠습니까?,Would you like to level up?,
 hero_lvup,레벨업,Level Up,
 hero_Requirements_not_met,조건부족,Requirements not met,
 hero_stat_healingpower,치유력,Healing Power,
-hero_buy_purchase,{0}을 구매하시겠습니까?,Would you like to purchase {0}?,
+hero_buy_purchase,을(를) 구매하시겠습니까?,Would you like to purchase?,
 setting_user_link,계정 연동,Link Account,
 macro_emoticon_equip,장착된 이모티콘,equip emoticon,
+ui_toast_unblock_player,차단 해제,Unblock,
+ui_toast_block_player,차단 완료,Block,

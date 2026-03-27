@@ -18,7 +18,7 @@ MonoBehaviour:
   skillDescription: augment_desc_tachyon_B
   note: 
   skillVFX: {fileID: 8597731318025692521, guid: f603c534c8679db47acd28ddb311a129, type: 3}
-  skillSFX: {fileID: 0}
+  skillSFX: {fileID: 8300000, guid: afd70cd925a42834f81261662023a6e3, type: 3}
   skillType: 2
   initCooldown: 3
   cooldown: 3

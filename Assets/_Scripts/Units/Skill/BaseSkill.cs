@@ -79,6 +79,10 @@ public abstract class BaseSkill<T> : ISkill where T : BaseSkillSO
                 break;
         }
     }
+    public void PlayEffectSound()
+    {
+        AudioManager.Instance.PlaySfx(_data.skillSFX);
+    }
 
     public abstract void Casting();
     public abstract bool UsingConditionCheck();

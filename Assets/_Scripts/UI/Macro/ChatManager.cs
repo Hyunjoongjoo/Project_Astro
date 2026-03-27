@@ -295,12 +295,12 @@ public class ChatManager : NetworkBehaviour
         if (StageManager.Instance.IsBlocked(targetPlayer))
         {
             StageManager.Instance.UnblockPlayer(targetPlayer);
-            ToastMessageUI.Instance.ShowToast($"<color=green>차단 해제:</color> {targetNickname}");
+            ToastMessageUI.Instance.ShowToast($"<color=green>{TableManager.Instance.GetString("ui_toast_unblock_player")}:</color> {targetNickname}");
         }
         else
         {
             StageManager.Instance.BlockPlayer(targetPlayer);
-            ToastMessageUI.Instance.ShowToast($"<color=red>차단 완료:</color> {targetNickname}");
+            ToastMessageUI.Instance.ShowToast($"<color=red>{TableManager.Instance.GetString("ui_toast_block_player")}:</color> {targetNickname}");
         }
     }
 

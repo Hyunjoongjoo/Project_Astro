@@ -93,16 +93,42 @@ public class HandCardDetail : BaseUI
         icon.gameObject.SetActive(s != null);
 
         // 3. 데이터 테이블에서 정보 가져오기
-        var data = TableManager.Instance.ItemTable.Get(id);
-        if (data != null)
+        var itemData = TableManager.Instance.ItemTable.Get(id);
+        if (itemData != null)
         {
-            nameTxt.text = TableManager.Instance.GetString(data.name);
-            desTxt.text = TableManager.Instance.GetString(data.note);
+            // 이름 설정
+            nameTxt.text = TableManager.Instance.GetString(itemData.name);
+
+            // 효과 그룹 ID를 통해 모든 효과 설명 가져오기
+            string fullDescription = "";
+            string targetGroupId = itemData.effectGroupId;
+
+            // ItemEffectTable의 모든 데이터를 순회하며 그룹 ID가 일치하는 것들을 찾음
+            var allEffects = TableManager.Instance.ItemEffectTable.GetAll();
+
+            List<string> effectDescs = new List<string>();
+
+            foreach (var effect in allEffects)
+            {
+                if (effect.effectGroupId == targetGroupId)
+                {
+                    // effectDesc(예: des_effect_item007_01)를 StringTable에서 번역해 가져옴
+                    string translatedEffect = TableManager.Instance.GetString(effect.effectDesc);
+                    if (!string.IsNullOrEmpty(translatedEffect))
+                    {
+                        effectDescs.Add(translatedEffect);
+                    }
+                }
+            }
+
+            // 여러 줄일 경우 줄바꿈(\n)이나 콤마(,)로 합쳐줌
+            fullDescription = string.Join("\n", effectDescs);
+            desTxt.text = fullDescription;
         }
         else
         {
-            nameTxt.text = "알 수 없는 아이템";
-            desTxt.text = $"ID: {id} 데이터 없음";
+            nameTxt.text = "Unknown Item";
+            desTxt.text = $"ID: {id} Not Found";
         }
     }
 }

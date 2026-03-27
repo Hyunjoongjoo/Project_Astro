@@ -373,15 +373,18 @@ public class UnitController : UnitBase
         HeroController hero = unit as HeroController;
 
         GameObject prefab = null;
+        AudioClip clip = null;
 
         // 평타 공격인가 스킬인가
         if (type == SkillType.NormalAttack)
         {
             prefab = unit._normalAttackData.skillVFX;
+            clip = unit._normalAttackData.skillSFX;
         }
         else if (hero != null)
         {
             prefab = hero.GetSkillVFX(type);
+            clip = hero.curUniqueSkill.Data.skillSFX;
         }
 
         if (prefab == null)
@@ -404,6 +407,7 @@ public class UnitController : UnitBase
         }
 
         GameObject obj;
+        AudioManager.Instance.PlaySfx(clip);
 
         if (parent != null)
         {
@@ -478,6 +482,7 @@ public class UnitController : UnitBase
                 Projectile projectile = projectileObj.GetComponent<Projectile>();
 
                 projectile.Initialize(projectileSO, networkedTeam, power, Runner);
+                AudioManager.Instance.PlaySfx(projectileSO.skillSFX);
                 projectile.Fire(targetPos);
             }
         }
@@ -501,6 +506,7 @@ public class UnitController : UnitBase
         if (hitscanSO == null) return;
 
         GameObject prefab = hitscanSO.skillVFX;
+        AudioClip clip = hitscanSO.skillSFX;
         if (prefab == null) return;
 
         // 타겟 위치
@@ -530,6 +536,7 @@ public class UnitController : UnitBase
         }
 
         // 이펙트 생성
+        AudioManager.Instance.PlaySfx(clip);
         GameObject fx = Instantiate(prefab);
         LineRenderer lr = fx.GetComponent<LineRenderer>();
 
@@ -574,6 +581,7 @@ public class UnitController : UnitBase
         if (chainSkillSO == null) return;
 
         GameObject prefab = chainSkillSO.skillVFX;
+        AudioClip clip = chainSkillSO.skillSFX;
         if (prefab == null) return;
 
         // 시작 위치
@@ -612,8 +620,9 @@ public class UnitController : UnitBase
             distance = minLength;
         }
 
-        // 이펙트 생성
+        // 이펙트 생성, 오디오 재생
         GameObject fx = Instantiate(prefab);
+        AudioManager.Instance.PlaySfx(clip);
         LineRenderer lr = fx.GetComponent<LineRenderer>();
 
         if (lr != null)

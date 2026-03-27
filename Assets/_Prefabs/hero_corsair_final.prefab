@@ -2663,7 +2663,7 @@ MonoBehaviour:
   firePoint: {fileID: 5809499524673346740}
   currentTarget: {fileID: 0}
   _networkedOnHit: 0
-  _normalAttackData: {fileID: 11400000, guid: 1eda0784ad35dfb46afe69f001332443, type: 2}
+  _normalAttackData: {fileID: 11400000, guid: 1c8bb3d52b8a91c479eb708cef51c5a4, type: 2}
   _BoosterRender: 0
   _standardSkillData: {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
   _itemObserver: {fileID: -1049799989734644490}

@@ -38,9 +38,6 @@ public class Projectile : MonoBehaviour
     {
         _target = targetPos;
 
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySfx(SfxList.HeroNormalAttackSound);
-
         Destroy(gameObject, 3f); // TODO : 오브젝트 풀링 해야하는 부분
     }
 
