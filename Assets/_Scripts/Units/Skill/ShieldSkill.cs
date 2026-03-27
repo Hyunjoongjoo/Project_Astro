@@ -29,8 +29,12 @@ public class ShieldSkill : BaseSkill<ShieldSkillSO>
         //_cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, _cachedUnit.Object.Id, _data.skillType, true, _data.duration);
 
         _phase = SkillPhase.Casting;
+
         // 보호막 지속시간 설정
-        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.duration);
+        float visualTime = _data.duration;
+        float extra = _data.preDelay + _data.postDelay;
+        float castTime = Mathf.Max(1f, visualTime - extra - 0.5f);
+        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, castTime);
         
         if (_data.aoeDamageRatio > 0)
         {
