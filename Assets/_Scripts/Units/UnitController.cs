@@ -217,8 +217,16 @@ public class UnitController : UnitBase
         if (UnitType == UnitType.Hero)
         {
             var hero = this as HeroController;
-            if (hero.StateMachine.CurrentState != hero.DeployState)
-                BoosterRender = true;
+            if (hero != null && hero.StateMachine != null)
+            {
+                if (hero.StateMachine.CurrentState != hero.DeployState)
+                {
+                    if (Object != null && Object.IsValid && Object.HasStateAuthority)
+                    {
+                        BoosterRender = true;
+                    }
+                }
+            }
         }
     }
 
@@ -231,7 +239,12 @@ public class UnitController : UnitBase
             agent.velocity = Vector3.zero;
         }
         if (UnitType == UnitType.Hero)
-            BoosterRender = false;
+        {
+            if (Object != null && Object.IsValid && Object.HasStateAuthority)
+            {
+                BoosterRender = false;
+            }
+        }
     }
 
     public UnitBase FindTarget()
