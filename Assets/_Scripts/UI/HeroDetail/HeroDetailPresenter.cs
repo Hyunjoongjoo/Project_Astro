@@ -134,7 +134,7 @@ public class HeroDetailPresenter : MonoBehaviour
             bool isBuy = UserDataManager.Instance.WalletModel.gold >= _heroData.goldRequirement;
 
             popup.Setup(
-                $"{translatedName}{TableManager.Instance.GetString("hero_buy_purchase")}",
+                $"<color=#00FF1F>{translatedName}</color>\n{TableManager.Instance.GetString("hero_buy_purchase")}",
                 async () => {
                     if (DBStatus.IsUpdating) return;
                     DBStatus.IsUpdating = true;
@@ -159,7 +159,7 @@ public class HeroDetailPresenter : MonoBehaviour
                 },
                 isBuy,
                 TableManager.Instance.GetString("hero_lvup_not_enough_gold"),
-                isBuy ? TableManager.Instance.GetString("btn_hero_buy") : TableManager.Instance.GetString("hero_buy_not_enough_gold"),
+                isBuy ? TableManager.Instance.GetString("btn_hero_buy") : TableManager.Instance.GetString("btn_hero_buy"),
                 TableManager.Instance.GetString("btn_hero_buy_cancel")
             );
         }
@@ -218,7 +218,7 @@ public class HeroDetailPresenter : MonoBehaviour
                 },
                 isExpFull && isGoldEnough, // 버튼 활성화 조건: 경험치와 골드 모두 충족 시
                 alertMsg,
-                (isExpFull && isGoldEnough) ? TableManager.Instance.GetString("hero_lvup") : TableManager.Instance.GetString("hero_Requirements_not_met"),
+                (isExpFull && isGoldEnough) ? TableManager.Instance.GetString("hero_lvup") : TableManager.Instance.GetString("btn_hero_upgrade"),
                 TableManager.Instance.GetString("btn_hero_buy_cancel")
             );
         }
