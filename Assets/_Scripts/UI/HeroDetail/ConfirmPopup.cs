@@ -9,6 +9,7 @@ public class ConfirmPopup : BaseUI
     [SerializeField] private Button _yesBtn;
     [SerializeField] private TMP_Text _yesBtnTxt;
     [SerializeField] private Button _noBtn;
+    [SerializeField] private TMP_Text _noBtnTxt;
 
     public void Setup(string msg,Action onYes, bool canConfirm = true, string denyMsg = "", string yesText = "확인", string noText = "취소")
     {
@@ -26,7 +27,7 @@ public class ConfirmPopup : BaseUI
         }
 
         //취소 버튼 텍스트도 바꾸고 싶으면 추가
-        // _noBtnTxt.text = noText;
+        _noBtnTxt.text = noText;
 
         // YES 버튼 리스너
         _yesBtn.onClick.RemoveAllListeners();

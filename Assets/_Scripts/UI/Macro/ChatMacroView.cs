@@ -37,7 +37,7 @@ public class ChatMacroView : MonoBehaviour
     public void RefreshList(MacroType currentTab, List<ChatMacroData> allMacros, List<string> editingIds, List<string> equippedIds, int maxCount, Action<string> onClick, Action<string> onRemoveClick)
     {
         // 탭 종류에 따른 타이틀 결정
-        string title = (currentTab == MacroType.Text) ? "장착된 매크로" : "장착된 이모티콘";
+        string title = (currentTab == MacroType.Text) ? TableManager.Instance.GetString("macro_equip") : TableManager.Instance.GetString("macro_emoticon_equip");
 
         // 개수 텍스트 업데이트
         if (_countText != null)

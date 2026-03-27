@@ -837,3 +837,4 @@ MonoBehaviour:
   _yesBtn: {fileID: 5772203774115773821}
   _yesBtnTxt: {fileID: 6531615448633282529}
   _noBtn: {fileID: 8291953582166701657}
+  _noBtnTxt: {fileID: 4842422782155450774}

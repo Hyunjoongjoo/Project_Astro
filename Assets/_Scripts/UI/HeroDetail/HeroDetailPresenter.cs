@@ -90,15 +90,15 @@ public class HeroDetailPresenter : MonoBehaviour
 
             // 버튼 텍스트 및 상태 결정 로직
             string priceText = _userHeroData.isUnlock ?
-                $"업그레이드\n{levelData.goldRequirement}골드" :
-                $"구매\n{_heroData.goldRequirement}골드";
+                $"{TableManager.Instance.GetString("btn_hero_upgrade")}\n{levelData.goldRequirement}G" :
+                $"{TableManager.Instance.GetString("btn_hero_buy")}\n{_heroData.goldRequirement}G";
 
             _view.SetUpgradeButton(_userHeroData.isUnlock, priceText, false);
         }
         else
         {
             _view.SetLevelInfo(_userHeroData.level.ToString(), 0, 0); // 0, 0을 넘겨서 "MAX"가 뜨게 함
-            _view.SetUpgradeButton(true, "최고 레벨", true);
+            _view.SetUpgradeButton(true, TableManager.Instance.GetString("hero_max_level"), true);
         }
 
         //스와이프 페이지 갱신
@@ -134,7 +134,7 @@ public class HeroDetailPresenter : MonoBehaviour
             bool isBuy = UserDataManager.Instance.WalletModel.gold >= _heroData.goldRequirement;
 
             popup.Setup(
-                $"{translatedName}을(를) 구매하시겠습니까?",
+                $"{translatedName}{TableManager.Instance.GetString("hero_buy_purchase")}",
                 async () => {
                     if (DBStatus.IsUpdating) return;
                     DBStatus.IsUpdating = true;
@@ -158,8 +158,9 @@ public class HeroDetailPresenter : MonoBehaviour
                     }
                 },
                 isBuy,
-                "골드가 부족하여 구매할 수 없습니다.",
-                isBuy ? "구매" : "골드 부족"
+                TableManager.Instance.GetString("hero_lvup_not_enough_gold"),
+                isBuy ? TableManager.Instance.GetString("btn_hero_buy") : TableManager.Instance.GetString("hero_buy_not_enough_gold"),
+                TableManager.Instance.GetString("btn_hero_buy_cancel")
             );
         }
         else
@@ -167,12 +168,12 @@ public class HeroDetailPresenter : MonoBehaviour
             //경험치랑 골드 조건 확인
             bool isExpFull = _userHeroData.exp >= levelData.expRequirement;
             bool isGoldEnough = UserDataManager.Instance.WalletModel.gold >= levelData.goldRequirement;
-            string alertMsg = !isExpFull ? "경험치가 부족하여 레벨업할 수 없습니다." : "골드가 부족하여 레벨업할 수 없습니다.";
+            string alertMsg = !isExpFull ? TableManager.Instance.GetString("hero_lvup_not_enough_exp") : TableManager.Instance.GetString("hero_lvup_not_enough_gold");
 
             var popup = UIManager.Instance.ShowUI<ConfirmPopup>(_confirmPopupPrefab);
 
             popup.Setup(
-                "레벨업 하시겠습니까?", 
+                TableManager.Instance.GetString("popup_hero_lvup"), 
                 async () =>
                 {
                     if (DBStatus.IsUpdating) return;
@@ -217,7 +218,8 @@ public class HeroDetailPresenter : MonoBehaviour
                 },
                 isExpFull && isGoldEnough, // 버튼 활성화 조건: 경험치와 골드 모두 충족 시
                 alertMsg,
-                (isExpFull && isGoldEnough) ? "레벨업" : "조건 부족"
+                (isExpFull && isGoldEnough) ? TableManager.Instance.GetString("hero_lvup") : TableManager.Instance.GetString("hero_Requirements_not_met"),
+                TableManager.Instance.GetString("btn_hero_buy_cancel")
             );
         }
     }
@@ -321,23 +323,23 @@ public class HeroDetailPresenter : MonoBehaviour
         }
 
         //성장수치 보여줄 애들은 성장수치도 보여주기
-        _view.AddStatItem("체력", GetStatText(status.BaseHp, tableBase.ipLvHp), _statIcons.GetIcon(StatType.Hp),Color.green);
-        _view.AddStatItem("공격력", GetStatText(status.baseAttackPower, tableBase.ipLvAttackPower), _statIcons.GetIcon(StatType.AttackPower), Color.green);
+        _view.AddStatItem(TableManager.Instance.GetString("hero_stat_hp"), GetStatText(status.BaseHp, tableBase.ipLvHp), _statIcons.GetIcon(StatType.Hp),Color.green);
+        _view.AddStatItem(TableManager.Instance.GetString("hero_stat_atk"), GetStatText(status.baseAttackPower, tableBase.ipLvAttackPower), _statIcons.GetIcon(StatType.AttackPower), Color.green);
 
         if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0) //치유력은 있는애들만 표시
-            _view.AddStatItem("치유력", GetStatText(status.baseHealingPower, tableBase.ipLvHealingPower), _statIcons.GetIcon(StatType.HealingPower), Color.green);
+            _view.AddStatItem(TableManager.Instance.GetString("hero_stat_healingpower"), GetStatText(status.baseHealingPower, tableBase.ipLvHealingPower), _statIcons.GetIcon(StatType.HealingPower), Color.green);
 
-        _view.AddStatItem("공격 속도", status.attackSpeed.ToString("F2"), _statIcons.GetIcon(StatType.AttackSpeed));
-        _view.AddStatItem("이동 속도", status.moveSpeed.ToString("F1"), _statIcons.GetIcon(StatType.MoveSpeed));
-        _view.AddStatItem("감지 범위", status.detectionRange.ToString("F1"), _statIcons.GetIcon(StatType.DetectionRange));
-        _view.AddStatItem("재소환 시간", status.spawnCooldown.ToString("F1"), _statIcons.GetIcon(StatType.RespawnTime));
-        _view.AddStatItem("쿨타임 증감", status.cooltimeReduce.ToString("F1"), _statIcons.GetIcon(StatType.SkillCooldown));
-        _view.AddStatItem("피해 감소량", status.damageReduce.ToString("F1"), _statIcons.GetIcon(StatType.DamageReduction));
+        _view.AddStatItem(TableManager.Instance.GetString("hero_stat_atkspeed"), status.attackSpeed.ToString("F2"), _statIcons.GetIcon(StatType.AttackSpeed));
+        _view.AddStatItem(TableManager.Instance.GetString("hero_stat_movespeed"), status.moveSpeed.ToString("F1"), _statIcons.GetIcon(StatType.MoveSpeed));
+        _view.AddStatItem(TableManager.Instance.GetString("hero_stat_detectionRange"), status.detectionRange.ToString("F1"), _statIcons.GetIcon(StatType.DetectionRange));
+        _view.AddStatItem(TableManager.Instance.GetString("hero_stat_spawncooldown"), status.spawnCooldown.ToString("F1"), _statIcons.GetIcon(StatType.RespawnTime));
+        _view.AddStatItem(TableManager.Instance.GetString("hero_stat_cooltimereduce"), status.cooltimeReduce.ToString("F1"), _statIcons.GetIcon(StatType.SkillCooldown));
+        _view.AddStatItem(TableManager.Instance.GetString("hero_stat_damagereduce"), status.damageReduce.ToString("F1"), _statIcons.GetIcon(StatType.DamageReduction));
 
         string typeKey = $"hero_movetype_{status.moveType.ToString().ToLower()}";
         string typeName = TableManager.Instance.GetString(typeKey);
 
-        var moveTypeItem = _view.AddStatItem("이동 유형", typeName, _statIcons.GetIcon(StatType.MoveType));
+        var moveTypeItem = _view.AddStatItem(TableManager.Instance.GetString("hero_stat_movetype"), typeName, _statIcons.GetIcon(StatType.MoveType));
 
         if (moveTypeItem != null)
         {
