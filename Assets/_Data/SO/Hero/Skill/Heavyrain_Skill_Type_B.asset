@@ -18,7 +18,7 @@ MonoBehaviour:
   skillDescription: augment_desc_heavyrain_B
   note: 
   skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
-  skillSFX: {fileID: 0}
+  skillSFX: {fileID: 8300000, guid: 5fce2a908966c53449db225fd66a25cd, type: 3}
   skillType: 2
   initCooldown: 4
   cooldown: 8

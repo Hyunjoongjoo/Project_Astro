@@ -44,6 +44,7 @@ public class HeroController : UnitController
         BoosterAnimator = transform.GetChild(0).GetComponent<Animator>();
 
         InitAttackRange();
+        AudioManager.Instance.PlaySfx(ObjectContainer.Instance.heroDeploySound);
 
         if (!Object.HasStateAuthority) return;
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
