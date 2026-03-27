@@ -63,7 +63,7 @@ public static class InputValidator
         // 필터 후 빈값이 됐다면 문제있는 상황인것
         if (string.IsNullOrEmpty(filterText))
         {
-            throw new Exception("허용되지 않는 문자(이모지/특수문자 등)만 포함되어 있습니다.");
+            throw new Exception(TableManager.Instance.GetString("signup_check_unsupported_characters"));
         }
 
         // 인젝션 공격
@@ -71,10 +71,11 @@ public static class InputValidator
             throw new Exception("허용되지 않는 문자가 포함되어 있습니다. (Code Injection)");
 
         // 비속어(리스트업된것들 중)
+        string format = TableManager.Instance.GetString("signup_check_word_detected");
         foreach (var badWord in BadWords)
         {
             if (filterText.Contains(badWord))
-                throw new Exception($"부적절한 단어가 포함되어 있습니다: {badWord}");
+            throw new Exception(string.Format(format, badWord));
         }
     }
 }
