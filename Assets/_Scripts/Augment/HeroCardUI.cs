@@ -70,7 +70,7 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoin
 
         //4. 타입 정보 세팅
         if (_heroTypeTxt != null)
-            _heroTypeTxt.text = TableManager.Instance.GetString($"hero_type_{data.heroType.ToString().ToLower()}");
+            _heroTypeTxt.text = TableManager.Instance.GetString($"hero_type_{data.heroType.ToString().ToLower()}_ingame");
 
         if (_heroRoleTxt != null)
             _heroRoleTxt.text = TableManager.Instance.GetString($"hero_role_{data.heroRole.ToString().ToLower()}");
