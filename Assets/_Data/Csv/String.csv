@@ -300,8 +300,8 @@ hero_des_movetype,소형 유닛은 운석지대를 통과할 수 있습니다.\n
 hero_skill_information,영웅 스킬 정보,Skill Info,영웅 스킬 관련 id 참고
 hero_skill_normal,기본 스킬,Basic Skill,
 hero_augment_information,영웅 증강 정보,Augment Info,영웅 증강 관련 id 참고
-matching_find,상대를 찾는중....,Finding Opponent...,
-btn_matching_cancel,매칭 취소,Cancel Matchmaking,
+matching_find,상대를 찾는중....,Finding...,
+btn_matching_cancel,매칭 취소,Cancel,
 ingame_touchholding,터치 홀드 시 핑 전송 가능,Hold touch to send a ping.,
 ingame_augment_select_upgrade,업그레이드 선택,Select Upgrade,
 ingame_limit_time,제한 시간: {0}초,Time Limit: {0} sec,
