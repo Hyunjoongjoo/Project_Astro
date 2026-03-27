@@ -108,7 +108,7 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
 
         if (firstTarget == null) return;
         if (firstTarget.IsDead) return;
-        if (firstTarget.Object == null) return;
+        if (firstTarget.Object == null || !firstTarget.Object.IsValid) return;
 
         _phase = SkillPhase.Casting;
 
@@ -155,10 +155,15 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
         Vector3 startPos = prev != null ? prev.transform.position : _cachedUnit.transform.position;
         Vector3 endPos = current.transform.position;
 
-        if (_cachedUnit.HasStateAuthority && current.Object != null)
+        if (_cachedUnit.HasStateAuthority &&
+            _cachedUnit.Object != null && _cachedUnit.Object.IsValid &&
+            current.Object != null && current.Object.IsValid)
         {
-            NetworkId fromId = (prev != null) ? prev.Object.Id : _cachedUnit.Object.Id;
-
+            NetworkId fromId = _cachedUnit.Object.Id;
+            if (prev != null && prev.Object != null && prev.Object.IsValid)
+            {
+                fromId = prev.Object.Id;
+            }
             _cachedUnit.RPC_PlayChainEffect(fromId, current.Object.Id);
         }
 
@@ -178,9 +183,14 @@ public class ChainSkill : BaseSkill<ChainSkillSO>
 
     private void ApplyDamage(UnitBase target, bool isChained, int chainCount)
     {
+        if (_cachedUnit == null || target == null) return;
+        if (_cachedUnit.IsDead || target.IsDead) return;
+        if (_cachedUnit.Object == null || !_cachedUnit.Object.IsValid) return;
+        if (target.Object == null || !target.Object.IsValid) return;
+
         float damage = _cachedUnit.AttackPower * _data.damageRatio; //기본공격력*비율
         if (isChained) damage *= _data.chainDamageMultiplier; //1회만 감소    
-        Debug.Log($"[체인스킬] HIT[{chainCount}] → {isChained} / dmg:{damage}");
+        //Debug.Log($"[체인스킬] HIT[{chainCount}] → {isChained} / dmg:{damage}");
         if (_cachedUnit.HasStateAuthority) target.TakeDamage(damage);
     }
 
