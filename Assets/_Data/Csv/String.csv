@@ -7,12 +7,12 @@ name_hero_tank,탱크,Tank,탱크 영웅 이름
 name_hero_angel,앤젤,Angel,앤젤 영웅 이름
 name_hero_tachyon,타키온,Tachyon,타키온 영웅 이름
 name_hero_tesla,테슬라,Tesla,테슬라 영웅 이름
-desc_hero_corsair,압도적인 가속력으로 전선의 사각을 파고들어 적의 핵심 전력을 단숨에 무력화하는 돌격의 기수입니다,A vanguard of the assault who uses overwhelming acceleration to penetrate blind spots and neutralize key enemy forces instantly.,커세어 영웅 설명
+desc_hero_corsair,압도적인 가속력으로 전선의 사각을 파고들어 적의 핵심 전력을 단숨에 무력화하는 돌격의 기수입니다,A vanguard of the assault which uses acceleration to penetrate blind spots and neutralize key enemy forces instantly.,커세어 영웅 설명
 desc_hero_heavyrain,안전거리 밖에서 적의 진형을 초토화하는 원거리 화력의 정점입니다,The pinnacle of long-range firepower that devastates enemy formations from a safe distance.,헤비레인 영웅 설명
 desc_hero_tank,적의 파상공격을 정면으로 받아내며 아군의 진격로를 개척하는 움직이는 요새입니다,A moving fortress that takes enemy waves head-on while clearing a path for allies.,탱크 영웅 설명
 desc_hero_angel,나노-리페어 기술로 손상된 아군 유닛을 복구하는 전장의 수호천사입니다,A guardian angel of the battlefield who repairs damaged allied units using nano-repair technology.,앤젤 영웅 설명
 desc_hero_tachyon,주무기를 통해 에너지를 모은 뒤 오버클럭 탄환을 발사하여 원거리의 적을 무력화합니다,Charges energy through the main weapon and fires overclocked bullets to neutralize distant enemies.,타키온 영웅 설명
-desc_hero_tesla,연쇄적인 피해를 입히는 스킬로 많은 수의 적을 상대로 할 때 유리한 다수전의 스페셜리스트입니다,A specialist in multi-enemy combat which is advantageous against large numbers of enemies due to skills that inflict chain damage.,테슬라 영웅 설명
+desc_hero_tesla,연쇄적인 피해를 입히는 스킬로 많은 수의 적을 상대로 할 때 유리한 다수전의 스페셜리스트입니다,A specialist in multi-enemy combat which is advantageous against large numbers of enemies due to inflict chain damage.,테슬라 영웅 설명
 name_unit_minion,미니언,Minion,미니언 이름
 name_unit_superminion,강화 미니언,Super Minion,강화미니언 이름
 name_unit_bridge,함교,Bridge,함교 이름
@@ -250,8 +250,8 @@ signup_required_agree_privacy,[필수] 개인 정보 처리방침 동의,[Requir
 signup_details,상세보기,View Details,
 signup_agree_start,동의하고 시작,Agree and Start,
 ui_toast_account_not_found,계정을 찾을 수 없습니다.,Account could not be found.,
-btn_1vs1_match,2:2 매칭,2:2 Matchmaking,로비 버튼
-btn_2vs2_match,1:1 매칭,1:1 Matchmaking,로비 버튼
+btn_1vs1_match,1:1 매칭,2:2 Matchmaking,로비 버튼
+btn_2vs2_match,2:2 매칭,1:1 Matchmaking,로비 버튼
 btn_macro,매크로,Macro,로비 버튼
 btn_robby,로비,Lobby,로비 버튼
 btn_myhero,내 영웅,My Heroes,로비 버튼
@@ -295,9 +295,9 @@ hero_stat_cooltimereduce,쿨타임 증감,Cooldown Reduction,
 hero_stat_damagereduce,피해 감소량,Damage Reduction,
 hero_stat_movetype,이동 유형,Movement Type,
 hero_des_movetype,소형 유닛은 운석지대를 통과할 수 있습니다.\n대형 유닛은 통과할 수 없습니다.,Small units can pass through asteroid fields.\nLarge units cannot.,
-hero_skill_information,영웅 스킬 정보,Hero Skill Info,영웅 스킬 관련 id 참고
+hero_skill_information,영웅 스킬 정보,Skill Info,영웅 스킬 관련 id 참고
 hero_skill_normal,기본 스킬,Basic Skill,
-hero_augment_information,영웅 증강 정보,Hero Augment Info,영웅 증강 관련 id 참고
+hero_augment_information,영웅 증강 정보,Augment Info,영웅 증강 관련 id 참고
 matching_find,상대를 찾는중....,Finding Opponent...,
 btn_matching_cancel,매칭 취소,Cancel Matchmaking,
 ingame_touchholding,터치 홀드 시 핑 전송 가능,Hold touch to send a ping.,
@@ -312,3 +312,12 @@ ingame_item_empty,장착 아이템이 없습니다.,No items equipped.,
 signup_check_name,닉네임 중복 체크를 해주세요,Please check for duplicate nicknames.,결과 표시 로 표현되어있음.
 signup_check_word_detected,부적절한 단어가 포함되어있습니다: {0},Inappropriate word detected: {0},코드
 signup_check_unsupported_characters,허용되지 않는 문자(이모지&특수문자 등)만 포함되어 있습니다.,Contains only unsupported characters (emojis & special characters & etc.).,코드
+hero_buy_not_enough_gold,골드 부족,Not enough gold,
+hero_max_level,최고 레벨,Max Level,
+hero_lvup_not_enough_exp,경험치가 부족하여 레벨업할 수 없습니다.,Not enough EXP to level up.,
+hero_lvup_not_enough_gold,골드가 부족하여 레벨업할 수 없습니다.,Not enough Gold to level up.,
+popup_hero_lvup,레벨업 하시겠습니까?,Would you like to level up?,
+hero_lvup,레벨업,Level Up,
+hero_Requirements_not_met,조건부족,Requirements not met,
+hero_stat_healingpower,치유력,Healing Power,
+hero_buy_purchase,{0}을 구매하시겠습니까?,Would you like to purchase {0}?,
