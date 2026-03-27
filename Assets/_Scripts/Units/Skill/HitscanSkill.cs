@@ -55,7 +55,10 @@ public class HitscanSkill : BaseSkill<HitscanSkillSO>
             target.TakeDamage(damage);
 
             //이펙트 추가 예정
-            _cachedUnit.RPC_PlayHitscanEffect(_cachedUnit.Object.Id, target.Object.Id);
+            if (target.Object != null && target.Object.IsValid)
+            {
+                _cachedUnit.RPC_PlayHitscanEffect(_cachedUnit.Object.Id, target.Object.Id);
+            }
         }
 
         Vector3 start = _cachedUnit.transform.position;

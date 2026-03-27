@@ -163,32 +163,35 @@ public class AugmentWindowUI : BaseUI
 
     private void UpdateTimerUI()
     {
-        if (_stageManager != null && _timerTxt != null && !_isForcePicked)
+        //03-27 CurrentState가 스폰후에 접근하도록 null 방지
+        if (_stageManager == null || _stageManager.Object == null || !_stageManager.Object.IsValid || _timerTxt == null || _isForcePicked)
         {
-            //상태(시작 전, 진행중) 에 따라 알맞은 곳에서 타이머 정보
-            float timeLeft = 0f;
+            return;
+        }
+        //상태(시작 전, 진행중) 에 따라 알맞은 곳에서 타이머 정보
+        float timeLeft = 0f;
 
-            if (_stageManager.CurrentState == StageState.PreGameAugment)
+        if (_stageManager.CurrentState == StageState.PreGameAugment)
+        {
+            //시작 전 2연속 증강은 StageManager의 글로벌 시계 참조
+            timeLeft = _stageManager.StateTimer;
+        }
+        else if (_stageManager.CurrentState == StageState.Playing)
+        {
+            //인게임 증강은 AugmentController의 개별 유저 시계 참조
+            if (AugmentController.Instance.PlayerAugmentTimers.TryGet(_stageManager.Runner.LocalPlayer, out float time))
             {
-                //시작 전 2연속 증강은 StageManager의 글로벌 시계 참조
-                timeLeft = _stageManager.StateTimer;
-            }
-            else if (_stageManager.CurrentState == StageState.Playing)
-            {
-                //인게임 증강은 AugmentController의 개별 유저 시계 참조
-                if (AugmentController.Instance.PlayerAugmentTimers.TryGet(_stageManager.Runner.LocalPlayer, out float time))
-                {
-                    timeLeft = time;
-                }
-            }
-            //소수점 올림
-            if (timeLeft > 0 || _stageManager.CurrentState == StageState.PreGameAugment)
-            {
-                int displayTime = Mathf.Max(0, Mathf.CeilToInt(timeLeft));
-                string timerFormat = TableManager.Instance.GetString("ingame_limit_time");
-                _timerTxt.text = string.Format(timerFormat, displayTime);
+                timeLeft = time;
             }
         }
+        //소수점 올림
+        if (timeLeft > 0 || _stageManager.CurrentState == StageState.PreGameAugment)
+        {
+            int displayTime = Mathf.Max(0, Mathf.CeilToInt(timeLeft));
+            string timerFormat = TableManager.Instance.GetString("ingame_limit_time");
+            _timerTxt.text = string.Format(timerFormat, displayTime);
+        }
+
     }
 
     //카드들이 자신을 터치했을 때 호출하는 함수

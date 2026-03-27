@@ -219,7 +219,7 @@ btn_help_play,인게임,In-Game,
 btn_help_augment,증강,Augment,
 btn_help_item,아이템,Item,
 btn_help_hero,영웅,Hero,
-help_play_1,로비에서 [1VS1] 또는 [2VS2] 버튼을 눌러 원하는 게임에 입장할 수 있습니다.,You can enter a game by pressing the [1VS1] or [2VS2] button in the lobby.,
+help_play_1,로비에서 [1vs1] 또는 [2vs2] 버튼을 눌러 원하는 게임에 입장할 수 있습니다.,You can enter a game by pressing the [1vs1] or [2vs2] button in the lobby.,
 help_play_2,게임 시간 4분 이내에 상대의 메인 함교를 파괴하면 승리합니다.\n시간 종료 이후에도 함교가 파괴되지 않았다면 포탑 파괴 갯수가 더 많은 진영이 승리합니다.,Win by destroying the enemy's Main Bridge within 4 minutes.\nThe side with more destroyed Turrets wins if no bridge is destroyed when time expires.,
 help_play_3,증강에서 영웅을 선택하면 슬롯에 등록됩니다.\n슬롯에 등록된 영웅은 화면에 드래그하는 것으로 출격시킬 수 있습니다.\n출격한 영웅은 일정 시간동안 다시 출격할 수 없습니다.,Selecting a hero in Augment registers them to a slot.\nYou can deploy heroes by dragging them from the slot onto the screen.\nDeployed heroes cannot be redeployed for a certain period.,
 help_augment_1,전투 중 [증강]을 통해 영웅들의 능력을 강화할 수 있습니다.,You can enhance your heroes' abilities through [Augment] during battle.,
@@ -250,11 +250,11 @@ signup_required_agree_privacy,[필수] 개인 정보 처리방침 동의,[Requir
 signup_details,상세보기,View Details,
 signup_agree_start,동의하고 시작,Agree and Start,
 ui_toast_account_not_found,계정을 찾을 수 없습니다.,Account could not be found.,
-btn_1vs1_match,1:1 매칭,2:2 Matchmaking,로비 버튼
-btn_2vs2_match,2:2 매칭,1:1 Matchmaking,로비 버튼
+btn_1vs1_match,1:1 매칭,1 vs 1,로비 버튼
+btn_2vs2_match,2:2 매칭,2 vs 2,로비 버튼
 btn_macro,매크로,Macro,로비 버튼
 btn_robby,로비,Lobby,로비 버튼
-btn_myhero,내 영웅,My Heroes,로비 버튼
+btn_myhero,내 영웅,Heroes,로비 버튼
 btn_setting_sound,소리,Sound,환경설정 카테고리 버튼
 btn_setting_screen,화면,Screen,환경설정 카테고리 버튼
 btn_setting_etc,기타,Others,환경설정 카테고리 버튼
@@ -273,7 +273,7 @@ btn_credit,개발자 크레딧,Credits,버튼
 btn_operation_policy,운영 정책 안내,Operating Policy,버튼
 btn_macro_text,텍스트 매크로,Text Macro,버튼
 btn_macro_emoticon,이모티콘,Emoticon,버튼
-macro_equip,장착된 매크로,Equipped Macros,
+macro_equip,장착된 매크로 {0},Equipped Macros,
 macro_ownlist,보유 목록,Owned List,
 btn_macro_save,저장하기,Save,버튼
 hero_collection,영웅 컬렉션,Hero Collection,
@@ -321,3 +321,4 @@ hero_lvup,레벨업,Level Up,
 hero_Requirements_not_met,조건부족,Requirements not met,
 hero_stat_healingpower,치유력,Healing Power,
 hero_buy_purchase,{0}을 구매하시겠습니까?,Would you like to purchase {0}?,
+setting_user_link,계정 연동,Link Account,
