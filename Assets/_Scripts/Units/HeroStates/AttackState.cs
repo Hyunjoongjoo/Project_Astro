@@ -5,7 +5,7 @@ using UnityEngine;
 public class AttackState : IState
 {
     private UnitController _unit;
-    //private TickTimer _attackTimer;
+    private TickTimer _attackTimer;
 
     // 평타를 시전하는 것이 스킬의 조건 등 다른 곳에 영향을 끼치는 경우 구독.
     public Action OnNormalAttack;
@@ -57,9 +57,12 @@ public class AttackState : IState
         //}
 
         //Skill이 쿨을 관리하므로 여기서는 조건만 체크
-        if (_unit.normalAttack != null && _unit.normalAttack.UsingConditionCheck())
+        if (_unit.normalAttack != null &&
+            _attackTimer.ExpiredOrNotRunning(_unit.Runner) &&
+            _unit.normalAttack.UsingConditionCheck())
         {
             PerformAttack();
+            _attackTimer = TickTimer.CreateFromSeconds(_unit.Runner, _unit.UnitStat.AttackSpeed.Value);
         }
     }
 
