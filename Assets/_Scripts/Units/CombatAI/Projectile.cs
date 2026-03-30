@@ -29,7 +29,7 @@ public class Projectile : MonoBehaviour
         _data = data;
         _team = team;
         _runner = runner;
-        _finalPower = power * _data.damageRatio;
+        _finalPower = power;
         ApplyTeamColor(team);
         isInitialized = true;
     }
@@ -37,9 +37,6 @@ public class Projectile : MonoBehaviour
     public void Fire(Vector3 targetPos)
     {
         _target = targetPos;
-
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySfx(SfxList.ShotLaserSound);
 
         Destroy(gameObject, 3f); // TODO : 오브젝트 풀링 해야하는 부분
     }

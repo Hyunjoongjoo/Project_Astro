@@ -79,6 +79,9 @@ public class StageManager : NetworkBehaviour
     [Networked] private MatchType CurMatchType { get; set; }
 
 
+    //3.27 플래그 추가
+    [Networked] private NetworkBool _augmentTimeoutHandled { get; set; }
+
     //더미 클라이언트 존재 여부
     private bool _existDummy;
 
@@ -283,12 +286,14 @@ public class StageManager : NetworkBehaviour
     //타이머 깎는 함수 추가
     private void UpdateAugmentSelectionTimer()
     {
+        if (_augmentTimeoutHandled) return;
+
         StateTimer -= Runner.DeltaTime;
         if (StateTimer <= 0)
         {
+            _augmentTimeoutHandled = true;
             //시간 종료 시모든 클라이언트에게 강제로 픽하라고 명령
             RPC_ForceAugmentTimeout();
-            StateTimer = 9999f; //RPC가 중복 호출 방지 9999
         }
     }
 
@@ -331,6 +336,7 @@ public class StageManager : NetworkBehaviour
             if (config != null) selectTime = float.Parse(config.configValue);
 
             StateTimer = selectTime; //타이머 시작
+            _augmentTimeoutHandled = false;
             _playerAugmentReady.Clear(); //레디 초기화
             RPC_RequestPreGameAugment(PreGameAugmentRound);
         }

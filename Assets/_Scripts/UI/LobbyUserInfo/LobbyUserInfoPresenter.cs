@@ -16,6 +16,7 @@ public class LobbyUserInfoPresenter : MonoBehaviour
         {
             UserDataManager.Instance.OnGoldChanged += UpdateGoldView;
             UserDataManager.Instance.OnWinCountChanged += UpdateWinView;
+            UserDataManager.Instance.OnNickNameChanged += UpdateNicknameView;
         }
     }
 
@@ -26,6 +27,7 @@ public class LobbyUserInfoPresenter : MonoBehaviour
         {
             UserDataManager.Instance.OnGoldChanged -= UpdateGoldView;
             UserDataManager.Instance.OnWinCountChanged -= UpdateWinView;
+            UserDataManager.Instance.OnNickNameChanged -= UpdateNicknameView;
         }
     }
 
@@ -51,6 +53,7 @@ public class LobbyUserInfoPresenter : MonoBehaviour
     private void UpdateGoldView(int newGold) => _view.SetGold(newGold);
     // 승리수 갱신 콜백
     private void UpdateWinView(int newWin) => _view.SetWinCount(newWin);
+    private void UpdateNicknameView(string newNickName) => _view.SetNickName(newNickName);
 
     // 계산 로직은 Presenter가 담당 (나중에 테이블 매니저 참조로 변경 가능)
     private float GetMaxExpForLevel(int level)

@@ -12,15 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33bf744b4e39dc04999fede7c64beeea, type: 3}
   m_Name: Tower_Projectile
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSkillSO
-  skillId: 
   heroId: 
+  skillIcon: {fileID: 0}
   skillName: 
   skillDescription: 
   note: 
   skillVFX: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
+  skillSFX: {fileID: 8300000, guid: a296cba82d8069a4db0fb3877e64eb91, type: 3}
   skillType: 0
   initCooldown: 0
   cooldown: 2
+  preDelay: 0
+  postDelay: 0
+  blockAction: 0
   damageRatio: 1
   range: 5
   projectileSpeed: 50

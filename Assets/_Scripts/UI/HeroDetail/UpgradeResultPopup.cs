@@ -47,17 +47,17 @@ public class UpgradeResultPopup : BaseUI
         }
 
         //체력 표시
-        _hpDiffTxt.text = $"체력 : {oldStat.BaseHp} -> {newStat.BaseHp}";
+        _hpDiffTxt.text = $"{TableManager.Instance.GetString("hero_stat_hp")}\n{oldStat.BaseHp} -> {newStat.BaseHp}";
         _hpPlusTxt.text = $"<color={growthColor}>(+ {tableBase.ipLvHp})</color>";
 
         //공격력 표시
-        _atkDiffTxt.text = $"공격력 : {oldStat.baseAttackPower} -> {newStat.baseAttackPower}";
+        _atkDiffTxt.text = $"{TableManager.Instance.GetString("hero_stat_atk")}\n{oldStat.baseAttackPower} -> {newStat.baseAttackPower}";
         _atkPlusTxt.text = $"<color={growthColor}>(+ {tableBase.ipLvAttackPower})</color>";
 
         //치유력 표시
         if (tableBase.baseHealingPower > 0 || tableBase.ipLvHealingPower > 0)
         {
-            _healDiffTxt.text = $"치유력 : {oldStat.baseHealingPower} -> {newStat.baseHealingPower}";
+            _healDiffTxt.text = $"{TableManager.Instance.GetString("hero_stat_healingpower")}\n{oldStat.baseHealingPower} -> {newStat.baseHealingPower}";
             _healPlusTxt.text = $"<color={growthColor}>(+ {tableBase.ipLvHealingPower})</color>";
             _healDiffTxt.gameObject.SetActive(true);
             _healPlusTxt.gameObject.SetActive(true);

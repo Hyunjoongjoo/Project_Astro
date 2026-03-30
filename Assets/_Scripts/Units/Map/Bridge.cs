@@ -47,15 +47,6 @@ public class Bridge : UnitBase
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
 
-        Debug.Log(
-            $"[적용된 브릿지 스텟]\n" +
-            $"ID : {_unitId}\n" +
-            $"HP : {MaxHealth}\n" +
-            $"Attack : {AttackPower}\n" +
-            $"AttackSpeed : {AttackSpeed}\n" +
-            $"DetectRange : {SearchRange}"
-            );
-
         _attackMode = false;
         _scanTimer = TickTimer.CreateFromSeconds(Runner, 0f);
         _attackTimer = TickTimer.CreateFromSeconds(Runner, 0f);
@@ -96,7 +87,6 @@ public class Bridge : UnitBase
         RPC_PlayAttackEffect(_currentTarget.transform.position, AttackPower);
     }
 
-    //투사체(현재는 이펙트만)
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_PlayAttackEffect(Vector3 targetPos, float power)
     {

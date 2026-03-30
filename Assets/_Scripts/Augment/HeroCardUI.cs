@@ -1,10 +1,12 @@
-﻿using TMPro;
+﻿using DG.Tweening;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 //영웅 증강 카드 스크립트
 //Base 는 AugmentCardUI인데 작성되면 삭제할 예정임 AugmentCardUI를
-public class HeroCardUI : MonoBehaviour, IAugmentUI
+public class HeroCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("Main UI")]
     [SerializeField] private Image _heroIconImg;       //기획서 1: 영웅 아이콘
@@ -26,13 +28,31 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI
     [SerializeField] private Button _selectBtn;
     [SerializeField] private GameObject _highlightObj;
 
+    [Header("Animation (DOTween)")]
+    [SerializeField] private RectTransform _visualRoot; 
+    [SerializeField] private float _hoverScale = 1.1f;
+    [SerializeField] private float _animDuration = 0.2f;
+
     private AugmentData _data;
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        _visualRoot.DOKill();
+
+        _visualRoot.DOScale(_hoverScale, _animDuration).SetEase(Ease.OutBack);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _visualRoot.DOKill();
+        _visualRoot.DOScale(1f, _animDuration).SetEase(Ease.OutCubic);
+    }
+
     //private bool _isClicked = false;
 
     public void Setup(AugmentData data)
     {
         _data = data;
-        //_isClicked = false;
         _selectBtn.interactable = true;
 
 
@@ -48,7 +68,7 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI
 
         //4. 타입 정보 세팅
         if (_heroTypeTxt != null)
-            _heroTypeTxt.text = TableManager.Instance.GetString($"hero_type_{data.heroType.ToString().ToLower()}");
+            _heroTypeTxt.text = TableManager.Instance.GetString($"hero_type_{data.heroType.ToString().ToLower()}_ingame");
 
         if (_heroRoleTxt != null)
             _heroRoleTxt.text = TableManager.Instance.GetString($"hero_role_{data.heroRole.ToString().ToLower()}");
@@ -84,11 +104,6 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI
     private void OnSelectClicked()
     {
         GetComponentInParent<AugmentWindowUI>().OnCardSelected(this, _data);
-        //if (_isClicked) return;
-        //_isClicked = true;
-        //_selectBtn.interactable = false;
-
-        //AugmentManager.Instance.SelectAugment(_data);
-        //GetComponentInParent<AugmentWindowUI>().Close();
+        _visualRoot.DOPunchScale(new Vector3(-0.05f, -0.05f, 0), 0.1f);
     }
 }

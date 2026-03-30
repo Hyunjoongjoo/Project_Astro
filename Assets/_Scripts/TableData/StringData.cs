@@ -5,6 +5,7 @@ public class StringData : ITableData
 {
     public string id;
     public string textKor;
+    public string textEng;
     public string note;
 
     public string PrimaryID => id.ToString();

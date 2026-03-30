@@ -5,7 +5,7 @@ using UnityEngine;
 public class AttackState : IState
 {
     private UnitController _unit;
-    private TickTimer _attackTimer;
+    //private TickTimer _attackTimer;
 
     // 평타를 시전하는 것이 스킬의 조건 등 다른 곳에 영향을 끼치는 경우 구독.
     public Action OnNormalAttack;
@@ -21,8 +21,8 @@ public class AttackState : IState
         _unit.StopMove();
 
         // 진입 직후 바로 첫 공격이 가능하도록 타이머를 0초로 세팅
-        if (_attackTimer.ExpiredOrNotRunning(_unit.Runner))
-            _attackTimer = TickTimer.CreateFromSeconds(_unit.Runner, 0f);
+        //if (_attackTimer.ExpiredOrNotRunning(_unit.Runner))
+        //    _attackTimer = TickTimer.CreateFromSeconds(_unit.Runner, 0f);
     }
 
     public void Update()
@@ -44,16 +44,22 @@ public class AttackState : IState
         }
 
         // 타겟 바라보기
-        RotateToTarget(diff);
+        _unit.RotateToTarget(diff);
 
         // 공격 실행
-        if (_attackTimer.ExpiredOrNotRunning(_unit.Runner))
+        //if (_attackTimer.ExpiredOrNotRunning(_unit.Runner))
+        //{
+        //    PerformAttack();
+
+        //    // 공속에 맞춰 다음 공격 타이머 설정
+        //    float attackCooldown = _unit.AttackSpeed > 0f ? 1f / _unit.AttackSpeed : 1f;
+        //    _attackTimer = TickTimer.CreateFromSeconds(_unit.Runner, attackCooldown);
+        //}
+
+        //Skill이 쿨을 관리하므로 여기서는 조건만 체크
+        if (_unit.normalAttack != null && _unit.normalAttack.UsingConditionCheck())
         {
             PerformAttack();
-
-            // 공속에 맞춰 다음 공격 타이머 설정
-            float attackCooldown = _unit.AttackSpeed > 0f ? 1f / _unit.AttackSpeed : 1f;
-            _attackTimer = TickTimer.CreateFromSeconds(_unit.Runner, attackCooldown);
         }
     }
 
@@ -62,19 +68,8 @@ public class AttackState : IState
         
     }
 
-    private void RotateToTarget(Vector3 direction)
-    {
-        direction.y = 0f; // 수평 회전만 적용
-        if (direction.sqrMagnitude > 0.001f)
-        {
-            _unit.transform.rotation = Quaternion.LookRotation(direction);
-        }
-    }
-
     private void PerformAttack()
     {
-        //if (_unit.UnitType == UnitType.Hero)
-        //    _unit.HeroAnimator.SetTrigger("AttackTrigger");
         _unit.normalAttack.Execute();
         OnNormalAttack?.Invoke();
     }

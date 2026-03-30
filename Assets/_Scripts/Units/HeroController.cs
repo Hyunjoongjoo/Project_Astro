@@ -14,7 +14,6 @@ public class HeroController : UnitController
     public ISkill curUniqueSkill;
     private Vector3 _targetPos;
     private float _deployDelay;
-    private StageManager _stageManager;
     private NetworkPrefabRef _myPrefab;
     private float _finalCooldown;
     private PlayerRef _ownerPlayer;
@@ -40,11 +39,12 @@ public class HeroController : UnitController
         normalAttack = _normalAttackData.CreateInstance(this);
         curUniqueSkill = _standardSkillData.CreateInstance(this);
 
-        _stageManager = FindFirstObjectByType<StageManager>();
-
         HeroAnimator = GetComponent<Animator>();
         // 부스터는 반드시 자식 오브젝트에서 첫번째에 위치한다.
         BoosterAnimator = transform.GetChild(0).GetComponent<Animator>();
+
+        InitAttackRange();
+        AudioManager.Instance.PlaySfx(ObjectContainer.Instance.heroDeploySound);
 
         if (!Object.HasStateAuthority) return;
         // === 이 아래론 마스터 클라이언트가 아니면 실행되지 않음. ===
@@ -63,7 +63,7 @@ public class HeroController : UnitController
         _unitStat = GetComponent<UnitStat>();
 
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
-
+        moveType = statData.moveType;
         //UnitStat 초기화
         _unitStat.Init(statData);
 
@@ -73,7 +73,7 @@ public class HeroController : UnitController
         MaxHealth = _unitStat.MaxHp.Value;
         CurrentHealth = MaxHealth;
         agent.speed = MoveSpeed;
-
+        ConfigureAreaMask();
         if (agent != null)
         {
             agent.enabled = false;
@@ -111,7 +111,7 @@ public class HeroController : UnitController
         // 기본 스킬의 시전은 어느 상태든 상관없이 조건만 만족하면 바로 전환한다.
         if (StateMachine.CurrentState != DieState &&
             StateMachine.CurrentState != DeployState &&
-            StateMachine.CurrentState != CastState)
+            curUniqueSkill.IsCasting == false)
         {
             if (curUniqueSkill.UsingConditionCheck())
             {
@@ -123,10 +123,11 @@ public class HeroController : UnitController
 
         StateMachine.Update();
 
-        if (curUniqueSkill is ShieldSkill shield)
-        {
-            shield.Tick();
-        }
+        if (normalAttack.IsCasting)
+            normalAttack.Tick();
+
+        if (curUniqueSkill.IsCasting)
+            curUniqueSkill.Tick();
     }
 
     // --- 생성시 초기화 관련 메서드 ---
@@ -163,6 +164,7 @@ public class HeroController : UnitController
         if (newSkillSO != null)
         {
             curUniqueSkill = newSkillSO.CreateInstance(this);
+            //InitAttackRange();//평타 사거리가 바뀌는 스킬이 생길경우
             Debug.Log($"[{unitId}] 스킬이 {newSkillSO.name}으로 교체되었습니다!");
         }
     }
@@ -222,7 +224,7 @@ public class HeroController : UnitController
 
         _appliedAugments.Clear();
 
-        foreach (var player in _stageManager.PlayerDataMap)
+        foreach (var player in StageManager.Instance.PlayerDataMap)
         {
             if (player.Value.Team != team)
                 continue;
@@ -259,7 +261,7 @@ public class HeroController : UnitController
         if (!Object.HasStateAuthority) return;
 
         //자신의 영웅 슬롯 인덱스 찾기
-        var playerData = _stageManager.PlayerDataMap.Get(_ownerPlayer);
+        var playerData = StageManager.Instance.PlayerDataMap.Get(_ownerPlayer);
         int myHeroIndex = -1;
 
         for (int i = 0; i < SlotData_5.Length; i++)
@@ -343,6 +345,51 @@ public class HeroController : UnitController
             Gizmos.DrawWireSphere(transform.position, shieldData.aoeRange);
         }
     }
+
+    private void OnDrawGizmos()//체인스킬기즈모
+    {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        ChainSkillSO chainData = null;
+
+        if (curUniqueSkill != null && curUniqueSkill.Data is ChainSkillSO data)
+        {
+            chainData = data;
+        }
+
+        if (chainData == null) return;
+
+        //스킬 사거리
+        Gizmos.color = Color.blueViolet;
+        Gizmos.DrawWireSphere(transform.position, chainData.range);
+
+        //체인 경로 표시
+        if (curUniqueSkill is ChainSkill chain && chain.debugChainTargets != null)
+        {
+            for (int i = 0; i < chain.debugChainTargets.Count; i++)
+            {
+                var unit = chain.debugChainTargets[i];
+                if (unit == null) continue;
+
+                //각 타겟 전이 범위
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(unit.transform.position, chainData.chainRange);
+
+                //연결선
+                if (i > 0)
+                {
+                    var prev = chain.debugChainTargets[i - 1];
+                    if (prev != null)
+                    {
+                        Gizmos.color = Color.gray;
+                        Gizmos.DrawLine(prev.transform.position, unit.transform.position);
+                    }
+                }
+            }
+        }
+    }
 #endif
+
 }
 

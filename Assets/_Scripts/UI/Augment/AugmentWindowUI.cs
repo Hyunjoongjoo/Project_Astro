@@ -49,6 +49,15 @@ public class AugmentWindowUI : BaseUI
     //아군 확정 여부 추적 프로퍼티
     public bool IsTeammateConfirmed { get; set; } = false;
 
+
+    //3.24 추가
+    private void OnEnable()
+    {
+        //창이 켜지는 순간 Update가 돌기 전이라도 즉시 시간 표시
+        UpdateTimerUI();
+    }
+
+
     //3.10 리팩토링
     //아군 데이터와 이름도 받을 수 있도록 매개변수 추가 (아군 데이터는 없을 수도 있으므로 null 허용)
     //3.12 리팩토링
@@ -94,7 +103,7 @@ public class AugmentWindowUI : BaseUI
         }
         if (isForcedOpen)
         {
-            base.Open(); //내가 눌렀거나 강제 오픈 시엔 눈앞에 띄움
+            base.Open(false); //내가 눌렀거나 강제 오픈 시엔 눈앞에 띄움
         }
         else
         {
@@ -143,34 +152,46 @@ public class AugmentWindowUI : BaseUI
         }
     }
 
+
+
+    //3.24 수정, Update 아닌 별도의 메서드로 변경
     //매 프레임 남은 시간 UI 갱신
     private void Update()
     {
-        if (_stageManager != null && _timerTxt != null && !_isForcePicked)
-        {
-            //상태(시작 전, 진행중) 에 따라 알맞은 곳에서 타이머 정보
-            float timeLeft = 0f;
+        UpdateTimerUI();
+    }
 
-            if (_stageManager.CurrentState == StageState.PreGameAugment)
+    private void UpdateTimerUI()
+    {
+        //03-27 CurrentState가 스폰후에 접근하도록 null 방지
+        if (_stageManager == null || _stageManager.Object == null || !_stageManager.Object.IsValid || _timerTxt == null || _isForcePicked)
+        {
+            return;
+        }
+        //상태(시작 전, 진행중) 에 따라 알맞은 곳에서 타이머 정보
+        float timeLeft = 0f;
+
+        if (_stageManager.CurrentState == StageState.PreGameAugment)
+        {
+            //시작 전 2연속 증강은 StageManager의 글로벌 시계 참조
+            timeLeft = _stageManager.StateTimer;
+        }
+        else if (_stageManager.CurrentState == StageState.Playing)
+        {
+            //인게임 증강은 AugmentController의 개별 유저 시계 참조
+            if (AugmentController.Instance.PlayerAugmentTimers.TryGet(_stageManager.Runner.LocalPlayer, out float time))
             {
-                //시작 전 2연속 증강은 StageManager의 글로벌 시계 참조
-                timeLeft = _stageManager.StateTimer;
-            }
-            else if (_stageManager.CurrentState == StageState.Playing)
-            {
-                //인게임 증강은 AugmentController의 개별 유저 시계 참조
-                if (AugmentController.Instance.PlayerAugmentTimers.TryGet(_stageManager.Runner.LocalPlayer, out float time))
-                {
-                    timeLeft = time;
-                }
-            }
-            //소수점 올림
-            if (timeLeft > 0 || _stageManager.CurrentState == StageState.PreGameAugment)
-            {
-                int displayTime = Mathf.Max(0, Mathf.CeilToInt(timeLeft));
-                _timerTxt.text = $"제한 시간: {displayTime}초";
+                timeLeft = time;
             }
         }
+        //소수점 올림
+        if (timeLeft > 0 || _stageManager.CurrentState == StageState.PreGameAugment)
+        {
+            int displayTime = Mathf.Max(0, Mathf.CeilToInt(timeLeft));
+            string timerFormat = TableManager.Instance.GetString("ingame_limit_time");
+            _timerTxt.text = string.Format(timerFormat, displayTime);
+        }
+
     }
 
     //카드들이 자신을 터치했을 때 호출하는 함수
@@ -271,12 +292,12 @@ public class AugmentWindowUI : BaseUI
     }
 
     //BaseUI 오버라이드
-    public override void Close()
+    public override void Close(bool playSound = true)
     {
         //생성했던 카드 처리
         ClearCards();
 
-        base.Close();
+        base.Close(false);
     }
 
     //아군의 확정 신호를 수신했을 때 스스로 판단해서 닫음

@@ -69,7 +69,8 @@ public class HeroSpawner : NetworkBehaviour
 
         foreach (var tower in Tower.AliveTowers)
         {
-            if (tower.networkedTeam == enemyTeam)
+            if (tower == null || tower.team == Team.None) continue;
+            if (tower.team == enemyTeam)
             {
                 aliveCount++;
             }
@@ -77,7 +78,7 @@ public class HeroSpawner : NetworkBehaviour
 
         return Mathf.Clamp(2 - aliveCount, 0, 2);//팀당 포탑 2개 기준
     }
-    
+
     private float GetCurrentDeployDistance(Team team)//현재 배치 가능 거리 계산
     {
         int destroyedCount = GetDestroyedTowerCount(team);
@@ -105,21 +106,6 @@ public class HeroSpawner : NetworkBehaviour
             return false;
         }
 
-        //Vector3 dir = spawnPos - deployOrigin.position;//이부분은 이야기가 나올시...
-
-        ////함교 뒤쪽 배치 방지
-        //if (team == Team.Blue && dir.z < 0)
-        //{
-        //    Debug.Log($"함교보다 뒤에 배치됨");
-        //    return false;
-        //}
-
-        //if (team == Team.Red && dir.z > 0)
-        //{
-        //    Debug.Log($"함교보다 뒤에 배치됨");
-        //    return false;
-        //}
-
         //최대 배치 거리 초과 시 차단
         float distance = Vector3.Distance(deployOrigin.position, spawnPos);
         float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
@@ -134,19 +120,6 @@ public class HeroSpawner : NetworkBehaviour
         {
             return false;
         }
-
-        //Vector3 dir = spawnPos - origin.position;//이부분은 이야기가 나올시...
-
-        ////함교 뒤쪽 배치 방지
-        //if (team == Team.Blue && dir.z < 0)
-        //{
-        //    return false;
-        //}
-
-        //if (team == Team.Red && dir.z > 0)
-        //{
-        //    return false;
-        //}
 
         float distance = Vector3.Distance(origin.position, spawnPos);
         float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
@@ -259,12 +232,19 @@ public class HeroSpawner : NetworkBehaviour
     {
         if (!Application.isPlaying) return;
 
-        Transform origin = GetDeployOrigin(Team.Blue);
+        DrawDeployGizmo(Team.Blue, Color.blue);
+
+        DrawDeployGizmo(Team.Red, Color.red);
+    }
+
+    private void DrawDeployGizmo(Team team, Color color)
+    {
+        Transform origin = GetDeployOrigin(team);
         if (origin == null) return;
 
-        float distance = GetCurrentDeployDistance(Team.Blue);
+        float distance = GetCurrentDeployDistance(team);
 
-        Gizmos.color = Color.green;
+        Gizmos.color = color;
         Gizmos.DrawWireSphere(origin.position, distance);
     }
 #endif

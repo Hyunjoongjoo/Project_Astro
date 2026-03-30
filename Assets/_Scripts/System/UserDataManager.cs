@@ -3,19 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class UserDataManager : Singleton<UserDataManager>
 {
+    [SerializeField] private GameObject _duplicateLoginPrefab;
+
     //옵저버 패턴용 이벤트
     public event Action<int> OnGoldChanged;
     public event Action<int> OnWinCountChanged;
+    public event Action<string> OnNickNameChanged;
     public event Action OnHeroDataChanged;
 
     private ProfileDbModel _profileModel;
     private RecordModel _recordModel;
     private WalletModel _walletModel;
     private List<HeroDbModel> _heroesModel = new List<HeroDbModel>();
+
+    private ListenerRegistration _sessionListener;
+    private bool _isLink = false;
+
+    public bool IsLink => _isLink;
 
     public void SetAllUserData(ProfileDbModel profile, RecordModel record, WalletModel wallet, List<HeroDbModel> heroes)
     {
@@ -38,6 +45,8 @@ public class UserDataManager : Singleton<UserDataManager>
 
         OnGoldChanged = null;
         OnHeroDataChanged = null;
+        OnWinCountChanged = null;
+        OnNickNameChanged = null;
 
         Debug.Log("[UserDataManager] 캐시가 초기화되었습니다.");
     }
@@ -75,6 +84,12 @@ public class UserDataManager : Singleton<UserDataManager>
 
                 if (updates.ContainsKey("Profile.isAgreed"))
                     ProfileModel.isAgreed = (bool)updates["Profile.isAgreed"];
+
+                if (updates.ContainsKey("Profile.nickName"))
+                {
+                    ProfileModel.nickName = (string)updates["Profile.nickName"];
+                    OnNickNameChanged?.Invoke(ProfileModel.nickName);
+                }
             }
 
             // 3. 영웅 데이터 로컬 캐시 갱신
@@ -113,65 +128,6 @@ public class UserDataManager : Singleton<UserDataManager>
         }
     }
 
-    // 골드 갱신
-    public async Task UpdateWallet(int amount)
-    {
-        var updateGold = new Dictionary<string, object> 
-        {
-            { "Wallet.gold", _walletModel.gold + amount }
-        };
-        // DB 업데이트 하기
-        await UpdateAll(updates: updateGold);
-
-        // 골드 변경 알림 (구독자들에게 전파)
-        OnGoldChanged?.Invoke(_walletModel.gold);
-    }
-
-    // 영웅 갱신
-    public async Task UpdateHero(string heroId, int level, int exp, bool unlock)
-    {
-        var updataHeroList = new List<HeroDbModel>
-        {
-            new HeroDbModel 
-            { 
-                heroId = heroId,
-                level = level, 
-                exp = exp, 
-                isUnlock = unlock 
-            }
-        };
-        await UpdateAll(heroesToUpdate: updataHeroList);
-
-        // 런타임 스텟 재계산
-        HeroManager.Instance.UpdateHeroRuntimeStatus(heroId, level);
-
-        //데이터 변경됬다 구독자한테 알리기
-        OnHeroDataChanged?.Invoke();
-    }
-
-    // 프로파일 갱신
-    public async Task UpdateUserDb(int expDelta, int levelDelta = 0) 
-    {
-        var updateProfile = new Dictionary<string, object>
-        {
-            { "Profile.userLevel", _profileModel.userLevel + levelDelta },
-            { "Profile.userExp", _profileModel.userExp + expDelta }
-        };
-        await UpdateAll(updates: updateProfile);
-    }
-
-    // 전적 갱신
-    public async Task UpdateRecord(int winDelta, int loseDelta, int drawDelta) 
-    {
-        var updateRecord = new Dictionary<string, object>
-        {
-            { "Record.win", _recordModel.win + winDelta },
-            { "Record.draw", _recordModel.draw + drawDelta },
-            { "Record.lose", _recordModel.lose + loseDelta }
-        };
-        await UpdateAll(updates: updateRecord);
-    }
-
     // 신규 영웅 생성 시(CSV 기준!) DB 대조하여 가감 (DB 로드 완료 이후 호출되어야함.)
     public async Task SyncHeroDataAsync()
     {
@@ -179,7 +135,7 @@ public class UserDataManager : Singleton<UserDataManager>
 
         //CSV에 있는 모든 영웅 ID 가져오기 (최신 리스트)
         var allCsvHeroes = TableManager.Instance.HeroTable.GetAll();
-        
+
         HashSet<string> csvHeroIds = new HashSet<string>();
         foreach (var csvHero in allCsvHeroes)
         {
@@ -237,6 +193,161 @@ public class UserDataManager : Singleton<UserDataManager>
 
             // 4. HeroManager 런타임 스텟 재초기화
             HeroManager.Instance.InitAllHeroStats(_heroesModel);
+        }
+    }
+
+    // 스냅샷 리스너 
+    public void StartDuplicateLoginListener(string userId, string myLocalSessionId)
+    {
+        StopDuplicateLoginListener();
+
+        DocumentReference sessionDocRef = FirebaseFirestore.DefaultInstance
+            .Collection("user_sessions").Document(userId);
+
+        Debug.Log($"[Session] 중복 로그인 리스너 등록 완료. 내 ID: {myLocalSessionId}");
+        // 리스너 등록 (서버 값 바뀌면 자동 호출)
+        _sessionListener = sessionDocRef.Listen(snapshot =>
+        {
+            if (_isLink) return;
+            if (!snapshot.Exists) return;
+
+            if (snapshot.TryGetValue("sessionId", out string dbSessionId))
+            {
+                // 로컬 세션값과 서버 세션값 다르면 튕기기
+                if (!string.IsNullOrEmpty(dbSessionId) && myLocalSessionId != dbSessionId)
+                {
+                    HandleKickOut();
+                }
+            }
+        });
+    }
+
+    // 리스너 정지 (로그아웃이나 앱 종료 시 필수 호출)
+    public void StopDuplicateLoginListener()
+    {
+        if (_sessionListener != null)
+        {
+            _sessionListener.Stop();
+            _sessionListener = null;
+            Debug.Log("[Session] 리스너 해제됨");
+        }
+    }
+
+    private void HandleKickOut()
+    {
+        if (_isLink)
+        {
+            Debug.Log("[Session] 연동 중이므로 킥아웃을 방어합니다.");
+            return;
+        }
+        StopDuplicateLoginListener();
+
+        Debug.LogError("중복 로그인 확인됨");
+
+        GameObject prefab = Instantiate(_duplicateLoginPrefab);
+    }
+
+    public void SetLinkMode(bool active)
+    {
+        _isLink = active;
+        if (active)
+        {
+            StopDuplicateLoginListener();
+        }
+    }
+
+    public async Task<bool> LinkDataAsync(string guestGuid, string newUid)
+    {
+        try
+        {
+            // 현재 캐시 데이터값
+            if (_profileModel == null)
+            {
+                Debug.LogError("[Migration] 현재 로드된 유저 데이터가 없습니다.");
+                return false;
+            }
+
+            // 배치 작업 시작
+            var firestore = FirebaseFirestore.DefaultInstance;
+            WriteBatch batch = firestore.StartBatch();
+
+            // 발신자 수신자 배정
+            DocumentReference oldDocRef = firestore.Collection("users").Document(guestGuid);
+            DocumentReference newDocRef = firestore.Collection("users").Document(newUid);
+            DocumentReference oldSessionRef = firestore.Collection("user_sessions").Document(guestGuid);
+            DocumentReference newSessionRef = firestore.Collection("user_sessions").Document(newUid);
+
+            // Profile, Record, Wallet 복사 및 신규 세션 ID 발행
+            string currentSessionId = AuthService.Instance.MyLocalSessionId;
+
+            _profileModel.uuid = newUid; // 모델 내부의 UID도 변경
+
+            batch.Set(newSessionRef, new Dictionary<string, object>
+            {
+                 { "sessionId", AuthService.Instance.MyLocalSessionId }
+            });
+
+            batch.Set(newDocRef, new Dictionary<string, object>
+            {
+                { "Profile", _profileModel },
+                { "Record", _recordModel },
+                { "Wallet", _walletModel }
+            });
+
+            // Heroes 복사 및 기존 데이터 삭제 예약
+            if (_heroesModel != null && _heroesModel.Count > 0)
+            {
+                foreach (var hero in _heroesModel)
+                {
+                    // 새 위치에 생성
+                    DocumentReference newHeroRef = newDocRef.Collection("COL_Hero").Document(hero.heroId);
+                    batch.Set(newHeroRef, hero);
+
+                    // 기존 위치에서 삭제
+                    DocumentReference oldHeroRef = oldDocRef.Collection("COL_Hero").Document(hero.heroId);
+                    batch.Delete(oldHeroRef);
+                }
+            }
+
+            // 기존 게스트 메인 문서 삭제 및 커밋
+            batch.Delete(oldSessionRef);
+            batch.Delete(oldDocRef);
+            await batch.CommitAsync();
+
+            // 성공 시 AuthService의 세션 ID도 동기화
+            Debug.Log($"[Migration] 성공: {guestGuid} -> {newUid}");
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Migration] 실패: {e.Message}");
+            return false;
+        }
+    }
+
+    // 닉네임 변경 로직
+    public async Task UpdateNicknameAsync(string newNickname)
+    {
+        try
+        {
+            string userId = _profileModel.uuid;
+
+            var updates = new Dictionary<string, object>
+            {
+                { "Profile.nickName", newNickname }
+            };
+
+            await UpdateAll(updates: updates);
+
+            _profileModel.nickName = newNickname;
+
+            Debug.Log($"[UserDataManager] 닉네임 변경 성공: {newNickname}");
+            return;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[UserDataManager] 닉네임 변경 실패: {e.Message}");
+            return;
         }
     }
 }

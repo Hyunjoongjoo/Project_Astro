@@ -73,7 +73,7 @@ public class TitleController : MonoBehaviour
             }
             else
             {
-                _loginController.OnClickLogin();
+                //_loginController.OnClickLogin();
             }
         });
     }
@@ -81,6 +81,13 @@ public class TitleController : MonoBehaviour
     private void OnLoginComplete(string nickname)
     {
         Debug.Log("[TitleController] 모든 로그인 로직 완료");
+
+        string userId = _authService.CurrentUser.UserId;
+        string mySesstionId = _authService.MyLocalSessionId;
+        
+        // 중복 로그인 리스너 시작
+        UserDataManager.Instance.StartDuplicateLoginListener(userId, mySesstionId);
+
         GameManager.Instance.SetSceneState(SceneState.Lobby);
         SceneManager.LoadScene("Lobby");
     }

@@ -148,8 +148,7 @@ public class ItemManager : NetworkBehaviour
         //메시지 대상자에게만 UI를 띄움
         if (Runner.LocalPlayer == targetPlayer)
         {
-            var stringData = TableManager.Instance.StringTable.Get(stringId);
-            string message = stringData != null ? stringData.textKor : stringId;
+            string message = TableManager.Instance.GetString(stringId);
 
             if (ToastMessageUI.Instance != null)
             {

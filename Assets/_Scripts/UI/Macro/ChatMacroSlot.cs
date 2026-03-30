@@ -24,7 +24,7 @@ public class ChatMacroSlot : MonoBehaviour
         {
             _txt.gameObject.SetActive(true);
             _emoticonImg.gameObject.SetActive(false);
-            _txt.text = data.text;
+            _txt.text = data.GetText();
         }
         else
         {

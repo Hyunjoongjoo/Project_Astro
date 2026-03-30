@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78fd50b56adbce84c90d76a8c1b2b6a7, type: 3}
+  m_Name: Tesla_Skill_Type_B_enhance
+  m_EditorClassIdentifier: Assembly-CSharp::ChainSkillSO
+  heroId: hero_tesla
+  skillIcon: {fileID: 0}
+  skillName: enhance_augment_name_tesla_B
+  skillDescription: 
+  note: 
+  skillVFX: {fileID: 7068615036737649895, guid: 319b7f456bff6df41960de359ccbb215, type: 3}
+  skillSFX: {fileID: 8300000, guid: fc60dac2e0beb4b449484615119e3f53, type: 3}
+  skillType: 3
+  initCooldown: 2
+  cooldown: 12
+  preDelay: 0
+  postDelay: 0
+  blockAction: 0
+  maxChainCount: 0
+  range: 5
+  chainRange: 0
+  damageRatio: 12
+  chainDamageMultiplier: 0
+  heroOnly: 1

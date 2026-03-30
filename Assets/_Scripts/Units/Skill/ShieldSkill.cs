@@ -1,93 +1,82 @@
 ﻿using Fusion;
 using UnityEngine;
 
-public class ShieldSkill : ISkill
+public class ShieldSkill : BaseSkill<ShieldSkillSO>
 {
-    private ShieldSkillSO _data;
-    private bool _isCasting;
-    private UnitController _cachedUnit;
-    private TickTimer _skillCooldown;
     private TickTimer _aoeTimer;
-    private TickTimer _durationTimer;
 
-    public BaseSkillSO Data => _data;
-    public bool IsCasting => _isCasting;
+    public ShieldSkill(ShieldSkillSO data, UnitController unit) : base(data, unit) { }
 
-    public ShieldSkill(ShieldSkillSO data, UnitController unit)
-    {
-        _data = data;
-        _cachedUnit = unit;
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.initCooldown);        
-    }
-
-    public void ChangeData(BaseSkillSO newData)
-    {
-        if (newData is ShieldSkillSO shieldData)
-            _data = shieldData;
-        else
-            Debug.LogWarning($"[ShieldSkill] 잘못된 데이터 타입: {newData.GetType().Name}");
-    }
-
-    public virtual bool UsingConditionCheck()
+    public override bool UsingConditionCheck()
     {
         if (_cachedUnit.currentTarget != null &&
             _skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner))
         {
-            //_skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
             return true;
         }
 
         return false;
     }
 
-    public void PreDelay() 
+    public override void Casting()
     {
-        _cachedUnit.HeroAnimator.SetBool("IsCasting", true);
-        _isCasting = true; 
-    }
+        //_skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
 
-    public void PostDelay() { _isCasting = false; }
-
-    public void Casting()
-    {
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.cooldown);
         _cachedUnit.UnitStat.RemoveModifier(EffectType.DecreaseDamageTaken, this);//중복방지
         var modifier = new StatModifier(_data.damageReduction, StatModType.Flat, this);
         _cachedUnit.UnitStat.AddModifier(EffectType.DecreaseDamageTaken, modifier, _data.duration);
+
         //_cachedUnit.RPC_PlayChildSkillEffect(_cachedUnit.Object.Id, _cachedUnit.Object.Id, _data.skillType, true, _data.duration);
-        _durationTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.duration);
+
+        _phase = SkillPhase.Casting;
+
+        // 보호막 지속시간 설정
+        float visualTime = _data.duration;
+        float extra = _data.preDelay + _data.postDelay;
+        float castTime = Mathf.Max(1f, visualTime - extra - 0.5f);
+        _phaseTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, castTime);
+        
         if (_data.aoeDamageRatio > 0)
         {
+            // 장판 데미지가 있을 경우 장판 데미지 간격 타이머 설정
             _aoeTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.aoeInterval);
         }
     }
 
-    public void Tick()
+    public override void Tick()
     {
-        // 스킬이 시작되지 않았으면 실행 안함
-        if (!_durationTimer.IsRunning || _durationTimer.Expired(_cachedUnit.Runner))
+        // FSM 기반으로 선딜레이 -> 캐스팅 -> 후딜레이 순으로 타이머를 설정하며 순차 실행
+        switch (_phase)
         {
-            _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
-            return;
-        }
-        // 스킬 종료
-        if (_durationTimer.Expired(_cachedUnit.Runner))
-        {
-            _cachedUnit.HeroAnimator.SetBool("IsCasting", false);
-            return;
-        }
+            case SkillPhase.PreDelay:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    Casting();
+                break;
 
-        // 증강 B 없으면 실행 안함
-        if (_data.aoeDamageRatio <= 0)
-            return;
+            case SkillPhase.Casting:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    PostDelay();
 
-        if (_aoeTimer.Expired(_cachedUnit.Runner))
-        {
-            DoAOEDamage();
+                // 증강 B 없으면 실행 안함
+                if (_data.aoeDamageRatio <= 0)
+                    return;
 
-            _aoeTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.aoeInterval);
+                if (_aoeTimer.Expired(_cachedUnit.Runner))
+                {
+                    DoAOEDamage();
+
+                    _aoeTimer = TickTimer.CreateFromSeconds(_cachedUnit.Runner, _data.aoeInterval);
+                }
+
+                break;
+
+            case SkillPhase.PostDelay:
+                if (_phaseTimer.Expired(_cachedUnit.Runner))
+                    _phase = SkillPhase.Idle;
+                break;
         }
     }
+
     private void DoAOEDamage()
     {
         if (!_cachedUnit.Object.HasStateAuthority)

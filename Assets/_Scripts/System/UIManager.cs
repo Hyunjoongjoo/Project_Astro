@@ -41,7 +41,7 @@ public class UIManager : Singleton<UIManager>
         if (rootObj != null)
         {
             // 씬에 이미 캔버스가 있다면 그걸 루트로 사용
-            Canvas canvas = rootObj.GetOrAddComponent<Canvas>();
+            // Canvas canvas = rootObj.GetOrAddComponent<Canvas>();
             rootObj.name = "@UI_Root";
         }
         else
@@ -104,14 +104,14 @@ public class UIManager : Singleton<UIManager>
 
         if (ui != null)
         {
-            ui.Open();
+            ui.Open(isPopup);
             if (isPopup) _popupStack.Push(ui);
         }
 
         return ui;
     }
 
-    public void CloseTopPopup()
+    public void CloseTopPopup(bool playSound = true)
     {
         if (_popupStack.Count > 0)
         {
@@ -122,7 +122,7 @@ public class UIManager : Singleton<UIManager>
             if (_popupStack.Count > 0)
             {
                 BaseUI ui = _popupStack.Pop();
-                ui.Close();
+                ui.Close(playSound);
             }
         }
     }

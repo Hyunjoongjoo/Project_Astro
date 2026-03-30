@@ -2,12 +2,14 @@
 using Firebase.Auth;
 using Google;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
 public class AuthService : Singleton<AuthService>
 {
     public FirebaseAuth Auth { get; private set; }
+    public string MyLocalSessionId {  get; set; }
 
     // 현재 로그인된 사용자 정보
     public FirebaseUser CurrentUser => Auth.CurrentUser;
@@ -110,12 +112,19 @@ public class AuthService : Singleton<AuthService>
     {
         try
         {
+            UserDataManager.Instance.StopDuplicateLoginListener();
+
+            MyLocalSessionId = null;
+
+            Auth.SignOut();
+            #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
             if (GoogleSignIn.DefaultInstance != null)
             {
                 GoogleSignIn.DefaultInstance.SignOut();
             }
-
-            Auth.SignOut();
+            #endif
+            PlayerPrefs.SetInt("IsAutoLogin", 0);
+            PlayerPrefs.Save();
 
             Debug.Log("[Auth] 로그아웃 성공");
         }
@@ -145,11 +154,15 @@ public class AuthService : Singleton<AuthService>
             Debug.Log("1. 구글 연동 해제 시도 (Disconnect)");
             if (isGoogleUser)
             {
+                #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
                 GoogleSignIn.DefaultInstance.Disconnect();
+                #endif
             }
 
             Debug.Log("2. 파이어베이스 계정 삭제 시도");
             await CurrentUser.DeleteAsync();
+            
+            ClearLocalUserData();
 
             Debug.Log("[Auth] 계정 삭제 및 연동 해제 완료");
             return true;
@@ -168,5 +181,59 @@ public class AuthService : Singleton<AuthService>
             Debug.LogError($"[Auth] 알 수 없는 오류: {ex.Message}");
             return false;
         }
+    }
+
+    public async Task<bool> LinkAccountWithGoogle(UserDataManager dataManager)
+    {
+        try
+        {
+            string guestGuid = CurrentUser.UserId;
+
+            // 구글 로그인 시도
+            
+            GoogleSignInUser googleUser = await GoogleSignIn.DefaultInstance.SignIn();
+            if (googleUser == null) return false;
+
+            Credential credential = GoogleAuthProvider.GetCredential(googleUser.IdToken, null);
+
+            // 구글 계정으로 로그인 (newUID로 변경됨)
+            var authResult = await Auth.SignInWithCredentialAsync(credential);
+            string newUid = authResult.UserId;
+
+            // 데이터 매니저에게 이전 요청
+            bool success = await dataManager.LinkDataAsync(guestGuid, newUid);
+
+            if (success)
+            {
+                PlayerPrefs.DeleteKey("Guest_Email");
+                PlayerPrefs.DeleteKey("Guest_PW");
+                PlayerPrefs.SetInt("IsAutoLogin", 1);
+                PlayerPrefs.Save();
+                return true;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"연동 에러: {ex.Message}");
+            return false;
+        }
+    }
+    public bool IsGuestUser()
+    {
+        if (CurrentUser == null) return false;
+
+        return CurrentUser.Email.Contains("@guest.com");
+    }
+
+    private void ClearLocalUserData()
+    {
+        PlayerPrefs.DeleteKey("Guest_Email");
+        PlayerPrefs.DeleteKey("Guest_PW");
+        PlayerPrefs.SetInt("IsAutoLogin", 0);
+        PlayerPrefs.Save();
+
+        MyLocalSessionId = null;
+        Debug.Log("[Auth] 로컬 PlayerPrefs 데이터 삭제 완료");
     }
 }

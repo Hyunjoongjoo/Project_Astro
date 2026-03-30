@@ -30,6 +30,7 @@ public class LobbyHeroListWindow : BaseUI
             // 골드가 변하거나 영웅 데이터가 변하면 리스트 리프레시
             UserDataManager.Instance.OnGoldChanged += HandleGoldChanged;
             UserDataManager.Instance.OnHeroDataChanged += RefreshHeroList;
+            TableManager.Instance.OnLanguageChanged += RefreshHeroList;
         }
     }
 
@@ -51,12 +52,13 @@ public class LobbyHeroListWindow : BaseUI
         {
             UserDataManager.Instance.OnGoldChanged -= HandleGoldChanged;
             UserDataManager.Instance.OnHeroDataChanged -= RefreshHeroList;
+            TableManager.Instance.OnLanguageChanged -= RefreshHeroList;
         }
     }
 
     private void HandleGoldChanged(int newGold) => RefreshHeroList();
 
-    public override void Open()
+    public override void Open(bool playSound = true)
     {
         if (!gameObject.activeSelf)
         {

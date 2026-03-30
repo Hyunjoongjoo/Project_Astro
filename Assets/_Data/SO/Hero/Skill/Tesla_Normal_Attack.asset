@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b605f38811daa0247b5ac5bda4750cdd, type: 3}
+  m_Name: Tesla_Normal_Attack
+  m_EditorClassIdentifier: Assembly-CSharp::HitscanSkillSO
+  heroId: hero_tesla
+  skillIcon: {fileID: 0}
+  skillName: 
+  skillDescription: 
+  note: 
+  skillVFX: {fileID: 7068615036737649895, guid: 319b7f456bff6df41960de359ccbb215, type: 3}
+  skillSFX: {fileID: 8300000, guid: 46d5feba0efa8a6479c2612cd9a9f23a, type: 3}
+  skillType: 0
+  initCooldown: 0
+  cooldown: 1.8
+  preDelay: 0
+  postDelay: 0
+  blockAction: 0
+  damageRatio: 1
+  range: 5

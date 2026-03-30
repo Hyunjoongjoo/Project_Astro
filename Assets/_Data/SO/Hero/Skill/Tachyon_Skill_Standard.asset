@@ -17,9 +17,14 @@ MonoBehaviour:
   skillName: skill_name_tachyon
   skillDescription: skill_desc_tachyon
   note: 
-  skillVFX: {fileID: 2393817908272368249, guid: 6b5a9f68bee28d043803ba395aa6eb98, type: 3}
+  skillVFX: {fileID: 8597731318025692521, guid: 11e991fd2e917744ab7e69ae73274897, type: 3}
+  skillSFX: {fileID: 8300000, guid: afd70cd925a42834f81261662023a6e3, type: 3}
   skillType: 1
   initCooldown: 3
   cooldown: 3
+  preDelay: 0
+  postDelay: 0
+  blockAction: 0
   additionalDamageRatio: 1
+  additionalRange: 3
   onhitPerAttack: 5
