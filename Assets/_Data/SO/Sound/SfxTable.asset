@@ -26,3 +26,9 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: d7d2f7cf541ce4745a374158741b01dd, type: 3}
   - UISfxList: 2
     clip: {fileID: 8300000, guid: 2d87d421504bbd245ae59132347a2dca, type: 3}
+  - UISfxList: 3
+    clip: {fileID: 8300000, guid: 87f174321976d064da6cbf3360bd3fa7, type: 3}
+  - UISfxList: 4
+    clip: {fileID: 8300000, guid: 3e4a24744fcc5834a958ff373e396dbe, type: 3}
+  - UISfxList: 5
+    clip: {fileID: 8300000, guid: 47b21a1e3bc2e5e439cd7a75b4d9f560, type: 3}

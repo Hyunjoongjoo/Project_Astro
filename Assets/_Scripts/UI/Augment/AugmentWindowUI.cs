@@ -103,7 +103,7 @@ public class AugmentWindowUI : BaseUI
         }
         if (isForcedOpen)
         {
-            base.Open(); //내가 눌렀거나 강제 오픈 시엔 눈앞에 띄움
+            base.Open(false); //내가 눌렀거나 강제 오픈 시엔 눈앞에 띄움
         }
         else
         {
