@@ -17,7 +17,7 @@ MonoBehaviour:
   skillName: 
   skillDescription: 
   note: 
-  skillVFX: {fileID: 1371980983267245554, guid: 51709a6c365cc24458ec08dbec8834a3, type: 3}
+  skillVFX: {fileID: 7068615036737649895, guid: 319b7f456bff6df41960de359ccbb215, type: 3}
   skillSFX: {fileID: 8300000, guid: 46d5feba0efa8a6479c2612cd9a9f23a, type: 3}
   skillType: 0
   initCooldown: 0
