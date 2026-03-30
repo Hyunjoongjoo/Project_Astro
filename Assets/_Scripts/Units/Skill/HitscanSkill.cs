@@ -27,16 +27,16 @@ public class HitscanSkill : BaseSkill<HitscanSkillSO>
 
         _phase = SkillPhase.Casting;
 
-        float finalCooldown;
-        if (_data.skillType == SkillType.NormalAttack)
-        {
-            finalCooldown = _cachedUnit.AttackSpeed;
-        }
-        else
-        {
-            finalCooldown = _data.cooldown;
-        }
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
+        //float finalCooldown;
+        //if (_data.skillType == SkillType.NormalAttack)
+        //{
+        //    finalCooldown = _cachedUnit.AttackSpeed;
+        //}
+        //else
+        //{
+        //    finalCooldown = _data.cooldown;
+        //}
+        //_skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
         ApplyDamage(target);
         PostDelay();
     }
