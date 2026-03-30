@@ -12,7 +12,10 @@ public enum UISfxList
 {
     Ping,
     BtnOpen,
-    BtnClose
+    BtnClose,
+    AugmentOpen,
+    AugmentSelect,
+    Tab
 }
 
 [CreateAssetMenu(menuName = "Audio/SFX Table", fileName = "SfxTable")]

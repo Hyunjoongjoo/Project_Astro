@@ -104,7 +104,7 @@ public class UIManager : Singleton<UIManager>
 
         if (ui != null)
         {
-            ui.Open();
+            ui.Open(isPopup);
             if (isPopup) _popupStack.Push(ui);
         }
 
