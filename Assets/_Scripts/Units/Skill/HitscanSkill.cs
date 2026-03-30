@@ -9,9 +9,7 @@ public class HitscanSkill : BaseSkill<HitscanSkillSO>
     }
     public override bool UsingConditionCheck()
     {
-        //if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
-        if (_cachedUnit.currentTarget == null) return false;
-        if (_cachedUnit.currentTarget.IsDead) return false;
+        if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
         return true;
     }
 

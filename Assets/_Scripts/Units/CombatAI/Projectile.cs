@@ -29,7 +29,7 @@ public class Projectile : MonoBehaviour
         _data = data;
         _team = team;
         _runner = runner;
-        _finalPower = power * _data.damageRatio;
+        _finalPower = power;
         ApplyTeamColor(team);
         isInitialized = true;
     }
