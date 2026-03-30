@@ -68,7 +68,9 @@ public static class InputValidator
 
         // 인젝션 공격
         if (Regex.IsMatch(filterText, ScriptInjectionPattern))
-            throw new Exception("허용되지 않는 문자가 포함되어 있습니다. (Code Injection)");
+        {
+            throw new Exception(TableManager.Instance.GetString("signup_check_unsupported_characters"));
+        }
 
         // 비속어(리스트업된것들 중)
         string format = TableManager.Instance.GetString("signup_check_word_detected");
