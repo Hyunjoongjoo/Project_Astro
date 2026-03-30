@@ -16,7 +16,7 @@ public class ProjectileSkill : BaseSkill<ProjectileSkillSO>
 
     public override bool UsingConditionCheck()
     {
-        if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
+        //if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return false;
         if (_cachedUnit.currentTarget == null) return false;
 
@@ -30,10 +30,11 @@ public class ProjectileSkill : BaseSkill<ProjectileSkillSO>
 
     public override void Casting()
     {
+        if (!_cachedUnit.HasStateAuthority) return;
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return;
 
         _phase = SkillPhase.Casting;
-
+        _castingEnd = false;
         // 기존 코루틴이 있다면 정지 후 새로 시작 (UnitController를 통해 실행)
         if (_fireCoroutine != null)
             _cachedUnit.StopCoroutine(_fireCoroutine);
