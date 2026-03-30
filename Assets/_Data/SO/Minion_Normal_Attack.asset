@@ -21,7 +21,7 @@ MonoBehaviour:
   skillSFX: {fileID: 8300000, guid: 8ce54c3fe796e2f40b02eb92a7b81d24, type: 3}
   skillType: 0
   initCooldown: 0
-  cooldown: 1
+  cooldown: 0.3
   preDelay: 0
   postDelay: 0
   blockAction: 0
