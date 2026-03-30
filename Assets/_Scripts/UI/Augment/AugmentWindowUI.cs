@@ -297,7 +297,7 @@ public class AugmentWindowUI : BaseUI
         //생성했던 카드 처리
         ClearCards();
 
-        base.Close();
+        base.Close(false);
     }
 
     //아군의 확정 신호를 수신했을 때 스스로 판단해서 닫음

@@ -91,6 +91,8 @@ public class SkillCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoi
     private void OnSelectClicked()
     {
         GetComponentInParent<AugmentWindowUI>().OnCardSelected(this, _data);
+        _visualRoot.DOPunchScale(new Vector3(-0.05f, -0.05f, 0), 0.1f);
+
         //if (_isClicked) return;
         //_isClicked = true;
         //_selectBtn.interactable = false;
