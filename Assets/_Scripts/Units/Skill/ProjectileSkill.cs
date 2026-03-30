@@ -16,7 +16,7 @@ public class ProjectileSkill : BaseSkill<ProjectileSkillSO>
 
     public override bool UsingConditionCheck()
     {
-        //if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
+        if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return false;
         if (_cachedUnit.currentTarget == null) return false;
 
