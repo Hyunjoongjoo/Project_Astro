@@ -47,15 +47,15 @@ public class Options : MonoBehaviour
         if (popup != null)
         {
             // 2. 팝업 설정 (수정된 Setup 파라미터 반영)
-            string msg = "타이틀로 돌아가시겠습니까?";
+            string msg = TableManager.Instance.GetString("signup_check_return_title");
 
             popup.Setup(
                 msg: msg,
                 onYes: async  () => await LogOut(),
                 canConfirm: true,
                 denyMsg: "",
-                yesText: "로그아웃",
-                noText: "취소"
+                yesText: TableManager.Instance.GetString("btn_setting_logout"),
+                noText: TableManager.Instance.GetString("btn_hero_buy_cancel")
             );
         }
     }
@@ -82,15 +82,15 @@ public class Options : MonoBehaviour
         if (popup != null)
         {
             // 2. 팝업 설정 (수정된 Setup 파라미터 반영)
-            string msg = "계정을 삭제하시겠습니까?";
+            string msg = TableManager.Instance.GetString("btn_setting_logout");
 
             popup.Setup(
                 msg: msg,
                 onYes: async () => await DeleteUser(),
                 canConfirm: true,
                 denyMsg: "",
-                yesText: "삭제",
-                noText: "취소"
+                yesText: TableManager.Instance.GetString("btn_setting_delete"),
+                noText: TableManager.Instance.GetString("btn_hero_buy_cancel")
             );
         }
     }
@@ -150,15 +150,15 @@ public class Options : MonoBehaviour
         if (popup != null)
         {
             // 2. 팝업 설정 (수정된 Setup 파라미터 반영)
-            string msg = "구글 계정으로 연동하시겠습니까?";
+            string msg = TableManager.Instance.GetString("signup_check_link_google");
 
             popup.Setup(
                 msg: msg,
                 onYes: async () => await ExecuteLinkProcess(),
                 canConfirm: true,
                 denyMsg: "",
-                yesText: "확인",
-                noText: "취소"
+                yesText: TableManager.Instance.GetString("setting_user_link"),
+                noText: TableManager.Instance.GetString("btn_hero_buy_cancel")
             );
         }
     }
@@ -194,10 +194,10 @@ public class Options : MonoBehaviour
     private void SuccessLinked()
     {
         if (_LinkBtn == null) return;
-        var btnText = _LinkBtn.GetComponentInChildren<TMPro.TMP_Text>();
+        var btnText = _LinkBtn.GetComponentInChildren<TMP_Text>();
         if (btnText != null)
         {
-            btnText.text = "연동 완료";
+            btnText.text = TableManager.Instance.GetString("link_complete");
         }
         _LinkBtn.interactable = false;
     }
@@ -216,19 +216,19 @@ public class Options : MonoBehaviour
             {
                 _isNicknameVerified = false;
                 _verifiedNickname = string.Empty;
-                _resultText.text = "이미 사용 중인 닉네임입니다.";
+                _resultText.text = TableManager.Instance.GetString("signup_check_name_taken");
                 return;
             }
 
             // 성공 시 상태 저장
             _isNicknameVerified = true;
             _verifiedNickname = inputName;
-            _resultText.text = $"'{inputName}'은(는) 사용 가능한 닉네임입니다.";
+            _resultText.text = TableManager.Instance.GetString("signup_check_name_available");
         }
         catch (Exception ex)
         {
             _isNicknameVerified = false;
-            _resultText.text = "검증에 실패하였습니다.";
+            _resultText.text = "Error.";
             Debug.LogError($"검증 실패: {ex.Message}");
         }
     }
@@ -240,7 +240,7 @@ public class Options : MonoBehaviour
         // 중복 확인을 아예 안 했거나, 확인받은 이름과 현재 입력창 이름이 다른 경우
         if (!_isNicknameVerified || _verifiedNickname != currentInput)
         {
-            _resultText.text = "닉네임 중복 확인을 다시 해주세요.";
+            _resultText.text = TableManager.Instance.GetString("signup_check_name");
             return;
         }
 
@@ -251,11 +251,11 @@ public class Options : MonoBehaviour
             _isNicknameVerified = false;
             _verifiedNickname = string.Empty;
 
-            _resultText.text = "닉네임 변경이 완료되었습니다.";
+            _resultText.text = TableManager.Instance.GetString("sname_change_complete");
         }
         catch (Exception ex)
         {
-            _resultText.text = "최종 변경 실패";
+            _resultText.text = "Error.";
         }
     }
 

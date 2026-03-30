@@ -18,8 +18,6 @@ public class SignUpView : BaseUI
     [SerializeField] private TextMeshProUGUI _resultText;
 
     private bool _isGoogleSign = false;
-    private string _titleText = "회원가입";
-    private string _infoText = "게스트 계정의 경우 분실 시 복구가 불가능합니다.\r\n로비 -> 설정에서 구글 연동을 진행해주세요.";
 
 
     public TMP_InputField NicknameInput => _nicknameInput;
@@ -78,7 +76,8 @@ public class SignUpView : BaseUI
 
     public void ShowSignUpSuccess(string nickname)
     {
-        ShowSuccess($"{nickname}님, 회원가입이 완료되었습니다!");
+        string welcomeText = TableManager.Instance.GetString("signup_welcome");
+        ShowSuccess($"{nickname}{welcomeText}");
     }
 
     public void ClearInputs()
@@ -99,7 +98,14 @@ public class SignUpView : BaseUI
     // 스트링 테이블 기반으로 차후 변경 예정
     public void TextSetting()
     {
-        _title.text = _titleText;
-        _info.text = _infoText;
+        if (_isGoogleSign)
+        {
+            _title.text = TableManager.Instance.GetString("signup_create_google_account");
+        }
+        else
+        {
+            _title.text = TableManager.Instance.GetString("title_guest_create");
+        }
+        _info.text = TableManager.Instance.GetString("signup_check_link_google");
     }
 }

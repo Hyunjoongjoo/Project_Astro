@@ -9,8 +9,9 @@ public class HitscanSkill : BaseSkill<HitscanSkillSO>
     }
     public override bool UsingConditionCheck()
     {
-        if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
-
+        //if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
+        if (_cachedUnit.currentTarget == null) return false;
+        if (_cachedUnit.currentTarget.IsDead) return false;
         return true;
     }
 
@@ -27,16 +28,16 @@ public class HitscanSkill : BaseSkill<HitscanSkillSO>
 
         _phase = SkillPhase.Casting;
 
-        float finalCooldown;
-        if (_data.skillType == SkillType.NormalAttack)
-        {
-            finalCooldown = _cachedUnit.AttackSpeed;
-        }
-        else
-        {
-            finalCooldown = _data.cooldown;
-        }
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
+        //float finalCooldown;
+        //if (_data.skillType == SkillType.NormalAttack)
+        //{
+        //    finalCooldown = _cachedUnit.AttackSpeed;
+        //}
+        //else
+        //{
+        //    finalCooldown = _data.cooldown;
+        //}
+        //_skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
         ApplyDamage(target);
         PostDelay();
     }
