@@ -25,7 +25,7 @@ MonoBehaviour:
   preDelay: 0
   postDelay: 0
   blockAction: 0
-  healCoefficient: 1.3
+  healCoefficient: 1.8
   range: 3
   duration: 0
   interval: 0

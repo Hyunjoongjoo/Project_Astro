@@ -25,7 +25,7 @@ MonoBehaviour:
   preDelay: 0
   postDelay: 0
   blockAction: 0
-  maxChainCount: 5
+  maxChainCount: 6
   range: 5
   chainRange: 5
   damageRatio: 1

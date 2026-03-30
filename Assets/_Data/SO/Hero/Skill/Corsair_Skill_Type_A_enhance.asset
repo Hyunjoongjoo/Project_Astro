@@ -26,7 +26,7 @@ MonoBehaviour:
   postDelay: 0
   blockAction: 1
   dashSpeed: 25
-  canDashMaxDistance: 7
+  canDashMaxDistance: 5
   canDashMinDistance: 2
   dashCount: 1
   dashInterval: 0.2

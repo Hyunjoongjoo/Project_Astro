@@ -26,5 +26,5 @@ MonoBehaviour:
   postDelay: 0
   blockAction: 0
   additionalDamageRatio: -0.2
-  additionalRange: 0
+  additionalRange: 3
   onhitPerAttack: 4

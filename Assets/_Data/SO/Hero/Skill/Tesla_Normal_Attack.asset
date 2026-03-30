@@ -26,4 +26,4 @@ MonoBehaviour:
   postDelay: 0
   blockAction: 0
   damageRatio: 1
-  range: 4
+  range: 5

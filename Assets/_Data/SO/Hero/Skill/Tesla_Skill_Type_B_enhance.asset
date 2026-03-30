@@ -28,6 +28,6 @@ MonoBehaviour:
   maxChainCount: 0
   range: 5
   chainRange: 0
-  damageRatio: 2
+  damageRatio: 6
   chainDamageMultiplier: 0
   heroOnly: 1
