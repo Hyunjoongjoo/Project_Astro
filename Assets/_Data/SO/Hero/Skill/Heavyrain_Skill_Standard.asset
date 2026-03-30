@@ -17,7 +17,7 @@ MonoBehaviour:
   skillName: skill_name_heavyrain
   skillDescription: skill_desc_heavyrain
   note: 
-  skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  skillVFX: {fileID: 1371980983267245554, guid: 6d29688ecb9699243ae48fc819dda096, type: 3}
   skillSFX: {fileID: 8300000, guid: f5c7ff7ed324f84448031c8f2cd5140e, type: 3}
   skillType: 1
   initCooldown: 4
