@@ -27,7 +27,7 @@ MonoBehaviour:
   blockAction: 1
   dashSpeed: 25
   canDashMaxDistance: 5
-  canDashMinDistance: 2
+  canDashMinDistance: 0
   dashCount: 3
   dashInterval: 0.15
   damageRatio: 3
