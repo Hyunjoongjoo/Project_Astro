@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ItemCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPointerExitHandler
+public class ItemCardUI : MonoBehaviour, IAugmentUI
 {
     [Header("Main UI")]
     [SerializeField] private Image _ItemIconImg;
@@ -24,19 +24,6 @@ public class ItemCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoin
 
     private AugmentData _data;
 
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        _visualRoot.DOKill();
-
-        _visualRoot.DOScale(_hoverScale, _animDuration).SetEase(Ease.OutBack);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        _visualRoot.DOKill();
-        // 원래 크기로 복구
-        _visualRoot.DOScale(1f, _animDuration).SetEase(Ease.OutCubic);
-    }
 
     public void Setup(AugmentData data)
     {
@@ -62,6 +49,7 @@ public class ItemCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoin
 
     private void OnSelectClicked()
     {
+        _visualRoot.DOKill();
         GetComponentInParent<AugmentWindowUI>().OnCardSelected(this, _data);
         _visualRoot.DOPunchScale(new Vector3(-0.05f, -0.05f, 0), 0.1f);
     }
