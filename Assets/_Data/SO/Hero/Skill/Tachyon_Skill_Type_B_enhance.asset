@@ -27,4 +27,4 @@ MonoBehaviour:
   blockAction: 0
   additionalDamageRatio: 1.5
   additionalRange: 3
-  onhitPerAttack: 4
+  onhitPerAttack: 2
