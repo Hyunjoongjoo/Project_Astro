@@ -199,8 +199,16 @@ public class HeroSpawner : NetworkBehaviour
         return 0f;
     }
 
+    //stat이 없으면 default로 전달
+    public void RPC_SpawnUnit(NetworkPrefabRef prefab, Vector3 spawnPos, Team team)
+    {
+        HeroStatNetworkData emptyStat = default;
+        RPC_SpawnUnit(prefab, spawnPos, team, emptyStat);
+    }
+
+    //플레이어별 성장 stat을 함께 넘긴다.
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_SpawnUnit(NetworkPrefabRef prefab, Vector3 spawnPos, Team team, RpcInfo info = default)
+    public void RPC_SpawnUnit(NetworkPrefabRef prefab, Vector3 spawnPos, Team team, HeroStatNetworkData stat, RpcInfo info = default)
     {
         if (prefab == default) return;
 
@@ -223,7 +231,7 @@ public class HeroSpawner : NetworkBehaviour
          onBeforeSpawned: (runner, obj) =>
          {
              HeroController hero = obj.GetComponent<HeroController>();
-             hero.Setup(team, spawnPos, deployDelay, prefab, caller);
+             hero.Setup(team, spawnPos, deployDelay, prefab, caller, stat);
          });
     }
 
