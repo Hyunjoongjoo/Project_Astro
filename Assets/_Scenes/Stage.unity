@@ -18912,11 +18912,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeroSpawner
   _minDeployTime: 0.25
-  _maxDeployTime: 2.5
+  _maxDeployTime: 5
   _minDeployDistance: 1
-  _baseDeployDistance: 10
-  _deployExpandPerTower: 2
-  _maxDeployDistance: 15
+  _maxDeployDistance: 20
+  _centerZoneOffset: {x: 0, y: 4.5}
+  _centerZoneSize: {x: 18, y: 13}
+  _leftZoneOffset: {x: -4.5, y: 15}
+  _leftZoneSize: {x: 9, y: 8}
+  _rightZoneOffset: {x: 4.5, y: 15}
+  _rightZoneSize: {x: 9, y: 8}
   _prefabs:
   - RawGuidValue: d09a2cf10307a4c40a977b56313018db
   - RawGuidValue: c0c1fc4164e37214aa41f81d8ae5136c

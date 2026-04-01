@@ -15,13 +15,21 @@ public class HeroSpawner : NetworkBehaviour
 
     [Header("배치 설정")]
     [SerializeField] private float _minDeployTime = 0.25f;
-    [SerializeField] private float _maxDeployTime = 2.5f;
+    [SerializeField] private float _maxDeployTime = 5f;
     [SerializeField] private float _minDeployDistance = 1f;
+    //[SerializeField] private float _baseDeployDistance = 8f;
+    //[SerializeField] private float _deployExpandPerTower = 3f;
+    [SerializeField] private float _maxDeployDistance = 20f;
 
-    [Header("배치 거리 확장")]
-    [SerializeField] private float _baseDeployDistance = 8f;
-    [SerializeField] private float _deployExpandPerTower = 3f;
-    [SerializeField] private float _maxDeployDistance = 14f;
+    [Header("사각형 배치 존 설정")]
+    [SerializeField] private Vector2 _centerZoneOffset = new Vector2(0f, 4.5f);
+    [SerializeField] private Vector2 _centerZoneSize = new Vector2(18f, 13f); 
+
+    [SerializeField] private Vector2 _leftZoneOffset = new Vector2(-4.5f, 13f); 
+    [SerializeField] private Vector2 _leftZoneSize = new Vector2(9f, 8f); 
+
+    [SerializeField] private Vector2 _rightZoneOffset = new Vector2(4.5f, 13f); 
+    [SerializeField] private Vector2 _rightZoneSize = new Vector2(9f, 8f); 
 
     [SerializeField] private List<NetworkPrefabRef> _prefabs;
 
@@ -32,6 +40,7 @@ public class HeroSpawner : NetworkBehaviour
     {
         Instance = this;
     }
+
     private int GetPrefabId(NetworkPrefabRef prefab)
     {
         int index = _prefabs.IndexOf(prefab);
@@ -61,72 +70,126 @@ public class HeroSpawner : NetworkBehaviour
         return Runner.SimulationTime >= data.EndTime;
     }
 
-    private int GetDestroyedTowerCount(Team team)//현재 파괴된 포탑 수
+    // 상대 진영의 왼쪽 포탑이 파괴되었는지 확인
+    private bool IsLeftTowerDestroyed(Team team)
     {
-        int aliveCount = 0;
+        UnitBase[] enemyStructures = team == Team.Blue
+            ? ObjectContainer.Instance.redSideStructure
+            : ObjectContainer.Instance.blueSideStructure;
 
-        Team enemyTeam = team == Team.Blue ? Team.Red : Team.Blue;
-
-        foreach (var tower in Tower.AliveTowers)
+        if (enemyStructures == null || enemyStructures.Length <= 1)
         {
-            if (tower == null || tower.team == Team.None) continue;
-            if (tower.team == enemyTeam)
-            {
-                aliveCount++;
-            }
+            return false;
         }
 
-        return Mathf.Clamp(2 - aliveCount, 0, 2);//팀당 포탑 2개 기준
+        UnitBase leftTower = enemyStructures[1];
+        return leftTower == null || leftTower.team == Team.None;
     }
 
-    private float GetCurrentDeployDistance(Team team)//현재 배치 가능 거리 계산
+    // 상대 진영의 오른쪽 포탑이 파괴되었는지 확인
+    private bool IsRightTowerDestroyed(Team team)
     {
-        int destroyedCount = GetDestroyedTowerCount(team);
+        UnitBase[] enemyStructures = team == Team.Blue
+            ? ObjectContainer.Instance.redSideStructure
+            : ObjectContainer.Instance.blueSideStructure;
 
-        float distance = _baseDeployDistance + destroyedCount * _deployExpandPerTower;
+        if (enemyStructures == null || enemyStructures.Length <= 1)
+        {
+            return false;
+        }
 
-        return Mathf.Min(distance, _maxDeployDistance);
+        UnitBase rightTower = enemyStructures[0];
+        return rightTower == null || rightTower.team == Team.None;
+    }
+
+    // 팀 방향을 반영해 배치 존의 중심 좌표를 월드 좌표로 변환
+    private Vector3 GetZoneCenterWorld(Transform origin, Team team, Vector2 offset)
+    {
+        float x = team == Team.Blue ? offset.x : -offset.x;
+        float z = team == Team.Blue ? offset.y : -offset.y;
+
+        return origin.position + new Vector3(x, 0f, z);
+    }
+
+    // 주어진 좌표가 직사각형 배치 존 내부에 있는지 검사
+    private bool IsInsideRectZone(Vector3 point, Vector3 center, Vector2 size)
+    {
+        float halfWidth = size.x * 0.5f;
+        float halfHeight = size.y * 0.5f;
+
+        bool insideX = point.x >= center.x - halfWidth && point.x <= center.x + halfWidth;
+        bool insideZ = point.z >= center.z - halfHeight && point.z <= center.z + halfHeight;
+
+        return insideX && insideZ;
+    }
+
+    // 현재 열려 있는 배치 존 중 하나에 목적지가 포함되는지 확인
+    private bool IsInsideAvailableDeployZone(Vector3 spawnPos, Team team)
+    {
+        Transform origin = GetDeployOrigin(team);
+
+        if (origin == null) return false;
+       
+        bool isLeftTowerDestroyed = IsLeftTowerDestroyed(team);
+        bool isRightTowerDestroyed = IsRightTowerDestroyed(team);
+
+        Vector3 centerZoneCenter = GetZoneCenterWorld(origin, team, _centerZoneOffset);
+        if (IsInsideRectZone(spawnPos, centerZoneCenter, _centerZoneSize))        
+            return true;
+        
+
+        if (isLeftTowerDestroyed)
+        {
+            Vector3 leftZoneCenter = GetZoneCenterWorld(origin, team, _leftZoneOffset);
+            if (IsInsideRectZone(spawnPos, leftZoneCenter, _leftZoneSize)) 
+                return true;
+        }
+
+        if (isRightTowerDestroyed)
+        {
+            Vector3 rightZoneCenter = GetZoneCenterWorld(origin, team, _rightZoneOffset);
+            if (IsInsideRectZone(spawnPos, rightZoneCenter, _rightZoneSize))           
+                return true;
+        }
+
+        return false;
     }
 
     public bool CanDeployHero(Vector3 spawnPos, Team team)//해당 위치에 영웅 배치가 가능한지 검사
     {
-        if (!Object.HasStateAuthority)
-        {
-            return false;
-        }
+        if (!Object.HasStateAuthority) return false;        
+        if (!GameManager.Instance.IsGameStarted) return false; // 카운트다운 중 차단
 
-        if (!GameManager.Instance.IsGameStarted) // 카운트다운 중 차단
-        {
-            return false;
-        }
+        //Transform deployOrigin = GetDeployOrigin(team);
+        //if (deployOrigin == null)
+        //{
+        //    return false;
+        //}
 
-        Transform deployOrigin = GetDeployOrigin(team);
-        if (deployOrigin == null)
-        {
-            return false;
-        }
-
-        //최대 배치 거리 초과 시 차단
-        float distance = Vector3.Distance(deployOrigin.position, spawnPos);
-        float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
-        return distance <= maxDistance;
+        ////최대 배치 거리 초과 시 차단
+        //float distance = Vector3.Distance(deployOrigin.position, spawnPos);
+        //float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
+        //return distance <= maxDistance;
+        return IsInsideAvailableDeployZone(spawnPos, team);
     }
 
     public bool CanPreviewDeployHero(Vector3 spawnPos, Team team)//UI체크
     {
-        Transform origin = GetDeployOrigin(team);
+        //Transform origin = GetDeployOrigin(team);
 
-        if (origin == null)
-        {
-            return false;
-        }
+        //if (origin == null)
+        //{
+        //    return false;
+        //}
 
-        float distance = Vector3.Distance(origin.position, spawnPos);
-        float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
-        return distance <= maxDistance;
+        //float distance = Vector3.Distance(origin.position, spawnPos);
+        //float maxDistance = GetCurrentDeployDistance(team);//현재 남은 포탑 기반 배치 거리
+        //return distance <= maxDistance;
+        return IsInsideAvailableDeployZone(spawnPos, team);
     }
 
-    private Transform GetDeployOrigin(Team team)//함교 위치를 반환
+    // 팀에 해당하는 함교 Transform을 배치 기준점으로 반환
+    private Transform GetDeployOrigin(Team team)
     {
         UnitBase[] myStructures = team == Team.Blue
             ? ObjectContainer.Instance.blueSideStructure
@@ -145,12 +208,14 @@ public class HeroSpawner : NetworkBehaviour
         return myStructures[2].transform;
     }
 
-    private float GetDeployDelay(float distance)//거리 기반 배치 지연시간
+    // 함교와 목적지 거리 기반으로 디플로이 지연 시간을 계산
+    private float GetDeployDelay(float distance)
     {
         float time = Mathf.InverseLerp(_minDeployDistance, _maxDeployDistance, distance);
         return Mathf.Lerp(_minDeployTime, _maxDeployTime, time);
     }
 
+    // 영웅 소환 후 플레이어별 쿨타임 정보를 네트워크 딕셔너리에 기록
     public void StartSummonCooldown(PlayerRef player, NetworkPrefabRef prefab, float cooldown)
     {
         if (!Object.HasStateAuthority) return;
@@ -186,6 +251,7 @@ public class HeroSpawner : NetworkBehaviour
         return 0f;
     }
 
+    // 지정한 플레이어와 영웅의 전체 소환 쿨타임 값을 반환
     public float GetTotalCooldown(PlayerRef player, NetworkPrefabRef prefab)
     {
         int prefabId = GetPrefabId(prefab);
@@ -236,6 +302,7 @@ public class HeroSpawner : NetworkBehaviour
     }
 
 #if UNITY_EDITOR
+    // 포탑 파괴 여부에 따라 배치 영역 기즈모를 표시
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying) return;
@@ -245,15 +312,45 @@ public class HeroSpawner : NetworkBehaviour
         DrawDeployGizmo(Team.Red, Color.red);
     }
 
+    private void DrawRectGizmo(Vector3 center, Vector2 size)
+    {
+        Vector3 half = new Vector3(size.x * 0.5f, 0f, size.y * 0.5f);
+
+        Vector3 p1 = center + new Vector3(-half.x, 0f, -half.z);
+        Vector3 p2 = center + new Vector3(-half.x, 0f, half.z);
+        Vector3 p3 = center + new Vector3(half.x, 0f, half.z);
+        Vector3 p4 = center + new Vector3(half.x, 0f, -half.z);
+
+        Gizmos.DrawLine(p1, p2);
+        Gizmos.DrawLine(p2, p3);
+        Gizmos.DrawLine(p3, p4);
+        Gizmos.DrawLine(p4, p1);
+    }
+    
     private void DrawDeployGizmo(Team team, Color color)
     {
         Transform origin = GetDeployOrigin(team);
         if (origin == null) return;
 
-        float distance = GetCurrentDeployDistance(team);
+        bool isLeftTowerDestroyed = IsLeftTowerDestroyed(team);
+        bool isRightTowerDestroyed = IsRightTowerDestroyed(team);
 
         Gizmos.color = color;
-        Gizmos.DrawWireSphere(origin.position, distance);
+
+        Vector3 centerZoneCenter = GetZoneCenterWorld(origin, team, _centerZoneOffset); 
+        DrawRectGizmo(centerZoneCenter, _centerZoneSize);
+
+        if (isLeftTowerDestroyed)
+        {
+            Vector3 leftZoneCenter = GetZoneCenterWorld(origin, team, _leftZoneOffset);
+            DrawRectGizmo(leftZoneCenter, _leftZoneSize);
+        }
+
+        if (isRightTowerDestroyed)
+        {
+            Vector3 rightZoneCenter = GetZoneCenterWorld(origin, team, _rightZoneOffset);
+            DrawRectGizmo(rightZoneCenter, _rightZoneSize);
+        }
     }
 #endif
 }
