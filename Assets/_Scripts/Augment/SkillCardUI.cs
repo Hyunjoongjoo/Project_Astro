@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SkillCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPointerExitHandler
+public class SkillCardUI : MonoBehaviour, IAugmentUI
 {
     [Header("Main UI")]
     [SerializeField] private Image _skillIconImg;        //기획서 1: 스킬 아이콘
@@ -30,20 +30,6 @@ public class SkillCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoi
 
     private AugmentData _data;
     //private bool _isClicked = false;
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        _visualRoot.DOKill();
-
-        _visualRoot.DOScale(_hoverScale, _animDuration).SetEase(Ease.OutBack);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        _visualRoot.DOKill();
-        // 원래 크기로 복구
-        _visualRoot.DOScale(1f, _animDuration).SetEase(Ease.OutCubic);
-    }
 
     public void Setup(AugmentData data)
     {
@@ -90,6 +76,7 @@ public class SkillCardUI : MonoBehaviour, IAugmentUI, IPointerEnterHandler, IPoi
     //나중엔 닫기 대신 확정 버튼 활성화로 로직 변경할 예정
     private void OnSelectClicked()
     {
+        _visualRoot.DOKill();
         GetComponentInParent<AugmentWindowUI>().OnCardSelected(this, _data);
         _visualRoot.DOPunchScale(new Vector3(-0.05f, -0.05f, 0), 0.1f);
 

@@ -17,12 +17,11 @@ public class HeroController : UnitController
     private NetworkPrefabRef _myPrefab;
     private float _finalCooldown;
     private PlayerRef _ownerPlayer;
+    private HeroStatNetworkData _spawnStat;
 
-    public float FinalCooldown => _finalCooldown;
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
     public ISkill CurUniqueSkill => curUniqueSkill;
-    public float RespawnTime => _respawnTime;
 
     //아이템용 옵저버
     [SerializeField] private HeroItemObserver _itemObserver;
@@ -61,12 +60,11 @@ public class HeroController : UnitController
         DieState = new DieState(this);
 
         _unitStat = GetComponent<UnitStat>();
-
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
         moveType = statData.moveType;
         //UnitStat 초기화
         _unitStat.Init(statData);
-
+        ApplySpawnStat();
         _unitStat.OnStatChanged += RefreshStatRuntime;//이벤트 구독
 
         //Stat 기반 값 적용
@@ -94,6 +92,30 @@ public class HeroController : UnitController
         ApplyEquippedItems();
         _finalCooldown = GetFinalRespawnCooldown();
         HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
+    }
+
+    private void ApplySpawnStat()
+    {
+        if (_unitStat == null)
+        {
+            Debug.LogError("[HeroController] UnitStat 없음");
+            return;
+        }
+
+        if (_spawnStat.MaxHp > 0)
+        {
+            _unitStat.MaxHp.BaseValue = _spawnStat.MaxHp;
+        }
+
+        if (_spawnStat.AttackPower > 0)
+        {
+            _unitStat.Attack.BaseValue = _spawnStat.AttackPower;
+        }
+
+        if (_spawnStat.HealPower > 0f)
+        {
+            _unitStat.HealPower.BaseValue = _spawnStat.HealPower;
+        }
     }
 
     private void OnDestroy()
@@ -133,13 +155,13 @@ public class HeroController : UnitController
     // --- 생성시 초기화 관련 메서드 ---
 
     // 스폰 전에 실행되는 메서드
-    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab, PlayerRef owner)
+    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab, PlayerRef owner, HeroStatNetworkData stat)
     {
         _targetPos = targetPos;
         _deployDelay = deployDelay;
         _myPrefab = prefab;
         _ownerPlayer = owner;
-
+        _spawnStat = stat;
         Setup(myTeam);
 
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
@@ -330,6 +352,7 @@ public class HeroController : UnitController
     {
         BoosterAnimator.SetBool("isActive", BoosterRender);
     }
+
 
 #if UNITY_EDITOR
     protected override void OnDrawGizmosSelected()

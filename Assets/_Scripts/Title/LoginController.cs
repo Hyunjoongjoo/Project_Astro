@@ -18,16 +18,20 @@ public class LoginController : MonoBehaviour
     private UserDataStore _userDataStore;
     private Action<string> _onLoginSuccess;
     private bool _isProcessing;
+    private bool _isFirebaseReady = false;
 
     public void Initialize(AuthService authService, UserDataStore userDataStore, Action<string> onLoginSuccess)
     {
         this._authService = authService;
         this._userDataStore = userDataStore;
         this._onLoginSuccess = onLoginSuccess;
+
+        _isFirebaseReady = true;
     }
 
     public async void OnClickPressScreen()
     {
+        if(_isFirebaseReady == false) return;
         if (_isProcessing) return;
         _isProcessing = true;
 

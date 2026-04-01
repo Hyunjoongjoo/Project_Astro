@@ -207,10 +207,26 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
                 return;
             }
 
+            HeroStatData myStat = HeroManager.Instance.GetStatus(HeroId);
+            if (myStat == null)
+            {
+                Debug.LogError($"[HeroHandCardUI] GetStatus 실패: {HeroId}");
+                transform.position = _originPos;
+                return;
+            }
+
+            HeroStatNetworkData netStat = new HeroStatNetworkData
+            {
+                MaxHp = myStat.BaseHp,
+                AttackPower = myStat.baseAttackPower,
+                HealPower = myStat.baseHealingPower
+            };
+
             HeroSpawner.Instance.RPC_SpawnUnit(
                 GetUnitPrefab(),
                 spawnPos,
-                team
+                team,
+                netStat
             );
 
             //소환 성공 시 타이머 시작 및 UI 갱신
