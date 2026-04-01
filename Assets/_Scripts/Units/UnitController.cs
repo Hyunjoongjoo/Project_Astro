@@ -469,8 +469,29 @@ public class UnitController : UnitBase
             float startAngle = projectileCount > 1 ? -spreadAngle / 2f : 0f;
             float angleStep = projectileCount > 1 ? spreadAngle / (projectileCount - 1) : 0f;
 
+            // targetPos를 collider 기준으로 보정
+            Collider targetCollider = null;
+            Collider[] hitColliders = Physics.OverlapSphere(targetPos, 0.5f, unit.TargetLayer);
+
+            foreach (Collider hitCollider in hitColliders)
+            {
+                UnitBase hitUnit = hitCollider.GetComponent<UnitBase>();
+                if (hitUnit == null) continue;              
+                if (hitUnit.IsDead) continue;
+                if (hitUnit.team == unit.team) continue;               
+                targetCollider = hitCollider;
+                break;
+            }
+
+            if (targetCollider != null)
+                targetPos = targetCollider.ClosestPoint(unit.firePoint.position);
+
             // 타겟을 향하는 기본 방향
-            Vector3 directionToTarget = (targetPos - firePoint.position).normalized;
+            Vector3 directionToTarget = (targetPos - unit.firePoint.position).normalized;
+
+            if (directionToTarget.sqrMagnitude < 0.0001f)
+                directionToTarget = unit.transform.forward;
+
             Quaternion baseRotation = Quaternion.LookRotation(directionToTarget);
 
             for (int i = 0; i < projectileCount; i++)
