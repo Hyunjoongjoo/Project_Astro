@@ -368,59 +368,6 @@ public class HeroController : UnitController
         //평타거리 빨간색
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
-
-        if (curUniqueSkill == null)
-            return;
-
-        if (curUniqueSkill.Data is ShieldSkillSO shieldData)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(transform.position, shieldData.aoeRange);
-        }
-    }
-
-    private void OnDrawGizmos()//체인스킬기즈모
-    {
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-
-        ChainSkillSO chainData = null;
-
-        if (curUniqueSkill != null && curUniqueSkill.Data is ChainSkillSO data)
-        {
-            chainData = data;
-        }
-
-        if (chainData == null) return;
-
-        //스킬 사거리
-        Gizmos.color = Color.blueViolet;
-        Gizmos.DrawWireSphere(transform.position, chainData.range);
-
-        //체인 경로 표시
-        if (curUniqueSkill is ChainSkill chain && chain.debugChainTargets != null)
-        {
-            for (int i = 0; i < chain.debugChainTargets.Count; i++)
-            {
-                var unit = chain.debugChainTargets[i];
-                if (unit == null) continue;
-
-                //각 타겟 전이 범위
-                Gizmos.color = Color.green;
-                Gizmos.DrawWireSphere(unit.transform.position, chainData.chainRange);
-
-                //연결선
-                if (i > 0)
-                {
-                    var prev = chain.debugChainTargets[i - 1];
-                    if (prev != null)
-                    {
-                        Gizmos.color = Color.gray;
-                        Gizmos.DrawLine(prev.transform.position, unit.transform.position);
-                    }
-                }
-            }
-        }
     }
 #endif
 
