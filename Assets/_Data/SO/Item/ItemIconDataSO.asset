@@ -33,3 +33,13 @@ MonoBehaviour:
     iconSprite: {fileID: 21300000, guid: e226bf6ab7a847840bdc46b597c16827, type: 3}
   - itemId: item010
     iconSprite: {fileID: 21300000, guid: a5b41028e083f7c419b25050fba10810, type: 3}
+  - itemId: item011
+    iconSprite: {fileID: 21300000, guid: aba1af904b6829c4fb16b1e3f7d0a454, type: 3}
+  - itemId: item012
+    iconSprite: {fileID: 21300000, guid: 8234ae38f5398d545a626cedb54de245, type: 3}
+  - itemId: item013
+    iconSprite: {fileID: 21300000, guid: 12a73b461f4bca044937050dd703d835, type: 3}
+  - itemId: item014
+    iconSprite: {fileID: 21300000, guid: 4c669c56277676e4eb245009ecc195ed, type: 3}
+  - itemId: item015
+    iconSprite: {fileID: 21300000, guid: 5da1580f214df3f4ca6b2842ced374ec, type: 3}
