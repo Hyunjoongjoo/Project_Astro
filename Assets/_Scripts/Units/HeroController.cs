@@ -91,9 +91,9 @@ public class HeroController : UnitController
         }
         curUniqueSkill.Initialize();
         DeployState.SetDeployData(_targetPos, _deployDelay);
-        StateMachine.ChangeState(DeployState);
         ApplyEquippedItems();
         attackRange = _unitStat.AttackRange.Value;
+        StateMachine.ChangeState(DeployState);
         _finalCooldown = GetFinalRespawnCooldown();
         HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
     }
