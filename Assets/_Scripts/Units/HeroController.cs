@@ -365,6 +365,10 @@ public class HeroController : UnitController
     {
         base.OnDrawGizmosSelected();//기존 기즈모
 
+        //평타거리 빨간색
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
         if (curUniqueSkill == null)
             return;
 
