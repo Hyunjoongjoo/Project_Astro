@@ -24,6 +24,10 @@ public class UnitStat : MonoBehaviour
     public Stat MoveSpeed { get; private set; }
     public Stat DetectRange { get; private set; }
 
+    //4.2 기본공격 사거리 추가
+    public Stat AttackRange { get; private set; }
+
+
     //Additive 받피감, 쿨다운
     public Stat DamageReduction { get; private set; }
     public Stat CooldownReduction { get; private set; }
@@ -54,6 +58,7 @@ public class UnitStat : MonoBehaviour
         //Speed 그룹
         MoveSpeed = new Stat(StatCalcMode.Speed, data.moveSpeed);
         DetectRange = new Stat(StatCalcMode.Speed, data.detectionRange);
+        AttackRange = new Stat(StatCalcMode.Speed, 0f); //4.2 추가
 
         //Additive 그룹 (기본값 0)
         DamageReduction = new Stat(StatCalcMode.Additive, 0f);
@@ -67,7 +72,11 @@ public class UnitStat : MonoBehaviour
 
         MapStat(EffectType.IncreaseMoveSpeed, MoveSpeed);
         MapStat(EffectType.DecreaseMoveSpeed, MoveSpeed);
-        MapStat(EffectType.IncreaseDetectionRange, DetectRange); //탐지범위 범례 추가 시 주석 해제(이름바꿔야함)
+        MapStat(EffectType.IncreaseDetectionRange, DetectRange); 
+        MapStat(EffectType.IncreaseAttackRange, AttackRange); //4.2 추가
+        MapStat(EffectType.DecreaseAttackRange, AttackRange); //4.2 추가
+
+
 
         //받피감
         MapStat(EffectType.DecreaseDamageTaken, DamageReduction);
