@@ -44,7 +44,9 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     [Header("Deploy Zone")]
     [SerializeField] private DeployZone _deployZone;
-
+    private bool _isDragging = false;
+    private float _zoneRefreshTimer = 0f;
+    [SerializeField] private float _zoneRefreshInterval = 0.1f;
 
     //private float _currentTimer = 0f;
     //private bool IsCooldown => _currentTimer > 0f;
@@ -95,6 +97,15 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         float total = HeroSpawner.Instance.GetTotalCooldown(player, prefab);
 
         UpdateCooldownUI(remaining, total);
+        if (!_isDragging) return;
+        if (_deployZone == null) return;
+        _zoneRefreshTimer += Time.deltaTime;
+        if (_zoneRefreshTimer < _zoneRefreshInterval) return;
+        _zoneRefreshTimer = 0f;
+        Team team = GameManager.Instance.PlayerTeam;
+        List<DeployZoneData> zones = HeroSpawner.Instance.GetAvailableDeployZones(team);
+        _deployZone.ShowZones(zones);
+
     }
 
     //쿨타임에 맞춰 커버 텍스트 갱신
@@ -170,6 +181,8 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             }
         }
         _originPos = transform.position;
+        _isDragging = true;
+        _zoneRefreshTimer = 0f;
         _iconImg.color = new Color(1, 1, 1, 0.5f);
 
         // 드래그 시 배치 가능 영역 표시
@@ -191,6 +204,8 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public void OnEndDrag(PointerEventData eventData)
     {
         //if (IsCooldown) return;
+        _isDragging = false;
+        _zoneRefreshTimer = 0f;
         var runner = HeroSpawner.Instance.Runner;
 
         if (runner != null && runner.IsRunning)
