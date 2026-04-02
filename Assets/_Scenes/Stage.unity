@@ -18912,7 +18912,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeroSpawner
   _minDeployTime: 0.25
-  _maxDeployTime: 5
+  _maxDeployTime: 6.5
   _minDeployDistance: 1
   _maxDeployDistance: 20
   _centerZoneOffset: {x: 0, y: 4.5}

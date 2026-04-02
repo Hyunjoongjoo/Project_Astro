@@ -15,7 +15,7 @@ public class HeroSpawner : NetworkBehaviour
 
     [Header("배치 설정")]
     [SerializeField] private float _minDeployTime = 0.25f;
-    [SerializeField] private float _maxDeployTime = 5f;
+    [SerializeField] private float _maxDeployTime = 6.5f;
     [SerializeField] private float _minDeployDistance = 1f;
     //[SerializeField] private float _baseDeployDistance = 8f;
     //[SerializeField] private float _deployExpandPerTower = 3f;
