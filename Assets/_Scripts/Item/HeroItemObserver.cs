@@ -114,7 +114,8 @@ public class HeroItemObserver : MonoBehaviour
            case EffectType.DecreaseMoveSpeed:
            case EffectType.IncreaseDamageTaken:
            case EffectType.DecreaseAttackSpeed:
-               return StatModType.PercentMult;
+           case EffectType.DecreaseAttackRange:
+                return StatModType.PercentMult;
            
            default:
                //나머진 버프
