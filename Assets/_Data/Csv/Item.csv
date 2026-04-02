@@ -11,5 +11,8 @@ item007,name_item007,icon_item007,effect_group_item007,FALSE,"긴급 호출기 :
 item008,name_item008,icon_item008,effect_group_item008,FALSE,"티타늄 합금 : 이동 속도 50% 감소, 받는 피해량 30% 감소"
 item009,name_item009,icon_item009,effect_group_item009,FALSE,"광전사 모듈 : 공격 속도 30% 증가, 이동 속도 30% 증가, 받는 피해량 30% 증가"
 item010,name_item010,icon_item010,effect_group_item010,FALSE,"저격용 위장막 : 공격력 150% 증가, 공격 속도 30% 감소"
+item011,name_item011,icon_item011,effect_group_item011,FALSE,"광학 조준경 : 기본 공격 사거리 +30%, 탐지거리 +30%"
+item012,name_item012,icon_item012,effect_group_item012,FALSE,"결사항전 프로토콜: 기본 공격 사거리 -40%, 공격력 +150%"
+item013,name_item013,icon_item013,effect_group_item013,FALSE,"고정형 함포 : 기본 공격 사거리 +50%, 이동속도 - 50%"
 item014,name_item014,icon_item014,effect_group_item014,FALSE,"과충전 실드 : 체력 50% 이상 받피 -50%, 체력 50% 이하 받피 +50%"
 item015,name_item015,icon_item015,effect_group_item015,FALSE,"불안정한 나노봇 : 치유력 +150% 증가, 받는 피해량 +40%"
