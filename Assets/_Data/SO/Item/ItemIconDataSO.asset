@@ -33,3 +33,7 @@ MonoBehaviour:
     iconSprite: {fileID: 21300000, guid: e226bf6ab7a847840bdc46b597c16827, type: 3}
   - itemId: item010
     iconSprite: {fileID: 21300000, guid: a5b41028e083f7c419b25050fba10810, type: 3}
+  - itemId: item014
+    iconSprite: {fileID: 21300000, guid: 4c669c56277676e4eb245009ecc195ed, type: 3}
+  - itemId: item015
+    iconSprite: {fileID: 21300000, guid: 5da1580f214df3f4ca6b2842ced374ec, type: 3}
