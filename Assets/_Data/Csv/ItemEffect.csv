@@ -23,6 +23,6 @@ effect_item012_02,effect_group_item012,increase_attack_power,1.5,passive,0,self,
 effect_item013_01,effect_group_item013,increase_attack_range,0.5,passive,0,self,des_effect_item013_01,고정형 함포1 : 기본 공격 사거리 +50%
 effect_item013_02,effect_group_item013,decrease_move_speed,0.5,passive,0,self,des_effect_item013_02,고정형 함포2 : 이동속도 - 50%
 effect_item014_01,effect_group_item014,decrease_damage_taken,0.5,hp_above,0.5,self,des_effect_item014_01,과충전 실드1 : 체력 50% 이상 받피 -50%
-effect_item014_02,effect_group_item014,increase_damage_taken,0.5,hp_below,0.5,self,des_effect_item014_02,과충전 실드2 : 체력 50% 이하 받피 +50%
+effect_item014_02,effect_group_item014,increase_damage_taken,0.5,hp_below,0.5,self,des_effect_item014_02,과충전 실드2 : 체력 50% 미만 받피 +50%
 effect_item015_01,effect_group_item015,increase_heal_power,1.5,passive,0,self,des_effect_item015_01,불안정한 나노봇1 : 치유력 +150% 증가
 effect_item015_02,effect_group_item015,increase_damage_taken,0.4,passive,0,self,des_effect_item015_02,불안정한 나노봇2 :  받는 피해량 +40%
