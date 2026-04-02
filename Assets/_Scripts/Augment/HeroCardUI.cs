@@ -30,8 +30,6 @@ public class HeroCardUI : MonoBehaviour, IAugmentUI
 
     [Header("Animation (DOTween)")]
     [SerializeField] private RectTransform _visualRoot; 
-    [SerializeField] private float _hoverScale = 1.1f;
-    [SerializeField] private float _animDuration = 0.2f;
 
     private AugmentData _data;
 
