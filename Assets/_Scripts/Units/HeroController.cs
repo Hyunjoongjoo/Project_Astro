@@ -284,8 +284,6 @@ public class HeroController : UnitController
 
     private void ApplyEquippedItems()
     {
-        if (!Object.HasStateAuthority) return;
-
         //자신의 영웅 슬롯 인덱스 찾기
         var playerData = StageManager.Instance.PlayerDataMap.Get(_ownerPlayer);
         int myHeroIndex = -1;
@@ -323,9 +321,11 @@ public class HeroController : UnitController
         foreach (string itemId in equippedItemIds)
         {
             var itemData = TableManager.Instance.ItemTable.Get(itemId);
+            Debug.Log($"[4.2아이템체크] itemId={itemId}, null={itemData == null}, groupId={itemData?.effectGroupId}");
+
             if (itemData != null)
             {
-                //EffectGroupId와 일치하는 효과들 전부 적ㅇ용
+                //EffectGroupId와 일치하는 효과들 전부 적용
                 for (int i = 0; i < allEffects.Count; i++)
                 {
                     if (allEffects[i].effectGroupId == itemData.effectGroupId)
@@ -334,6 +334,8 @@ public class HeroController : UnitController
                     }
                 }
             }
+            Debug.Log($"[4.2아이템체크] totalEffects={totalEffects.Count}");
+
         }
 
         //옵저버에 데이터 주입하고 업데이트 시작
