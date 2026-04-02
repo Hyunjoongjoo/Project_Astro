@@ -54,7 +54,10 @@ public class OnHitSkill : BaseSkill<OnHitSkillSO>
 
             // 원래 사거리 저장하고 추가 사거리 계수 더하기
             _originRange = _projectileSO.range;
-            _projectileSO.range += _data.additionalRange;
+            _projectileSO.range += _data.additionalRange; //4.2 여현구 일단 냅두기
+
+            //4.2 여현구 추가, 현재 유닛의 사거리도 늘려주기
+            _cachedUnit.attackRange += _data.additionalRange;
 
             // 원래 이펙트 저장하고 바뀐 이펙트 적용하기
             _originVFX = _projectileSO.skillVFX;
@@ -108,6 +111,9 @@ public class OnHitSkill : BaseSkill<OnHitSkillSO>
         _projectileSO.range = _originRange;
         _projectileSO.skillVFX = _originVFX;
         _cachedUnit.networkedOnHit = false;
+        //유닛(아이템적용된) 사거리로 원복
+        _cachedUnit.attackRange = _cachedUnit.UnitStat.AttackRange.Value;
+
         // 탐색 모드로 전환
         _cachedUnit.StateMachine.ChangeState(_cachedUnit.DetectState);
         Debug.Log("평타 원상복구됨.");
