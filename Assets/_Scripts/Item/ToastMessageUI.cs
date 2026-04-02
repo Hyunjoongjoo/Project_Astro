@@ -55,8 +55,10 @@ public class ToastMessageUI : BaseUI
         _toastCoroutine = null;
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
+
         if (Instance == this)
         {
             Instance = null;

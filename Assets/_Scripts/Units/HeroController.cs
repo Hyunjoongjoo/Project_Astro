@@ -62,8 +62,11 @@ public class HeroController : UnitController
         _unitStat = GetComponent<UnitStat>();
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
         moveType = statData.moveType;
+
         //UnitStat 초기화
         _unitStat.Init(statData);
+        _unitStat.AttackRange.BaseValue = attackRange; //InitAttackRang() 에서 초기화 된 값 주입
+
         ApplySpawnStat();
         _unitStat.OnStatChanged += RefreshStatRuntime;//이벤트 구독
 
@@ -90,6 +93,7 @@ public class HeroController : UnitController
         DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
         ApplyEquippedItems();
+        attackRange = _unitStat.AttackRange.Value;
         _finalCooldown = GetFinalRespawnCooldown();
         HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
     }
@@ -280,8 +284,6 @@ public class HeroController : UnitController
 
     private void ApplyEquippedItems()
     {
-        if (!Object.HasStateAuthority) return;
-
         //자신의 영웅 슬롯 인덱스 찾기
         var playerData = StageManager.Instance.PlayerDataMap.Get(_ownerPlayer);
         int myHeroIndex = -1;
@@ -319,9 +321,11 @@ public class HeroController : UnitController
         foreach (string itemId in equippedItemIds)
         {
             var itemData = TableManager.Instance.ItemTable.Get(itemId);
+            Debug.Log($"[4.2아이템체크] itemId={itemId}, null={itemData == null}, groupId={itemData?.effectGroupId}");
+
             if (itemData != null)
             {
-                //EffectGroupId와 일치하는 효과들 전부 적ㅇ용
+                //EffectGroupId와 일치하는 효과들 전부 적용
                 for (int i = 0; i < allEffects.Count; i++)
                 {
                     if (allEffects[i].effectGroupId == itemData.effectGroupId)
@@ -330,6 +334,8 @@ public class HeroController : UnitController
                     }
                 }
             }
+            Debug.Log($"[4.2아이템체크] totalEffects={totalEffects.Count}");
+
         }
 
         //옵저버에 데이터 주입하고 업데이트 시작
@@ -359,58 +365,9 @@ public class HeroController : UnitController
     {
         base.OnDrawGizmosSelected();//기존 기즈모
 
-        if (curUniqueSkill == null)
-            return;
-
-        if (curUniqueSkill.Data is ShieldSkillSO shieldData)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(transform.position, shieldData.aoeRange);
-        }
-    }
-
-    private void OnDrawGizmos()//체인스킬기즈모
-    {
-        Gizmos.color = Color.magenta;
+        //평타거리 빨간색
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
-
-        ChainSkillSO chainData = null;
-
-        if (curUniqueSkill != null && curUniqueSkill.Data is ChainSkillSO data)
-        {
-            chainData = data;
-        }
-
-        if (chainData == null) return;
-
-        //스킬 사거리
-        Gizmos.color = Color.blueViolet;
-        Gizmos.DrawWireSphere(transform.position, chainData.range);
-
-        //체인 경로 표시
-        if (curUniqueSkill is ChainSkill chain && chain.debugChainTargets != null)
-        {
-            for (int i = 0; i < chain.debugChainTargets.Count; i++)
-            {
-                var unit = chain.debugChainTargets[i];
-                if (unit == null) continue;
-
-                //각 타겟 전이 범위
-                Gizmos.color = Color.green;
-                Gizmos.DrawWireSphere(unit.transform.position, chainData.chainRange);
-
-                //연결선
-                if (i > 0)
-                {
-                    var prev = chain.debugChainTargets[i - 1];
-                    if (prev != null)
-                    {
-                        Gizmos.color = Color.gray;
-                        Gizmos.DrawLine(prev.transform.position, unit.transform.position);
-                    }
-                }
-            }
-        }
     }
 #endif
 

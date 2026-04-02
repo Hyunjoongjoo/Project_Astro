@@ -21,7 +21,13 @@ public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     }
-   
+
+    protected virtual void OnDestroy()
+    {
+        _canvasGroup?.DOKill();
+        transform?.DOKill();
+    }
+
     //열릴 때
     public virtual void Open(bool playSound = true)
     {
@@ -43,9 +49,12 @@ public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
     //비활성화 닫기 애니메이션용
     public virtual void DeActivate(bool playSound = true)
     {
-        if (_isClosing) return;
+        if (_isClosing || !gameObject.activeSelf) return;
         
         _isClosing = true;
+
+        _canvasGroup.DOKill(); // 기존 트윈 중단
+        transform.DOKill();
 
         _canvasGroup.DOFade(0, _fadeDuration).SetEase(Ease.InCubic);
         transform.DOScale(0.9f, _scaleDuration).SetEase(Ease.InCubic).OnComplete(() =>
@@ -63,10 +72,16 @@ public abstract class BaseUI : MonoBehaviour, IPointerEnterHandler
         if (_isClosing) return;
         _isClosing = true;
 
+        _canvasGroup.DOKill(); // 기존 트윈 중단
+        transform.DOKill();
+
         _canvasGroup.DOFade(0, _fadeDuration).SetEase(Ease.InCubic);
         transform.DOScale(0.9f, _scaleDuration).SetEase(Ease.InCubic).OnComplete(() =>
         {
-            Destroy(gameObject);
+            if (this != null && gameObject != null)
+            {
+                Destroy(gameObject);
+            }
         });
 
         if (playSound) AudioManager.Instance.PlayUISfx(UISfxList.BtnClose);
