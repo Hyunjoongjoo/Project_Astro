@@ -42,6 +42,10 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private string _currentItemId2;
     private List<string> _currentAugmentIds = new List<string>();
 
+    [Header("Deploy Zone")]
+    [SerializeField] private DeployZone _deployZone;
+
+
     //private float _currentTimer = 0f;
     //private bool IsCooldown => _currentTimer > 0f;
 
@@ -56,6 +60,11 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         //스테이지매니저캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
+
+        if (_deployZone == null)
+        {
+            _deployZone = FindFirstObjectByType<DeployZone>();
+        }
 
         UpdateCooldownUI(0f, 1f);
     }
@@ -162,6 +171,16 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
         _originPos = transform.position;
         _iconImg.color = new Color(1, 1, 1, 0.5f);
+
+        // 드래그 시 배치 가능 영역 표시
+        if (_deployZone != null && HeroSpawner.Instance != null)
+        {
+            Team team = GameManager.Instance.PlayerTeam;
+            List<DeployZoneData> zones = HeroSpawner.Instance.GetAvailableDeployZones(team);
+            Debug.Log($"[HeroHandCardUI] ShowZones 호출, zones.Count = {zones.Count}");
+            _deployZone.ShowZones(zones);
+        }
+
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -181,6 +200,12 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             {
                 transform.position = _originPos;
                 _iconImg.color = new Color(1, 1, 1, 1f);
+
+                if (_deployZone != null)
+                {
+                    _deployZone.HideZones();
+                }
+
                 return;
             }
         }
@@ -204,6 +229,10 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             {
                 //Debug.Log("배치 거리 초과 - 소환 불가");
                 transform.position = _originPos;
+                if (_deployZone != null)
+                {
+                    _deployZone.HideZones();
+                }
                 return;
             }
 
@@ -212,6 +241,10 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             {
                 Debug.LogError($"[HeroHandCardUI] GetStatus 실패: {HeroId}");
                 transform.position = _originPos;
+                if (_deployZone != null)
+                {
+                    _deployZone.HideZones();
+                }
                 return;
             }
 
@@ -238,6 +271,10 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             Debug.LogWarning("소환실패");
         }
         transform.position = _originPos;
+        if (_deployZone != null)
+        {
+            _deployZone.HideZones();
+        }
     }
 
     public NetworkPrefabRef GetUnitPrefab()

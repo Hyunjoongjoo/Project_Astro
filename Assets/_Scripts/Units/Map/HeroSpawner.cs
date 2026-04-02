@@ -9,6 +9,19 @@ public struct CooldownData : INetworkStruct
     public float TotalDuration;
 }
 
+public struct DeployZoneData
+{
+    public Vector3 Center;
+    public Vector2 Size;
+
+    public DeployZoneData(Vector3 center, Vector2 size)
+    {
+        Center = center;
+        Size = size;
+    }
+}
+
+
 public class HeroSpawner : NetworkBehaviour
 {
     public static HeroSpawner Instance { get; private set; }
@@ -264,6 +277,39 @@ public class HeroSpawner : NetworkBehaviour
 
         return 0f;
     }
+
+    // 활성화된 배치 존 목록 반환
+    public List<DeployZoneData> GetAvailableDeployZones(Team team)
+    {
+        List<DeployZoneData> zones = new List<DeployZoneData>();
+
+        Transform origin = GetDeployOrigin(team);
+        if (origin == null)
+        {
+            return zones;
+        }
+
+        bool isLeftTowerDestroyed = IsLeftTowerDestroyed(team);
+        bool isRightTowerDestroyed = IsRightTowerDestroyed(team);
+
+        Vector3 centerZoneCenter = GetZoneCenterWorld(origin, team, _centerZoneOffset);
+        zones.Add(new DeployZoneData(centerZoneCenter, _centerZoneSize));
+
+        if (isLeftTowerDestroyed)
+        {
+            Vector3 leftZoneCenter = GetZoneCenterWorld(origin, team, _leftZoneOffset);
+            zones.Add(new DeployZoneData(leftZoneCenter, _leftZoneSize));
+        }
+
+        if (isRightTowerDestroyed)
+        {
+            Vector3 rightZoneCenter = GetZoneCenterWorld(origin, team, _rightZoneOffset);
+            zones.Add(new DeployZoneData(rightZoneCenter, _rightZoneSize));
+        }
+
+        return zones;
+    }
+
 
     //stat이 없으면 default로 전달
     public void RPC_SpawnUnit(NetworkPrefabRef prefab, Vector3 spawnPos, Team team)
