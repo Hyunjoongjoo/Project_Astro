@@ -62,8 +62,11 @@ public class HeroController : UnitController
         _unitStat = GetComponent<UnitStat>();
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
         moveType = statData.moveType;
+
         //UnitStat 초기화
         _unitStat.Init(statData);
+        _unitStat.AttackRange.BaseValue = attackRange; //InitAttackRang() 에서 초기화 된 값 주입
+
         ApplySpawnStat();
         _unitStat.OnStatChanged += RefreshStatRuntime;//이벤트 구독
 
@@ -90,6 +93,7 @@ public class HeroController : UnitController
         DeployState.SetDeployData(_targetPos, _deployDelay);
         StateMachine.ChangeState(DeployState);
         ApplyEquippedItems();
+        attackRange = _unitStat.AttackRange.Value;
         _finalCooldown = GetFinalRespawnCooldown();
         HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
     }
