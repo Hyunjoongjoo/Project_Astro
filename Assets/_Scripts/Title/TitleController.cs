@@ -71,10 +71,6 @@ public class TitleController : MonoBehaviour
             {
                 _loginController.OnClickGoogleLogIn();
             }
-            else
-            {
-                //_loginController.OnClickLogin();
-            }
         });
     }
 

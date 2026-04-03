@@ -19,11 +19,22 @@ public class ToggleSwitch : MonoBehaviour
     private RectTransform _handleRect;
     private float _handleOnPos; // On 좌표
     private float _handleOffPos; //off 좌표
+    private bool _isInitialized = false;
 
     private void Awake()
     {
         _toggle = GetComponent<Toggle>();
-        _handleRect = _handleImg.rectTransform;
+        _handleRect = _handleImg.rectTransform;  
+    }
+
+    private void Start()
+    {
+        Init();
+    }
+
+    private void Init()
+    {
+        if (_isInitialized) return;
 
         //핸들 시작위치를 off 위치로 설정
         _handleOffPos = _handleRect.anchoredPosition.x;
@@ -33,12 +44,15 @@ public class ToggleSwitch : MonoBehaviour
         float handleWidth = _handleRect.rect.width;
         _handleOnPos = bgWidth - handleWidth;
 
-        // 시작은 off 상태
-        SetState(_toggle.isOn, false);
-
         // 토글 상태 변화 리스너 연결
+        _toggle.onValueChanged.RemoveAllListeners();
         _toggle.onValueChanged.AddListener((isOn) => SetState(isOn, true));
+
+        _isInitialized = true;
+
+        RefreshUI();
     }
+
 
     // 상태에 따라 시각적 요소 변경 (animate가 true면 부드럽게)
     private void SetState(bool isOn, bool animate)
@@ -57,6 +71,17 @@ public class ToggleSwitch : MonoBehaviour
         {
             // 즉시 변경
             _handleRect.anchoredPosition = new Vector2(targetX, _handleRect.anchoredPosition.y);
+        }
+    }
+
+    public void RefreshUI()
+    {
+        if (!_isInitialized) Init();
+
+        // Toggle 컴포넌트의 현재 isOn 상태에 맞춰 UI를 즉시 갱신
+        if (_toggle != null)
+        {
+            SetState(_toggle.isOn, false);
         }
     }
 }

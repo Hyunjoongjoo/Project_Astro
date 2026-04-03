@@ -17,11 +17,11 @@ MonoBehaviour:
   skillName: augment_name_heavyrain_A
   skillDescription: augment_desc_heavyrain_A
   note: 
-  skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  skillVFX: {fileID: 1371980983267245554, guid: 6d29688ecb9699243ae48fc819dda096, type: 3}
   skillSFX: {fileID: 8300000, guid: f5c7ff7ed324f84448031c8f2cd5140e, type: 3}
   skillType: 2
-  initCooldown: 4
-  cooldown: 8
+  initCooldown: 0
+  cooldown: 20
   preDelay: 1.5
   postDelay: 1.5
   blockAction: 1

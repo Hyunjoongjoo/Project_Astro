@@ -88,7 +88,8 @@ public class AugmentManager : Singleton<AugmentManager>
         }
 
         //UIManager를 통해 팝업 형식으로 띄움
-        _currentWindow = UIManager.Instance.ShowUI<AugmentWindowUI>(_augmentWindowPrefab, true);
+        _currentWindow = UIManager.Instance.ShowUI<AugmentWindowUI>(_augmentWindowPrefab, false);
+        AudioManager.Instance.PlayUISfx(UISfxList.AugmentOpen);
         if (_cachedStageManager == null) _cachedStageManager = FindFirstObjectByType<StageManager>();
 
         //Playing 상태일 때만 토글 버튼 활성화

@@ -17,16 +17,16 @@ MonoBehaviour:
   skillName: 
   skillDescription: 
   note: 
-  skillVFX: {fileID: 2393817908272368249, guid: c09ea11988b832e458a2fd122083ef02, type: 3}
+  skillVFX: {fileID: 1371980983267245554, guid: fcc8f31bc00fc734ebe4055eae45c8be, type: 3}
   skillSFX: {fileID: 8300000, guid: 8a2484c63cf06614f9efa649d232a936, type: 3}
   skillType: 0
   initCooldown: 0
-  cooldown: 1.5
-  preDelay: 0.5
-  postDelay: 0.5
+  cooldown: 0.3
+  preDelay: 0.1
+  postDelay: 0.1
   blockAction: 0
   damageRatio: 1
-  range: 2.5
+  range: 3
   projectileSpeed: 10
   isHoming: 0
   oneShotProjectileNum: 1

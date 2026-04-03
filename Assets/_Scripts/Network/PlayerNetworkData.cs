@@ -33,4 +33,15 @@ public struct PlayerNetworkData : INetworkStruct
 
     //영웅별 장착 아이템 리스트
     public SlotData_10 HeroEquippedItems;
+
+    //03-31 플레이어 성장 스탯 전달/저장용
+    public HeroStatNetworkData HeroStat;
+}
+
+// 테이블 기본값이 아니라 레벨/성장 반영 후 값
+public struct HeroStatNetworkData : INetworkStruct
+{
+    public int MaxHp;
+    public int AttackPower;
+    public float HealPower;
 }

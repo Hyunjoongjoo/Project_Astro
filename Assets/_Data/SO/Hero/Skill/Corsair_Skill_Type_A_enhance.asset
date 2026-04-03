@@ -20,14 +20,14 @@ MonoBehaviour:
   skillVFX: {fileID: 6393617126741755569, guid: cd314f7e717ada041bb94a53b1fdff9c, type: 3}
   skillSFX: {fileID: 8300000, guid: ea479fe4eab6a70499dd80a356b72ef0, type: 3}
   skillType: 3
-  initCooldown: 5
-  cooldown: 7
+  initCooldown: 0
+  cooldown: 15
   preDelay: 0
   postDelay: 0
   blockAction: 1
   dashSpeed: 25
-  canDashMaxDistance: 7
-  canDashMinDistance: 2
+  canDashMaxDistance: 5
+  canDashMinDistance: 0
   dashCount: 1
   dashInterval: 0.2
   damageRatio: 2

@@ -51,6 +51,11 @@ public sealed class AudioOptionsView : MonoBehaviour
         if (_bgmMuteToggle != null) _bgmMuteToggle.SetIsOnWithoutNotify(b_mute);
         if (_sfxMuteToggle != null) _sfxMuteToggle.SetIsOnWithoutNotify(s_mute);
 
+        //토글버튼 비쥬얼 동기화
+        UpdateToggleSwitchVisuals(_masterMuteToggle);
+        UpdateToggleSwitchVisuals(_bgmMuteToggle);
+        UpdateToggleSwitchVisuals(_sfxMuteToggle);
+
         if (AudioManager.Instance != null)
             AudioManager.Instance.LoadAndApplySavedVolumes();
 
@@ -146,5 +151,15 @@ public sealed class AudioOptionsView : MonoBehaviour
         PlayerPrefs.Save();
 
         SyncSlidersFromSaved();
+    }
+
+    //토글 스위치 비주얼 갱신용 헬퍼 메서드
+    private void UpdateToggleSwitchVisuals(Toggle toggle)
+    {
+        if (toggle != null)
+        {
+            var sw = toggle.GetComponent<ToggleSwitch>();
+            if (sw != null) sw.RefreshUI();
+        }
     }
 }

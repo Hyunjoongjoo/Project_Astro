@@ -412,6 +412,7 @@ GameObject:
   - component: {fileID: 4011482379679225173}
   - component: {fileID: 2466631899868332685}
   - component: {fileID: 946459580674420085}
+  - component: {fileID: 7018459943452212479}
   m_Layer: 5
   m_Name: Confirm_btn
   m_TagString: Untagged
@@ -521,6 +522,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7018459943452212479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2291379645790093777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9068d62415521940b43926086eef620, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundSetBtn
+  _selectSound: 4
 --- !u!1 &2414451335694696893
 GameObject:
   m_ObjectHideFlags: 0

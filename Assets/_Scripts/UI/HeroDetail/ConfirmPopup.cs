@@ -17,7 +17,7 @@ public class ConfirmPopup : BaseUI
         _messageTxt.text = canConfirm ? msg : denyMsg;
 
         // 돈부족하면 버튼 못누르게
-        _yesBtn.interactable = canConfirm;
+        _yesBtn.gameObject.SetActive(canConfirm);
 
         // 버튼 텍스트 변경 
         if (_yesBtnTxt != null)
@@ -34,6 +34,8 @@ public class ConfirmPopup : BaseUI
         if (canConfirm)
         {
             _yesBtn.onClick.AddListener(() => {
+                _yesBtn.interactable = false;
+                _noBtn.interactable = false;
                 onYes?.Invoke();
                 OnBackButtonPressed(false);
             });
@@ -41,6 +43,8 @@ public class ConfirmPopup : BaseUI
 
         _noBtn.onClick.RemoveAllListeners();
         _noBtn.onClick.AddListener(() => {
+            _yesBtn.interactable = false;
+            _noBtn.interactable = false;
             OnBackButtonPressed(); // 그냥 닫기
         });
     }

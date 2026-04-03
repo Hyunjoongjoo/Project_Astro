@@ -1,18 +1,28 @@
 효과 ID,효과 그룹 ID,효과 종류,효과 수치,발동 조건,발동 조건 값,대상,설명 텍스트,기획용 비고
 id,effectGroupId,effectType,effectValue,triggerCondition,triggerValue,target,effectDesc,note
 String,String,EffectType,Float,TriggerCondition,Float,Target,String,String
-effect_item001_01,effect_group_item001,increase_attack_power,0.2,passive,0,self,des_effect_item001_01,강화 철갑탄 : 공격력 20%
-effect_item002_01,effect_group_item002,increase_max_hp,0.2,passive,0,self,des_effect_item002_01,생명 유지 장치 : 체력 20%
-effect_item003_01,effect_group_item003,increase_heal_power,0.2,passive,0,self,des_effect_item003_01,응급 의료 키트 : 치유력 20%
-effect_item004_01,effect_group_item004,increase_move_speed,0.2,passive,0,self,des_effect_item004_01,이온 추진기 : 이동 속도 20%
-effect_item005_01,effect_group_item005,increase_attack_power,0.5,hp_below,0.4,self,des_effect_item005_01,증폭 회로 : 체력 40% 이하 공격력 50% 증가
-effect_item006_01,effect_group_item006,decrease_cooldown,0.2,hp_above,0.7,self,des_effect_item006_01,고출력 렌즈 : 체력 70% 이상 쿨타임 20% 감소
-effect_item007_01,effect_group_item007,decrease_respawn_time,0.2,passive,0,self,des_effect_item007_01,긴급 호출기1 : 재소환 대기시간 20% 감소
-effect_item007_02,effect_group_item007,decrease_max_hp,0.3,passive,0,self,des_effect_item007_02,긴급 호출기1 : 체력 30% 감소
+effect_item001_01,effect_group_item001,increase_attack_power,1,passive,0,self,des_effect_item001_01,강화 철갑탄 : 공격력 +100%
+effect_item002_01,effect_group_item002,increase_max_hp,1,passive,0,self,des_effect_item002_01,생명 유지 장치 : 체력 +100%
+effect_item003_01,effect_group_item003,increase_heal_power,1,passive,0,self,des_effect_item003_01,응급 의료 키트 : 치유력 +100%
+effect_item004_01,effect_group_item004,increase_move_speed,0.5,passive,0,self,des_effect_item004_01,이온 추진기 : 이동 속도 +50%
+effect_item005_01,effect_group_item005,increase_attack_power,2,hp_below,0.4,self,des_effect_item005_01,증폭 회로 : 체력 40% 이하 공격력 200% 증가
+effect_item006_01,effect_group_item006,decrease_cooldown,0.3,hp_above,0.7,self,des_effect_item006_01,고출력 렌즈 : 체력 70% 이상 쿨타임 30% 감소
+effect_item007_01,effect_group_item007,decrease_respawn_time,0.3,passive,0,self,des_effect_item007_01,긴급 호출기1 : 재소환 대기시간 30% 감소
+effect_item007_02,effect_group_item007,decrease_max_hp,0.5,passive,0,self,des_effect_item007_02,긴급 호출기1 : 체력 50% 감소
 effect_item008_01,effect_group_item008,decrease_damage_taken,0.3,passive,0,self,des_effect_item008_01,티타늄 합금1 : 받는 피해량 30% 감소
-effect_item008_02,effect_group_item008,decrease_move_speed,0.2,passive,0,self,des_effect_item008_02,티타늄 합금2 : 이동 속도 20% 감소
+effect_item008_02,effect_group_item008,decrease_move_speed,0.5,passive,0,self,des_effect_item008_02,티타늄 합금2 : 이동 속도 50% 감소
 effect_item009_01,effect_group_item009,increase_attack_speed,0.3,passive,0,self,des_effect_item009_01,광전사 모듈1 : 공격 속도 30% 증가
 effect_item009_02,effect_group_item009,increase_move_speed,0.3,passive,0,self,des_effect_item009_02,광전사 모듈2 : 이동 속도 30% 증가
 effect_item009_03,effect_group_item009,increase_damage_taken,0.3,passive,0,self,des_effect_item009_03,광전사 모듈3 : 받는 피해량 30% 증가
-effect_item010_01,effect_group_item010,increase_attack_power,0.2,passive,0,self,des_effect_item010_01,저격용 위장막1 : 공격력 20% 증가
-effect_item010_02,effect_group_item010,decrease_attack_speed,0.2,passive,0,self,des_effect_item010_02,저격용 위장막2 : 공격 속도 30% 감소
+effect_item010_01,effect_group_item010,increase_attack_power,1.5,passive,0,self,des_effect_item010_01,저격용 위장막1 : 공격력 150% 증가
+effect_item010_02,effect_group_item010,decrease_attack_speed,0.3,passive,0,self,des_effect_item010_02,저격용 위장막2 : 공격 속도 30% 감소
+effect_item011_01,effect_group_item011,increase_attack_range,0.3,passive,0,self,des_effect_item011_01,"광학 조준경1 : 기본 공격 사거리 +30%, "
+effect_item011_02,effect_group_item011,increase_detection_range,0.3,passive,0,self,des_effect_item011_02,광학 조준경2 : 탐지거리 +30%
+effect_item012_01,effect_group_item012,decrease_attack_range,0.4,passive,0,self,des_effect_item012_01,결사항전 프로토콜1 : 기본 공격 사거리 -40%
+effect_item012_02,effect_group_item012,increase_attack_power,1.5,passive,0,self,des_effect_item012_02,결사항전 프로토콜2 : 공격력 +150%
+effect_item013_01,effect_group_item013,increase_attack_range,0.5,passive,0,self,des_effect_item013_01,고정형 함포1 : 기본 공격 사거리 +50%
+effect_item013_02,effect_group_item013,decrease_move_speed,0.5,passive,0,self,des_effect_item013_02,고정형 함포2 : 이동속도 - 50%
+effect_item014_01,effect_group_item014,decrease_damage_taken,0.5,hp_above,0.5,self,des_effect_item014_01,과충전 실드1 : 체력 50% 이상 받피 -50%
+effect_item014_02,effect_group_item014,increase_damage_taken,0.5,hp_below,0.5,self,des_effect_item014_02,과충전 실드2 : 체력 50% 미만 받피 +50%
+effect_item015_01,effect_group_item015,increase_heal_power,1.5,passive,0,self,des_effect_item015_01,불안정한 나노봇1 : 치유력 +150% 증가
+effect_item015_02,effect_group_item015,increase_damage_taken,0.4,passive,0,self,des_effect_item015_02,불안정한 나노봇2 :  받는 피해량 +40%

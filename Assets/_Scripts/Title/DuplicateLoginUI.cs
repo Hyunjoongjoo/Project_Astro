@@ -8,11 +8,9 @@ public class DuplicateLoginUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _text;
     [SerializeField] private Button _btn;
 
-    private string _message = "다른 환경에서 접속되어 로그아웃 됩니다.";
-
     private void Awake()
     {
-        _text.text = _message;
+        _text.text = TableManager.Instance.GetString("setting_logout_another_device");
         Time.timeScale = 0f;
         _btn.onClick.AddListener(OnClickBtn);
     }

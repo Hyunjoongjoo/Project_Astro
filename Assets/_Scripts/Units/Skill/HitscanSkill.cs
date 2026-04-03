@@ -11,6 +11,18 @@ public class HitscanSkill : BaseSkill<HitscanSkillSO>
     {
         if (!_skillCooldown.ExpiredOrNotRunning(_cachedUnit.Runner)) return false;
 
+        //4.2 여현구 추가
+        //유효성(없어도버그는없었다함)
+        if (_cachedUnit.currentTarget == null || _cachedUnit.currentTarget.IsDead) return false;
+        //사거리검사
+        Vector3 diff = _cachedUnit.currentTarget.transform.position - _cachedUnit.transform.position;
+        //평타면 실시간, 스킬이면 원본데이터
+        float currentRange = (_data.skillType == SkillType.NormalAttack) ? _cachedUnit.attackRange : _data.range;
+        //제곱
+        if (diff.sqrMagnitude > currentRange * currentRange)
+        {
+            return false;
+        }
         return true;
     }
 
@@ -27,16 +39,16 @@ public class HitscanSkill : BaseSkill<HitscanSkillSO>
 
         _phase = SkillPhase.Casting;
 
-        float finalCooldown;
-        if (_data.skillType == SkillType.NormalAttack)
-        {
-            finalCooldown = _cachedUnit.AttackSpeed;
-        }
-        else
-        {
-            finalCooldown = _data.cooldown;
-        }
-        _skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
+        //float finalCooldown;
+        //if (_data.skillType == SkillType.NormalAttack)
+        //{
+        //    finalCooldown = _cachedUnit.AttackSpeed;
+        //}
+        //else
+        //{
+        //    finalCooldown = _data.cooldown;
+        //}
+        //_skillCooldown = TickTimer.CreateFromSeconds(_cachedUnit.Runner, finalCooldown);
         ApplyDamage(target);
         PostDelay();
     }
@@ -60,9 +72,5 @@ public class HitscanSkill : BaseSkill<HitscanSkillSO>
                 _cachedUnit.RPC_PlayHitscanEffect(_cachedUnit.Object.Id, target.Object.Id);
             }
         }
-
-        Vector3 start = _cachedUnit.transform.position;
-        Vector3 dir = (target.transform.position - start).normalized;
-        float distance = Vector3.Distance(start, target.transform.position);
     }
 }
