@@ -135,6 +135,7 @@ public class AugmentManager : Singleton<AugmentManager>
         if (go.TryGetComponent(out HeroHandCardUI card))
         {
             int myIndex = _slotContainer.childCount - 1;
+            card.AvailableState += ObjectContainer.Instance.stageUi.CutScenePlay;
             card.Setup(data, myIndex);
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 // Stage 씬 인게임 시퀀스에 쓰이는 UI들을 제어하는 클래스
 public class StageUI : MonoBehaviour
@@ -17,6 +18,9 @@ public class StageUI : MonoBehaviour
     [SerializeField] private GameObject _teamMemberSlot;
     [SerializeField] private Transform _teammateContainer;
     [SerializeField] private Slider _augmentGauge;
+    [SerializeField] private RectTransform _cutsceneFrame;
+    [SerializeField] private Image _cutsceneImage;
+    [SerializeField] private HeroIconDataSO _heroIcons;
 
     [Header("Result")]
     [SerializeField] private GameObject _resultPanel;
@@ -47,6 +51,10 @@ public class StageUI : MonoBehaviour
     private bool _isHostPaused = false;
     private readonly string HOST_MISSING = "ui_toast_host_missing";
     private readonly string PLAYER_MISSING = "ui_toast_player_missing";
+
+    // 컷신 재생 중 여부 판단을 위한 변수
+    private bool _isCutscenePlaying = false;
+    private Sequence _cutsceneSeq;
 
     private void Awake()
     {
@@ -81,6 +89,11 @@ public class StageUI : MonoBehaviour
             _isHostPaused = false;
             SetNetworkExceptionPanel(false, true);
         }
+    }
+
+    private void OnDestroy()
+    {
+        _cutsceneSeq?.Kill();
     }
 
     public void SetMaxValueAugmentSlider(int value)
@@ -293,5 +306,28 @@ public class StageUI : MonoBehaviour
         
         _disconnected.SetActive(!isWaiting);
         _waitingHost.SetActive(isWaiting);
+    }
+
+    public void CutScenePlay(string targetId)
+    {
+        // 컷신이 재생 중이면 무시한다.
+        if (_isCutscenePlaying) return;
+
+        _isCutscenePlaying = true;
+
+        // 표시할 이미지와 음성 정보를 받는다.
+        _cutsceneImage.sprite = _heroIcons.GetPilotImage(targetId);
+        AudioManager.Instance.PlaySfx(_heroIcons.GetPilotVoice(targetId));
+
+        // DOTween을 사용해 이미지를 움직인다.
+        float width = _cutsceneFrame.rect.width;
+
+        Sequence _cutsceneSeq = DOTween.Sequence();
+
+        _cutsceneSeq.Append(_cutsceneFrame.DOAnchorPosX(width + 20f, 0.3f).SetEase(Ease.OutCubic));  // 슬라이드 인
+        _cutsceneSeq.AppendInterval(2f);                                               // 2초 유지
+        _cutsceneSeq.Append(_cutsceneFrame.DOAnchorPosX(0f, 0.3f).SetEase(Ease.InCubic));      // 슬라이드 아웃
+
+        _cutsceneSeq.OnComplete(() => _isCutscenePlaying = false);
     }
 }

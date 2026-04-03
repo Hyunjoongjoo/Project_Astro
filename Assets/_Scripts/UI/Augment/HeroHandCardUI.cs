@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -51,6 +52,8 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     //private float _currentTimer = 0f;
     //private bool IsCooldown => _currentTimer > 0f;
 
+    public event Action<string> AvailableState;
+
     public string HeroId => _data != null ? _data.targetId : "";
 
     public void Setup(AugmentData data, int heroIndex)
@@ -67,7 +70,7 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         {
             _deployZone = FindFirstObjectByType<DeployZone>();
         }
-
+        AvailableState?.Invoke(_data.targetId);
         UpdateCooldownUI(0f, 1f);
     }
     private void Update()
@@ -108,6 +111,11 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     }
 
+    private void OnDestroy()
+    {
+        AvailableState = null;
+    }
+
     //쿨타임에 맞춰 커버 텍스트 갱신
     private void UpdateCooldownUI(float remaining, float total)
     {
@@ -139,8 +147,13 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
         else
         {
-            _cooldownCover.gameObject.SetActive(false);
-            _cooldownText.text = string.Empty;
+            if (_cooldownCover.gameObject.activeSelf)
+            {
+                AvailableState?.Invoke(_data.targetId);
+                _cooldownText.text = string.Empty;
+                _cooldownCover.gameObject.SetActive(false);
+            }
+                
         }
     }
 

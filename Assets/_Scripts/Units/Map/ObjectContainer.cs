@@ -12,6 +12,7 @@ public class ObjectContainer : Singleton<ObjectContainer>
     [Header("전역 참조가 필요한 오브젝트")]
     public UnitBase[] blueSideStructure;
     public UnitBase[] redSideStructure;
+    public StageUI stageUi;
 
     [Header("공용 오디오 클립")]
     public AudioClip heroDeploySound;
