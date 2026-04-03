@@ -135,6 +135,7 @@ public class AugmentManager : Singleton<AugmentManager>
         if (go.TryGetComponent(out HeroHandCardUI card))
         {
             int myIndex = _slotContainer.childCount - 1;
+            card.AvailableState += TriggeringCutScene;
             card.Setup(data, myIndex);
         }
 
@@ -237,6 +238,11 @@ public class AugmentManager : Singleton<AugmentManager>
         _cachedStageManager = null;
         _currentWindow = null;
         _isWaitingForServerResponse = false;
+    }
+
+    private void TriggeringCutScene()
+    {
+        Debug.Log("컷신 트리거 됨.");
     }
 }
 
