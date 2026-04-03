@@ -45,18 +45,18 @@ augment_desc_tank_A,5초간 본인의 받는 피해량 20% 감소,Reduces damage
 augment_desc_angel_A,회복이 영웅 한명과 그 주변 아군에게 적용,Healing is applied to a hero and nearby allies.,앤젤 증강 스킬1 설명
 augment_desc_tachyon_A,강화 공격이 적을 관통함,Enhanced attacks penetrate enemies.,타키온 증강 스킬1 설명
 augment_desc_tesla_A,전이 범위 증가 및 전이 횟수+3,Increases transfer range and number+3.,테슬라 증강 스킬1 설명
-enhance_augment_name_corsair_A,옴니 스트라이크+,Omni Strike+,커세어 강화 증강 스킬1 이름
-enhance_augment_name_heavyrain_A,초토화+,Devastation+,헤비레인 강화 증강 스킬1 이름
-enhance_augment_name_tank_A,성벽+,Bulwark+,탱크 강화 증강 스킬1 이름
-enhance_augment_name_angel_A,나노 펄스+,Nano Pulse+,앤젤 강화 증강 스킬1 이름
-enhance_augment_name_tachyon_A,철갑탄+,Armor Piercing Shell+,타키온 강화 증강 스킬1 이름
-enhance_augment_name_tesla_A,연쇄 번개+,Chain Lightning+,테슬라 강화 증강 스킬1 이름
-enhance_augment_desc_corsair_A,돌진 후 추가적으로 강력한 광역 피해를 입힌다,Additional powerful AoE damage after dashing.,커세어 강화 증강 스킬1 설명
-enhance_augment_desc_heavyrain_A,레이저 발사 횟수+4,Laser fire count+4.,헤비레인 강화 증강 스킬1 설명
-enhance_augment_desc_tank_A,5초간 본인의 받는 피해량 25% 감소,Reduces damage taken by 40% for 5 seconds.,탱크 강화 증강 스킬1 설명
-enhance_augment_desc_angel_A,회복량 증가 및 영웅 한명과 그 주변 아군에게 적용,Increased healing amount; healing applies to a hero and nearby allies.,앤젤 강화 증강 스킬1 설명
-enhance_augment_desc_tachyon_A,피해량이 증가하고 강화 공격이 적을 관통함,Increased damage; Enhanced attacks penetrate enemies.,타키온 강화 증강 스킬1 설명
-enhance_augment_desc_tesla_A,전이 시 피해량 감소 제거. 전이 범위 증가 및 전이 횟수 +3,Removed damage reduction upon transfer. Increases transfer range and number+3,태슬라 강화 증강 스킬1 설명
+enhance_augment_name_corsair_A,<color=#00ff00ff>옴니 스트라이크+</color>,<color=#00ff00ff>Omni Strike+</color>,커세어 강화 증강 스킬1 이름
+enhance_augment_name_heavyrain_A,<color=#00ff00ff>초토화+</color>,<color=#00ff00ff>Devastation+</color>,헤비레인 강화 증강 스킬1 이름
+enhance_augment_name_tank_A,<color=#00ff00ff>성벽+</color>,<color=#00ff00ff>Bulwark+</color>,탱크 강화 증강 스킬1 이름
+enhance_augment_name_angel_A,<color=#00ff00ff>나노 펄스+</color>,<color=#00ff00ff>Nano Pulse+</color>,앤젤 강화 증강 스킬1 이름
+enhance_augment_name_tachyon_A,<color=#00ff00ff>철갑탄+</color>,<color=#00ff00ff>Armor Piercing Shell+</color>,타키온 강화 증강 스킬1 이름
+enhance_augment_name_tesla_A,<color=#00ff00ff>연쇄 번개+</color>,<color=#00ff00ff>Chain Lightning+</color>,테슬라 강화 증강 스킬1 이름
+enhance_augment_desc_corsair_A,돌진 후 <color=#00ff00ff>강력한</color> 광역 피해를 입힌다,Additional <color=#00ff00ff>powerful</color> AoE damage after dashing.,커세어 강화 증강 스킬1 설명
+enhance_augment_desc_heavyrain_A,레이저 발사 횟수<color=#00ff00ff>+4</color>,Laser fire count<color=#00ff00ff>+4.</color>,헤비레인 강화 증강 스킬1 설명
+enhance_augment_desc_tank_A,5초간 본인의 받는 피해량 <color=#00ff00ff>25%</color> 감소,Reduces damage taken by <color=#00ff00ff>25%</color> for 5 seconds.,탱크 강화 증강 스킬1 설명
+enhance_augment_desc_angel_A,<color=#00ff00ff>회복량 증가</color> 및 영웅 한명과 그 주변 아군에게 적용,<color=#00ff00ff>Increased healing amount;</color> healing applies to a hero and nearby allies.,앤젤 강화 증강 스킬1 설명
+enhance_augment_desc_tachyon_A,<color=#00ff00ff>피해량이 증가하고</color> 강화 공격이 적을 관통함,<color=#00ff00ff>Increased damage;</color> Enhanced attacks penetrate enemies.,타키온 강화 증강 스킬1 설명
+enhance_augment_desc_tesla_A,<color=#00ff00ff>전이 시 피해량 감소 제거.</color> 전이 범위 증가 및 전이 횟수+3,<color=#00ff00ff>Removed damage reduction upon transfer.</color> Increases transfer range and number+3,태슬라 강화 증강 스킬1 설명
 augment_name_corsair_B,팬텀 스트라이크,Phantom Strike,커세어 증강 스킬2 이름
 augment_name_heavyrain_B,멀티 샷,Multi-Shot,헤비레인 증강 스킬2 이름
 augment_name_tank_B,전자기 방출,Electromagnetic Emission,탱크 증강 스킬2 이름
@@ -69,18 +69,18 @@ augment_desc_tank_B,스킬 지속시간 동안 주변 적에게 피해를 줌,De
 augment_desc_angel_B,스킬 쿨타임 30% 감소,Reduces skill cooldown by 30%.,앤젤 증강 스킬2 설명
 augment_desc_tachyon_B,맞은 대상의 주변에 광역 피해를 줌,Deals damage to enemies around the hit target.,타키온 증강 스킬2 설명
 augment_desc_tesla_B,공격력이 증가하나 피해가 전이되지 않음,Attack power increases but damage is not transferred.,테슬라 증강 스킬2 설명
-enhance_augment_name_corsair_B,팬텀 스트라이크+,Phantom Strike+,커세어 강화 증강 스킬2 이름
-enhance_augment_name_heavyrain_B,멀티 샷+,Multi-Shot+,헤비레인 강화 증강 스킬2 이름
-enhance_augment_name_tank_B,전자기 방출+,Electromagnetic Emission+,탱크 강화 증강 스킬2 이름
-enhance_augment_name_angel_B,긴급 수리+,Emergency Repair+,앤젤 강화 증강 스킬2 이름
-enhance_augment_name_tachyon_B,작렬탄+,Explosive Shell+,타키온 강화 증강 스킬2 이름
-enhance_augment_name_tesla_B,과충전+,Overcharge+,테슬라 강화 증강 스킬2 설명
-enhance_augment_desc_corsair_B,돌진 횟수+2,Dash count increases to 3.,커세어 강화 증강 스킬2 설명
-enhance_augment_desc_heavyrain_B,레이저를 한번에 6발 발사함,Fires 6 lasers at once.,헤비레인 강화 증강 스킬2 설명
-enhance_augment_desc_tank_B,스킬 지속시간 동안 주변 적에게 강력한 피해를 줌,Deals powerful damage to nearby enemies during the skill duration.,탱크 강화 증강 스킬2 설명
-enhance_augment_desc_angel_B,회복량 증가. 스킬 쿨타임 30% 감소,Increased healing amount; reduces skill cooldown by 30%.,앤젤 강화 증강 스킬2 설명
-enhance_augment_desc_tachyon_B,기본 공격 2회마다 스킬 사용. 맞은 대상의 주변에 광역 피해를 줌,Uses skill every 2 basic attacks. Deals damage to enemies around the hit target.,타키온 강화 증강 스킬2 설명
-enhance_augment_desc_tesla_B,공격력이 대폭 증가하나 피해가 전이되지 않는다,Attack power increases significantly but damage is not transferred.,테슬라 강화 증강 스킬2 설명
+enhance_augment_name_corsair_B,<color=#00ff00ff>팬텀 스트라이크+</color>,<color=#00ff00ff>Phantom Strike+</color>,커세어 강화 증강 스킬2 이름
+enhance_augment_name_heavyrain_B,<color=#00ff00ff>멀티 샷+</color>,<color=#00ff00ff>Multi-Shot+</color>,헤비레인 강화 증강 스킬2 이름
+enhance_augment_name_tank_B,<color=#00ff00ff>전자기 방출+</color>,<color=#00ff00ff>Electromagnetic Emission+</color>,탱크 강화 증강 스킬2 이름
+enhance_augment_name_angel_B,<color=#00ff00ff>긴급 수리+</color>,<color=#00ff00ff>Emergency Repair+</color>,앤젤 강화 증강 스킬2 이름
+enhance_augment_name_tachyon_B,<color=#00ff00ff>작렬탄+</color>,<color=#00ff00ff>Explosive Shell+</color>,타키온 강화 증강 스킬2 이름
+enhance_augment_name_tesla_B,<color=#00ff00ff>과충전+</color>,<color=#00ff00ff>Overcharge+</color>,테슬라 강화 증강 스킬2 설명
+enhance_augment_desc_corsair_B,돌진 횟수<color=#00ff00ff>+2</color>,Dash count<color=#00ff00ff>+2</color>,커세어 강화 증강 스킬2 설명
+enhance_augment_desc_heavyrain_B,레이저를 한번에 <color=#00ff00ff>6발</color> 발사함,Fires <color=#00ff00ff>6</color> lasers at once.,헤비레인 강화 증강 스킬2 설명
+enhance_augment_desc_tank_B,스킬 지속시간 동안 주변 적에게 <color=#00ff00ff>강력한</color> 피해를 줌,Deals <color=#00ff00ff>powerful</color> damage to nearby enemies during the skill duration.,탱크 강화 증강 스킬2 설명
+enhance_augment_desc_angel_B,<color=#00ff00ff>회복량 증가.</color> 스킬 쿨타임 30% 감소,<color=#00ff00ff>Increased healing amount.</color> reduces skill cooldown by 30%.,앤젤 강화 증강 스킬2 설명
+enhance_augment_desc_tachyon_B,<color=#00ff00ff>기본 공격 2회마다 스킬 사용.</color> 맞은 대상의 주변에 광역 피해를 줌,<color=#00ff00ff>Uses skill every 2 basic attacks.</color> Deals damage to enemies around the hit target.,타키온 강화 증강 스킬2 설명
+enhance_augment_desc_tesla_B,공격력이 <color=#00ff00ff>대폭</color> 증가하나 피해가 전이되지 않는다,Attack power increases <color=#00ff00ff>significantly</color> but damage is not transferred.,테슬라 강화 증강 스킬2 설명
 passive_name_corsair_1,커세어 패시브 스킬1 이름,Corsair Passive Skill 1 Name,커세어 패시브 스킬1 이름
 passive_name_heavyrain_1,헤비레인 패시브 스킬1 이름,Heavy Rain Passive Skill 1 Name,헤비레인 패시브 스킬1 이름
 passive_name_tank_1,탱크 패시브 스킬1 이름,Tank Passive Skill 1 Name,탱크 패시브 스킬1 이름
@@ -354,3 +354,4 @@ link_complete,연동 완료,Linking complete,
 sname_change_complete,닉네임 변경이 완료되었습니다.,Nickname changed,
 help_play_4,운석 지대가 존재하며 운석 지대는 소형 영웅만 통과 가능합니다.\n대형 영웅은 게이트를 통해 이동 가능합니다.,"Meteor fields are present, and only Small Heroes can pass through them.\nLarge Heroes must travel through Gates.",
 help_play_5,운석 지대 아래쪽에만 배치가 가능하며\n상대의 포탑을 파괴하면 운석 지대 위쪽에도 배치가 가능합니다.,Deployment is only possible below the Meteor Field\nbut destroying enemy Turrets allows deployment above the Meteor Field.,
+help_augment_6,선택하지 않은 스킬 증강은 12번째 증강부터 강화되어 등장합니다.,"Starting from the 12th augment, unselected Skill Augments will reappear in an enhanced state.",

@@ -4,11 +4,14 @@ String,Category,int,String,String,String
 help_play_1,play,1,help_play_1,help_play_1,로비에서 [1VS1] 또는 [2VS2] 버튼을 눌러 원하는 게임에 입장할 수 있습니다.
 help_play_2,play,2,help_play_2,help_play_2,게임 시간 4분 이내에 상대의 메인 함교를 파괴하면 승리합니다.\n시간 종료 이후에도 함교가 파괴되지 않았다면 포탑 파괴 갯수가 더 많은 진영이 승리합니다.
 help_play_3,play,3,help_play_3,help_play_3,증강에서 영웅을 선택하면 슬롯에 등록됩니다.\n슬롯에 등록된 영웅은 화면에 드래그하는 것으로 출격시킬 수 있습니다.\n출격한 영웅은 일정 시간동안 다시 출격할 수 없습니다.
+help_play_4,play,4,help_play_4,help_play_4,운석 지대가 존재하며 운석 지대는 소형 영웅만 통과 가능합니다.\n대형 영웅은 게이트를 통해 이동 가능합니다.
+help_play_5,play,5,help_play_5,help_play_5,운석 지대 아래쪽에만 배치가 가능하며\n상대의 포탑을 파괴하면 운석 지대 위쪽에도 배치가 가능합니다.
 help_augment_1,augment,1,help_augment_1,help_augment_1,전투 중 [증강]을 통해 영웅들의 능력을 강화할 수 있습니다.
 help_augment_2,augment,2,help_augment_2,help_augment_2,상대 미니언과 영웅을 처치하면 증강 게이지를 획득합니다.\n증강 게이지가 가득차면 증강 버튼을 눌러 증강을 선택할 수 있습니다.
 help_augment_3,augment,3,help_augment_3,help_augment_3,영웅을 선택하면 영웅 슬롯에 배치됩니다.
 help_augment_4,augment,4,help_augment_4,help_augment_4,스킬 증강을 선택하면 영웅의 스킬이 변화합니다.
 help_augment_5,augment,5,help_augment_5,help_augment_5,아이템 증강을 선택하면 아이템 슬롯에 보관됩니다.
+help_augment_6,augment,6,help_augment_6,help_augment_6,선택하지 않은 스킬 증강은 12번째 증강부터 강화되어 등장합니다.
 help_item_1,item,1,help_item_1,help_item_1,아이템 보관함에서 아이템을 드래그하여 영웅에게 장착가능합니다.
 help_item_2,item,2,help_item_2,help_item_2,아이템은 각 영웅별로 최대2개씩 장착 가능합니다
 help_item_3,item,3,help_item_3,help_item_3,아이템을 팀원 슬롯에 드래그하면 팀원에게 전달이 가능합니다
