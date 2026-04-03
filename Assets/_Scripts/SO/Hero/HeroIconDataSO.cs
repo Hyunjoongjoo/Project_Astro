@@ -11,6 +11,8 @@ public class HeroIconDataSO : ScriptableObject
     {
         public string heroId; //테이블 매칭용
         public Sprite iconSprite; // 영웅 초상화 아이콘
+        public Sprite pilotSprite; // 파일럿 초상화
+        public AudioClip pilotVoice; // 파일럿 음성
         public List<BaseSkillSO> skillIcons; //스킬 아이콘 리스트
         public NetworkPrefabRef heroPrefab; //소환용 네트워크 프리팹 추가
     }
@@ -19,6 +21,8 @@ public class HeroIconDataSO : ScriptableObject
 
     // 빠른 검색을 위한 딕셔너리 캐싱
     private Dictionary<string, Sprite> _iconCache;
+    private Dictionary<string, Sprite> _pilotCache;
+    private Dictionary<string, AudioClip> _voiceCache;
     private Dictionary<string, List<BaseSkillSO>> _skillIconCache;
 
     //3.3 여현구 프리팹캐싱
@@ -37,6 +41,26 @@ public class HeroIconDataSO : ScriptableObject
         }
 
         Debug.LogWarning($"[HeroIconDataSO] 아이콘 ID '{id}'를 찾을 수 없습니다.");
+        return null;
+    }
+
+    public Sprite GetPilotImage(string id)
+    {
+        if (_pilotCache == null) CacheData();
+
+        if (_pilotCache.TryGetValue(id, out Sprite sprite)) return sprite;
+
+        Debug.LogWarning($"[HeroIconDataSO] {id} 파일럿 이미지를 찾을 수 없습니다.");
+        return null;
+    }
+
+    public AudioClip GetPilotVoice(string id)
+    {
+        if (_voiceCache == null) CacheData();
+
+        if (_voiceCache.TryGetValue(id, out AudioClip clip)) return clip;
+
+        Debug.LogWarning($"[HeroIconDataSO] {id} 파일럿 음성을 찾을 수 없습니다.");
         return null;
     }
 
@@ -64,6 +88,8 @@ public class HeroIconDataSO : ScriptableObject
     private void CacheData()
     {
         _iconCache = new Dictionary<string, Sprite>();
+        _pilotCache = new Dictionary<string, Sprite>();
+        _voiceCache = new Dictionary<string, AudioClip>();
         _prefabCache = new Dictionary<string, NetworkPrefabRef>();
         _skillIconCache = new Dictionary<string, List<BaseSkillSO>>();
 
@@ -73,6 +99,12 @@ public class HeroIconDataSO : ScriptableObject
 
             if (!_iconCache.ContainsKey(info.heroId))
                 _iconCache.Add(info.heroId, info.iconSprite);
+
+            if (!_pilotCache.ContainsKey(info.heroId))
+                _pilotCache.Add(info.heroId, info.pilotSprite);
+
+            if (!_voiceCache.ContainsKey(info.heroId))
+                _voiceCache.Add(info.heroId, info.pilotVoice);
 
             if (!_prefabCache.ContainsKey(info.heroId))
                 _prefabCache.Add(info.heroId, info.heroPrefab);
