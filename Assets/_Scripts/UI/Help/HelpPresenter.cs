@@ -10,6 +10,11 @@ public class HelpPresenter : MonoBehaviour
     {
         InitAllHelpData();
     }
+    private void OnEnable()
+    {
+        InitAllHelpData();
+    }
+
     private void InitAllHelpData()
     {
         var allData = TableManager.Instance.HelpTable.GetAll();
