@@ -5,7 +5,8 @@ public class DeployZone : MonoBehaviour
 {
     [SerializeField] private Transform[] _zoneBorders; // 테두리
     [SerializeField] private Transform[] _zoneFills;   // 배치 가능 영역 내부
-    [SerializeField] private float _fillInset = 0.2f;
+    [SerializeField] private float _fillInset = 0.25f;
+    [SerializeField] private float _borderYOffset = 0f;
     [SerializeField] private float _fillYOffset = 0.01f;
 
     private void Awake()
@@ -17,23 +18,25 @@ public class DeployZone : MonoBehaviour
     {
         HideZones();
 
-        if (zones == null || _zoneBorders == null || _zoneFills == null)
+        if (zones == null)
         {
             return;
         }
 
-        int count = Mathf.Min(zones.Count, Mathf.Min(_zoneBorders.Length, _zoneFills.Length));
+        int borderCount = _zoneBorders != null ? _zoneBorders.Length : 0;
+        int fillCount = _zoneFills != null ? _zoneFills.Length : 0;
+        int count = Mathf.Min(zones.Count, Mathf.Max(borderCount, fillCount));
 
         for (int index = 0; index < count; index++)
         {
-            Transform border = _zoneBorders[index];
-            Transform fill = _zoneFills[index];
+            Transform border = index < borderCount ? _zoneBorders[index] : null;
+            Transform fill = index < fillCount ? _zoneFills[index] : null;
             DeployZoneData zoneData = zones[index];
 
             if (border != null)
             {
                 border.gameObject.SetActive(true);
-                border.position = zoneData.Center;
+                border.position = zoneData.Center + new Vector3(0f, _borderYOffset, 0f);
                 border.localScale = new Vector3(zoneData.Size.x, zoneData.Size.y, 1f);
             }
 
@@ -51,6 +54,7 @@ public class DeployZone : MonoBehaviour
 
     public void HideZones()
     {
+        if (_zoneBorders != null)
         {
             for (int index = 0; index < _zoneBorders.Length; index++)
             {
