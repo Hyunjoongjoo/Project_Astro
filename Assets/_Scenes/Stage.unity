@@ -29602,10 +29602,10 @@ MonoBehaviour:
   _maxDeployDistance: 20
   _centerZoneOffset: {x: 0, y: 3}
   _centerZoneSize: {x: 23.5, y: 16}
-  _leftZoneOffset: {x: -6.5, y: 19.5}
-  _leftZoneSize: {x: 10.5, y: 6.5}
-  _rightZoneOffset: {x: 6.5, y: 19.5}
-  _rightZoneSize: {x: 10.5, y: 6.5}
+  _leftZoneOffset: {x: -6.5, y: 18.5}
+  _leftZoneSize: {x: 10.5, y: 5}
+  _rightZoneOffset: {x: 6.5, y: 18.5}
+  _rightZoneSize: {x: 10.5, y: 5}
   _prefabs:
   - RawGuidValue: d09a2cf10307a4c40a977b56313018db
   - RawGuidValue: c0c1fc4164e37214aa41f81d8ae5136c
