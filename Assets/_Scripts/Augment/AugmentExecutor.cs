@@ -96,7 +96,7 @@ public static class AugmentExecutor
                 {
                     PlayerNetworkData memberData = stageManager.PlayerDataMap.Get(member);
 
-                    for (int i = 0; i < SlotData_5.Length; i++)
+                    for (int i = 0; i < SlotData_10.Length; i++)
                     {
                         //빈 슬롯을 찾아 스킬 증강 상태 기록
                         if (string.IsNullOrEmpty(memberData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim()))

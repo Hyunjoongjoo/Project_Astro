@@ -19,8 +19,9 @@ public struct PlayerNetworkData : INetworkStruct
     //내 필드/덱에 소환한 영웅 ID 목록 (최대 5마리)
     public SlotData_5 OwnedHeroes;
 
-    //내가 선택해서 장착한 스킬 증강 ID 목록 (최대 5개 => 영웅당 1개)
-    public SlotData_5 OwnedSkillAugments;
+    //내가 선택해서 장착한 스킬 증강 ID 목록
+    //영웅 증가에 따라 Slot 최대치 10으로 개선
+    public SlotData_10 OwnedSkillAugments;
     
     //내 보관소에 들어있는 아이템 증강 ID 목록 (Config테이블 3개)
     public SlotData_3 InventoryItems;

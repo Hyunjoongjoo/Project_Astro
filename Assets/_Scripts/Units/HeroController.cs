@@ -201,7 +201,7 @@ public class HeroController : UnitController
     private void ApplyAugments(PlayerNetworkData data)
     {
 
-        for (int i = 0; i < SlotData_5.Length; i++)
+        for (int i = 0; i < SlotData_10.Length; i++)
         {
             string rawId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
             if (string.IsNullOrEmpty(rawId))

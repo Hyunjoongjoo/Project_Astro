@@ -185,7 +185,7 @@ public class AugmentController : NetworkBehaviour
                 }
 
                 List<string> mySkills = new List<string>();
-                for (int i = 0; i < SlotData_5.Length; i++)
+                for (int i = 0; i < SlotData_10.Length; i++)
                 {
                     string rawId = myData.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
                     if (!string.IsNullOrEmpty(rawId))
@@ -521,7 +521,7 @@ public class AugmentController : NetworkBehaviour
 
         //패킷이 날아오는 동안 슬롯이 꽉 찼는지 다시 한번 확인
         if (type == AugmentType.Hero && IsSlotFull5(data.OwnedHeroes)) isValid = false;
-        if (type == AugmentType.Skill && IsSlotFull5(data.OwnedSkillAugments)) isValid = false;
+        if (type == AugmentType.Skill && IsSlotFull10(data.OwnedSkillAugments)) isValid = false;
 
         //3.16
         //아이템은 인벤 3칸과 임시 슬롯 1칸이 모두 꽉 찼을 때만 반려
@@ -693,7 +693,18 @@ public class AugmentController : NetworkBehaviour
             if (string.IsNullOrEmpty(slotData.Get(i).Replace("\0", "").Trim())) return false;
         }
         return true;
+    }    
+    
+    //10칸
+    private bool IsSlotFull10(SlotData_10 slotData)
+    {
+        for (int i = 0; i < SlotData_10.Length; i++)
+        {
+            if (string.IsNullOrEmpty(slotData.Get(i).Replace("\0", "").Trim())) return false;
+        }
+        return true;
     }
+
 
     //3칸
     private bool IsSlotFull3(SlotData_3 slotData)
