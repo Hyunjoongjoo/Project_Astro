@@ -16,7 +16,7 @@ MonoBehaviour:
   - heroId: hero_corsair
     iconSprite: {fileID: 21300000, guid: 0888c46a7f74d4244ba8741aa5f82341, type: 3}
     pilotSprite: {fileID: 21300000, guid: cb6799d420ea67042b92eb3bf9693c14, type: 3}
-    pilotVoice: {fileID: 8300000, guid: 07ae2cd6ddd69de40a6ddb86a8a38e0d, type: 3}
+    pilotVoice: {fileID: 8300000, guid: fc1d41af1f1881545af5020edc7e1424, type: 3}
     skillIcons:
     - {fileID: 11400000, guid: 2151af66b22c76b4491286c66664e1eb, type: 2}
     - {fileID: 11400000, guid: 5b25317ce4b273744bf0eea99813212d, type: 2}
@@ -26,7 +26,7 @@ MonoBehaviour:
   - heroId: hero_heavyrain
     iconSprite: {fileID: 21300000, guid: 42a13969511bc024892b5481ae4305fd, type: 3}
     pilotSprite: {fileID: 21300000, guid: 1f959cc649185664cb783f1034acd9cf, type: 3}
-    pilotVoice: {fileID: 8300000, guid: 3568b5e263f71814aaf783a21d79004f, type: 3}
+    pilotVoice: {fileID: 8300000, guid: c14b562e7763faa41a02cdef5791311d, type: 3}
     skillIcons:
     - {fileID: 11400000, guid: 4cd053f36a047424babc7a75bd69c41c, type: 2}
     - {fileID: 11400000, guid: ca6c9d171086a2f4cb6861b7949d561d, type: 2}
@@ -36,7 +36,7 @@ MonoBehaviour:
   - heroId: hero_tank
     iconSprite: {fileID: 21300000, guid: d2158142f3d96b248be324fc2f90e7c9, type: 3}
     pilotSprite: {fileID: 21300000, guid: 4fb04e4a00bd25749894d7dbb087fb89, type: 3}
-    pilotVoice: {fileID: 8300000, guid: 0e2327a270322914db785850ff5eefa7, type: 3}
+    pilotVoice: {fileID: 8300000, guid: 26672e81b971eb741816b8171b1cb7bf, type: 3}
     skillIcons:
     - {fileID: 11400000, guid: b0fad8a3236bb7e4597f6d58c11cc918, type: 2}
     - {fileID: 11400000, guid: 1fa882fa5cd54be48bd4e31b912e7b0b, type: 2}
@@ -46,7 +46,7 @@ MonoBehaviour:
   - heroId: hero_angel
     iconSprite: {fileID: 21300000, guid: 84b20f48c8a41ea45ba3dfc32dce6047, type: 3}
     pilotSprite: {fileID: 21300000, guid: fe415f6938498c641ab5260af171e914, type: 3}
-    pilotVoice: {fileID: 8300000, guid: fd7c6ddb122782e4db268c9eba566193, type: 3}
+    pilotVoice: {fileID: 8300000, guid: 8d66090aed836c04da4fb766ca1fc0c5, type: 3}
     skillIcons:
     - {fileID: 11400000, guid: d6dd206c7bea98c44acb6c53c617a268, type: 2}
     - {fileID: 11400000, guid: c58705a6061f3204db40e9abc3b16054, type: 2}
@@ -56,7 +56,7 @@ MonoBehaviour:
   - heroId: hero_tachyon
     iconSprite: {fileID: 21300000, guid: e81e3fc314c572f4f9367a4ff43d8002, type: 3}
     pilotSprite: {fileID: 21300000, guid: 7449598b75bed964e8f39a078f3cdd2e, type: 3}
-    pilotVoice: {fileID: 8300000, guid: 354a724f39d34364298f0edd6be250cf, type: 3}
+    pilotVoice: {fileID: 8300000, guid: 16e96eb2e9c64384ea260ccd9cffa63e, type: 3}
     skillIcons:
     - {fileID: 11400000, guid: 5a3454fdb602d9240b32304b1c7baf13, type: 2}
     - {fileID: 11400000, guid: 78ea71a2a7314a340af750248ef38849, type: 2}
