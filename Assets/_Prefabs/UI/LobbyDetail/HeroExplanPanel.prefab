@@ -1924,12 +1924,12 @@ GameObject:
   - component: {fileID: 1788521629274114005}
   - component: {fileID: 8091998012749280396}
   m_Layer: 5
-  m_Name: pliot_Image
+  m_Name: Pliot_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &836349381678292168
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1937,18 +1937,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4832381754505312548}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 9175007938799396470}
+  m_Father: {fileID: 1742389309462188101}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -2}
-  m_SizeDelta: {x: 734.7, y: 555.76}
-  m_Pivot: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 400, y: 400}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1788521629274114005
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1977,7 +1977,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bfd71187e5f614337ae0b4a9bcfff07f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1f959cc649185664cb783f1034acd9cf, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2314,6 +2314,7 @@ RectTransform:
   - {fileID: 1565110732886203835}
   - {fileID: 8269000715819381919}
   - {fileID: 1950565373872535496}
+  - {fileID: 836349381678292168}
   m_Father: {fileID: 9175007938799396470}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3490,7 +3491,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 836349381678292168}
   - {fileID: 1742389309462188101}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3522,7 +3522,8 @@ MonoBehaviour:
   _uiName: 
   _fadeDuration: 0.25
   _scaleDuration: 0.25
-  _heroPilotImg: {fileID: 7395451040501436724}
+  _heroImg: {fileID: 7395451040501436724}
+  _pilotImg: {fileID: 8091998012749280396}
   _heroNameTxt: {fileID: 378167188600754013}
   _heroTypeTxt: {fileID: 4215845119802188025}
   _heroRoleTxt: {fileID: 8929378810654216747}

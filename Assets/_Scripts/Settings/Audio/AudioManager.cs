@@ -195,6 +195,11 @@ public sealed class AudioManager : Singleton<AudioManager>
         _sfxSource.PlayOneShot(clip);
         clipLastPlayTimes[clip] = Time.time;
     }
+
+    public void StopSfx()
+    {
+        _sfxSource.Stop();
+    }
     #endregion
 
     #region Volume

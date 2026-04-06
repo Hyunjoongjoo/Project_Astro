@@ -5,7 +5,8 @@ using UnityEngine.UI;
 public class HeroDetailView : BaseUI
 {
     [Header("메인 정보")]
-    [SerializeField] private Image _heroPilotImg;
+    [SerializeField] private Image _heroImg;
+    [SerializeField] private Image _pilotImg;
     [SerializeField] private TMP_Text _heroNameTxt;
     [SerializeField] private TMP_Text _heroTypeTxt;
     [SerializeField] private TMP_Text _heroRoleTxt;
@@ -56,7 +57,12 @@ public class HeroDetailView : BaseUI
     }
     public void SetHeroImage(Sprite icon)
     {
-        _heroPilotImg.sprite = icon;
+        _heroImg.sprite = icon;
+    }
+
+    public void SetPilotImage(Sprite icon)
+    {
+        _pilotImg.sprite = icon;
     }
 
     // 레벨 및 경험치 세팅
@@ -138,6 +144,11 @@ public class HeroDetailView : BaseUI
         }
     }
 
+    public override void OnBackButtonPressed(bool playSound = true)
+    {
+        AudioManager.Instance.StopSfx();
+        base.OnBackButtonPressed(playSound);
+    }
 
     //public void UpdateLevelRewardUI(int currentLevel, string rewardName,string rewardDes, int selectedIndex)
     //{
