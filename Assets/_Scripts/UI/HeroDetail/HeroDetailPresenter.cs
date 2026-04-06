@@ -82,9 +82,6 @@ public class HeroDetailPresenter : MonoBehaviour
             _view.SetPilotImage(_heroIcons.GetPilotImage(_heroData.id));
         }
 
-        // 영웅 음성 출력
-        AudioManager.Instance.PlaySfx(_heroIcons.GetPilotVoice(_heroData.id));
-
         //레벨/경험치 로직 처리
         var levelData = TableManager.Instance.HeroLevelTable.Get(_userHeroData.level.ToString());
 

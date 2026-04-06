@@ -144,12 +144,6 @@ public class HeroDetailView : BaseUI
         }
     }
 
-    public override void OnBackButtonPressed(bool playSound = true)
-    {
-        AudioManager.Instance.StopSfx();
-        base.OnBackButtonPressed(playSound);
-    }
-
     //public void UpdateLevelRewardUI(int currentLevel, string rewardName,string rewardDes, int selectedIndex)
     //{
     //    int[] unlockLevels = { 3, 6, 6, 9 };
