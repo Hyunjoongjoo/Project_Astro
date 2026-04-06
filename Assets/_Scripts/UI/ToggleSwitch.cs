@@ -36,6 +36,9 @@ public class ToggleSwitch : MonoBehaviour
     {
         if (_isInitialized) return;
 
+        if (_toggle == null) _toggle = GetComponent<Toggle>();
+        if (_handleImg != null && _handleRect == null) _handleRect = _handleImg.rectTransform;
+
         //핸들 시작위치를 off 위치로 설정
         _handleOffPos = _handleRect.anchoredPosition.x;
 
@@ -76,7 +79,7 @@ public class ToggleSwitch : MonoBehaviour
 
     public void RefreshUI()
     {
-        if (!_isInitialized) Init();
+        Init();
 
         // Toggle 컴포넌트의 현재 isOn 상태에 맞춰 UI를 즉시 갱신
         if (_toggle != null)
