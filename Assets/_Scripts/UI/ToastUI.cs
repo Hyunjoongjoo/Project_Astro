@@ -14,6 +14,6 @@ public class ToastUI : BaseUI
     private IEnumerator CO_CloseAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        Close(); 
+        Close(false); 
     }
 }
