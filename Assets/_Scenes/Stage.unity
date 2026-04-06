@@ -17692,7 +17692,7 @@ MonoBehaviour:
   - {fileID: 35565685}
   _zoneFills: []
   _fillInset: 0.25
-  _borderYOffset: -2
+  _borderYOffset: -8
   _fillYOffset: -1.9
 --- !u!1 &448271314
 GameObject:
@@ -29600,12 +29600,12 @@ MonoBehaviour:
   _maxDeployTime: 6.5
   _minDeployDistance: 1
   _maxDeployDistance: 20
-  _centerZoneOffset: {x: 0, y: 4.5}
-  _centerZoneSize: {x: 20, y: 14}
-  _leftZoneOffset: {x: -5.5, y: 18.5}
-  _leftZoneSize: {x: 9, y: 5}
-  _rightZoneOffset: {x: 5.5, y: 18.5}
-  _rightZoneSize: {x: 9, y: 5}
+  _centerZoneOffset: {x: 0, y: 3}
+  _centerZoneSize: {x: 23.5, y: 16}
+  _leftZoneOffset: {x: -6.5, y: 19.5}
+  _leftZoneSize: {x: 10.5, y: 6.5}
+  _rightZoneOffset: {x: 6.5, y: 19.5}
+  _rightZoneSize: {x: 10.5, y: 6.5}
   _prefabs:
   - RawGuidValue: d09a2cf10307a4c40a977b56313018db
   - RawGuidValue: c0c1fc4164e37214aa41f81d8ae5136c
