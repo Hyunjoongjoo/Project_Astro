@@ -25,8 +25,8 @@ MonoBehaviour:
   preDelay: 0
   postDelay: 0
   blockAction: 0
-  damageReduction: -0.15
+  damageReduction: -0.3
   duration: 5
   aoeDamageRatio: 0.8
-  aoeRange: 3
+  aoeRange: 4
   aoeInterval: 1
