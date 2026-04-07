@@ -22,6 +22,7 @@ public class LoginController : MonoBehaviour
     private bool _isProcessing;
     private bool _isFirebaseReady = false;
     private bool _inputEnabled = false;
+    private bool _pendingPressScreen = false;
 
     IEnumerator Start()
     {
@@ -38,12 +39,22 @@ public class LoginController : MonoBehaviour
         this._onLoginSuccess = onLoginSuccess;
 
         _isFirebaseReady = true;
+        // Firebase 준비 전에 눌린 입력이 있었다면, 준비 완료 후 한 번 다시 처리
+        if (_pendingPressScreen)
+        {
+            _pendingPressScreen = false;
+            OnClickPressScreen();
+        }
     }
 
     public async void OnClickPressScreen()
     {
         if (_inputEnabled == false) return;
-        if (_isFirebaseReady == false) return;
+        if (_isFirebaseReady == false)// 아직 로그인 준비 전이면, 현재 클릭을 보류해두고 종료
+        {
+            _pendingPressScreen = true;
+            return;
+        }
         if (_isProcessing) return;
         _isProcessing = true;
 
