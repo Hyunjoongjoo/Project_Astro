@@ -254,7 +254,7 @@ help_hero_2,골드를 소모하여 영웅을 구매 가능합니다.,Heroes can 
 help_hero_3,영웅은 레벨이 존재하며 경험치가 가득차면 골드를 소모해 레벨업이 가능합니다.,Heroes have levels. when EXP is full you can level them up by spending Gold.,
 help_hero_4,구매한 영웅만 레벨업이 가능하며 구매하지 않은 영웅도 경험치는 획득 가능합니다.,Only purchased heroes can level up but unpurchased heroes can still earn EXP.,
 help_hero_5,전투 종료 후 해당 전투에서 사용한 영웅만 경험치를 획득합니다.,After battle only the heroes used in that combat will earn EXP.,
-title_guest_create,게스트 계정 생성,Create Guest Account,텍스트 / 현재 인게임에 회원 가입으로 표시되어있음.
+title_guest_create,계정 생성,Create Account,텍스트 / 현재 인게임에 회원 가입으로 표시되어있음.
 title_guest_create_recovered,게스트 계정은 분실 시 복구가 불가능 합니다. 로비 ▶ 설정에서 구글 연동을 진행해주세요.,Guest accounts cannot be recovered if lost. Please link your Google account in Lobby ▶ Settings.,텍스트
 signup_create,생성,Create,버튼 / 현재 인게임에 회원가입으로 되어있음.
 signup_cancel,취소,Cancel,버튼
