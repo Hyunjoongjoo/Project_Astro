@@ -66,7 +66,7 @@ MonoBehaviour:
   - heroId: hero_tesla
     iconSprite: {fileID: 21300000, guid: 606ee4cd902ca664b977d49730a93663, type: 3}
     pilotSprite: {fileID: 21300000, guid: 2831c79c179e9bd4da5e78a77fca61e9, type: 3}
-    pilotVoice: {fileID: 8300000, guid: 9f170f1eeb47bf24881a1192bf739ad1, type: 3}
+    pilotVoice: {fileID: 8300000, guid: 1e6cc2adb171f164396e2e9655b53d82, type: 3}
     skillIcons:
     - {fileID: 11400000, guid: 89f6a0933d3985d45b01ceda93971bd1, type: 2}
     - {fileID: 11400000, guid: dd2defb87f877124eb8daf117970d0d6, type: 2}
