@@ -1,6 +1,5 @@
-﻿using Firebase.Auth;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -14,11 +13,23 @@ public class LoginController : MonoBehaviour
 
     [SerializeField] private SignUpController _signUpController;
 
+    [Header("Screen Button")]
+    [SerializeField] private GameObject _screenBtn;
+
     private AuthService _authService;
     private UserDataStore _userDataStore;
     private Action<string> _onLoginSuccess;
     private bool _isProcessing;
     private bool _isFirebaseReady = false;
+    private bool _inputEnabled = false;
+
+    IEnumerator Start()
+    {
+        // 최소 2~3프레임은 입력 무시
+        yield return null;
+        yield return null;
+        _inputEnabled = true;
+    }
 
     public void Initialize(AuthService authService, UserDataStore userDataStore, Action<string> onLoginSuccess)
     {
@@ -31,7 +42,8 @@ public class LoginController : MonoBehaviour
 
     public async void OnClickPressScreen()
     {
-        if(_isFirebaseReady == false) return;
+        if (_inputEnabled == false) return;
+        if (_isFirebaseReady == false) return;
         if (_isProcessing) return;
         _isProcessing = true;
 
@@ -63,6 +75,7 @@ public class LoginController : MonoBehaviour
         {
             _loginSelectUI.Open();
         }
+        _screenBtn.SetActive(false);
     }
 
     public void OnClickGuestLogin()
