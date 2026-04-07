@@ -7,7 +7,6 @@ minion_spawn_count,3,한 라인에서 생성되는 미니언 개수
 minion_spawn_plus_count,1,포탑 1개 파괴시 한 라인 당 추가되는 미니언 개수
 augment_select_time,20,증강 선택 시 주어지는 제한 시간 (초)
 augment_exp_minion,10,미니언 처치 시 획득하는 증강 경험치
-augment_exp_superminion,20,강화미니언 처치 시 획득하는 증강 경험치
 augment_exp_hero,17,영웅 처치 시 획득하는 증강 경험치
 augment_gauge,120,"증강 선택까지 필요한 경험치의 양 (증강 횟수에 상관 없이 고정), 증강 게이지의 100% 기준"
 player_item_slot,3,플레이어 보관함에 소지 가능한 아이템 최대 개수

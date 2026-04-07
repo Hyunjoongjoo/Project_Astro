@@ -6,7 +6,7 @@ public class ObjectContainer : Singleton<ObjectContainer>
 {
     [Header("영웅 & 미니언 경험치 (100당 1회 증강 선택)")]
     private int MINION_AUGMENT_EXP;
-    private int SUPER_MINION_AUGMENT_EXP;
+    //private int SUPER_MINION_AUGMENT_EXP;
     private int HERO_AUGMENT_EXP;
 
     [Header("전역 참조가 필요한 오브젝트")]
@@ -29,7 +29,7 @@ public class ObjectContainer : Singleton<ObjectContainer>
         BridgeIndex = 2;
 
         MINION_AUGMENT_EXP = int.Parse(TableManager.Instance.ConfigTable.Get("augment_exp_minion").configValue);
-        SUPER_MINION_AUGMENT_EXP = int.Parse(TableManager.Instance.ConfigTable.Get("augment_exp_superminion").configValue);
+        //SUPER_MINION_AUGMENT_EXP = int.Parse(TableManager.Instance.ConfigTable.Get("augment_exp_superminion").configValue);
         HERO_AUGMENT_EXP = int.Parse(TableManager.Instance.ConfigTable.Get("augment_exp_hero").configValue);
     }
 
