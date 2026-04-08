@@ -82,7 +82,7 @@ public class Options : MonoBehaviour
         if (popup != null)
         {
             // 2. 팝업 설정 (수정된 Setup 파라미터 반영)
-            string msg = TableManager.Instance.GetString("btn_setting_logout");
+            string msg = TableManager.Instance.GetString("ui_setting_delete_account");
 
             popup.Setup(
                 msg: msg,

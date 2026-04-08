@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -42,8 +43,16 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private string _currentItemId2;
     private List<string> _currentAugmentIds = new List<string>();
 
+    [Header("Deploy Zone")]
+    [SerializeField] private DeployZone _deployZone;
+    private bool _isDragging = false;
+    private float _zoneRefreshTimer = 0f;
+    [SerializeField] private float _zoneRefreshInterval = 0.1f;
+
     //private float _currentTimer = 0f;
     //private bool IsCooldown => _currentTimer > 0f;
+
+    public event Action<string> AvailableState;
 
     public string HeroId => _data != null ? _data.targetId : "";
 
@@ -57,6 +66,11 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         //스테이지매니저캐싱
         _stageManager = FindFirstObjectByType<StageManager>();
 
+        if (_deployZone == null)
+        {
+            _deployZone = FindFirstObjectByType<DeployZone>();
+        }
+        AvailableState?.Invoke(_data.targetId);
         UpdateCooldownUI(0f, 1f);
     }
     private void Update()
@@ -86,6 +100,20 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         float total = HeroSpawner.Instance.GetTotalCooldown(player, prefab);
 
         UpdateCooldownUI(remaining, total);
+        if (!_isDragging) return;
+        if (_deployZone == null) return;
+        _zoneRefreshTimer += Time.deltaTime;
+        if (_zoneRefreshTimer < _zoneRefreshInterval) return;
+        _zoneRefreshTimer = 0f;
+        Team team = GameManager.Instance.PlayerTeam;
+        List<DeployZoneData> zones = HeroSpawner.Instance.GetAvailableDeployZones(team);
+        _deployZone.ShowZones(zones);
+
+    }
+
+    private void OnDestroy()
+    {
+        AvailableState = null;
     }
 
     //쿨타임에 맞춰 커버 텍스트 갱신
@@ -119,8 +147,13 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
         else
         {
-            _cooldownCover.gameObject.SetActive(false);
-            _cooldownText.text = string.Empty;
+            if (_cooldownCover.gameObject.activeSelf)
+            {
+                AvailableState?.Invoke(_data.targetId);
+                _cooldownText.text = string.Empty;
+                _cooldownCover.gameObject.SetActive(false);
+            }
+                
         }
     }
 
@@ -161,7 +194,19 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             }
         }
         _originPos = transform.position;
+        _isDragging = true;
+        _zoneRefreshTimer = 0f;
         _iconImg.color = new Color(1, 1, 1, 0.5f);
+
+        // 드래그 시 배치 가능 영역 표시
+        if (_deployZone != null && HeroSpawner.Instance != null)
+        {
+            Team team = GameManager.Instance.PlayerTeam;
+            List<DeployZoneData> zones = HeroSpawner.Instance.GetAvailableDeployZones(team);
+            Debug.Log($"[HeroHandCardUI] ShowZones 호출, zones.Count = {zones.Count}");
+            _deployZone.ShowZones(zones);
+        }
+
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -172,6 +217,8 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public void OnEndDrag(PointerEventData eventData)
     {
         //if (IsCooldown) return;
+        _isDragging = false;
+        _zoneRefreshTimer = 0f;
         var runner = HeroSpawner.Instance.Runner;
 
         if (runner != null && runner.IsRunning)
@@ -181,6 +228,12 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             {
                 transform.position = _originPos;
                 _iconImg.color = new Color(1, 1, 1, 1f);
+
+                if (_deployZone != null)
+                {
+                    _deployZone.HideZones();
+                }
+
                 return;
             }
         }
@@ -204,13 +257,37 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             {
                 //Debug.Log("배치 거리 초과 - 소환 불가");
                 transform.position = _originPos;
+                if (_deployZone != null)
+                {
+                    _deployZone.HideZones();
+                }
                 return;
             }
+
+            HeroStatData myStat = HeroManager.Instance.GetStatus(HeroId);
+            if (myStat == null)
+            {
+                Debug.LogError($"[HeroHandCardUI] GetStatus 실패: {HeroId}");
+                transform.position = _originPos;
+                if (_deployZone != null)
+                {
+                    _deployZone.HideZones();
+                }
+                return;
+            }
+
+            HeroStatNetworkData netStat = new HeroStatNetworkData
+            {
+                MaxHp = myStat.BaseHp,
+                AttackPower = myStat.baseAttackPower,
+                HealPower = myStat.baseHealingPower
+            };
 
             HeroSpawner.Instance.RPC_SpawnUnit(
                 GetUnitPrefab(),
                 spawnPos,
-                team
+                team,
+                netStat
             );
 
             //소환 성공 시 타이머 시작 및 UI 갱신
@@ -222,6 +299,10 @@ public class HeroHandCardUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             Debug.LogWarning("소환실패");
         }
         transform.position = _originPos;
+        if (_deployZone != null)
+        {
+            _deployZone.HideZones();
+        }
     }
 
     public NetworkPrefabRef GetUnitPrefab()

@@ -20,8 +20,19 @@ public class ProjectileSkill : BaseSkill<ProjectileSkillSO>
         if (_data.skillVFX == null || _cachedUnit.firePoint == null) return false;
         if (_cachedUnit.currentTarget == null) return false;
 
-        if ( Vector3.Distance(_cachedUnit.transform.position, _cachedUnit.currentTarget.transform.position) > _data.range)
+
+        //4.2 여현구 추가
+        //사거리검사
+        Vector3 diff = _cachedUnit.currentTarget.transform.position - _cachedUnit.transform.position;
+
+        //평타면 실시간, 스킬이면 원본데이터
+        float currentRange = (_data.skillType == SkillType.NormalAttack) ? _cachedUnit.attackRange : _data.range;
+
+        //제곱
+        if (diff.sqrMagnitude > currentRange * currentRange)
+        {
             return false;
+        }
 
         // 스킬을 시전하기로 한 녀석의 위치를 저장해둠. (타겟이 사라져도 그 자리에 쏘도록 하기 위해)
         _targetPosition = _cachedUnit.currentTarget.transform.position;

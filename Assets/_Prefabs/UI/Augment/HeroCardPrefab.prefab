@@ -67,8 +67,6 @@ MonoBehaviour:
   _selectBtn: {fileID: 1448131494327005669}
   _highlightObj: {fileID: 6657864801992122661}
   _visualRoot: {fileID: 2283405981279440640}
-  _hoverScale: 1.1
-  _animDuration: 0.2
 --- !u!222 &6553150027251201400
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -353,7 +351,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC601\uC6C5 [\uB378\uB8E8\uC544]\uB97C \uC0AC\uC6A9\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4"
+  m_text: "\uC601\uC6C5 [\uD5E4\uBE44\uB808\uC778]\uB97C \uC0AC\uC6A9\uD560 \uC218
+    \uC788\uC2B5\uB2C8\uB2E4"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
   m_sharedMaterial: {fileID: 8240547230195516182, guid: 9c85f9e3870a4d44e86d574e36dfb2a2, type: 2}
@@ -380,8 +379,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 15
-  m_fontSizeBase: 15
+  m_fontSize: 17
+  m_fontSizeBase: 17
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

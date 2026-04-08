@@ -79,6 +79,7 @@ public class HeroDetailPresenter : MonoBehaviour
         if (_heroIcons != null)
         {
             _view.SetHeroImage(_heroIcons.GetIcon(_heroData.id));
+            _view.SetPilotImage(_heroIcons.GetPilotImage(_heroData.id));
         }
 
         //레벨/경험치 로직 처리
@@ -158,9 +159,9 @@ public class HeroDetailPresenter : MonoBehaviour
                     }
                 },
                 isBuy,
-                TableManager.Instance.GetString("hero_lvup_not_enough_gold"),
+                TableManager.Instance.GetString("popup_hero_buy_unavailable"),
                 isBuy ? TableManager.Instance.GetString("btn_hero_buy") : TableManager.Instance.GetString("btn_hero_buy"),
-                TableManager.Instance.GetString("btn_hero_buy_cancel")
+                isBuy ? TableManager.Instance.GetString("cancel") : TableManager.Instance.GetString("check")
             );
         }
         else
@@ -219,7 +220,7 @@ public class HeroDetailPresenter : MonoBehaviour
                 isExpFull && isGoldEnough, // 버튼 활성화 조건: 경험치와 골드 모두 충족 시
                 alertMsg,
                 (isExpFull && isGoldEnough) ? TableManager.Instance.GetString("hero_lvup") : TableManager.Instance.GetString("btn_hero_upgrade"),
-                TableManager.Instance.GetString("btn_hero_buy_cancel")
+                (isExpFull && isGoldEnough) ? TableManager.Instance.GetString("cancel") : TableManager.Instance.GetString("check")
             );
         }
     }

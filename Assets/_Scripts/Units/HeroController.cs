@@ -17,12 +17,11 @@ public class HeroController : UnitController
     private NetworkPrefabRef _myPrefab;
     private float _finalCooldown;
     private PlayerRef _ownerPlayer;
+    private HeroStatNetworkData _spawnStat;
 
-    public float FinalCooldown => _finalCooldown;
     public DeployState DeployState { get; private set; }
     public CastingState CastState { get; private set; }
     public ISkill CurUniqueSkill => curUniqueSkill;
-    public float RespawnTime => _respawnTime;
 
     //아이템용 옵저버
     [SerializeField] private HeroItemObserver _itemObserver;
@@ -61,12 +60,14 @@ public class HeroController : UnitController
         DieState = new DieState(this);
 
         _unitStat = GetComponent<UnitStat>();
-
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
         moveType = statData.moveType;
+
         //UnitStat 초기화
         _unitStat.Init(statData);
+        _unitStat.AttackRange.BaseValue = attackRange; //InitAttackRang() 에서 초기화 된 값 주입
 
+        ApplySpawnStat();
         _unitStat.OnStatChanged += RefreshStatRuntime;//이벤트 구독
 
         //Stat 기반 값 적용
@@ -90,10 +91,35 @@ public class HeroController : UnitController
         }
         curUniqueSkill.Initialize();
         DeployState.SetDeployData(_targetPos, _deployDelay);
-        StateMachine.ChangeState(DeployState);
         ApplyEquippedItems();
+        attackRange = _unitStat.AttackRange.Value;
+        StateMachine.ChangeState(DeployState);
         _finalCooldown = GetFinalRespawnCooldown();
         HeroSpawner.Instance.StartSummonCooldown(_ownerPlayer, _myPrefab, _finalCooldown);
+    }
+
+    private void ApplySpawnStat()
+    {
+        if (_unitStat == null)
+        {
+            Debug.LogError("[HeroController] UnitStat 없음");
+            return;
+        }
+
+        if (_spawnStat.MaxHp > 0)
+        {
+            _unitStat.MaxHp.BaseValue = _spawnStat.MaxHp;
+        }
+
+        if (_spawnStat.AttackPower > 0)
+        {
+            _unitStat.Attack.BaseValue = _spawnStat.AttackPower;
+        }
+
+        if (_spawnStat.HealPower > 0f)
+        {
+            _unitStat.HealPower.BaseValue = _spawnStat.HealPower;
+        }
     }
 
     private void OnDestroy()
@@ -133,13 +159,13 @@ public class HeroController : UnitController
     // --- 생성시 초기화 관련 메서드 ---
 
     // 스폰 전에 실행되는 메서드
-    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab, PlayerRef owner)
+    public void Setup(Team myTeam, Vector3 targetPos, float deployDelay, NetworkPrefabRef prefab, PlayerRef owner, HeroStatNetworkData stat)
     {
         _targetPos = targetPos;
         _deployDelay = deployDelay;
         _myPrefab = prefab;
         _ownerPlayer = owner;
-
+        _spawnStat = stat;
         Setup(myTeam);
 
         HeroStatData statData = HeroManager.Instance.GetStatus(unitId);
@@ -175,7 +201,7 @@ public class HeroController : UnitController
     private void ApplyAugments(PlayerNetworkData data)
     {
 
-        for (int i = 0; i < SlotData_5.Length; i++)
+        for (int i = 0; i < SlotData_10.Length; i++)
         {
             string rawId = data.OwnedSkillAugments.Get(i).Replace("\0", "").Trim();
             if (string.IsNullOrEmpty(rawId))
@@ -258,8 +284,6 @@ public class HeroController : UnitController
 
     private void ApplyEquippedItems()
     {
-        if (!Object.HasStateAuthority) return;
-
         //자신의 영웅 슬롯 인덱스 찾기
         var playerData = StageManager.Instance.PlayerDataMap.Get(_ownerPlayer);
         int myHeroIndex = -1;
@@ -297,9 +321,11 @@ public class HeroController : UnitController
         foreach (string itemId in equippedItemIds)
         {
             var itemData = TableManager.Instance.ItemTable.Get(itemId);
+            Debug.Log($"[4.2아이템체크] itemId={itemId}, null={itemData == null}, groupId={itemData?.effectGroupId}");
+
             if (itemData != null)
             {
-                //EffectGroupId와 일치하는 효과들 전부 적ㅇ용
+                //EffectGroupId와 일치하는 효과들 전부 적용
                 for (int i = 0; i < allEffects.Count; i++)
                 {
                     if (allEffects[i].effectGroupId == itemData.effectGroupId)
@@ -308,6 +334,8 @@ public class HeroController : UnitController
                     }
                 }
             }
+            Debug.Log($"[4.2아이템체크] totalEffects={totalEffects.Count}");
+
         }
 
         //옵저버에 데이터 주입하고 업데이트 시작
@@ -331,63 +359,15 @@ public class HeroController : UnitController
         BoosterAnimator.SetBool("isActive", BoosterRender);
     }
 
+
 #if UNITY_EDITOR
     protected override void OnDrawGizmosSelected()
     {
         base.OnDrawGizmosSelected();//기존 기즈모
 
-        if (curUniqueSkill == null)
-            return;
-
-        if (curUniqueSkill.Data is ShieldSkillSO shieldData)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(transform.position, shieldData.aoeRange);
-        }
-    }
-
-    private void OnDrawGizmos()//체인스킬기즈모
-    {
-        Gizmos.color = Color.magenta;
+        //평타거리 빨간색
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
-
-        ChainSkillSO chainData = null;
-
-        if (curUniqueSkill != null && curUniqueSkill.Data is ChainSkillSO data)
-        {
-            chainData = data;
-        }
-
-        if (chainData == null) return;
-
-        //스킬 사거리
-        Gizmos.color = Color.blueViolet;
-        Gizmos.DrawWireSphere(transform.position, chainData.range);
-
-        //체인 경로 표시
-        if (curUniqueSkill is ChainSkill chain && chain.debugChainTargets != null)
-        {
-            for (int i = 0; i < chain.debugChainTargets.Count; i++)
-            {
-                var unit = chain.debugChainTargets[i];
-                if (unit == null) continue;
-
-                //각 타겟 전이 범위
-                Gizmos.color = Color.green;
-                Gizmos.DrawWireSphere(unit.transform.position, chainData.chainRange);
-
-                //연결선
-                if (i > 0)
-                {
-                    var prev = chain.debugChainTargets[i - 1];
-                    if (prev != null)
-                    {
-                        Gizmos.color = Color.gray;
-                        Gizmos.DrawLine(prev.transform.position, unit.transform.position);
-                    }
-                }
-            }
-        }
     }
 #endif
 
