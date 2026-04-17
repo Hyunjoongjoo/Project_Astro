@@ -18,7 +18,7 @@ Photon Fusion 기반 멀티플레이 PVP 전략 게임으로,
 
 ## 플레이 화면
 
-<img width="720" height="1280" alt="Honeycam 2026-04-17 10-41-12" src="https://github.com/user-attachments/assets/809aefeb-1d16-4a7f-ae0d-91e3b9058a01" />
+<img width="360" height="640" alt="Honeycam 2026-04-17 12-32-41" src="https://github.com/user-attachments/assets/6beb2b2f-f5b9-4631-974b-1b6b3733780e" />
 
 - 배치 가능 영역 표시
 - 카드 드래그를 통한 유닛 소환
