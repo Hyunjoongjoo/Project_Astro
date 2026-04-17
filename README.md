@@ -11,13 +11,14 @@ Photon Fusion 기반 멀티플레이 PVP 전략 게임으로,
 
 - 기간: 2026.02.09 - 2026.04.10
 - 팀 구성: 기획 7명 / 개발 5명
+
 - 플랫폼: Android (AOS)
 
 ---
 
 ## 플레이 화면
 
-(여기에 GIF 또는 이미지 추가)
+<img width="720" height="1280" alt="Honeycam 2026-04-17 10-41-12" src="https://github.com/user-attachments/assets/809aefeb-1d16-4a7f-ae0d-91e3b9058a01" />
 
 - 배치 가능 영역 표시
 - 카드 드래그를 통한 유닛 소환
@@ -58,6 +59,7 @@ Photon Fusion 기반 멀티플레이 PVP 전략 게임으로,
 
 이를 통해 네트워크 환경에서도 안정적인 수치 적용이 가능해졌으며,
 UI와 실제 게임 데이터 간의 일관성을 유지할 수 있었습니다.
+
 
 ---
 
